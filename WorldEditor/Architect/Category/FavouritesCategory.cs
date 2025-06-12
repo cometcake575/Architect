@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using Architect.objects;
+using Architect.Objects;
 
-namespace Architect.categories;
+namespace Architect.Category;
 
 internal class FavouritesCategory : ObjectCategory
 {
@@ -10,11 +10,6 @@ internal class FavouritesCategory : ObjectCategory
     
     private FavouritesCategory() : base("Favourites")
     {
-    }
-
-    internal override int VerticalShift()
-    {
-        return 20;
     }
 
     internal override List<SelectableObject> GetObjects()

@@ -338,10 +338,19 @@
         <Reference Include="Satchel">
             <HintPath>/Users/arunkapila/Library/Application Support/Steam/steamapps/common/Hollow Knight/hollow_knight.app/Contents/Resources/Data/Managed/Mods/Satchel/Satchel.dll</HintPath>
         </Reference>
+        <Reference Include="HKMP">
+            <HintPath>/Users/arunkapila/Library/Application Support/Steam/steamapps/common/Hollow Knight/hollow_knight.app/Contents/Resources/Data/Managed/Mods/HKMP/HKMP.dll</HintPath>
+        </Reference>
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="cursor.png" />
         <EmbeddedResource Include="eraser.png" />
+        <EmbeddedResource Include="dash_crystal.png" />
+        <EmbeddedResource Include="single_dash_crystal.png" />
+        <EmbeddedResource Include="wings_crystal.png" />
+        <EmbeddedResource Include="single_wings_crystal.png" />
+        <EmbeddedResource Include="zote_trophy.png" />
+        <EmbeddedResource Include="hazard_respawn_point.png" />
     </ItemGroup>
     <ItemGroup>
         <None Include=".gitignore"/>

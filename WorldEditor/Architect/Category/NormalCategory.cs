@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using Architect.objects;
+using Architect.Objects;
 
-namespace Architect.categories;
+namespace Architect.Category;
 
 internal class NormalCategory : ObjectCategory
 {
@@ -20,5 +20,15 @@ internal class NormalCategory : ObjectCategory
     internal override List<SelectableObject> GetObjects()
     {
         return _selectableObjects;
+    }
+
+    internal void Sort()
+    {
+        _selectableObjects.Sort(Compare);
+    }
+
+    private static int Compare(SelectableObject obj1, SelectableObject obj2)
+    {
+        return (obj1.GetWeight()).CompareTo(obj2.GetWeight());
     }
 }

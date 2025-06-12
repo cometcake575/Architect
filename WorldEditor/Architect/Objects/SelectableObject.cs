@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Architect.objects;
+namespace Architect.Objects;
 
 public abstract class SelectableObject
 {
@@ -10,14 +10,11 @@ public abstract class SelectableObject
 
     public abstract bool IsFavourite();
 
-    public virtual bool FlipX()
-    {
-        return false;
-    }
-
     public abstract Sprite GetSprite();
 
-    public virtual int GetRotation()
+    public abstract int GetWeight();
+
+    public virtual int GetSpriteRotation()
     {
         return 0;
     }

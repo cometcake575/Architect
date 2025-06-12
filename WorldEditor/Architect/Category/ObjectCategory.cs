@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using Architect.objects;
+using Architect.Objects;
 
-namespace Architect.categories;
+namespace Architect.Category;
 
 internal abstract class ObjectCategory
 {
@@ -10,9 +10,9 @@ internal abstract class ObjectCategory
         return _name;
     }
 
-    internal virtual int VerticalShift()
+    internal virtual bool CreateButton()
     {
-        return 0;
+        return true;
     }
 
     internal abstract List<SelectableObject> GetObjects();
