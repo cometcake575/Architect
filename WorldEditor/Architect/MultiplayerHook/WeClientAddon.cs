@@ -1,11 +1,7 @@
-using System.Collections.Generic;
 using Architect.Content.Elements.Custom;
 using Architect.MultiplayerHook.Packets;
-using Architect.Objects;
 using Architect.Util;
 using Hkmp.Api.Client;
-using Modding.Converters;
-using Newtonsoft.Json;
 
 namespace Architect.MultiplayerHook;
 
@@ -22,10 +18,12 @@ public class WeClientAddon : ClientAddon
         
         netReceiver.RegisterPacketHandler<RefreshPacketData>(PacketId.Refresh, packet =>
         {
-            //if (EditorManager.IsEditing) return;
+            if (EditorManager.IsEditing) return;
             
-            Architect.GlobalSettings.Edits[packet.SceneName] = packet.Edits;
-            EditorManager.ScheduleReloadScene();
+            Architect.GlobalSettings.Edits[packet.SceneName].Clear();
+            Architect.GlobalSettings.Edits[packet.SceneName].AddRange(packet.Edits);
+            
+            if (packet.SceneName == GameManager.instance.sceneName) EditorManager.ScheduleReloadScene();
         });
         
         netReceiver.RegisterPacketHandler<WinPacketData>(PacketId.Win, packet =>
