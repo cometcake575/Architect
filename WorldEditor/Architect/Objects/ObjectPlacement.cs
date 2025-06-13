@@ -155,15 +155,6 @@ public class ObjectPlacement
         public static readonly Vector3Converter Vector3Converter = new();
 
         private static bool _initialized;
-
-        public ObjectPlacementConverter()
-        {
-            if (_initialized) return;
-            
-            _initialized = true;
-            ConfigGroup.Initialize();
-            ReceiverGroup.Initialize();
-        }
         
         public override void WriteJson(JsonWriter writer, ObjectPlacement value, JsonSerializer serializer)
         {
@@ -226,6 +217,13 @@ public class ObjectPlacement
             bool hasExistingValue,
             JsonSerializer serializer)
         {
+            if (!_initialized)
+            {
+                _initialized = true;
+                ConfigGroup.Initialize();
+                ReceiverGroup.Initialize();
+            }
+            
             var name = "";
             var id = "";
             var pos = Vector3.zero;
