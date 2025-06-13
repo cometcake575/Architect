@@ -1,7 +1,6 @@
-using System;
 using UnityEngine;
 
-namespace Architect.Content.Custom;
+namespace Architect.Content.Elements.Custom;
 
 public class TemporaryAbilityGranter : MonoBehaviour
 {

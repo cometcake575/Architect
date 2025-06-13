@@ -6,11 +6,22 @@ namespace Architect.Objects;
 
 public static class PlacementManager
 {
+    private static string _sceneName;
+    private static List<ObjectPlacement> _currentPlacements;
+
     public static List<ObjectPlacement> GetCurrentPlacements()
     {
-        if (!Architect.GlobalSettings.Edits.ContainsKey(GameManager.instance.sceneName))
-            Architect.GlobalSettings.Edits[GameManager.instance.sceneName] = new List<ObjectPlacement>();
-        return Architect.GlobalSettings.Edits[GameManager.instance.sceneName];
+        var sceneName = GameManager.instance.sceneName;
+        if (_sceneName == sceneName) return _currentPlacements;
+
+        _sceneName = sceneName;
+        
+        if (Architect.GlobalSettings.Edits.TryGetValue(_sceneName, out _currentPlacements)) return _currentPlacements;
+        
+        _currentPlacements = new List<ObjectPlacement>();
+        Architect.GlobalSettings.Edits[_sceneName] = _currentPlacements;
+
+        return _currentPlacements;
     }
 
     private static void LoadPlacements()

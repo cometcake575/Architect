@@ -1,8 +1,7 @@
-using System;
 using Architect.MultiplayerHook;
 using UnityEngine;
 
-namespace Architect.Content.Custom;
+namespace Architect.Content.Elements.Custom;
 
 public class ZoteTrophy : MonoBehaviour
 {

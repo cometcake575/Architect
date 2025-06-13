@@ -5,6 +5,7 @@ using Architect.Attributes;
 using Architect.Attributes.Broadcasters;
 using Architect.Attributes.Config;
 using Architect.Attributes.Receivers;
+using Architect.Content.Groups;
 using Architect.Util;
 using Modding.Converters;
 using Newtonsoft.Json;
@@ -121,26 +122,20 @@ public class ObjectPlacement
         }
     }
 
-    private readonly List<EventBroadcaster> _broadcasters = new();
-    private readonly List<EventReceiver> _receivers = new();
-    private readonly List<ConfigValue> _config = new();
-
-    public void AddBroadcaster(EventBroadcaster broadcaster)
-    {
-        _broadcasters.Add(broadcaster);
-    }
-
-    public void AddReceiver(EventReceiver receiver)
-    {
-        _receivers.Add(receiver);
-    }
-
-    public void AddConfig(ConfigValue value)
-    {
-        _config.Add(value);
-    }
+    private readonly EventBroadcaster[] _broadcasters;
+    private readonly EventReceiver[] _receivers;
+    private readonly ConfigValue[] _config;
     
-    public ObjectPlacement(string name, Vector3 pos, bool flipped, int rotation, float scale, string id)
+    public ObjectPlacement(
+        string name, 
+        Vector3 pos, 
+        bool flipped, 
+        int rotation, 
+        float scale, 
+        string id, 
+        EventBroadcaster[] broadcasters, 
+        EventReceiver[] receivers, 
+        ConfigValue[] config)
     {
         _name = name;
         _pos = pos;
@@ -148,12 +143,27 @@ public class ObjectPlacement
         _scale = scale;
         _id = id;
         _rotation = rotation;
+
+        _broadcasters = broadcasters;
+        _receivers = receivers;
+        _config = config;
     }
 
     public class ObjectPlacementConverter : Newtonsoft.Json.JsonConverter<ObjectPlacement>
     {
         public static readonly ObjectPlacementConverter Instance = new();
         public static readonly Vector3Converter Vector3Converter = new();
+
+        private static bool _initialized;
+
+        public ObjectPlacementConverter()
+        {
+            if (_initialized) return;
+            
+            _initialized = true;
+            ConfigGroup.Initialize();
+            ReceiverGroup.Initialize();
+        }
         
         public override void WriteJson(JsonWriter writer, ObjectPlacement value, JsonSerializer serializer)
         {
@@ -161,19 +171,19 @@ public class ObjectPlacement
             
             WritePlacementInfo(writer, value, serializer);
             
-            if (value._broadcasters.Count > 0)
+            if (value._broadcasters.Length > 0)
             {
                 writer.WritePropertyName("events");
                 serializer.Serialize(writer, value._broadcasters.Select(broadcaster => broadcaster.Serialize()).ToList());
             }
 
-            if (value._receivers.Count > 0)
+            if (value._receivers.Length > 0)
             {
                 writer.WritePropertyName("listeners");
                 serializer.Serialize(writer, value._receivers.Select(receiver => receiver.Serialize()).ToList());
             }
 
-            if (value._config.Count > 0)
+            if (value._config.Length > 0)
             {
                 writer.WritePropertyName("config");
                 serializer.Serialize(writer, value._config.ToDictionary(c => c.GetName(), c => c.SerializeValue()));
@@ -222,9 +232,10 @@ public class ObjectPlacement
             var flipped = true;
             var rotation = 0;
             var scale = 1f;
-            List<Dictionary<string, string>> broadcasters = new();
-            List<Dictionary<string, string>> receivers = new();
-            Dictionary<string, string> config = new();
+            
+            var broadcasters = Array.Empty<EventBroadcaster>();
+            var receivers = Array.Empty<EventReceiver>();
+            var config = Array.Empty<ConfigValue>();
 
             reader.Read();
             while (reader.TokenType == JsonToken.PropertyName)
@@ -273,38 +284,55 @@ public class ObjectPlacement
                     }
                     case "events":
                         reader.Read();
-                        broadcasters = serializer.Deserialize<List<Dictionary<string, string>>>(reader);
+                        broadcasters = DeserializeBroadcasters(serializer.Deserialize<List<Dictionary<string, string>>>(reader));
                         break;
                     case "listeners":
                         reader.Read();
-                        receivers = serializer.Deserialize<List<Dictionary<string, string>>>(reader);
+                        receivers = DeserializeReceivers(serializer.Deserialize<List<Dictionary<string, string>>>(reader));
                         break;
                     case "config":
                         reader.Read();
-                        config = serializer.Deserialize<Dictionary<string, string>>(reader);
+                        config = DeserializeConfig(serializer.Deserialize<Dictionary<string, string>>(reader));
                         break;
                 }
                 reader.Read();
             }
             
-            var placement = new ObjectPlacement(name, pos, flipped, rotation, scale, id);
-
-            foreach (var broadcaster in broadcasters)
-            {
-                placement.AddBroadcaster(EventManager.DeserializeBroadcaster(broadcaster));
-            }
-
-            foreach (var receiver in receivers)
-            {
-                placement.AddReceiver(EventManager.DeserializeReceiver(receiver));
-            }
-
-            foreach (var cvalue in config)
-            {
-                placement.AddConfig(Attributes.ConfigManager.DeserializeConfigValue(cvalue.Key, cvalue.Value));
-            }
+            var placement = new ObjectPlacement(name, pos, flipped, rotation, scale, id, broadcasters, receivers, config);
 
             return placement;
+        }
+
+        private static EventBroadcaster[] DeserializeBroadcasters(List<Dictionary<string, string>> data)
+        {
+            var broadcasters = new EventBroadcaster[data.Count];
+            for (var i = 0; i < data.Count; i++)
+            {
+                broadcasters[i] = EventManager.DeserializeBroadcaster(data[i]);
+            }
+            return broadcasters;
+        }
+
+        private static EventReceiver[] DeserializeReceivers(List<Dictionary<string, string>> data)
+        {
+            var receivers = new EventReceiver[data.Count];
+            for (var i = 0; i < data.Count; i++)
+            {
+                receivers[i] = EventManager.DeserializeReceiver(data[i]);
+            }
+            return receivers;
+        }
+
+        private static ConfigValue[] DeserializeConfig(Dictionary<string, string> data)
+        {
+            var config = new ConfigValue[data.Count];
+            var i = 0;
+            foreach (var cvalue in data)
+            {
+                config[i] = Attributes.ConfigManager.DeserializeConfigValue(cvalue.Key, cvalue.Value);
+                i++;
+            }
+            return config;
         }
     }
 }

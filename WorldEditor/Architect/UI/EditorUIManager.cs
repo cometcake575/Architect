@@ -23,30 +23,57 @@ namespace Architect.UI;
 
 public static class EditorUIManager
 {
+    // The current page, item index and filter info
     private static int _groupIndex;
     private static int _index;
     private static string _filter = "";
+    
+    // Categories of items
     private static ObjectCategory _category;
     private static List<ObjectCategory> _categories;
+    
+    // Info about current selected item and buttons to change item
     private static TextObject _selectionInfo;
     private static List<(Button, Button, Image)> _selectionButtons;
     
+    // Selectable objects
+    private static List<SelectableObject> _objects;
+    [CanBeNull] internal static SelectableObject SelectedItem;
+
+    // Config grids and data
+    private static GridLayout _configGrid;
+    private static GridLayout _receiversGrid;
+    private static GridLayout _broadcastersGrid;
+    public static readonly Dictionary<string, ConfigValue> ConfigValues = new();
+    public static readonly List<EventBroadcaster> Broadcasters = new();
+    public static readonly List<EventReceiver> Receivers = new();
+
+    // Blank sprite texture, used for buttons with no item
+    private static Sprite _blankSprite;
+    
+    // Constants
+    private const int ItemsPerGroup = 9;
     private const string FilledStar = "★";
     private const string EmptyStar = "☆";
 
+    // All elements that should not appear when paused (everything except text info)
     internal static List<ArrangableElement> PauseOptions;
 
+    // Sets the current selected category
     private static void SetCategory(ObjectCategory category)
     {
         _category = category;
         _groupIndex = 0;
         _index = 0;
+        
+        RefreshObjects();
         RefreshButtons();
     }
 
+    // Shifts the currently selected page, looping round if index is out of range
     internal static void ShiftGroup(int amount)
     {
-        int groupCount = GetObjects().Count / 9 + 1;
+        var groupCount = GetObjects().Count / ItemsPerGroup + 1;
         _groupIndex += amount;
         if (_groupIndex < 0) _groupIndex += groupCount;
         _groupIndex %= groupCount;
@@ -54,28 +81,29 @@ public static class EditorUIManager
         RefreshButtons();
     }
 
+    // Refreshes the objects in the current selection (when filter or category change)
+    private static void RefreshObjects()
+    {
+        _objects = _category.GetObjects().Where(obj => obj.GetName().IndexOf(_filter, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
+    }
+    
+    // Returns the objects in the current selection
     private static List<SelectableObject> GetObjects()
     {
-        List<SelectableObject> objects = new();
-        foreach (SelectableObject obj in _category.GetObjects())
-        {
-            if (obj.GetName().ToLower().Contains(_filter))
-            {
-                objects.Add(obj);
-            } 
-        }
-
-        return objects;
+        if (_objects == null) RefreshObjects();
+        return _objects;
     }
 
+    // Refresh the object selection buttons
     private static void RefreshButtons()
     {
-        int i = 0;
+        var i = 0;
+        var objects = GetObjects();
         foreach (var pair in _selectionButtons)
         {
-            pair.Item1.Content = (_groupIndex * 9 + i).ToString();
-            int index = _groupIndex * 9 + i;
-            SelectableObject currentItem = GetObjects().Count > index ? GetObjects()[index] : null;
+            pair.Item1.Content = (_groupIndex * ItemsPerGroup + i).ToString();
+            var index = _groupIndex * ItemsPerGroup + i;
+            var currentItem = index < objects.Count ? objects[index] : null;
             if (currentItem != null)
             {
                 pair.Item1.Content = "";
@@ -95,18 +123,20 @@ public static class EditorUIManager
         }
     }
 
-    [CanBeNull] internal static SelectableObject SelectedItem;
-    private static Sprite _blankSprite;
-
+    // Toggles whether something is a favourite
+    // Does not refresh grid, so that items can easily be readded if removed by accident
     private static void ToggleFavourite(int index)
     {
-        index += _groupIndex * 9;
+        index += _groupIndex * ItemsPerGroup;
+        
         var objects = GetObjects();
-        if ((objects.Count > index ? objects[index] : null) is not PlaceableObject obj) return;
+        if (index >= objects.Count || objects[index] is not PlaceableObject obj) return;
+        
         obj.ToggleFavourite();
         RefreshButtons();
     }
 
+    // Refreshes the currently selected item, resetting configuration applied to the object
     private static void RefreshSelectedItem(LayoutRoot layout)
     {
         ConfigValues.Clear();
@@ -122,9 +152,9 @@ public static class EditorUIManager
                 break;
             default:
             {
-                var index = _groupIndex * 9 + _index;
+                var index = _groupIndex * ItemsPerGroup + _index;
                 var objects = GetObjects();
-                SelectedItem = objects.Count > index ? objects[index] : null;
+                SelectedItem = index < objects.Count ? objects[index] : null;
                 break;
             }
         }
@@ -142,6 +172,7 @@ public static class EditorUIManager
         RefreshConfigMode();
     }
     
+    // Initializes the UI
     internal static void Initialize(LayoutRoot layout)
     {
         _selectionButtons = new List<(Button, Button, Image)>();
@@ -151,13 +182,9 @@ public static class EditorUIManager
         layout.VisibilityCondition = () => EditorManager.IsEditing;
 
         SetupTextDisplay(layout);
-
         SetupLeftSide(layout);
-
         SetupObjectOptions(layout);
-
         SetupFilter(layout);
-
         SetupExtraSettings(layout);
     }
 
@@ -315,16 +342,13 @@ public static class EditorUIManager
 
     private static void SetupObjectOptions(LayoutRoot layout)
     {
-        for (int i = 0; i < 9; i++)
+        for (var i = 0; i < ItemsPerGroup; i++)
         {
-            int j = 2 - i / 3;
+            var j = 2 - i / 3;
 
-            var imagedButton = CreateImagedButton(layout, _blankSprite, i.ToString(), (2 - i % 3) * 100, j * 100, i);
+            var (button, image) = CreateImagedButton(layout, _blankSprite, i.ToString(), (2 - i % 3) * 100, j * 100, i);
 
-            var img = imagedButton.Item2;
-            var button = imagedButton.Item1;
-            
-            Button favourite = new Button(layout, i + " Favourite")
+            var favourite = new Button(layout, i + " Favourite")
             {
                 Content = EmptyStar,
                 HorizontalAlignment = HorizontalAlignment.Right,
@@ -341,15 +365,15 @@ public static class EditorUIManager
             };
             PauseOptions.Add(favourite);
             
-            _selectionButtons.Add((button, favourite, img));
-            
-            RefreshButtons();
+            _selectionButtons.Add((button, favourite, image));
         }
+        RefreshObjects();
+        RefreshButtons();
     }
 
     private static void SetupFilter(LayoutRoot layout)
     {
-        TextInput filter = new TextInput(layout, "Search")
+        var filter = new TextInput(layout, "Search")
         {
             ContentType = InputField.ContentType.Standard,
             HorizontalAlignment = HorizontalAlignment.Right,
@@ -359,8 +383,10 @@ public static class EditorUIManager
         };
         filter.TextChanged += (_, s) =>
         {
-            _filter = s.ToLower();
+            _filter = s;
             _groupIndex = 0;
+            
+            RefreshObjects();
             RefreshButtons();
         };
         PauseOptions.Add(filter);
@@ -469,10 +495,6 @@ public static class EditorUIManager
         if (_broadcastersGrid != null) _broadcastersGrid.Visibility = _currentMode == ConfigMode.Broadcasters ? Visibility.Visible : Visibility.Hidden;
         if (_receiversGrid != null) _receiversGrid.Visibility = _currentMode == ConfigMode.Receivers ? Visibility.Visible : Visibility.Hidden;
     }
-
-    private static GridLayout _configGrid;
-    private static GridLayout _receiversGrid;
-    private static GridLayout _broadcastersGrid;
 
     private static void CreateConfigGrid(LayoutRoot layout)
     {
@@ -599,7 +621,7 @@ public static class EditorUIManager
             HorizontalAlignment = HorizontalAlignment.Center
         }.WithProp(GridLayout.Column, 3);
         
-        var name = new TextInput(layout, "Name")
+        var eventNameInput = new TextInput(layout, "Name")
         {
             Padding = new Padding(10, 0),
             VerticalAlignment = VerticalAlignment.Top,
@@ -608,7 +630,7 @@ public static class EditorUIManager
             MinWidth = 80
         }.WithProp(GridLayout.Row, 1);
         
-        var eName = new TextInput(layout, "Trigger Type")
+        var eventTypeInput = new TextInput(layout, "Trigger Type")
         {
             ContentType = InputField.ContentType.Alphanumeric,
             VerticalAlignment = VerticalAlignment.Top,
@@ -634,19 +656,19 @@ public static class EditorUIManager
             Enabled = false
         }.WithProp(GridLayout.Column, 3).WithProp(GridLayout.Row, 1);
 
-        eName.TextChanged += (_, s) => { ValidateReceiver(s, name.Text, add, placeable); };
-        name.TextChanged += (_, s) => { ValidateReceiver(eName.Text, s, add, placeable); };
+        eventTypeInput.TextChanged += (_, s) => { ValidateReceiver(s, eventNameInput.Text, add, placeable); };
+        eventNameInput.TextChanged += (_, s) => { ValidateReceiver(eventTypeInput.Text, s, add, placeable); };
 
         add.Click += button =>
         {
             button.Enabled = false;
             if (!int.TryParse(times.Text, out var time)) time = 1;
-            var receiver = EventManager.CreateReceiver(eName.Text, name.Text, time);
+            var receiver = EventManager.CreateReceiver(eventTypeInput.Text, eventNameInput.Text, time);
             Receivers.Add(receiver);
 
             var info = new TextObject(layout)
             {
-                Text = "On: " + name.Text + " | Trigger: " + eName.Text,
+                Text = "On: " + eventNameInput.Text + " | Trigger: " + eventTypeInput.Text,
                 VerticalAlignment = VerticalAlignment.Bottom,
                 HorizontalAlignment = HorizontalAlignment.Center
             }.WithProp(GridLayout.ColumnSpan, 2).WithProp(GridLayout.Row, _receiversGrid.RowDefinitions.Count);
@@ -673,8 +695,8 @@ public static class EditorUIManager
             _receiversGrid.Children.Add(info);
             _receiversGrid.Children.Add(remove);
 
-            eName.Text = "";
-            name.Text = "";
+            eventTypeInput.Text = "";
+            eventNameInput.Text = "";
         };
         
         _receiversGrid.Children.Add(info1);
@@ -682,8 +704,8 @@ public static class EditorUIManager
         _receiversGrid.Children.Add(info3);
         _receiversGrid.Children.Add(info4);
         
-        _receiversGrid.Children.Add(eName);
-        _receiversGrid.Children.Add(name);
+        _receiversGrid.Children.Add(eventTypeInput);
+        _receiversGrid.Children.Add(eventNameInput);
         _receiversGrid.Children.Add(times);
         _receiversGrid.Children.Add(add);
         
@@ -735,7 +757,7 @@ public static class EditorUIManager
             HorizontalAlignment = HorizontalAlignment.Center
         }.WithProp(GridLayout.Column, 2);
         
-        var eName = new TextInput(layout, "Event Type")
+        var eventTypeInput = new TextInput(layout, "Event Type")
         {
             Padding = new Padding(10, 0),
             VerticalAlignment = VerticalAlignment.Top,
@@ -744,7 +766,7 @@ public static class EditorUIManager
             MinWidth = 120
         }.WithProp(GridLayout.Row, 1);
         
-        var name = new TextInput(layout, "Name")
+        var eventNameInput = new TextInput(layout, "Name")
         {
             VerticalAlignment = VerticalAlignment.Top,
             HorizontalAlignment = HorizontalAlignment.Center,
@@ -761,20 +783,20 @@ public static class EditorUIManager
             Enabled = false
         }.WithProp(GridLayout.Column, 2).WithProp(GridLayout.Row, 1);
 
-        eName.TextChanged += (_, s) => { ValidateBroadcaster(s, name.Text, add, placeable); };
-        name.TextChanged += (_, s) => { ValidateBroadcaster(eName.Text, s, add, placeable); };
+        eventTypeInput.TextChanged += (_, s) => { ValidateBroadcaster(s, eventNameInput.Text, add, placeable); };
+        eventNameInput.TextChanged += (_, s) => { ValidateBroadcaster(eventTypeInput.Text, s, add, placeable); };
 
         add.Click += button =>
         {
             button.Enabled = false;
-            if (!Enum.TryParse<EventBroadcasterType>(eName.Text, true, out var type)) return;
+            if (!Enum.TryParse<EventBroadcasterType>(eventTypeInput.Text, true, out var type)) return;
 
-            var broadcaster = new EventBroadcaster(type, name.Text);
+            var broadcaster = new EventBroadcaster(type, eventNameInput.Text);
             Broadcasters.Add(broadcaster);
 
             var info = new TextObject(layout)
             {
-                Text = "Event: " + type + " | Name: " + name.Text,
+                Text = "Event: " + type + " | Name: " + eventNameInput.Text,
                 VerticalAlignment = VerticalAlignment.Bottom,
                 HorizontalAlignment = HorizontalAlignment.Center
             }.WithProp(GridLayout.ColumnSpan, 2).WithProp(GridLayout.Row, _broadcastersGrid.RowDefinitions.Count);
@@ -801,16 +823,16 @@ public static class EditorUIManager
             _broadcastersGrid.Children.Add(info);
             _broadcastersGrid.Children.Add(remove);
 
-            eName.Text = "";
-            name.Text = "";
+            eventTypeInput.Text = "";
+            eventNameInput.Text = "";
         };
         
         _broadcastersGrid.Children.Add(info1);
         _broadcastersGrid.Children.Add(info2);
         _broadcastersGrid.Children.Add(info3);
         
-        _broadcastersGrid.Children.Add(eName);
-        _broadcastersGrid.Children.Add(name);
+        _broadcastersGrid.Children.Add(eventTypeInput);
+        _broadcastersGrid.Children.Add(eventNameInput);
         _broadcastersGrid.Children.Add(add);
         
         _leftSideGrid.Children.Add(_broadcastersGrid);
@@ -841,8 +863,4 @@ public static class EditorUIManager
             
         add.Enabled = valid;
     }
-
-    public static readonly Dictionary<string, ConfigValue> ConfigValues = new();
-    public static readonly List<EventBroadcaster> Broadcasters = new();
-    public static readonly List<EventReceiver> Receivers = new();
 }

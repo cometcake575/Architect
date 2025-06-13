@@ -2,7 +2,6 @@ using System.Linq;
 using Architect.Content.Groups;
 using Architect.Objects;
 using Architect.UI;
-using JetBrains.Annotations;
 using MagicUI.Core;
 using Modding;
 using UnityEngine;
@@ -20,23 +19,29 @@ public static class EditorManager
     private static bool _loadPos;
     private static bool _needsReload;
     
-    [CanBeNull] private static LayoutRoot _layout;
-    
     internal static Camera GameCamera;
     
     public static void Initialize()
     {
-        ModHooks.NewGameHook += InitializeLayout;
-        
-        ModHooks.AfterSavegameLoadHook += InitializeLayout;
-        
         ModHooks.HeroUpdateHook += EditorUpdate;
 
         On.GameManager.EnterHero += LoadStoredPosition;
 
         On.QuitToMenu.Start += (orig, self) =>
         {
+            if (!Architect.GlobalSettings.CanEnableEditing) return orig(self);
+            
             IsEditing = false;
+
+            var keysToRemove = Architect.GlobalSettings.Edits.Keys
+                .Where(key => Architect.GlobalSettings.Edits[key].Count == 0)
+                .ToList();
+
+            foreach (var s in keysToRemove)
+            {
+                Architect.GlobalSettings.Edits.Remove(s);
+            }
+
             return orig(self);
         };
         
@@ -60,19 +65,6 @@ public static class EditorManager
             _loadPos = false;
         }
         orig(self, search);
-    }
-
-    private static void InitializeLayout(SaveGameData _)
-    {
-        InitializeLayout();
-    }
-
-    private static void InitializeLayout()
-    {
-        IsEditing = false;
-        _layout?.Destroy();
-        _layout = new LayoutRoot(true, "Architect Layout");
-        EditorUIManager.Initialize(_layout);
     }
 
     private static void EditorUpdate()

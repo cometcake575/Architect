@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using Architect.Content.Elements;
 using Architect.Util;
 using UnityEngine;
 
-namespace Architect.Content.Custom;
+namespace Architect.Content.Elements.Custom;
 
 public static class CustomObjects
 {

@@ -1,6 +1,4 @@
-using System;
-
-namespace Architect.Content.Custom;
+namespace Architect.Content.Elements.Custom;
 
 public class CustomHazardRespawnMarker : HazardRespawnMarker
 {

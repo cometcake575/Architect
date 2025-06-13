@@ -1,5 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Architect.Attributes.Broadcasters;
+using Architect.Attributes.Config;
+using Architect.Attributes.Receivers;
 using UnityEngine;
 using Architect.Content.Elements;
 using Architect.UI;
@@ -15,20 +19,22 @@ public class PlaceableObject : SelectableObject
     {
         if (!first) return;
         pos.z = GetZPos();
-        var placement = new ObjectPlacement(GetName(), pos, EditorManager.IsFlipped, EditorManager.Rotation, EditorManager.Scale, Guid.NewGuid().ToString().Substring(0, 8));
+
+        var broadcasters = EditorUIManager.Broadcasters.ToArray();
+        var receivers = EditorUIManager.Receivers.ToArray();
+        var config = EditorUIManager.ConfigValues.Values.ToArray();
         
-        foreach (var value in EditorUIManager.ConfigValues.Values)
-        {
-            placement.AddConfig(value);
-        }
-        foreach (var value in EditorUIManager.Broadcasters)
-        {
-            placement.AddBroadcaster(value);
-        }
-        foreach (var value in EditorUIManager.Receivers)
-        {
-            placement.AddReceiver(value);
-        }
+        var placement = new ObjectPlacement(
+            GetName(),
+            pos, 
+            EditorManager.IsFlipped, 
+            EditorManager.Rotation, 
+            EditorManager.Scale, 
+            Guid.NewGuid().ToString().Substring(0, 8),
+            broadcasters,
+            receivers,
+            config
+        );
         
         PlacementManager.GetCurrentPlacements().Add(placement);
         placement.PlaceGhost();

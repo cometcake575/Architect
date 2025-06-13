@@ -20,11 +20,15 @@ public static class EventManager
             if (received) return;
             BroadcastEvent(effects.gameObject, EventBroadcasterType.OnDeath);
         };
-        ModHooks.OnEnableEnemyHook += (enemy, dead) =>
+        
+        On.HealthManager.Awake += (orig, self) =>
         {
-            Architect.Instance.Log("!!!");
-            Architect.Instance.Log(enemy + " is " + dead + " dead");
-            return dead;
+            orig(self);
+            
+            self.GetComponent<PersistentBoolItem>().OnSetSaveState += value =>
+            {
+                if (value) BroadcastEvent(self.gameObject, EventBroadcasterType.LoadedDead);
+            };
         };
     }
 

@@ -6,12 +6,13 @@ using Architect.Attributes;
 using Architect.Configuration;
 using UnityEngine;
 using Architect.Content;
-using Architect.Content.Custom;
+using Architect.Content.Elements.Custom;
 using Architect.Content.Groups;
 using Architect.MultiplayerHook;
 using Architect.Objects;
 using Architect.UI;
 using Architect.Util;
+using MagicUI.Core;
 using Object = UnityEngine.Object;
 
 namespace Architect;
@@ -53,23 +54,32 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
         EditorManager.Initialize();
         PlacementManager.Initialize();
         EventManager.InitializeBroadcasters();
-
-        if (ModHooks.GetMod("HKMP") is not Mod) return;
         
-        HkmpHook.Initialize();
-        UsingMultiplayer = true;
+        if (ModHooks.GetMod("HKMP") is Mod)
+        {
+            HkmpHook.Initialize();
+            UsingMultiplayer = true;
+        }
+        
+        InitializeLayout();
+    }
+
+    private static LayoutRoot _layout;
+    
+    private static void InitializeLayout()
+    {
+        _layout?.Destroy();
+        _layout = new LayoutRoot(true, "Architect Layout");
+        EditorUIManager.Initialize(_layout);
     }
 
     internal static WorldEditorGlobalSettings GlobalSettings { get; private set; } = new();
 
     public void OnLoadGlobal(WorldEditorGlobalSettings s)
     {
-        ConfigGroup.Initialize();
-        ReceiverGroup.Initialize();
-        
         GlobalSettings = s;
     }
-
+    
     public WorldEditorGlobalSettings OnSaveGlobal()
     {
         return GlobalSettings;
