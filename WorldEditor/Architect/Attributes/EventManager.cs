@@ -11,16 +11,6 @@ namespace Architect.Attributes;
 
 public static class EventManager
 {
-    private static bool _initializedForSerialization;
-    
-    // Called on settings load as receiver types require initialization for deserialization
-    public static void InitializeReceivers()
-    {
-        if (_initializedForSerialization) return;
-        _initializedForSerialization = true;
-        ReceiverGroup.Initialize();
-    }
-
     // Called on Initialize as broadcaster types are an enum and do not require initialization for deserialization
     public static void InitializeBroadcasters()
     {

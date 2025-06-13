@@ -478,7 +478,7 @@ public static class EditorUIManager
     {
         _configGrid?.Destroy();
         _configGrid = null;
-
+        
         if (SelectedItem is not PlaceableObject placeable) return;
 
         _configGrid = new GridLayout(layout, "Config Grid")
@@ -610,6 +610,7 @@ public static class EditorUIManager
         
         var eName = new TextInput(layout, "Trigger Type")
         {
+            ContentType = InputField.ContentType.Alphanumeric,
             VerticalAlignment = VerticalAlignment.Top,
             HorizontalAlignment = HorizontalAlignment.Center,
             MinWidth = 80
@@ -739,6 +740,7 @@ public static class EditorUIManager
             Padding = new Padding(10, 0),
             VerticalAlignment = VerticalAlignment.Top,
             HorizontalAlignment = HorizontalAlignment.Center,
+            ContentType = InputField.ContentType.Alphanumeric,
             MinWidth = 120
         }.WithProp(GridLayout.Row, 1);
         

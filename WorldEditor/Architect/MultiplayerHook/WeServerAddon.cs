@@ -1,4 +1,5 @@
 using System.Linq;
+using Architect.MultiplayerHook.Packets;
 using Hkmp.Api.Server;
 
 namespace Architect.MultiplayerHook;
@@ -9,18 +10,18 @@ public class WeServerAddon : ServerAddon
     {
         Logger.Info("Initializing server-side Architect addon!");
         
-        var netReceiver = serverApi.NetServer.GetNetworkReceiver<ServerPacketId>(this, HkmpHook.InstantiatePacket);
+        var netReceiver = serverApi.NetServer.GetNetworkReceiver<PacketId>(this, HkmpHook.InstantiatePacket);
         
-        netReceiver.RegisterPacketHandler<ServerRefreshPacketData>(ServerPacketId.Refresh, (_, packet) =>
+        netReceiver.RegisterPacketHandler<RefreshPacketData>(PacketId.Refresh, (_, packet) =>
         {
-            serverApi.NetServer.GetNetworkSender<ServerPacketId>(this)
-                .SendSingleData(ServerPacketId.Refresh, packet, serverApi.ServerManager.Players.Select(player => player.Id).ToArray());
+            serverApi.NetServer.GetNetworkSender<PacketId>(this)
+                .SendSingleData(PacketId.Refresh, packet, serverApi.ServerManager.Players.Select(player => player.Id).ToArray());
         });
         
-        netReceiver.RegisterPacketHandler<ServerWinPacketData>(ServerPacketId.Win, (_, packet) =>
+        netReceiver.RegisterPacketHandler<WinPacketData>(PacketId.Win, (_, packet) =>
         {
-            serverApi.NetServer.GetNetworkSender<ServerPacketId>(this)
-                .SendSingleData(ServerPacketId.Win, packet, serverApi.ServerManager.Players.Select(player => player.Id).ToArray());
+            serverApi.NetServer.GetNetworkSender<PacketId>(this)
+                .SendSingleData(PacketId.Win, packet, serverApi.ServerManager.Players.Select(player => player.Id).ToArray());
         });
     }
 

@@ -106,5 +106,5 @@ public abstract class AbstractPackElement
         return this;
     }
 
-    public virtual void PostSpawn(GameObject gameObject) { }
+    public virtual void PostSpawn(GameObject gameObject, bool flipped, int rotation) { }
 }

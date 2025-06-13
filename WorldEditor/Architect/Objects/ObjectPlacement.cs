@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Architect.Attributes;
@@ -5,11 +6,14 @@ using Architect.Attributes.Broadcasters;
 using Architect.Attributes.Config;
 using Architect.Attributes.Receivers;
 using Architect.Util;
+using Modding.Converters;
+using Newtonsoft.Json;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Architect.Objects;
 
+[JsonConverter(typeof(ObjectPlacementConverter))]
 public class ObjectPlacement
 {
     internal bool Touching(Vector2 pos)
@@ -31,7 +35,7 @@ public class ObjectPlacement
     internal void Destroy()
     {
         if (_obj) Object.Destroy(_obj);
-        PlacementManager.Placements.Remove(this);
+        PlacementManager.GetCurrentPlacements().Remove(this);
     }
 
     private PlaceableObject GetPlaceableObject()
@@ -45,7 +49,7 @@ public class ObjectPlacement
     private readonly bool _flipped;
     private readonly int _rotation;
     private readonly float _scale;
-    private readonly string _guid;
+    private readonly string _id;
 
     private GameObject _obj;
 
@@ -66,7 +70,7 @@ public class ObjectPlacement
         var prefab = GetPlaceableObject().PackElement.GetPrefab(_flipped, _rotation);
         
         var obj = Object.Instantiate(prefab, _pos, prefab.transform.rotation);
-        obj.name = _name + " (" + _guid + ")";
+        obj.name = _name + " (" + _id + ")";
         
         if (!Mathf.Approximately(_scale, 1))
         {
@@ -81,7 +85,7 @@ public class ObjectPlacement
         
         obj.SetActive(true);
         
-        GetPlaceableObject().PackElement.PostSpawn(obj);
+        GetPlaceableObject().PackElement.PostSpawn(obj, _flipped, _rotation);
         
         if (!GetPlaceableObject().PackElement.OverrideFlip() && _flipped)
         {
@@ -135,74 +139,172 @@ public class ObjectPlacement
     {
         _config.Add(value);
     }
-
-    public bool HasBroadcasters()
-    {
-        return _broadcasters.Count > 0;
-    }
-
-    public bool HasReceivers()
-    {
-        return _receivers.Count > 0;
-    }
-
-    public bool HasConfig()
-    {
-        return _config.Count > 0;
-    }
-
-    public Dictionary<string, string> SerializeConfig()
-    {
-        return _config.ToDictionary(c => c.GetName(), c => c.SerializeValue());
-    }
-
-    public List<Dictionary<string, string>> SerializeBroadcasters()
-    {
-        return _broadcasters.Select(broadcaster => broadcaster.Serialize()).ToList();
-    }
-
-    public List<Dictionary<string, string>> SerializeReceivers()
-    {
-        return _receivers.Select(receiver => receiver.Serialize()).ToList();
-    }
     
-    internal ObjectPlacement(string name, Vector3 pos, bool flipped, int rotation, float scale, string guid)
+    public ObjectPlacement(string name, Vector3 pos, bool flipped, int rotation, float scale, string id)
     {
         _name = name;
         _pos = pos;
         _flipped = flipped;
         _scale = scale;
-        _guid = guid;
+        _id = id;
         _rotation = rotation;
     }
-    
-    public string GetName()
-    {
-        return _name;
-    }
 
-    public string GetGuid()
+    public class ObjectPlacementConverter : Newtonsoft.Json.JsonConverter<ObjectPlacement>
     {
-        return _guid;
-    }
+        public static readonly ObjectPlacementConverter Instance = new();
+        public static readonly Vector3Converter Vector3Converter = new();
+        
+        public override void WriteJson(JsonWriter writer, ObjectPlacement value, JsonSerializer serializer)
+        {
+            writer.WriteStartObject();
+            
+            WritePlacementInfo(writer, value, serializer);
+            
+            if (value._broadcasters.Count > 0)
+            {
+                writer.WritePropertyName("events");
+                serializer.Serialize(writer, value._broadcasters.Select(broadcaster => broadcaster.Serialize()).ToList());
+            }
 
-    public int GetRotation()
-    {
-        return _rotation;
-    }
+            if (value._receivers.Count > 0)
+            {
+                writer.WritePropertyName("listeners");
+                serializer.Serialize(writer, value._receivers.Select(receiver => receiver.Serialize()).ToList());
+            }
 
-    public float GetScale()
-    {
-        return _scale;
-    }
+            if (value._config.Count > 0)
+            {
+                writer.WritePropertyName("config");
+                serializer.Serialize(writer, value._config.ToDictionary(c => c.GetName(), c => c.SerializeValue()));
+            }
+            
+            writer.WriteEndObject();
+        }
 
-    public Vector3 GetPos()
-    {
-        return _pos;
-    }
+        private static void WritePlacementInfo(JsonWriter writer, ObjectPlacement placement, JsonSerializer serializer)
+        {
+            writer.WritePropertyName("placement");
+            
+            writer.WriteStartObject();
+            writer.WritePropertyName("name");
+            writer.WriteValue(placement._name);
+            writer.WritePropertyName("id");
+            writer.WriteValue(placement._id);
+            writer.WritePropertyName("pos");
+            serializer.Serialize(writer, placement._pos);
 
-    public bool IsFlipped()
-    {
-        return _flipped;
+            writer.WritePropertyName("flipped");
+            writer.WriteValue(placement._flipped);
+            
+            if (placement._rotation != 0)
+            {
+                writer.WritePropertyName("rotation");
+                writer.WriteValue(placement._rotation);
+            }
+            
+            if (!Mathf.Approximately(placement._scale, 1))
+            {
+                writer.WritePropertyName("scale");
+                writer.WriteValue(placement._scale);
+            }
+            
+            writer.WriteEndObject();
+        }
+
+        public override ObjectPlacement ReadJson(JsonReader reader, Type objectType, ObjectPlacement existingValue,
+            bool hasExistingValue,
+            JsonSerializer serializer)
+        {
+            var name = "";
+            var id = "";
+            var pos = Vector3.zero;
+            var flipped = true;
+            var rotation = 0;
+            var scale = 1f;
+            List<Dictionary<string, string>> broadcasters = new();
+            List<Dictionary<string, string>> receivers = new();
+            Dictionary<string, string> config = new();
+
+            reader.Read();
+            while (reader.TokenType == JsonToken.PropertyName)
+            {
+                switch (reader.Value as string)
+                {
+                    case "placement":
+                    {
+                        reader.Read();
+                        reader.Read();
+                        while (reader.TokenType == JsonToken.PropertyName)
+                        {
+                            var key = reader.Value as string;
+                            switch (key)
+                            {
+                                case "name":
+                                    reader.ReadAsString();
+                                    name = reader.Value as string;
+                                    break;
+                                case "id":
+                                    reader.ReadAsString();
+                                    id = reader.Value as string;
+                                    break;
+                                case "pos":
+                                    reader.Read();
+                                    pos = serializer.Deserialize<Vector3>(reader);
+                                    break;
+                                case "flipped":
+                                    reader.ReadAsBoolean();
+                                    flipped = (bool)reader.Value;
+                                    break;
+                                case "rotation":
+                                    reader.ReadAsInt32();
+                                    rotation = (int)reader.Value;
+                                    break;
+                                case "scale":
+                                    reader.ReadAsDouble();
+                                    scale = (float)(double)reader.Value;
+                                    break;
+                            }
+
+                            reader.Read();
+                        }
+
+                        break;
+                    }
+                    case "events":
+                        reader.Read();
+                        broadcasters = serializer.Deserialize<List<Dictionary<string, string>>>(reader);
+                        break;
+                    case "listeners":
+                        reader.Read();
+                        receivers = serializer.Deserialize<List<Dictionary<string, string>>>(reader);
+                        break;
+                    case "config":
+                        reader.Read();
+                        config = serializer.Deserialize<Dictionary<string, string>>(reader);
+                        break;
+                }
+                reader.Read();
+            }
+            
+            var placement = new ObjectPlacement(name, pos, flipped, rotation, scale, id);
+
+            foreach (var broadcaster in broadcasters)
+            {
+                placement.AddBroadcaster(EventManager.DeserializeBroadcaster(broadcaster));
+            }
+
+            foreach (var receiver in receivers)
+            {
+                placement.AddReceiver(EventManager.DeserializeReceiver(receiver));
+            }
+
+            foreach (var cvalue in config)
+            {
+                placement.AddConfig(Attributes.ConfigManager.DeserializeConfigValue(cvalue.Key, cvalue.Value));
+            }
+
+            return placement;
+        }
     }
 }

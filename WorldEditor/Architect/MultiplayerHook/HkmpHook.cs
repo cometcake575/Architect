@@ -1,3 +1,4 @@
+using Architect.MultiplayerHook.Packets;
 using Hkmp.Api.Client;
 using Hkmp.Api.Server;
 using Hkmp.Networking.Packet;
@@ -25,12 +26,12 @@ public static class HkmpHook
         _clientAddon.BroadcastWin();
     }
     
-    public static IPacketData InstantiatePacket(ServerPacketId packetId)
+    public static IPacketData InstantiatePacket(PacketId packetId)
     {
         return packetId switch
         {
-            ServerPacketId.Refresh => new ServerRefreshPacketData(),
-            ServerPacketId.Win => new ServerWinPacketData(),
+            PacketId.Refresh => new RefreshPacketData(),
+            PacketId.Win => new WinPacketData(),
             _ => null
         };
     }

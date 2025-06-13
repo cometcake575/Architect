@@ -6,11 +6,16 @@ namespace Architect.Objects;
 
 public static class PlacementManager
 {
-    internal static List<ObjectPlacement> Placements => Architect.GlobalSettings.Edits.GetPlacements(GameManager.instance.sceneName);
+    public static List<ObjectPlacement> GetCurrentPlacements()
+    {
+        if (!Architect.GlobalSettings.Edits.ContainsKey(GameManager.instance.sceneName))
+            Architect.GlobalSettings.Edits[GameManager.instance.sceneName] = new List<ObjectPlacement>();
+        return Architect.GlobalSettings.Edits[GameManager.instance.sceneName];
+    }
 
     private static void LoadPlacements()
     {
-        foreach (var placement in Placements)
+        foreach (var placement in GetCurrentPlacements())
         {
             if (EditorManager.IsEditing) placement.PlaceGhost();
             else placement.SpawnObject();

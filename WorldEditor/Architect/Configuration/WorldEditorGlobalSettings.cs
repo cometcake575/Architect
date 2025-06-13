@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Architect.Util;
+using Architect.Objects;
 using Modding.Converters;
 using Newtonsoft.Json;
 
@@ -16,6 +16,5 @@ public class WorldEditorGlobalSettings
     [JsonConverter(typeof(PlayerActionSetConverter))]
     public readonly WorldEditorKeyBinds Keybinds = new();
 
-    [JsonConverter(typeof(CustomSceneData.CustomSceneDataConverter))]
-    public CustomSceneData Edits = new();
+    public Dictionary<string, List<ObjectPlacement>> Edits = new();
 }

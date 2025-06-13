@@ -249,8 +249,8 @@ public static class ContentPacks
             CreateEnemy("Deepnest_East_07", "Ceiling Dropper", "Belfly"),
             CreateEnemy("Deepnest_East_07", "Blow Fly", "Boofly"),
             CreateEnemy("Deepnest_East_07", "Super Spitter", "Primal Aspid"),
-            CreateEnemy("Deepnest_East_07", "Hopper", "Hopper"),
-            CreateEnemy("Deepnest_East_14b", "Giant Hopper", "Great Hopper"),
+            new HopperPackElement("Deepnest_East_07", "Hopper", "Hopper"),
+            new HopperPackElement("Deepnest_East_14b", "Giant Hopper", "Great Hopper"),
             Create("Ruins2_11_b", "jar_col_plat", "Tower of Love Platform", "Solids")
         });
         RegisterInternalPack(new ContentPack("The Hive", "Assets from the Hive")

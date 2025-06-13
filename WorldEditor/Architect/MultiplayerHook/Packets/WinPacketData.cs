@@ -1,8 +1,8 @@
 using Hkmp.Networking.Packet;
 
-namespace Architect.MultiplayerHook;
+namespace Architect.MultiplayerHook.Packets;
 
-public class ServerWinPacketData : IPacketData
+public class WinPacketData : IPacketData
 {
     public string WinnerName;
     

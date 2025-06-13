@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Architect.Content.Custom;
+using Architect.MultiplayerHook.Packets;
 using Architect.Objects;
 using Architect.Util;
 using Hkmp.Api.Client;
@@ -17,17 +18,17 @@ public class WeClientAddon : ClientAddon
         Logger.Info("Initializing client-side Architect addon!");
         _api = clientApi;
         
-        var netReceiver = clientApi.NetClient.GetNetworkReceiver<ServerPacketId>(this, HkmpHook.InstantiatePacket);
+        var netReceiver = clientApi.NetClient.GetNetworkReceiver<PacketId>(this, HkmpHook.InstantiatePacket);
         
-        netReceiver.RegisterPacketHandler<ServerRefreshPacketData>(ServerPacketId.Refresh, packet =>
+        netReceiver.RegisterPacketHandler<RefreshPacketData>(PacketId.Refresh, packet =>
         {
-            if (EditorManager.IsEditing) return;
+            //if (EditorManager.IsEditing) return;
             
-            Architect.GlobalSettings.Edits.SetPlacements(packet.SceneName, JsonConvert.DeserializeObject<List<ObjectPlacement>>(packet.SerializedEdits, CustomSceneData.PartConverter));
+            Architect.GlobalSettings.Edits[packet.SceneName] = packet.Edits;
             EditorManager.ScheduleReloadScene();
         });
         
-        netReceiver.RegisterPacketHandler<ServerWinPacketData>(ServerPacketId.Win, packet =>
+        netReceiver.RegisterPacketHandler<WinPacketData>(PacketId.Win, packet =>
         {
             ZoteTrophy.WinScreen(packet.WinnerName);
         });
@@ -38,12 +39,11 @@ public class WeClientAddon : ClientAddon
         if (!_api.NetClient.IsConnected) return;
         
         var scene = GameManager.instance.sceneName;
-        var serialized = JsonConvert.SerializeObject(Architect.GlobalSettings.Edits.GetPlacements(scene), CustomSceneData.PartConverter, new Vector3Converter());
-        
-        _api.NetClient.GetNetworkSender<ServerPacketId>(this)
-            .SendSingleData(ServerPacketId.Refresh, new ServerRefreshPacketData
+
+        _api.NetClient.GetNetworkSender<PacketId>(this)
+            .SendSingleData(PacketId.Refresh, new RefreshPacketData
             {
-                SerializedEdits = serialized,
+                Edits = Architect.GlobalSettings.Edits[scene],
                 SceneName = scene
             });
     }
@@ -51,8 +51,8 @@ public class WeClientAddon : ClientAddon
     public void BroadcastWin()
     {
         if (!_api.NetClient.IsConnected) return;
-        _api.NetClient.GetNetworkSender<ServerPacketId>(this)
-            .SendSingleData(ServerPacketId.Win, new ServerWinPacketData
+        _api.NetClient.GetNetworkSender<PacketId>(this)
+            .SendSingleData(PacketId.Win, new WinPacketData
             {
                 WinnerName = _api.ClientManager.Username
             });

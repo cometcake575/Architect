@@ -7,6 +7,7 @@ using Architect.Configuration;
 using UnityEngine;
 using Architect.Content;
 using Architect.Content.Custom;
+using Architect.Content.Groups;
 using Architect.MultiplayerHook;
 using Architect.Objects;
 using Architect.UI;
@@ -63,6 +64,9 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
 
     public void OnLoadGlobal(WorldEditorGlobalSettings s)
     {
+        ConfigGroup.Initialize();
+        ReceiverGroup.Initialize();
+        
         GlobalSettings = s;
     }
 

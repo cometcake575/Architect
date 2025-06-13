@@ -15,7 +15,7 @@ public class PlaceableObject : SelectableObject
     {
         if (!first) return;
         pos.z = GetZPos();
-        var placement = new ObjectPlacement(GetName(), pos, EditorManager.IsFlipped, EditorManager.Rotation, EditorManager.Scale, Guid.NewGuid().ToString());
+        var placement = new ObjectPlacement(GetName(), pos, EditorManager.IsFlipped, EditorManager.Rotation, EditorManager.Scale, Guid.NewGuid().ToString().Substring(0, 8));
         
         foreach (var value in EditorUIManager.ConfigValues.Values)
         {
@@ -30,7 +30,7 @@ public class PlaceableObject : SelectableObject
             placement.AddReceiver(value);
         }
         
-        PlacementManager.Placements.Add(placement);
+        PlacementManager.GetCurrentPlacements().Add(placement);
         placement.PlaceGhost();
     }
 
