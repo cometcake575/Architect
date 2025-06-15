@@ -23,7 +23,7 @@ public static class WeSpriteUtils
         return Quaternion.Euler(0, 0, rotation) * (offset * scale);
     }
 
-    public static Sprite ConvertFrom2DToolkit(tk2dSpriteDefinition def)
+    public static Sprite ConvertFrom2DToolkit(tk2dSpriteDefinition def, float ppu)
     {
         if (def.material.mainTexture is not Texture2D texture) return null;
         var minX = def.uvs[0].x;
@@ -42,8 +42,8 @@ public static class WeSpriteUtils
         var y = minY * texture.height;
         var width = (maxX - minX) * texture.width;
         var height = (maxY - minY) * texture.height;
-
+        
         return Sprite.Create(texture, new Rect(x, y, width, height),
-            new Vector2(0.5f, 0.5f), 64);
+            new Vector2(0.5f, 0.5f), ppu);
     }
 }

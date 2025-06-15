@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Architect.Content.Elements;
 using Architect.Content.Elements.Internal;
-using Architect.Content.Elements.Internal.Special;
+using Architect.Content.Elements.Internal.Fixers;
 using Architect.Content.Groups;
 using UnityEngine;
 
@@ -51,18 +51,22 @@ public static class ContentPacks
 
     private static AbstractPackElement Create(string scene, string path, string name, string category, float offset = 0, int weight = 0)
     {
-        return new GInternalPackElement(scene, path, name, category, offset, weight);
+        return new GInternalPackElement(scene, path, name, category, weight);
     }
 
     private static AbstractPackElement CreateEnemy(string scene, string path, string name, float offset = 0, int weight = 0)
     {
-        return new GInternalPackElement(scene, path, name, "Enemies", offset, weight)
+        return new GInternalPackElement(scene, path, name, "Enemies", weight)
             .WithConfigGroup(ConfigGroup.Enemies)
             .WithBroadcasterGroup(BroadcasterGroup.Enemies);
     }
 
     internal static void PreloadInternalPacks()
     {
+        // If there weren't any placements these didn't end up initialized, so they're initialized here
+        ConfigGroup.Initialize();
+        ReceiverGroup.Initialize();
+        
         RegisterInternalPack(new ContentPack("King's Pass", "Assets from King's Pass")
         {
             Create("Tutorial_01", "_Props/Stalactite Hazard", "Stalactite", "Hazards")
@@ -75,7 +79,7 @@ public static class ContentPacks
             Create("Tutorial_01", "_Scenery/plat_float_17", "Platform 6", "Solids"),
             Create("Tutorial_01", "_Scenery/plat_float_18", "Platform 7", "Solids"),
             Create("Tutorial_01", "_Scenery/plat_float_20", "Platform 8", "Solids"),
-            Create("Tutorial_01", "_Props/Health Cocoon", "Lifeblood Cocoon", "Interactable")
+            Create("Tutorial_01", "_Props/Health Cocoon", "Lifeblood Cocoon", "Interactable", weight:1)
                 .WithConfigGroup(ConfigGroup.Cocoon)
         });
         RegisterInternalPack(new ContentPack("Forgotten Crossroads", "Assets from the regular Forgotten Crossroads")
@@ -93,7 +97,11 @@ public static class ContentPacks
             CreateEnemy("Crossroads_21", "non_infected_event/Zombie Leaper", "Leaping Husk"),
             CreateEnemy("Crossroads_15", "_Enemies/Zombie Shield", "Husk Warrior"),
             CreateEnemy("Crossroads_21", "non_infected_event/Zombie Guard", "Husk Guard"),
+            CreateEnemy("Crossroads_ShamanTemple", "_Enemies/Roller", "Baldur"),
+            new ElderBaldurElement(),
+            new MenderbugElement(),
             CreateEnemy("Crossroads_19", "_Enemies/Spitter", "Aspid Hunter"),
+            new HatcherPackElement("Crossroads_19", "_Enemies/Hatcher", "Hatcher Cage (1)", "Aspid Mother", "Hatcher"),
             Create("Crossroads_18", "Soul Totem mini_horned", "Mini Soul Totem", "Interactable")
                 .WithRotationGroup(RotationGroup.Eight),
             Create("Crossroads_25", "Soul Totem mini_two_horned", "Horned Soul Totem", "Interactable")
@@ -172,6 +180,7 @@ public static class ContentPacks
         });
         RegisterInternalPack(new ContentPack("Queen's Gardens", "Assets from the Queen's Gardens")
         {
+            new MossyVagabondElement(),
             CreateEnemy("Fungus3_34", "Garden Zombie", "Spiny Husk"),
             CreateEnemy("Fungus3_48", "Lazy Flyer Enemy", "Aluba"),
             CreateEnemy("Fungus3_34", "Moss Flyer", "Mossfly"),
@@ -255,9 +264,23 @@ public static class ContentPacks
         });
         RegisterInternalPack(new ContentPack("The Hive", "Assets from the Hive")
         {
-            CreateEnemy("Hive_04", "Bee Hatchling Ambient (31)", "Hiveling"),
-            CreateEnemy("Hive_04", "Bee Stinger (9)", "Hive Soldier"),
-            CreateEnemy("Hive_04", "Big Bee (3)", "Hive Guardian")
+            CreateEnemy("Hive_03_c", "Bee Hatchling Ambient (11)", "Hiveling"),
+            CreateEnemy("Hive_03_c", "Bee Stinger (4)", "Hive Soldier"),
+            CreateEnemy("Hive_03_c", "Big Bee", "Hive Guardian"),
+            new HatcherPackElement("Hive_01", "Zombie Hive", "Hatcher Cage (1)", "Husk Hive", "Hive Zombie"),
+            Create("Hive_03_c", "hive_plat_01 (4)", "Hive Platform 1", "Solids"),
+            Create("Hive_03_c", "hive_plat_02 (2)", "Hive Platform 2", "Solids"),
+            Create("Hive_03_c", "hive_plat_03 (3)", "Hive Platform 3", "Solids"),
+            Create("Hive_03_c", "hive_plat_04 (4)", "Hive Platform 4", "Solids"),
+            Create("Hive_03_c", "hive_plat_brk_02", "Breakable Hive Platform 1", "Solids"),
+            Create("Hive_03_c", "hive_plat_brk_03 (1)", "Breakable Hive Platform 2", "Solids"),
+            Create("Hive_03_c", "hive_plat_brk_04", "Breakable Hive Platform 3", "Solids"),
+            Create("Hive_03_c", "Hive Breakable Pillar (5)", "Hive Breakable Pillar", "Interactable", weight:1)
+                .WithRotationGroup(RotationGroup.Four)
+        });
+        RegisterInternalPack(new ContentPack("Resting Grounds", "Assets from the Resting Grounds")
+        {
+            CreateEnemy("RestingGrounds_10", "Grave Zombie", "Entombed Husk")
         });
         RegisterInternalPack(new ContentPack("Ancient Basin", "Assets from the Ancient Basin")
         {
@@ -272,6 +295,7 @@ public static class ContentPacks
             CreateEnemy("Deepnest_33", "Zombie Runner Sp (1)", "Corpse Creeper (Wandering Husk)"),
             CreateEnemy("Deepnest_33", "Zombie Hornhead Sp (2)", "Corpse Creeper (Husk Hornhead)"),
             CreateEnemy("Deepnest_17", "Baby Centipede", "Dirtcarver"),
+            new HatcherPackElement("Deepnest_26b", "Centipede Hatcher (4)", "Centipede Cage", "Carver Hatcher", "Centipede Hatcher"),
             CreateEnemy("Deepnest_41", "Spider Mini", "Deephunter")
                 .WithRotationGroup(RotationGroup.Four),
             CreateEnemy("Deepnest_41", "Tiny Spider", "Deepling"),
@@ -287,7 +311,8 @@ public static class ContentPacks
             Create("White_Palace_07", "wp_plat_float_05 (1)", "White Palace Platform 4", "Solids"),
             Create("White_Palace_07", "wp_trap_spikes", "White Palace Moving Spikes", "Hazards")
                 .WithRotationGroup(RotationGroup.Eight),
-            Create("White_Palace_07", "wp_saw", "White Palace Saw", "Hazards"),
+            Create("White_Palace_07", "wp_saw", "White Palace Saw", "Hazards")
+                .WithConfigGroup(ConfigGroup.Sawblade),
             Create("White_Palace_03_hub", "Soul Totem white", "Pale King Soul Totem", "Interactable")
                 .WithRotationGroup(RotationGroup.Eight),
             Create("White_Palace_18", "Soul Totem white_Infinte", "Pure Vessel Soul Totem", "Interactable")

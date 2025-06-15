@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Modding;
 using System.Reflection;
 using Architect.Attributes;
@@ -7,7 +8,6 @@ using Architect.Configuration;
 using UnityEngine;
 using Architect.Content;
 using Architect.Content.Elements.Custom;
-using Architect.Content.Groups;
 using Architect.MultiplayerHook;
 using Architect.Objects;
 using Architect.UI;
@@ -57,7 +57,7 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
         
         if (ModHooks.GetMod("HKMP") is Mod)
         {
-            HkmpHook.Initialize();
+            HookInitializer.Initialize();
             UsingMultiplayer = true;
         }
         
@@ -82,6 +82,15 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
     
     public WorldEditorGlobalSettings OnSaveGlobal()
     {
+        var keysToRemove = GlobalSettings.Edits.Keys
+            .Where(key => GlobalSettings.Edits[key].Count == 0)
+            .ToList();
+
+        foreach (var s in keysToRemove)
+        {
+            GlobalSettings.Edits.Remove(s);
+        }
+        
         return GlobalSettings;
     }
     

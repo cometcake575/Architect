@@ -8,12 +8,13 @@ public static class GhostPlacementUtils
     public static void SetupForPlacement(GameObject obj, SpriteRenderer renderer, PlaceableObject selected, bool flipped, int rotation, float scale)
     {
         renderer.sprite = selected.GetSprite();
-        
-        obj.transform.localScale = selected.PackElement.GetPrefab(flipped, rotation).transform.localScale * scale;
+
+        var prefab = selected.PackElement.GetPrefab(flipped, rotation);
+        obj.transform.localScale = prefab.transform.localScale * scale;
         
         var visualRotation = selected.GetSpriteRotation();
         
-        obj.transform.rotation = Quaternion.Euler(0, 0, visualRotation + rotation);
+        obj.transform.rotation = Quaternion.Euler(0, 0, visualRotation + rotation + prefab.transform.eulerAngles.z);
 
         if (visualRotation % 180 != 0)
         {

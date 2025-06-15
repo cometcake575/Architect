@@ -29,19 +29,7 @@ public static class EditorManager
 
         On.QuitToMenu.Start += (orig, self) =>
         {
-            if (!Architect.GlobalSettings.CanEnableEditing) return orig(self);
-            
             IsEditing = false;
-
-            var keysToRemove = Architect.GlobalSettings.Edits.Keys
-                .Where(key => Architect.GlobalSettings.Edits[key].Count == 0)
-                .ToList();
-
-            foreach (var s in keysToRemove)
-            {
-                Architect.GlobalSettings.Edits.Remove(s);
-            }
-
             return orig(self);
         };
         

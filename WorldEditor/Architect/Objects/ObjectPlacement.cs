@@ -86,7 +86,7 @@ public class ObjectPlacement
         
         obj.SetActive(true);
         
-        GetPlaceableObject().PackElement.PostSpawn(obj, _flipped, _rotation);
+        GetPlaceableObject().PackElement.PostSpawn(obj, _flipped, _rotation, _scale);
         
         if (!GetPlaceableObject().PackElement.OverrideFlip() && _flipped)
         {
@@ -153,8 +153,6 @@ public class ObjectPlacement
     {
         public static readonly ObjectPlacementConverter Instance = new();
         public static readonly Vector3Converter Vector3Converter = new();
-
-        private static bool _initialized;
         
         public override void WriteJson(JsonWriter writer, ObjectPlacement value, JsonSerializer serializer)
         {
@@ -217,12 +215,9 @@ public class ObjectPlacement
             bool hasExistingValue,
             JsonSerializer serializer)
         {
-            if (!_initialized)
-            {
-                _initialized = true;
-                ConfigGroup.Initialize();
-                ReceiverGroup.Initialize();
-            }
+            // Required for deserialization
+            ConfigGroup.Initialize();
+            ReceiverGroup.Initialize();
             
             var name = "";
             var id = "";

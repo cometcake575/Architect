@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using Architect.Content.Groups;
 using UnityEngine;
 
-namespace Architect.Content.Elements.Internal.Special;
+namespace Architect.Content.Elements.Internal.Fixers;
 
-internal class MawlurkPackElement : InternalPackElement
+internal sealed class MawlurkPackElement : InternalPackElement
 {
     private GameObject _normal;
     private GameObject _inverted;

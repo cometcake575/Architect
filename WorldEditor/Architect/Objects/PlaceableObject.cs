@@ -117,7 +117,7 @@ public class PlaceableObject : SelectableObject
         }
         else def = sprite.CurrentSprite;
 
-        _sprite = WeSpriteUtils.ConvertFrom2DToolkit(def);
+        _sprite = WeSpriteUtils.ConvertFrom2DToolkit(def, 64 / sprite.scale.x);
         
         if (def.flipped != tk2dSpriteDefinition.FlipMode.None) _rotation += 90;
         Offset = def.GetBounds().center;
@@ -143,7 +143,10 @@ public class PlaceableObject : SelectableObject
         _weight = element.Weight * -1000 + _nextWeight;
         _nextWeight++;
         PackElement = element;
-        PreparePlacementData(element.GetPrefab(false, 0));
+
+        var prefab = element.GetPrefab(false, 0);
+        PreparePlacementData(prefab);
+        Offset = prefab.transform.rotation * Offset;
     }
 
     public static SelectableObject Create(AbstractPackElement element)

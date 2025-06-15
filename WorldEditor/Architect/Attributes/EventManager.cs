@@ -24,8 +24,10 @@ public static class EventManager
         On.HealthManager.Awake += (orig, self) =>
         {
             orig(self);
-            
-            self.GetComponent<PersistentBoolItem>().OnSetSaveState += value =>
+
+            var component = self.GetComponent<PersistentBoolItem>();
+            if (!component) return;
+            component.OnSetSaveState += value =>
             {
                 if (value) BroadcastEvent(self.gameObject, EventBroadcasterType.LoadedDead);
             };

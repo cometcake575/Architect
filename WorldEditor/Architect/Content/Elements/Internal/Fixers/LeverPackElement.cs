@@ -5,11 +5,11 @@ using Architect.Content.Groups;
 using Satchel;
 using UnityEngine;
 
-namespace Architect.Content.Elements.Internal.Special;
+namespace Architect.Content.Elements.Internal.Fixers;
 
-internal class LeverPackElement : GInternalPackElement
+internal sealed class LeverPackElement : GInternalPackElement
 {
-    public LeverPackElement(string scene, string path, string name) : base(scene, path, name, "Interactable", 0, 20)
+    public LeverPackElement(string scene, string path, string name) : base(scene, path, name, "Interactable", 20)
     {
         WithBroadcasterGroup(BroadcasterGroup.Levers);
         WithConfigGroup(ConfigGroup.Levers);
@@ -24,7 +24,7 @@ internal class LeverPackElement : GInternalPackElement
         GameObject.transform.localScale = scale;
     }
 
-    public override void PostSpawn(GameObject gameObject, bool flipped, int rotation)
+    public override void PostSpawn(GameObject gameObject, bool flipped, int rotation, float scale)
     {
         var fsm = gameObject.LocateMyFSM("Switch Control");
         fsm.AddCustomAction("Activated", makerFsm =>

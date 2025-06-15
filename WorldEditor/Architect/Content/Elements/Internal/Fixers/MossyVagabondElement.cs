@@ -1,15 +1,14 @@
 using System.Collections.Generic;
 using Architect.Content.Groups;
-using Satchel;
 using UnityEngine;
 
-namespace Architect.Content.Elements.Internal.Special;
+namespace Architect.Content.Elements.Internal.Fixers;
 
-internal class ZombieMylaPackElement : InternalPackElement
+internal sealed class MossyVagabondElement : InternalPackElement
 {
     private GameObject _gameObject;
 
-    public ZombieMylaPackElement() : base("Husk Myla", "Enemies")
+    public MossyVagabondElement() : base("Mossy Vagabond", "Enemies")
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
         WithConfigGroup(ConfigGroup.Enemies);
@@ -22,13 +21,16 @@ internal class ZombieMylaPackElement : InternalPackElement
 
     internal override void AddPreloads(List<(string, string)> preloadInfo)
     {
-        preloadInfo.Add(("Crossroads_45", "Zombie Myla"));
+        preloadInfo.Add(("Fungus3_39", "Moss Knight Fat"));
     }
 
     internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
     {
-        _gameObject = preloads["Crossroads_45"]["Zombie Myla"];
+        _gameObject = preloads["Fungus3_39"]["Moss Knight Fat"];
+    }
 
-        _gameObject.RemoveComponent<DeactivateIfPlayerdataFalse>();
+    public override void PostSpawn(GameObject gameObject, bool flipped, int rotatio, float scale)
+    {
+        _gameObject.LocateMyFSM("FSM").SetFsmTemplate(null);
     }
 }

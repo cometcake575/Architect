@@ -7,11 +7,16 @@ namespace Architect.Content.Groups;
 
 public class ReceiverGroup
 {
+    private static bool _initialized;
+    
     internal static ReceiverGroup All;
     internal static ReceiverGroup Gates;
     
     internal static void Initialize()
     {
+        if (_initialized) return;
+        _initialized = true;
+
         All = new ReceiverGroup(null, 
             EventManager.RegisterEventReceiverType(DisableOnEventType.Instance),
             EventManager.RegisterEventReceiverType(EnableOnEventType.Instance)
