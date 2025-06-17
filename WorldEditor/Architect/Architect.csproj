@@ -6,7 +6,7 @@
         <TargetFramework>net472</TargetFramework>
         <AssemblyTitle>Architect</AssemblyTitle>
         <Product>Architect</Product>
-        <Description>A mod to add platforms, enemies and more to change areas in the game.</Description>
+        <Description>A mod to add platforms, enemies and more to change areas in the game with an in-game level editor.</Description>
         <Copyright>Copyright © Arun Kapila 2025</Copyright>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
         <FileVersion>1.0.0.0</FileVersion>
