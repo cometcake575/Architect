@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Architect.Attributes;
 using Architect.Util;
 
@@ -26,7 +27,7 @@ public static class PlacementManager
 
     private static void LoadPlacements()
     {
-        foreach (var placement in GetCurrentPlacements())
+        foreach (var placement in GetCurrentPlacements().Where(placement => placement.GetPlaceableObject() != null))
         {
             if (EditorManager.IsEditing) placement.PlaceGhost();
             else placement.SpawnObject();

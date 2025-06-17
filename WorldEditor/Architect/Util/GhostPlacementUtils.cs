@@ -14,9 +14,9 @@ public static class GhostPlacementUtils
         
         var visualRotation = selected.GetSpriteRotation();
         
-        obj.transform.rotation = Quaternion.Euler(0, 0, visualRotation + rotation + prefab.transform.eulerAngles.z);
-
-        if (visualRotation % 180 != 0)
+        obj.transform.rotation = Quaternion.Euler(0, 0, visualRotation + rotation);
+        
+        if (Mathf.RoundToInt(visualRotation / 90) % 2 != 0)
         {
             renderer.flipY = flipped;
             renderer.flipX = selected.PackElement.ShouldFlipVertical();

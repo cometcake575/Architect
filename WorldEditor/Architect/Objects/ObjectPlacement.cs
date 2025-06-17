@@ -39,9 +39,11 @@ public class ObjectPlacement
         PlacementManager.GetCurrentPlacements().Remove(this);
     }
 
-    private PlaceableObject GetPlaceableObject()
+    public PlaceableObject GetPlaceableObject()
     {
-        return _placeableObject ??= PlaceableObject.AllObjects[_name] as PlaceableObject;
+        return _placeableObject ??= PlaceableObject.AllObjects.TryGetValue(_name, out var obj)
+            ? _placeableObject = obj as PlaceableObject
+            : null;
     }
 
     private PlaceableObject _placeableObject;
@@ -68,20 +70,27 @@ public class ObjectPlacement
 
     internal void SpawnObject()
     {
-        var prefab = GetPlaceableObject().PackElement.GetPrefab(_flipped, _rotation);
+        var packElement = GetPlaceableObject().PackElement;
+        var prefab = packElement.GetPrefab(_flipped, _rotation);
         
         var obj = Object.Instantiate(prefab, _pos, prefab.transform.rotation);
         obj.name = _name + " (" + _id + ")";
         
         if (!Mathf.Approximately(_scale, 1))
         {
-            if (obj.GetComponent<PlayMakerFSM>())
+            if (obj.GetComponent<HealthManager>() && !packElement.DisableScaleParent())
             {
                 var par = new GameObject("Scale Parent") { transform = { position = _pos } };
                 obj.transform.parent = par.transform;
                 par.transform.localScale *= _scale;
             }
             else obj.transform.localScale *= _scale;
+        }
+
+        foreach (var c in _config)
+        {
+            if (!c.PreAwake()) continue;
+            c.Setup(obj);
         }
         
         obj.SetActive(true);
@@ -118,6 +127,7 @@ public class ObjectPlacement
 
         foreach (var c in _config)
         {
+            if (c.PreAwake()) continue;
             c.Setup(obj);
         }
     }

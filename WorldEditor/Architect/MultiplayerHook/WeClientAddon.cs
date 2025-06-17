@@ -18,8 +18,6 @@ public class WeClientAddon : ClientAddon
         
         netReceiver.RegisterPacketHandler<RefreshPacketData>(PacketId.Refresh, packet =>
         {
-            if (EditorManager.IsEditing) return;
-            
             Architect.GlobalSettings.Edits[packet.SceneName].Clear();
             Architect.GlobalSettings.Edits[packet.SceneName].AddRange(packet.Edits);
             
@@ -57,6 +55,6 @@ public class WeClientAddon : ClientAddon
     }
 
     protected override string Name => "Architect";
-    protected override string Version => "0.1.0";
+    protected override string Version => "1.0.0";
     public override bool NeedsNetwork => true;
 }

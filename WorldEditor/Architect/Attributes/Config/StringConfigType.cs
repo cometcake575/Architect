@@ -2,36 +2,33 @@ using System;
 using MagicUI.Core;
 using MagicUI.Elements;
 using UnityEngine;
-using UnityEngine.UI;
-using Button = MagicUI.Elements.Button;
 
 namespace Architect.Attributes.Config;
 
-public class IntConfigType : ConfigType<IntConfigValue>
+public class StringConfigType : ConfigType<StringConfigValue>
 {
-    public IntConfigType(string name, Action<GameObject, IntConfigValue> action, bool preAwake = false) : base(name, action, preAwake) { }
+    public StringConfigType(string name, Action<GameObject, StringConfigValue> action, bool preAwake = false) : base(name, action, preAwake) { }
 
     public override ConfigValue Deserialize(string data)
     {
-        return new IntConfigValue(this, Convert.ToInt32(data));
+        return new StringConfigValue(this, data);
     }
 
     public override ConfigElement CreateInput(LayoutRoot root, Button apply)
     {
-        return new IntConfigElement(Name, root, apply);
+        return new StringConfigElement(Name, root, apply);
     }
 }
 
-public class IntConfigElement : ConfigElement
+public class StringConfigElement : ConfigElement
 {
     private readonly TextInput _input;
     
-    public IntConfigElement(string name, LayoutRoot layout, Button apply)
+    public StringConfigElement(string name, LayoutRoot layout, Button apply)
     {
         _input = new TextInput(layout, name + " Input")
         {
-            MinWidth = 80,
-            ContentType = InputField.ContentType.IntegerNumber
+            MinWidth = 80
         };
 
         _input.TextChanged += (_, _) =>
@@ -51,22 +48,22 @@ public class IntConfigElement : ConfigElement
     }
 }
 
-public class IntConfigValue : ConfigValue<IntConfigType>
+public class StringConfigValue : ConfigValue<StringConfigType>
 {
-    public IntConfigValue(IntConfigType type, int value) : base(type)
+    public StringConfigValue(StringConfigType type, string value) : base(type)
     {
         _value = value;
     }
 
-    private readonly int _value;
+    private readonly string _value;
 
-    public int GetValue()
+    public string GetValue()
     {
         return _value;
     }
 
     public override string SerializeValue()
     {
-        return _value.ToString();
+        return _value;
     }
 }

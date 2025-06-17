@@ -14,6 +14,11 @@ internal class ElderBaldurElement : InternalPackElement
         WithConfigGroup(ConfigGroup.Enemies);
     }
 
+    public override bool DisableScaleParent()
+    {
+        return true;
+    }
+
     public override GameObject GetPrefab(bool flipped, int rotation)
     {
         return _gameObject;

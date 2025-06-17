@@ -34,7 +34,7 @@ public static class CursorItem
         _obj.transform.position = objPos + _offset;
 
         if (!NeedsRefreshing) return;
-
+        
         NeedsRefreshing = false;
 
         var renderer = _obj.GetComponent<SpriteRenderer>();

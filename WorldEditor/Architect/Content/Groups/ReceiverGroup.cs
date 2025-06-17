@@ -10,6 +10,7 @@ public class ReceiverGroup
     private static bool _initialized;
     
     internal static ReceiverGroup All;
+    
     internal static ReceiverGroup Gates;
     
     internal static void Initialize()

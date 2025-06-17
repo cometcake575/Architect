@@ -41,6 +41,8 @@ public static class EditorManager
         
         On.HeroController.CanNailArt += (orig, self) => !IsEditing && orig(self);
         
+        On.HeroController.CanTakeDamage += (orig, self) => orig(self) && !IsEditing;
+        
         ModHooks.CursorHook += () => { Cursor.visible = GameManager.instance.isPaused || (IsEditing && EditorUIManager.SelectedItem is not PlaceableObject); };
     }
 
@@ -74,6 +76,7 @@ public static class EditorManager
         CursorItem.TryRefresh(paused || !IsEditing);
         
         if (!IsEditing) return;
+        HeroController.instance.GetComponent<Rigidbody2D>().velocity.Set(0, 0);
 
         // Checks if the selected item is placeable
         if (EditorUIManager.SelectedItem is PlaceableObject placeable)

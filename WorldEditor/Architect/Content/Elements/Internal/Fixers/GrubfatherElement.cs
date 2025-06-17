@@ -1,18 +1,14 @@
 using System.Collections.Generic;
-using Architect.Content.Groups;
-using Satchel;
 using UnityEngine;
 
 namespace Architect.Content.Elements.Internal.Fixers;
 
-internal sealed class MenderbugElement : InternalPackElement
+internal class GrubfatherElement : InternalPackElement
 {
     private GameObject _gameObject;
 
-    public MenderbugElement() : base("Menderbug", "Enemies")
+    public GrubfatherElement(int weight) : base("Grubfather", "Interactable", weight)
     {
-        WithBroadcasterGroup(BroadcasterGroup.Enemies);
-        WithConfigGroup(ConfigGroup.Enemies);
     }
 
     public override GameObject GetPrefab(bool flipped, int rotation)
@@ -22,18 +18,16 @@ internal sealed class MenderbugElement : InternalPackElement
 
     internal override void AddPreloads(List<(string, string)> preloadInfo)
     {
-        preloadInfo.Add(("Crossroads_01", "_Scenery/Mender Bug"));
+        preloadInfo.Add(("Crossroads_38", "Fat Grub King"));
     }
 
     internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
     {
-        _gameObject = preloads["Crossroads_01"]["_Scenery/Mender Bug"];
+        _gameObject = preloads["Crossroads_38"]["Fat Grub King"];
     }
 
     public override void PostSpawn(GameObject gameObject, bool flipped, int rotation, float scale)
     {
-        var fsm = gameObject.LocateMyFSM("Mender Bug Ctrl");
-        fsm.SetState("Idle");
-        fsm.DisableAction("Killed", 0);
+        gameObject.LocateMyFSM("FSM").enabled = false;
     }
 }

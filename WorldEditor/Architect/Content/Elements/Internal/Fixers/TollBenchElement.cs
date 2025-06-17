@@ -1,18 +1,16 @@
 using System.Collections.Generic;
 using Architect.Content.Groups;
-using Satchel;
 using UnityEngine;
 
 namespace Architect.Content.Elements.Internal.Fixers;
 
-internal sealed class MenderbugElement : InternalPackElement
+internal class TollBenchElement : InternalPackElement
 {
     private GameObject _gameObject;
 
-    public MenderbugElement() : base("Menderbug", "Enemies")
+    public TollBenchElement(int weight) : base("Toll Bench", "Interactable", weight)
     {
-        WithBroadcasterGroup(BroadcasterGroup.Enemies);
-        WithConfigGroup(ConfigGroup.Enemies);
+        WithConfigGroup(ConfigGroup.Tolls);
     }
 
     public override GameObject GetPrefab(bool flipped, int rotation)
@@ -22,18 +20,16 @@ internal sealed class MenderbugElement : InternalPackElement
 
     internal override void AddPreloads(List<(string, string)> preloadInfo)
     {
-        preloadInfo.Add(("Crossroads_01", "_Scenery/Mender Bug"));
+        preloadInfo.Add(("Fungus3_50", "Toll Machine Bench"));
     }
 
     internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
     {
-        _gameObject = preloads["Crossroads_01"]["_Scenery/Mender Bug"];
+        _gameObject = preloads["Fungus3_50"]["Toll Machine Bench"];
     }
 
     public override void PostSpawn(GameObject gameObject, bool flipped, int rotation, float scale)
     {
-        var fsm = gameObject.LocateMyFSM("Mender Bug Ctrl");
-        fsm.SetState("Idle");
-        fsm.DisableAction("Killed", 0);
+        gameObject.transform.GetChild(2).name = gameObject.name + " Bench";
     }
 }

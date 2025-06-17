@@ -14,7 +14,7 @@ public abstract class SelectableObject
 
     public abstract int GetWeight();
 
-    public virtual int GetSpriteRotation()
+    public virtual float GetSpriteRotation()
     {
         return 0;
     }

@@ -5,5 +5,7 @@ public enum EventBroadcasterType
     OnDeath,
     LoadedDead,
     OnPull,
-    LoadedPulled
+    LoadedPulled,
+    OnPay,
+    LoadedPaid
 }

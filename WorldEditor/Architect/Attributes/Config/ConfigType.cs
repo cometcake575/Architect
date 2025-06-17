@@ -8,17 +8,12 @@ namespace Architect.Attributes.Config;
 public abstract class ConfigType
 {
     public readonly string Name;
-    private readonly Func<GameObject, bool> _applies;
+    public readonly bool PreAwake;
     
-    protected ConfigType(string name, Func<GameObject, bool> applies)
+    protected ConfigType(string name, bool preAwake)
     {
         Name = name;
-        _applies = applies;
-    }
-
-    public bool DoesApply(GameObject obj)
-    {
-        return _applies == null || _applies.Invoke(obj);
+        PreAwake = preAwake;
     }
     
     public abstract ConfigValue Deserialize(string data);
@@ -32,7 +27,7 @@ public abstract class ConfigType<TValue> : ConfigType where TValue : ConfigValue
 {
     private readonly Action<GameObject, TValue> _action;
 
-    protected ConfigType(string name, Action<GameObject, TValue> action, Func<GameObject, bool> applies) : base(name, applies)
+    protected ConfigType(string name, Action<GameObject, TValue> action, bool preAwake) : base(name, preAwake)
     {
         _action = action;
     }
@@ -48,6 +43,8 @@ public abstract class ConfigValue
     public abstract string SerializeValue();
 
     public abstract string GetName();
+
+    public abstract bool PreAwake();
     
     public abstract void Setup(GameObject obj);
 }
@@ -69,6 +66,11 @@ public abstract class ConfigValue<TType> : ConfigValue where TType : ConfigType
     public override void Setup(GameObject obj)
     {
         _type.RunAction(obj, this);
+    }
+
+    public override bool PreAwake()
+    {
+        return _type.PreAwake;
     }
 }
 

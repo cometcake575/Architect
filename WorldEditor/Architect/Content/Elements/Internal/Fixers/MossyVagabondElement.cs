@@ -31,6 +31,6 @@ internal sealed class MossyVagabondElement : InternalPackElement
 
     public override void PostSpawn(GameObject gameObject, bool flipped, int rotatio, float scale)
     {
-        _gameObject.LocateMyFSM("FSM").SetFsmTemplate(null);
+        gameObject.LocateMyFSM("FSM").SetFsmTemplate(null);
     }
 }

@@ -518,8 +518,6 @@ public static class EditorUIManager
         var i = 0;
         foreach (var type in placeable.PackElement.GetConfigGroup().Types)
         {
-            if (!type.DoesApply(
-                    placeable.PackElement.GetPrefab(EditorManager.IsFlipped, EditorManager.Rotation))) continue;
             _configGrid.RowDefinitions.Add(new GridDimension(1, GridUnit.Proportional));
             _configGrid.Children.Add(
                 new TextObject(layout, type.Name + " Description")

@@ -7,7 +7,7 @@ namespace Architect.Attributes.Config;
 
 public class BoolConfigType : ConfigType<BoolConfigValue>
 {
-    public BoolConfigType(string name, Action<GameObject, BoolConfigValue> action, Func<GameObject, bool> applies = null) : base(name, action, applies) { }
+    public BoolConfigType(string name, Action<GameObject, BoolConfigValue> action, bool preAwake = false) : base(name, action, preAwake) { }
 
     public override ConfigValue Deserialize(string data)
     {

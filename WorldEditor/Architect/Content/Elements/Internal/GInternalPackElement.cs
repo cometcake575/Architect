@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Architect.Content.Groups;
 using UnityEngine;
 
 namespace Architect.Content.Elements.Internal;
@@ -7,13 +8,16 @@ internal class GInternalPackElement : InternalPackElement
 {
     private readonly string _scene;
     private readonly string _path;
+    
+    private readonly float _offset;
 
     protected GameObject GameObject;
 
-    public GInternalPackElement(string scene, string path, string name, string category, int weight) : base(name, category, weight)
+    public GInternalPackElement(string scene, string path, string name, string category, int weight, float offset = 0) : base(name, category, weight)
     {
         _scene = scene;
         _path = path;
+        _offset = offset;
     }
     
     internal override void AddPreloads(List<(string, string)> preloadInfo)
@@ -26,9 +30,10 @@ internal class GInternalPackElement : InternalPackElement
         GameObject = preloads[_scene][_path];
         GameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
 
+        var z = GameObject.transform.position.z + _offset;
         var setZ = GameObject.GetComponent<SetZ>();
-        if (!setZ) return;
-        GameObject.transform.SetPositionZ(setZ.z);
+        if (setZ && setZ.enabled) z = setZ.z;
+        GameObject.transform.SetPositionZ(z);
     }
 
     public override GameObject GetPrefab(bool flipped, int rotation)

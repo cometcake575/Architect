@@ -9,7 +9,7 @@ namespace Architect.Content.Elements.Internal.Fixers;
 
 internal sealed class LeverPackElement : GInternalPackElement
 {
-    public LeverPackElement(string scene, string path, string name) : base(scene, path, name, "Interactable", 20)
+    public LeverPackElement(string scene, string path, string name, int weight = 0) : base(scene, path, name, "Interactable", weight)
     {
         WithBroadcasterGroup(BroadcasterGroup.Levers);
         WithConfigGroup(ConfigGroup.Levers);

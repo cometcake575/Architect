@@ -106,5 +106,10 @@ public abstract class AbstractPackElement
         return this;
     }
 
+    public virtual bool DisableScaleParent()
+    {
+        return false;
+    }
+
     public virtual void PostSpawn(GameObject gameObject, bool flipped, int rotation, float scale) { }
 }

@@ -12,10 +12,14 @@ public class WeServerAddon : ServerAddon
         
         var netReceiver = serverApi.NetServer.GetNetworkReceiver<PacketId>(this, HkmpHook.InstantiatePacket);
         
-        netReceiver.RegisterPacketHandler<RefreshPacketData>(PacketId.Refresh, (_, packet) =>
+        netReceiver.RegisterPacketHandler<RefreshPacketData>(PacketId.Refresh, (id, packet) =>
         {
             serverApi.NetServer.GetNetworkSender<PacketId>(this)
-                .SendSingleData(PacketId.Refresh, packet, serverApi.ServerManager.Players.Select(player => player.Id).ToArray());
+                .SendSingleData(PacketId.Refresh, packet, serverApi.ServerManager.Players
+                    .Where(player => player.Id != id)
+                    .Select(player => player.Id)
+                    .ToArray()
+                );
         });
         
         netReceiver.RegisterPacketHandler<WinPacketData>(PacketId.Win, (_, packet) =>
@@ -26,6 +30,6 @@ public class WeServerAddon : ServerAddon
     }
 
     protected override string Name => "Architect";
-    protected override string Version => "0.1.0";
+    protected override string Version => "1.0.0";
     public override bool NeedsNetwork => true;
 }

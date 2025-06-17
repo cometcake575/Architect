@@ -6,6 +6,7 @@ using Architect.Attributes.Config;
 using Architect.Attributes.Receivers;
 using UnityEngine;
 using Architect.Content.Elements;
+using Architect.Content.Elements.Internal;
 using Architect.UI;
 using Architect.Util;
 
@@ -82,6 +83,7 @@ public class PlaceableObject : SelectableObject
         if (spriteRenderer)
         {
             _sprite = spriteRenderer.sprite;
+            _rotation += spriteRenderer.gameObject.transform.rotation.eulerAngles.z;
             return;
         }
         var sprite = prefab.gameObject.GetComponent<tk2dSprite>();
@@ -103,6 +105,7 @@ public class PlaceableObject : SelectableObject
         
         _sprite = cSpriteRenderer.sprite;
         Offset += prefab.transform.InverseTransformPoint(cSpriteRenderer.gameObject.transform.position);
+        _rotation += cSpriteRenderer.gameObject.transform.rotation.eulerAngles.z;
     }
 
     private void PrepareSpriteWithTk2D(tk2dSprite sprite)
@@ -120,16 +123,17 @@ public class PlaceableObject : SelectableObject
         _sprite = WeSpriteUtils.ConvertFrom2DToolkit(def, 64 / sprite.scale.x);
         
         if (def.flipped != tk2dSpriteDefinition.FlipMode.None) _rotation += 90;
+        _rotation += sprite.gameObject.transform.rotation.eulerAngles.z;
         Offset = def.GetBounds().center;
     }
 
-    public override int GetSpriteRotation()
+    public override float GetSpriteRotation()
     {
         return _rotation;
     }
     
     private Sprite _sprite;
-    private int _rotation;
+    private float _rotation;
     public readonly AbstractPackElement PackElement;
 
     public Vector3 Offset;

@@ -1,6 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using Architect.Configuration;
+using Architect.Content;
 using Satchel.BetterMenus;
+using Satchel.BetterMenus.Config;
+using UnityEngine;
 
 namespace Architect.UI;
 
@@ -47,8 +51,15 @@ public static class ConfigurationScreen
             new KeyBind(
                 name: "Increase Scale",
                 playerAction: globalSettings.Keybinds.IncreaseScale
-            )
+            ),
+            new TextPanel("Content Pack Toggles"),
+            new TextPanel("Disable packs you don't need to reduce startup time and memory usage, changes are applied when game is rebooted.\n\nThings will break if you disable a pack that is in use!")
+            {
+                FontSize = 20,
+                Anchor = TextAnchor.UpperCenter
+            }
         };
+        elements.AddRange(ContentPacks.Packs.Select(pack => new HorizontalOption(name: pack.GetName(), description: pack.GetDescription(), values: values, applySetting: i => { globalSettings.ContentPackSettings[pack.GetName()] = i == 0; }, loadSetting: () => globalSettings.ContentPackSettings[pack.GetName()] ? 0 : 1)).Cast<Element>());
         _menuRef ??= new Menu(
             name: Architect.Instance.Name,
             elements: elements.ToArray()

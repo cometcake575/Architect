@@ -10,7 +10,7 @@ namespace Architect.Attributes.Config;
 
 public class FloatConfigType : ConfigType<FloatConfigValue>
 {
-    public FloatConfigType(string name, Action<GameObject, FloatConfigValue> action, Func<GameObject, bool> applies = null) : base(name, action, applies) { }
+    public FloatConfigType(string name, Action<GameObject, FloatConfigValue> action, bool preAwake = false) : base(name, action, preAwake) { }
 
     public override ConfigValue Deserialize(string data)
     {
