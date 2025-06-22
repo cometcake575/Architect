@@ -5,4 +5,4 @@ You can make these changes with the **in-game editor**, and can share them with 
 
 Architect has a wide range of objects to place down and configuration settings to use, allowing for lots of creativity!
 
-You can find the full documentation for Architect [here](https://app.gitbook.com/o/SbZeaYBRm2aGL9WNuuL6/s/roKqeUVmdQ9t9hEeZQP0/).
+You can find the full documentation for Architect [here](https://starshooter.gitbook.io/architect).
