@@ -387,7 +387,9 @@ public static class ContentPacks
         });
         RegisterInternalPack(new ContentPack("Godhome", "Assets from Godhome")
         {
-            Create("GG_Atrium", "RestBench", "Godhome Bench", "Interactable", weight:SpecialBenchWeight),
+            Create("GG_Atrium_Roof", "gg_plat_float_small", "Godhome Platform S", "Solids"),
+            Create("GG_Workshop", "gg_plat_float_wide", "Godhome Platform L", "Solids"),
+            Create("GG_Workshop", "RestBench (1)", "Godhome Bench", "Interactable", weight:SpecialBenchWeight),
             new MultiPartInternalElement("GG_Atrium_Roof", "RestBench (1)", "GG_bench_metal_0001_1", "Godhome Roof Bench", "Interactable", weight:SpecialBenchWeight)
         });
     }
