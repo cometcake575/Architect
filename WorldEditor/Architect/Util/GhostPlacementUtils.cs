@@ -18,12 +18,12 @@ public static class GhostPlacementUtils
         
         if (Mathf.RoundToInt(visualRotation / 90) % 2 != 0)
         {
-            renderer.flipY = flipped;
+            renderer.flipY = flipped != selected.PackElement.ShouldFlipHorizontal();
             renderer.flipX = selected.PackElement.ShouldFlipVertical();
         }
         else
         {
-            renderer.flipX = flipped;
+            renderer.flipX = flipped != selected.PackElement.ShouldFlipHorizontal();
             renderer.flipY = selected.PackElement.ShouldFlipVertical();
         }
     }

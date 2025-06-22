@@ -150,7 +150,7 @@ public class PlaceableObject : SelectableObject
 
         var prefab = element.GetPrefab(false, 0);
         PreparePlacementData(prefab);
-        Offset = prefab.transform.rotation * Offset;
+        Offset = prefab.transform.rotation * Offset + PackElement.ExtraOffset();
     }
 
     public static SelectableObject Create(AbstractPackElement element)

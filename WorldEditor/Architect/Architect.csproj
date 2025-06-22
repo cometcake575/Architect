@@ -8,8 +8,8 @@
         <Product>Architect</Product>
         <Description>A mod to add platforms, enemies and more to change areas in the game with an in-game level editor.</Description>
         <Copyright>Copyright © Arun Kapila 2025</Copyright>
-        <AssemblyVersion>1.0.0.0</AssemblyVersion>
-        <FileVersion>1.0.0.0</FileVersion>
+        <AssemblyVersion>1.1.0.0</AssemblyVersion>
+        <FileVersion>1.1.0.0</FileVersion>
         <OutputPath>bin\$(Configuration)\</OutputPath>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
@@ -343,14 +343,15 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
-        <EmbeddedResource Include="cursor.png" />
-        <EmbeddedResource Include="eraser.png" />
-        <EmbeddedResource Include="dash_crystal.png" />
-        <EmbeddedResource Include="single_dash_crystal.png" />
-        <EmbeddedResource Include="wings_crystal.png" />
-        <EmbeddedResource Include="single_wings_crystal.png" />
-        <EmbeddedResource Include="zote_trophy.png" />
-        <EmbeddedResource Include="hazard_respawn_point.png" />
+        <EmbeddedResource Include="Resources/cursor.png" />
+        <EmbeddedResource Include="Resources/eraser.png" />
+        <EmbeddedResource Include="Resources/dash_crystal.png" />
+        <EmbeddedResource Include="Resources/single_dash_crystal.png" />
+        <EmbeddedResource Include="Resources/wings_crystal.png" />
+        <EmbeddedResource Include="Resources/single_wings_crystal.png" />
+        <EmbeddedResource Include="Resources/zote_trophy.png" />
+        <EmbeddedResource Include="Resources/hazard_respawn_point.png" />
+        <EmbeddedResource Include="Resources/architect_knight.png" />
     </ItemGroup>
     <ItemGroup>
         <None Include=".gitignore"/>

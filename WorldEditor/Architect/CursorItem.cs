@@ -15,7 +15,7 @@ public static class CursorItem
     
     public static void TryRefresh(bool disabled)
     {
-        if (!EditorManager.GameCamera || disabled || EditorUIManager.SelectedItem is not PlaceableObject selected)
+        if (disabled || EditorUIManager.SelectedItem is not PlaceableObject selected || !EditorManager.GameCamera)
         {
             if (_obj) _obj.SetActive(false);
             return;

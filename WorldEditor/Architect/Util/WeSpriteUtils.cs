@@ -7,7 +7,7 @@ public static class WeSpriteUtils
 {
     internal static Sprite Load(string spriteName) {
         var asm = Assembly.GetExecutingAssembly();
-        using var s = asm.GetManifestResourceStream($"Architect.{spriteName}.png");
+        using var s = asm.GetManifestResourceStream($"Architect.Resources.{spriteName}.png");
         if (s == null) return null;
         var buffer = new byte[s.Length];
         _ = s.Read(buffer, 0, buffer.Length);

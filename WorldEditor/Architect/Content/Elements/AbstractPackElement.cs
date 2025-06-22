@@ -11,7 +11,8 @@ public abstract class AbstractPackElement
     private readonly string _name;
     private readonly string _category;
         
-    private bool _flip;
+    private bool _flipVertical;
+    private bool _flipHorizontal;
     private BroadcasterGroup _broadcasterGroup = BroadcasterGroup.EmptyGroup;
     private ReceiverGroup _receiverGroup = ReceiverGroup.All;
     private ConfigGroup _configGroup = ConfigGroup.All;
@@ -97,18 +98,34 @@ public abstract class AbstractPackElement
 
     public bool ShouldFlipVertical()
     {
-        return _flip;
+        return _flipVertical;
+    }
+
+    public bool ShouldFlipHorizontal()
+    {
+        return _flipHorizontal;
     }
 
     public AbstractPackElement FlipVertical()
     {
-        _flip = true;
+        _flipVertical = true;
+        return this;
+    }
+
+    public AbstractPackElement FlipHorizontal()
+    {
+        _flipHorizontal = true;
         return this;
     }
 
     public virtual bool DisableScaleParent()
     {
         return false;
+    }
+
+    public virtual Vector3 ExtraOffset()
+    {
+        return Vector3.zero;
     }
 
     public virtual void PostSpawn(GameObject gameObject, bool flipped, int rotation, float scale) { }

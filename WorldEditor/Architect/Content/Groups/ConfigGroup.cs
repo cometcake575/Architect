@@ -34,6 +34,8 @@ public class ConfigGroup
     internal static ConfigGroup Sawblade;
     
     internal static ConfigGroup Tablets;
+    
+    internal static ConfigGroup Abyss;
 
     internal static void Initialize()
     {
@@ -156,6 +158,15 @@ public class ConfigGroup
                 fsm.FsmVariables.GetFsmString("Sheet Name").Value = "Custom";
                 CustomTexts[o.name] = value.GetValue();
             }))
+        );
+
+        Abyss = new ConfigGroup(All,
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Ignore Void Heart", (o, value) =>
+                {
+                    if (value.GetValue()) o.GetComponent<VhEffects>().ForceDisable();
+                })
+            )
         );
     }
 

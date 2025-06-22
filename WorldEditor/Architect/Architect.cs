@@ -13,6 +13,7 @@ using Architect.Objects;
 using Architect.UI;
 using Architect.Util;
 using MagicUI.Core;
+using MagicUI.Elements;
 using Object = UnityEngine.Object;
 
 namespace Architect;
@@ -64,13 +65,24 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
         InitializeLayout();
     }
 
-    private static LayoutRoot _layout;
+    private static LayoutRoot _editorLayout;
+    
+    private static LayoutRoot _menuLayout;
     
     private static void InitializeLayout()
     {
-        _layout?.Destroy();
-        _layout = new LayoutRoot(true, "Architect Layout");
-        EditorUIManager.Initialize(_layout);
+        _editorLayout?.Destroy();
+        _editorLayout = new LayoutRoot(true, "Architect Editor");
+        EditorUIManager.Initialize(_editorLayout);
+        
+        /*
+        _menuLayout?.Destroy();
+        _menuLayout = new LayoutRoot(true, "Architect Menu")
+        {
+            VisibilityCondition = () => GameManager.instance.IsMenuScene()
+        };
+        MenuUIManager.Initialize(_menuLayout);
+        */
     }
 
     internal static WorldEditorGlobalSettings GlobalSettings { get; private set; } = new();

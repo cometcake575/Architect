@@ -27,10 +27,6 @@ internal sealed class MossyVagabondElement : InternalPackElement
     internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
     {
         _gameObject = preloads["Fungus3_39"]["Moss Knight Fat"];
-    }
-
-    public override void PostSpawn(GameObject gameObject, bool flipped, int rotatio, float scale)
-    {
-        gameObject.LocateMyFSM("FSM").SetFsmTemplate(null);
+        _gameObject.LocateMyFSM("FSM").SetFsmTemplate(null);
     }
 }

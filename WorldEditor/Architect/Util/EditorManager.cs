@@ -32,7 +32,7 @@ public static class EditorManager
             IsEditing = false;
             return orig(self);
         };
-        
+
         On.HeroController.CanAttack += (orig, self) => !IsEditing && orig(self);
 
         On.HeroController.CanCast += (orig, self) => !IsEditing && orig(self);
@@ -76,6 +76,7 @@ public static class EditorManager
         CursorItem.TryRefresh(paused || !IsEditing);
         
         if (!IsEditing) return;
+        
         HeroController.instance.GetComponent<Rigidbody2D>().velocity.Set(0, 0);
 
         // Checks if the selected item is placeable
@@ -132,7 +133,7 @@ public static class EditorManager
 
         HeroController.instance.AffectedByGravity(false);
 
-        HeroActions actions = InputHandler.Instance.inputActions;
+        var actions = InputHandler.Instance.inputActions;
 
         if (paused) ShiftSelection(actions);
         else TryPlace();
@@ -168,8 +169,11 @@ public static class EditorManager
     private static void CheckToggle(bool paused)
     {
         if (paused) return;
+        
         if (!Architect.GlobalSettings.Keybinds.ToggleEditor.WasPressed) return;
-        if (!Architect.GlobalSettings.CanEnableEditing) return;
+        var fsm = HeroController.instance.gameObject.LocateMyFSM("Surface Water");
+        if (fsm.ActiveStateName == "Idle") fsm.SetState("Regain Control");
+        
         if (HeroController.instance.controlReqlinquished) return;
         
         HeroController.instance.AffectedByGravity(IsEditing);

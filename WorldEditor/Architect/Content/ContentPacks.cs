@@ -64,9 +64,9 @@ public static class ContentPacks
         return new GInternalPackElement(scene, path, name, category, weight, offset);
     }
 
-    private static AbstractPackElement CreateEnemy(string scene, string path, string name, int weight = 0)
+    private static AbstractPackElement CreateEnemy(string scene, string path, string name, int weight = 0, string category = "Enemies")
     {
-        return new GInternalPackElement(scene, path, name, "Enemies", weight)
+        return new GInternalPackElement(scene, path, name, category, weight)
             .WithConfigGroup(ConfigGroup.Enemies)
             .WithBroadcasterGroup(BroadcasterGroup.Enemies);
     }
@@ -110,6 +110,7 @@ public static class ContentPacks
             CreateEnemy("Crossroads_21", "non_infected_event/Zombie Leaper", "Leaping Husk"),
             CreateEnemy("Crossroads_15", "_Enemies/Zombie Shield", "Husk Warrior"),
             CreateEnemy("Crossroads_21", "non_infected_event/Zombie Guard", "Husk Guard"),
+            CreateEnemy("Crossroads_10_boss_defeated", "Prayer Room/Prayer Slug", "Maggot").FlipHorizontal(),
             CreateEnemy("Crossroads_ShamanTemple", "_Enemies/Roller", "Baldur"),
             new ElderBaldurElement(),
             new MenderbugElement(),
@@ -129,7 +130,9 @@ public static class ContentPacks
             Create("Crossroads_ShamanTemple", "BoneBench", "Ancestral Mound Bench", "Interactable", weight:BenchWeight),
             Create("Crossroads_04", "RestBench", "Salubra's Bench", "Interactable", weight:BenchWeight),
             Create("Room_Final_Boss_Atrium", "RestBench", "Black Egg Bench", "Interactable", weight:SpecialBenchWeight),
-            new GrubfatherElement(weight:MiscInteractableWeight)
+            new GrubfatherElement(weight:MiscInteractableWeight),
+            Create("Crossroads_07", "_Scenery/plat_lift_06", "Lift Platform S", "Solids"),
+            Create("Crossroads_07", "_Scenery/plat_lift_05", "Lift Platform L", "Solids")
         });
         RegisterInternalPack(new ContentPack("Infected Crossroads", "Assets unique to the Infected Crossroads")
         {
@@ -263,9 +266,7 @@ public static class ContentPacks
             CreateEnemy("GG_Pipeway", "Flukeman", "Flukemon"),
             CreateEnemy("GG_Pipeway", "Fat Fluke", "Flukemunga"),
             CreateEnemy("Waterways_01", "_Enemies/Inflater", "Hwurmp"),
-            CreateEnemy("Waterways_01", "_Enemies/Flip Hopper", "Pilflip"),
-            Create("GG_Atrium", "RestBench", "Godhome Bench", "Interactable", weight:SpecialBenchWeight),
-            new MultiPartInternalElement("GG_Atrium_Roof", "RestBench (1)", "GG_bench_metal_0001_1", "Godhome Roof Bench", "Interactable", weight:SpecialBenchWeight)
+            CreateEnemy("Waterways_01", "_Enemies/Flip Hopper", "Pilflip")
         });
         RegisterInternalPack(new ContentPack("Crystal Peak", "Assets from the Crystal Peak")
         {
@@ -349,7 +350,17 @@ public static class ContentPacks
             CreateEnemy("Deepnest_Spider_Town", "Tiny Spider", "Deepling"),
             CreateEnemy("Deepnest_42", "Spider Flyer", "Little Weaver"),
             CreateEnemy("Deepnest_Spider_Town", "Slash Spider", "Stalking Devout").FlipVertical(),
+            CreateEnemy("Deepnest_Spider_Town", "Egg Sac", "Bluggsac"),
             Create("Deepnest_Spider_Town", "RestBench Return", "Beast's Den Bench", "Interactable", weight:BenchWeight)
+        });
+        RegisterInternalPack(new ContentPack("The Abyss", "Assets from The Abyss")
+        {
+            Create("Abyss_06_Core", "_Scenery/abyss_plat_float_01", "Abyss Platform 1", "Solids"),
+            Create("Abyss_06_Core", "_Scenery/abyss_plat_float_02", "Abyss Platform 2", "Solids"),
+            Create("Abyss_06_Core", "_Scenery/abyss_plat_float_03", "Abyss Platform 3", "Solids"),
+            Create("Abyss_06_Core", "_Scenery/abyss_plat_float_04", "Abyss Platform 4", "Solids"),
+            new VoidTendrilsElement(),
+            new ShadeSiblingElement()
         });
         RegisterInternalPack(new ContentPack("White Palace", "Assets from the White Palace")
         {
@@ -359,10 +370,12 @@ public static class ContentPacks
             Create("White_Palace_07", "wp_plat_float_07", "White Palace Platform 2", "Solids"),
             Create("White_Palace_07", "wp_plat_float_03", "White Palace Platform 3", "Solids"),
             Create("White_Palace_07", "wp_plat_float_05 (1)", "White Palace Platform 4", "Solids"),
-            Create("White_Palace_07", "wp_trap_spikes", "White Palace Moving Spikes", "Hazards")
-                .WithRotationGroup(RotationGroup.Eight),
             Create("White_Palace_07", "wp_saw", "White Palace Saw", "Hazards")
                 .WithConfigGroup(ConfigGroup.Sawblade),
+            Create("White_Palace_07", "wp_trap_spikes", "White Palace Moving Spikes", "Hazards")
+                .WithRotationGroup(RotationGroup.Eight),
+            Create("White_Palace_03_hub", "White_ Spikes", "White Palace Spikes", "Hazards")
+                .WithRotationGroup(RotationGroup.Eight),
             Create("White_Palace_03_hub", "Soul Totem white", "Pale King Soul Totem", "Interactable", weight:SoulSourceWeight)
                 .WithRotationGroup(RotationGroup.Eight),
             Create("White_Palace_18", "Soul Totem white_Infinte", "Pure Vessel Soul Totem", "Interactable", weight:SoulSourceWeight)
@@ -371,6 +384,11 @@ public static class ContentPacks
             Create("White_Palace_03_hub", "White_Servant_02", "Royal Retainer 2", "Interactable", weight:SoulSourceWeight),
             Create("White_Palace_03_hub", "White_Servant_03", "Royal Retainer 3", "Interactable", weight:SoulSourceWeight),
             Create("White_Palace_03_hub", "WhiteBench", "White Palace Bench", "Interactable", weight:BenchWeight)
+        });
+        RegisterInternalPack(new ContentPack("Godhome", "Assets from Godhome")
+        {
+            Create("GG_Atrium", "RestBench", "Godhome Bench", "Interactable", weight:SpecialBenchWeight),
+            new MultiPartInternalElement("GG_Atrium_Roof", "RestBench (1)", "GG_bench_metal_0001_1", "Godhome Roof Bench", "Interactable", weight:SpecialBenchWeight)
         });
     }
 }
