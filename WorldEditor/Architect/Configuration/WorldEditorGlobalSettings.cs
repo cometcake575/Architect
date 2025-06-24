@@ -9,6 +9,8 @@ public class WorldEditorGlobalSettings
 {
     public List<string> Favourites = new();
 
+    public string ApiKey = "";
+
     public Dictionary<string, bool> ContentPackSettings = new();
 
     public bool CanEnableEditing = false;

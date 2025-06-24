@@ -12,6 +12,7 @@ internal class ElderBaldurElement : InternalPackElement
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
         WithConfigGroup(ConfigGroup.Enemies);
+        WithReceiverGroup(ReceiverGroup.Enemies);
     }
 
     public override bool DisableScaleParent()

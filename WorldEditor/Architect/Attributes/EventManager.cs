@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Architect.Attributes.Broadcasters;
 using Architect.Attributes.Receivers;
-using Architect.Content.Groups;
 using Modding;
 using UnityEngine;
 
@@ -62,7 +60,7 @@ public static class EventManager
 
     public static EventReceiver CreateReceiver(string type, string name, int times)
     {
-        return EventReceiverTypes[type].Create(name, times);
+        return EventReceiverTypes[type.ToLower()].Create(name, times);
     }
 
     public static EventBroadcaster DeserializeBroadcaster(Dictionary<string, string> data)

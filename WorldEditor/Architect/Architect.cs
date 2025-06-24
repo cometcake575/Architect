@@ -12,8 +12,8 @@ using Architect.MultiplayerHook;
 using Architect.Objects;
 using Architect.UI;
 using Architect.Util;
+using GlobalEnums;
 using MagicUI.Core;
-using MagicUI.Elements;
 using Object = UnityEngine.Object;
 
 namespace Architect;
@@ -71,18 +71,14 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
     
     private static void InitializeLayout()
     {
-        _editorLayout?.Destroy();
         _editorLayout = new LayoutRoot(true, "Architect Editor");
         EditorUIManager.Initialize(_editorLayout);
         
-        /*
-        _menuLayout?.Destroy();
         _menuLayout = new LayoutRoot(true, "Architect Menu")
         {
-            VisibilityCondition = () => GameManager.instance.IsMenuScene()
+            VisibilityCondition = () => UIManager.instance.menuState == MainMenuState.MAIN_MENU
         };
         MenuUIManager.Initialize(_menuLayout);
-        */
     }
 
     internal static WorldEditorGlobalSettings GlobalSettings { get; private set; } = new();

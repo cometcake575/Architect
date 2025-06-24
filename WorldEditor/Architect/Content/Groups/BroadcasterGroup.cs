@@ -15,6 +15,11 @@ public class BroadcasterGroup
         EventBroadcasterType.OnPull,
         EventBroadcasterType.LoadedPulled
     );
+    
+    public static readonly BroadcasterGroup TriggerZones = new(
+        EventBroadcasterType.ZoneEnter,
+        EventBroadcasterType.ZoneExit
+    );
 
     public readonly EventBroadcasterType[] Types;
     

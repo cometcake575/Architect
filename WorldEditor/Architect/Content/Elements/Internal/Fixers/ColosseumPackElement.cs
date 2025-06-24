@@ -15,6 +15,7 @@ internal class ColosseumPackElement : InternalPackElement
         _scene = scene;
         _path = path;
         WithConfigGroup(ConfigGroup.Enemies);
+        WithReceiverGroup(ReceiverGroup.Enemies);
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
     }
 

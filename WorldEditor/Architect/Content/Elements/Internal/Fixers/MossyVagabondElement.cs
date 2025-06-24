@@ -12,6 +12,7 @@ internal sealed class MossyVagabondElement : InternalPackElement
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
         WithConfigGroup(ConfigGroup.Enemies);
+        WithReceiverGroup(ReceiverGroup.Enemies);
     }
 
     public override GameObject GetPrefab(bool flipped, int rotation)

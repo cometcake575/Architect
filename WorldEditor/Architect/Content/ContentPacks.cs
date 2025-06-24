@@ -68,6 +68,7 @@ public static class ContentPacks
     {
         return new GInternalPackElement(scene, path, name, category, weight)
             .WithConfigGroup(ConfigGroup.Enemies)
+            .WithReceiverGroup(ReceiverGroup.Enemies)
             .WithBroadcasterGroup(BroadcasterGroup.Enemies);
     }
 
@@ -111,6 +112,8 @@ public static class ContentPacks
             CreateEnemy("Crossroads_15", "_Enemies/Zombie Shield", "Husk Warrior"),
             CreateEnemy("Crossroads_21", "non_infected_event/Zombie Guard", "Husk Guard"),
             CreateEnemy("Crossroads_10_boss_defeated", "Prayer Room/Prayer Slug", "Maggot").FlipHorizontal(),
+            Create("Crossroads_10", "Chest", "Geo Chest", "Interactable", weight:MiscInteractableWeight)
+                .WithConfigGroup(ConfigGroup.GeoChest).FlipHorizontal(),
             CreateEnemy("Crossroads_ShamanTemple", "_Enemies/Roller", "Baldur"),
             new ElderBaldurElement(),
             new MenderbugElement(),
@@ -132,7 +135,9 @@ public static class ContentPacks
             Create("Room_Final_Boss_Atrium", "RestBench", "Black Egg Bench", "Interactable", weight:SpecialBenchWeight),
             new GrubfatherElement(weight:MiscInteractableWeight),
             Create("Crossroads_07", "_Scenery/plat_lift_06", "Lift Platform S", "Solids"),
-            Create("Crossroads_07", "_Scenery/plat_lift_05", "Lift Platform L", "Solids")
+            Create("Crossroads_07", "_Scenery/plat_lift_05", "Lift Platform L", "Solids"),
+            Create("Crossroads_31", "Grub Bottle", "Grub Bottle", "Interactable", weight:MiscInteractableWeight)
+                .WithConfigGroup(ConfigGroup.Grub)
         });
         RegisterInternalPack(new ContentPack("Infected Crossroads", "Assets unique to the Infected Crossroads")
         {
@@ -146,6 +151,7 @@ public static class ContentPacks
             CreateEnemy("Fungus1_12", "Pigeon", "Maskfly"),
             CreateEnemy("Fungus1_22", "Plant Trap", "Fool Eater")
                 .WithRotationGroup(RotationGroup.Four),
+            CreateEnemy("Fungus1_17", "Moss Charger", "Moss Charger"),
             CreateEnemy("Fungus1_22", "Mosquito", "Squit"),
             CreateEnemy("Fungus1_12", "Acid Walker", "Durandoo"),
             CreateEnemy("Fungus1_09", "Acid Flyer", "Duranda"),
@@ -191,8 +197,10 @@ public static class ContentPacks
             CreateEnemy("Fungus2_18", "Fung Crawler", "Ambloom"),
             CreateEnemy("Fungus2_04", "Mushroom Turret", "Sporg")
                 .WithRotationGroup(RotationGroup.Eight),
-            CreateEnemy("Fungus2_12", "Mantis", "Mantis Warrior"),
-            CreateEnemy("Fungus2_12", "Mantis Flyer Child", "Mantis Youth"),
+            CreateEnemy("Fungus2_12", "Mantis", "Mantis Warrior")
+                .WithConfigGroup(ConfigGroup.Mantis),
+            CreateEnemy("Fungus2_12", "Mantis Flyer Child", "Mantis Youth").FlipHorizontal()
+                .WithConfigGroup(ConfigGroup.Mantis),
             Create("Fungus2_18", "_Props/Bounce Shrooms 1/Bounce Shroom B (1)", "Bouncy Mushroom", "Interactable", weight:MiscInteractableWeight, offset:15.5f)
                 .FlipVertical()
                 .WithRotationGroup(RotationGroup.Eight),
@@ -226,7 +234,8 @@ public static class ContentPacks
                 .WithRotationGroup(RotationGroup.Eight),
             Create("Ruins2_01", "Battle Gate", "Battle Gate", "Interactable", weight:GateWeight)
                 .WithRotationGroup(RotationGroup.Four)
-                .WithReceiverGroup(ReceiverGroup.Gates),
+                .WithReceiverGroup(ReceiverGroup.BattleGate)
+                .WithConfigGroup(ConfigGroup.BattleGate),
             Create("Ruins2_01", "Ruins Gate 2", "City Gate", "Interactable", weight:GateWeight)
                 .WithRotationGroup(RotationGroup.Four)
                 .WithReceiverGroup(ReceiverGroup.Gates),
@@ -271,15 +280,19 @@ public static class ContentPacks
         RegisterInternalPack(new ContentPack("Crystal Peak", "Assets from the Crystal Peak")
         {
             new ZombieMylaPackElement(),
-            CreateEnemy("Mines_11", "Zombie Miner 1", "Husk Miner"),
+            CreateEnemy("Mines_20", "Zombie Miner 1", "Husk Miner"),
             CreateEnemy("Mines_25", "Zombie Beam Miner", "Crystallised Husk"),
-            CreateEnemy("Mines_11", "Crystal Crawler", "Blimback"),
-            CreateEnemy("Mines_11", "Mines Crawler", "Shardmite"),
+            CreateEnemy("Mines_20", "Crystal Crawler", "Blimback"),
+            CreateEnemy("Mines_20", "Mines Crawler", "Shardmite"),
             CreateEnemy("Mines_25", "Crystal Flyer", "Crystal Hunter"),
-            CreateEnemy("Mines_11", "Crystallised Lazer Bug", "Crystal Crawler")
+            Create("Mines_20", "Metal Gate v2", "Mines Gate", "Interactable", weight:GateWeight)
+                .WithReceiverGroup(ReceiverGroup.Gates)
                 .WithRotationGroup(RotationGroup.Four),
-            Create("Mines_11", "mines_metal_grate_02", "Metal Grate", "Solids")
+            CreateEnemy("Mines_20", "Crystallised Lazer Bug (3)", "Crystal Crawler").FlipHorizontal()
                 .WithRotationGroup(RotationGroup.Four),
+            Create("Mines_20", "mines_metal_grate_06", "Metal Grate", "Solids")
+                .WithRotationGroup(RotationGroup.Four),
+            Create("Mines_20", "plat_float_06", "Crystal Peak Platform", "Solids"),
             Create("Mines_31", "Mines Platform", "Crystal Peak Rotating Platform", "Solids")
                 .WithRotationGroup(RotationGroup.Three),
             Create("Mines_37", "stomper_offset", "Crystal Peak Stomper (Slow)", "Hazards")
@@ -381,7 +394,7 @@ public static class ContentPacks
             Create("White_Palace_18", "Soul Totem white_Infinte", "Pure Vessel Soul Totem", "Interactable", weight:SoulSourceWeight)
                 .WithRotationGroup(RotationGroup.Eight),
             Create("White_Palace_03_hub", "White_Servant_01", "Royal Retainer 1", "Interactable", weight:SoulSourceWeight),
-            Create("White_Palace_03_hub", "White_Servant_02", "Royal Retainer 2", "Interactable", weight:SoulSourceWeight),
+            Create("White_Palace_03_hub", "White_Servant_02", "Royal Retainer 2", "Interactable", weight:SoulSourceWeight).FlipHorizontal(),
             Create("White_Palace_03_hub", "White_Servant_03", "Royal Retainer 3", "Interactable", weight:SoulSourceWeight),
             Create("White_Palace_03_hub", "WhiteBench", "White Palace Bench", "Interactable", weight:BenchWeight)
         });
@@ -392,5 +405,12 @@ public static class ContentPacks
             Create("GG_Workshop", "RestBench (1)", "Godhome Bench", "Interactable", weight:SpecialBenchWeight),
             new MultiPartInternalElement("GG_Atrium_Roof", "RestBench (1)", "GG_bench_metal_0001_1", "Godhome Roof Bench", "Interactable", weight:SpecialBenchWeight)
         });
+        /*RegisterInternalPack(new ContentPack("Bosses", "Various bosses from throughout the game")
+        {
+            new VengeflyKingElement(),
+            CreateEnemy("Crossroads_04", "_Enemies/Giant Fly", "Gruz Mother", category:"Bosses"),
+            CreateEnemy("GG_Mega_Moss_Charger", "Mega Moss Charger", "Massive Moss Charger", category:"Bosses").FlipVertical(),
+            CreateEnemy("GG_Hornet_1", "Boss Holder/Hornet Boss 1", "Hornet Protector", category:"Bosses")
+        });*/
     }
 }

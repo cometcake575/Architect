@@ -13,6 +13,10 @@ public class ReceiverGroup
     
     internal static ReceiverGroup Gates;
     
+    internal static ReceiverGroup BattleGate;
+    
+    internal static ReceiverGroup Enemies;
+    
     internal static void Initialize()
     {
         if (_initialized) return;
@@ -24,6 +28,10 @@ public class ReceiverGroup
         );
         
         Gates = new ReceiverGroup(All, EventManager.RegisterEventReceiverType(OpenGateType.Instance));
+        
+        BattleGate = new ReceiverGroup(Gates, EventManager.RegisterEventReceiverType(CloseGateType.Instance));
+
+        Enemies = new ReceiverGroup(All, EventManager.RegisterEventReceiverType(DieType.Instance));
     }
 
     public readonly EventReceiverType[] Types;

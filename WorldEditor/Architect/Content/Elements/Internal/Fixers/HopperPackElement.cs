@@ -11,6 +11,7 @@ internal sealed class HopperPackElement : GInternalPackElement
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
         WithConfigGroup(ConfigGroup.Enemies);
+        WithReceiverGroup(ReceiverGroup.Enemies);
         _flip = flip;
     }
 

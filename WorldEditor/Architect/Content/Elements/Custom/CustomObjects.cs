@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Architect.Content.Groups;
 using Architect.Util;
 using UnityEngine;
 
@@ -13,6 +14,8 @@ public static class CustomObjects
         var customs = new ContentPack("Custom", "Custom assets that don't exist in the base game")
         {
             new SimplePackElement(CreateHazardRespawnPoint(), "Hazard Respawn Point", "Custom", WeSpriteUtils.Load("hazard_respawn_point")),
+            new SimplePackElement(CreateTriggerZone(), "Trigger Zone", "Custom", WeSpriteUtils.Load("trigger_zone"))
+                .WithBroadcasterGroup(BroadcasterGroup.TriggerZones),
             new SimplePackElement(CreateZoteTrophy(), "Winner's Trophy", "Custom"),
             CreateTemporaryAbilityGranter("dash_crystal", "Dash", false, "Dash Crystal"),
             CreateTemporaryAbilityGranter("single_dash_crystal", "Dash", true, "Single Use Dash Crystal"),
@@ -32,6 +35,23 @@ public static class CustomObjects
 
         var collider = point.AddComponent<CircleCollider2D>();
         collider.isTrigger = true;
+        
+        point.SetActive(false);
+        Object.DontDestroyOnLoad(point);
+
+        return point;
+    }
+
+    private static GameObject CreateTriggerZone()
+    {
+        var point = new GameObject("Trigger Zone");
+        point.transform.localScale *= 10;
+        
+        var collider = point.AddComponent<BoxCollider2D>();
+        collider.isTrigger = true;
+        collider.size = new Vector2(0.32f, 0.32f);
+
+        point.AddComponent<TriggerZone>();
         
         point.SetActive(false);
         Object.DontDestroyOnLoad(point);

@@ -25,6 +25,11 @@ public static class PlacementManager
         return _currentPlacements;
     }
 
+    public static void InvalidateCache()
+    {
+        _sceneName = "Invalid";
+    }
+
     private static void LoadPlacements()
     {
         foreach (var placement in GetCurrentPlacements().Where(placement => placement.GetPlaceableObject() != null))

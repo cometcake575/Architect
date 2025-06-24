@@ -19,7 +19,11 @@ public class ConfigGroup
     
     internal static ConfigGroup All;
 
+    internal static ConfigGroup GeoChest;
+    
     internal static ConfigGroup Enemies;
+    
+    internal static ConfigGroup Mantis;
     
     internal static ConfigGroup Twisters;
     
@@ -36,6 +40,10 @@ public class ConfigGroup
     internal static ConfigGroup Tablets;
     
     internal static ConfigGroup Abyss;
+    
+    internal static ConfigGroup Grub;
+    
+    internal static ConfigGroup BattleGate;
 
     internal static void Initialize()
     {
@@ -47,6 +55,21 @@ public class ConfigGroup
             {
                 o.SetActive(value.GetValue());
             })));
+
+        GeoChest = new ConfigGroup(All,
+            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Large Geo", (o, value) =>
+            {
+                o.LocateMyFSM("Chest Control").FsmVariables.FindFsmInt("Geo Large").Value = value.GetValue();
+            })),
+            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Medium Geo", (o, value) =>
+            {
+                o.LocateMyFSM("Chest Control").FsmVariables.FindFsmInt("Geo Med").Value = value.GetValue();
+            })),
+            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Small Geo", (o, value) =>
+            {
+                o.LocateMyFSM("Chest Control").FsmVariables.FindFsmInt("Geo Small").Value = value.GetValue();
+            }))
+        );
         
         Enemies = new ConfigGroup(All,
             Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Health", (o, value) =>
@@ -80,6 +103,24 @@ public class ConfigGroup
                 {
                     b = o.GetComponent<HealthManager>().isDead;
                 };
+            }))
+        );
+
+        Mantis = new ConfigGroup(Enemies,
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Ignore Respect", (o, value) =>
+            {
+                if (!value.GetValue()) return;
+                var mantis = o.LocateMyFSM("Mantis");
+                if (mantis)
+                {
+                    var defeated = mantis.GetAction<PlayerDataBoolTest>("Lords Defeated?", 0);
+                    defeated.isTrue = defeated.isFalse;
+                }
+                var child = o.LocateMyFSM("Mantis Flyer");
+                if (child)
+                {
+                    child.SendEvent("TOOK DAMAGE");
+                }
             }))
         );
 
@@ -165,6 +206,27 @@ public class ConfigGroup
                 new BoolConfigType("Ignore Void Heart", (o, value) =>
                 {
                     if (value.GetValue()) o.GetComponent<VhEffects>().ForceDisable();
+                })
+            )
+        );
+
+        Grub = new ConfigGroup(Breakable,
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Contains Grub", (o, value) =>
+                {
+                    if (!value.GetValue()) o.transform.GetChild(1).gameObject.SetActive(false);
+                })
+            )
+        );
+
+        BattleGate = new ConfigGroup(
+            All,
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Start Opened", (o, value) =>
+                {
+                    if (!value.GetValue()) return;
+                    var fsm = o.LocateMyFSM("BG Control");
+                    fsm.SetState("Open");
                 })
             )
         );

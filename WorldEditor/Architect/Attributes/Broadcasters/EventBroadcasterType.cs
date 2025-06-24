@@ -6,6 +6,6 @@ public enum EventBroadcasterType
     LoadedDead,
     OnPull,
     LoadedPulled,
-    OnPay,
-    LoadedPaid
+    ZoneEnter,
+    ZoneExit
 }

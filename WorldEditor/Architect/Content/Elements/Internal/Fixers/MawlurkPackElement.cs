@@ -14,6 +14,7 @@ internal sealed class MawlurkPackElement : InternalPackElement
         WithRotationGroup(RotationGroup.Vertical);
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
         WithConfigGroup(ConfigGroup.Enemies);
+        WithReceiverGroup(ReceiverGroup.Enemies);
     }
 
     public override bool OverrideRotation()

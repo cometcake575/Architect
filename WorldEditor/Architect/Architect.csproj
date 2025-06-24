@@ -8,8 +8,8 @@
         <Product>Architect</Product>
         <Description>A mod to add platforms, enemies and more to change areas in the game with an in-game level editor.</Description>
         <Copyright>Copyright © Arun Kapila 2025</Copyright>
-        <AssemblyVersion>1.1.0.0</AssemblyVersion>
-        <FileVersion>1.1.0.0</FileVersion>
+        <AssemblyVersion>1.2.0.0</AssemblyVersion>
+        <FileVersion>1.2.0.0</FileVersion>
         <OutputPath>bin\$(Configuration)\</OutputPath>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
@@ -351,7 +351,9 @@
         <EmbeddedResource Include="Resources/single_wings_crystal.png" />
         <EmbeddedResource Include="Resources/zote_trophy.png" />
         <EmbeddedResource Include="Resources/hazard_respawn_point.png" />
+        <EmbeddedResource Include="Resources/trigger_zone.png" />
         <EmbeddedResource Include="Resources/architect_knight.png" />
+        <EmbeddedResource Include="Resources/sleeping_knight.png" />
     </ItemGroup>
     <ItemGroup>
         <None Include=".gitignore"/>

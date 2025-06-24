@@ -19,7 +19,8 @@ internal sealed class HatcherPackElement : GInternalPackElement
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
         WithConfigGroup(ConfigGroup.Enemies);
-
+        WithReceiverGroup(ReceiverGroup.Enemies);
+        
         _scene = scene;
         _cagePath = cagePath;
         

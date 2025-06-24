@@ -1,14 +1,89 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Architect.Objects;
 using Architect.Util;
 using MagicUI.Core;
 using MagicUI.Elements;
+using Newtonsoft.Json;
+using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.UI;
+using Button = MagicUI.Elements.Button;
+using GridLayout = MagicUI.Elements.GridLayout;
+using Image = MagicUI.Elements.Image;
 
 namespace Architect.UI;
 
 public static class MenuUIManager
 {
+    private static bool _viewing;
+    private static GridLayout _searchArea;
+    private static GridLayout _downloadArea;
+    private static GridLayout _loginArea;
+    private static GridLayout _uploadArea;
+    private static Button _leftButton;
+    private static Button _rightButton;
+
+    private static readonly List<(TextObject, TextObject, Button)> DownloadChoices = new();
+    private static int _index;
+    private static List<Dictionary<string, string>> _currentLevels;
+
+    private const string URL = "https://cometcake575.pythonanywhere.com";
+
     public static void Initialize(LayoutRoot layout)
     {
-        var img = new Image(layout, WeSpriteUtils.Load("architect_knight"))
+        SetupSwitchArea(layout);
+        SetupSearchArea(layout);
+        SetupLoginArea(layout);
+        SetupUploadArea(layout);
+        SetupIndexButtons(layout);
+    }
+
+    private static void SetupIndexButtons(LayoutRoot layout)
+    {
+        var arrowPadding = new Padding(150, 0);
+        
+        _leftButton = new Button(layout, "Left")
+        {
+            Content = "<=",
+            FontSize = 32,
+            Padding = arrowPadding,
+            VerticalAlignment = VerticalAlignment.Center,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            Visibility = Visibility.Hidden
+        };
+        _leftButton.Click += _ =>
+        {
+            _index -= 1;
+            if (_index < 0) _index = _currentLevels.Count / 4;
+            RefreshCurrentLevels();
+        };
+        
+        _rightButton = new Button(layout, "Right")
+        {
+            Content = "=>",
+            FontSize = 32,
+            Padding = arrowPadding,
+            VerticalAlignment = VerticalAlignment.Center,
+            HorizontalAlignment = HorizontalAlignment.Right,
+            Visibility = Visibility.Hidden
+        };
+        _rightButton.Click += _ =>
+        {
+            _index = (_index + 1) % (_currentLevels.Count / 4 + 1);
+            RefreshCurrentLevels();
+        };
+    }
+
+    private static void SetupSwitchArea(LayoutRoot layout)
+    {
+        var architectKnight = WeSpriteUtils.Load("architect_knight");
+        var sleepingKnight = WeSpriteUtils.Load("sleeping_knight");
+
+        var img = new Image(layout, architectKnight)
         {
             HorizontalAlignment = HorizontalAlignment.Right,
             VerticalAlignment = VerticalAlignment.Top,
@@ -26,5 +101,662 @@ public static class MenuUIManager
             FontSize = 28,
             Padding = new Padding(20, 20)
         };
+
+        find.Click += _ =>
+        {
+            var uiManager = UIManager.instance;
+            _viewing = !_viewing;
+            if (_viewing)
+            {
+                img.Sprite = sleepingKnight;
+                uiManager.StartCoroutine(FadeGameTitle());
+                uiManager.StartCoroutine(uiManager.FadeOutCanvasGroup(uiManager.mainMenuScreen));
+            }
+            else
+            {
+                img.Sprite = architectKnight;
+                _searchArea.Visibility = Visibility.Hidden;
+                _loginArea.Visibility = Visibility.Hidden;
+                _downloadArea.Visibility = Visibility.Hidden;
+                _uploadArea.Visibility = Visibility.Hidden;
+                _leftButton.Visibility = Visibility.Hidden;
+                _rightButton.Visibility = Visibility.Hidden;
+                uiManager.UIGoToMainMenu();
+            }
+        };
+    }
+
+    private static async Task<string> SendSearchRequest(string description, string creator)
+    {
+        var jsonBody = JsonUtility.ToJson(new SearchRequestData
+        {
+            desc = description,
+            creator = creator
+        });
+        
+        var request = new UnityWebRequest(URL + "/search", "POST");
+        
+        var bodyRaw = Encoding.UTF8.GetBytes(jsonBody);
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        
+        request.SetRequestHeader("Content-Type", "application/json");
+        
+        var operation = request.SendWebRequest();
+        while (!operation.isDone) await Task.Yield();
+
+        return request.downloadHandler.text;
+    }
+
+    private static async Task DownloadLevel(int index)
+    {
+        if (_currentLevels.Count <= index) return;
+        
+        var jsonBody = JsonUtility.ToJson(new DownloadRequestData
+        {
+            level_id = _currentLevels[index]["level_id"]
+        });
+        
+        var request = new UnityWebRequest(URL + "/download", "POST");
+        
+        var bodyRaw = Encoding.UTF8.GetBytes(jsonBody);
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        
+        request.SetRequestHeader("Content-Type", "application/json");
+        
+        var operation = request.SendWebRequest();
+        while (!operation.isDone) await Task.Yield();
+
+        var json = request.downloadHandler.text;
+        
+        Architect.GlobalSettings.Edits = JsonConvert.DeserializeObject<Dictionary<string, List<ObjectPlacement>>>(json);
+        PlacementManager.InvalidateCache();
+    }
+
+    private const float MenuFadeSpeed = 3.2f;
+    
+    private static IEnumerator FadeGameTitle()
+    {
+        var sprite = UIManager.instance.gameTitle;
+        while (sprite.color.a > 0.0)
+        {
+            if (!_viewing) break;
+            sprite.color = new Color(sprite.color.r, sprite.color.g, sprite.color.b, sprite.color.a - Time.unscaledDeltaTime * MenuFadeSpeed);
+            yield return null;
+        }
+        sprite.color = new Color(sprite.color.r, sprite.color.g, sprite.color.b, _viewing ? 0 : 1);
+
+        if (_viewing)
+        {
+            _searchArea.Visibility = Visibility.Visible;
+            _loginArea.Visibility = Visibility.Visible;
+            _downloadArea.Visibility = Visibility.Visible;
+            _uploadArea.Visibility = Visibility.Visible;
+            _leftButton.Visibility = Visibility.Visible;
+            _rightButton.Visibility = Visibility.Visible;
+        }
+        
+        yield return null;
+    }
+    
+    [System.Serializable]
+    public class SearchRequestData
+    {
+        public string desc;
+        public string creator;
+    }
+    
+    [System.Serializable]
+    public class DownloadRequestData
+    {
+        // ReSharper disable once InconsistentNaming
+        public string level_id;
+    }
+    
+    [System.Serializable]
+    public class AuthRequestData
+    {
+        public string username;
+        public string password;
+    }
+    
+    [System.Serializable]
+    public class DeleteRequestData
+    {
+        public string key;
+        public string name;
+    }
+
+    private static void SetupSearchArea(LayoutRoot layout)
+    {
+        var padding = new Padding(20, 20);
+
+        var descriptionInput = new TextInput(layout)
+        {
+            MinWidth = 400,
+            FontSize = 30,
+            Font = MagicUI.Core.UI.Perpetua,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Padding = padding
+        }.WithProp(GridLayout.Row, 1);
+
+        var creatorInput = new TextInput(layout)
+        {
+            MinWidth = 400,
+            FontSize = 30,
+            Font = MagicUI.Core.UI.Perpetua,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Padding = padding
+        }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 1);
+
+        var searchButton = new Button(layout)
+        {
+            FontSize = 30,
+            Content = "Search",
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        }.WithProp(GridLayout.RowSpan, 2).WithProp(GridLayout.Column, 2);
+
+        _searchArea = new GridLayout(layout, "Search Grid")
+        {
+            RowDefinitions =
+            {
+                new GridDimension(1, GridUnit.Proportional),
+                new GridDimension(1, GridUnit.Proportional)
+            },
+            ColumnDefinitions =
+            {
+                new GridDimension(1, GridUnit.Proportional),
+                new GridDimension(1, GridUnit.Proportional),
+                new GridDimension(1, GridUnit.Proportional)
+            },
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Top,
+            Padding = new Padding(100, 60),
+            Children =
+            {
+                new TextObject(layout)
+                {
+                    FontSize = 30,
+                    Text = "Name/Description",
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Padding = padding
+                },
+                new TextObject(layout)
+                {
+                    FontSize = 30,
+                    Text = "Creator",
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Padding = padding
+                }.WithProp(GridLayout.Column, 1),
+                descriptionInput,
+                creatorInput,
+                searchButton
+            },
+            Visibility = Visibility.Hidden
+        };
+
+        searchButton.Click += async _ =>
+        {
+            var jsonResponse = await SendSearchRequest(descriptionInput.Text, creatorInput.Text);
+            _currentLevels = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(jsonResponse);
+            _index = 0;
+            RefreshCurrentLevels();
+        };
+
+        _downloadArea = new GridLayout(layout, "Level Grid")
+        {
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Top,
+            ColumnDefinitions =
+            {
+                new GridDimension(1, GridUnit.Proportional),
+                new GridDimension(0.2f, GridUnit.Proportional)
+            },
+            RowDefinitions =
+            {
+                new GridDimension(0.25f, GridUnit.Proportional),
+                new GridDimension(1, GridUnit.Proportional),
+                new GridDimension(0.25f, GridUnit.Proportional),
+                new GridDimension(1, GridUnit.Proportional),
+                new GridDimension(0.25f, GridUnit.Proportional),
+                new GridDimension(1, GridUnit.Proportional),
+                new GridDimension(0.25f, GridUnit.Proportional),
+                new GridDimension(1, GridUnit.Proportional)
+            },
+            Padding = new Padding(0, 240),
+            Visibility = Visibility.Hidden
+        };
+
+        var downloadPadding = new Padding(0, 5);
+        
+        for (var i = 0; i < 4; i++)
+        {
+            var infoName = new TextObject(layout, "Info 1A")
+            {
+                Padding = downloadPadding,
+                Text = "",
+                FontSize = 24,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center
+            }.WithProp(GridLayout.Row, i * 2);
+
+            var infoDesc = new TextObject(layout, "Info 1B")
+            {
+                Text = "",
+                FontSize = 16,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center
+            }.WithProp(GridLayout.Row, i * 2 + 1);
+
+            var download = new Button(layout, "Download " + i)
+            {
+                Content = "Download",
+                VerticalAlignment = VerticalAlignment.Bottom,
+                Visibility = Visibility.Hidden
+            }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, i * 2);
+            
+            DownloadChoices.Add((infoName, infoDesc, download));
+
+            var k = i;
+            download.Click += async _ =>
+            {
+                await DownloadLevel(_index * 4 + k);
+            };
+
+            _downloadArea.Children.Add(infoName);
+            _downloadArea.Children.Add(infoDesc);
+            _downloadArea.Children.Add(download);
+        }
+    }
+
+    private static void RefreshCurrentLevels()
+    {
+        for (var i = 0; i < 4; i++)
+        {
+            var index = _index * 4 + i;
+            if (_currentLevels.Count > index)
+            {
+                var name = _currentLevels[index]["level_name"];
+                DownloadChoices[i].Item1.Text = name + new string(' ', Mathf.Max(0, 50 - name.Length));
+                DownloadChoices[i].Item2.Text = SplitText(_currentLevels[index]["level_desc"]);
+                DownloadChoices[i].Item3.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                DownloadChoices[i].Item1.Text = "";
+                DownloadChoices[i].Item2.Text = "";
+                DownloadChoices[i].Item3.Visibility = Visibility.Hidden;
+            }
+        }
+    }
+    
+    private static string SplitText(string text)
+    {
+        var segments = new List<string>();
+        var words = text.Split(' ');
+        
+        var currentSegment = "\t";
+        var sub = 0;
+
+        foreach (var word in words)
+        {
+            if (currentSegment.Length + word.Length - sub <= 100)
+            {
+                if (currentSegment.Length > 1) currentSegment += " ";
+                
+                currentSegment += word;
+            }
+            else
+            {
+                currentSegment += new string(' ', Mathf.Max(0, 100 - currentSegment.Length + sub));
+                segments.Add(currentSegment);
+                sub = 1;
+                if (segments.Count >= 4) break;
+                currentSegment = "\n\t" + word;
+            }
+        }
+
+        if (segments.Count < 4 && currentSegment.Length > 0)
+        {
+            currentSegment += new string(' ', Mathf.Max(0, 100 - currentSegment.Length + sub));
+            segments.Add(currentSegment);
+        }
+        while (segments.Count < 4) segments.Add("\n                                                                                                    ");
+
+        return segments.Aggregate("", (current, seg) => current + seg);
+    }
+
+    private static void SetupLoginArea(LayoutRoot layout)
+    {
+        var padding = new Padding(20, 5);
+        
+        var errorMessage = new TextObject(layout)
+        {
+            FontSize = 15,
+            Text = "",
+            Padding = padding,
+            VerticalAlignment = VerticalAlignment.Center,
+            HorizontalAlignment = HorizontalAlignment.Center
+        }.WithProp(GridLayout.ColumnSpan, 2);
+        
+        var usernameInput = new TextInput(layout)
+        {
+            MinWidth = 160,
+            FontSize = 20,
+            Font = MagicUI.Core.UI.Perpetua,
+            Padding = padding,
+            VerticalAlignment = VerticalAlignment.Center,
+            HorizontalAlignment = HorizontalAlignment.Center
+        }.WithProp(GridLayout.Row, 2);
+        
+        var passwordInput = new TextInput(layout)
+        {
+            MinWidth = 160,
+            FontSize = 20,
+            Font = MagicUI.Core.UI.Perpetua,
+            ContentType = InputField.ContentType.Password,
+            Padding = padding,
+            VerticalAlignment = VerticalAlignment.Center,
+            HorizontalAlignment = HorizontalAlignment.Center
+        }.WithProp(GridLayout.Row, 2).WithProp(GridLayout.Column, 1);
+
+        var signUpButton = new Button(layout)
+        {
+            FontSize = 15,
+            Content = "Sign Up",
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+
+        var logInButton = new Button(layout)
+        {
+            FontSize = 15,
+            Content = "Log In",
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        }.WithProp(GridLayout.Column, 1);
+
+        var logOutButton = new Button(layout)
+        {
+            FontSize = 15,
+            Content = "Log Out",
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        }.WithProp(GridLayout.Column, 2);
+        
+        _loginArea = new GridLayout(layout, "Login Area")
+        {
+            Padding = new Padding(50, 50),
+            VerticalAlignment = VerticalAlignment.Bottom,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            ColumnDefinitions =
+            {
+                new GridDimension(1, GridUnit.Proportional),
+                new GridDimension(1, GridUnit.Proportional)
+            },
+            RowDefinitions =
+            {
+                new GridDimension(1, GridUnit.Proportional),
+                new GridDimension(1, GridUnit.Proportional),
+                new GridDimension(1, GridUnit.Proportional),
+                new GridDimension(1, GridUnit.Proportional)
+            },
+            Children =
+            {
+                errorMessage,
+                new TextObject(layout)
+                {
+                    FontSize = 15,
+                    Text = "Username",
+                    Padding = padding,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Center
+                }.WithProp(GridLayout.Row, 1),
+                new TextObject(layout)
+                {
+                    FontSize = 15,
+                    Text = "Password",
+                    Padding = padding,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Center
+                }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 1),
+                usernameInput,
+                passwordInput,
+                new GridLayout(layout, "Login Buttons")
+                {
+                    Padding = padding,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    ColumnDefinitions =
+                    {
+                        new GridDimension(0.3f, GridUnit.Proportional),
+                        new GridDimension(0.3f, GridUnit.Proportional),
+                        new GridDimension(0.3f, GridUnit.Proportional)
+                    },
+                    Children =
+                    {
+                        signUpButton,
+                        logInButton,
+                        logOutButton
+                    }
+                }.WithProp(GridLayout.ColumnSpan, 2).WithProp(GridLayout.Row, 3)
+            },
+            Visibility = Visibility.Hidden
+        };
+
+        if (Architect.GlobalSettings.ApiKey.Length == 0) logOutButton.Enabled = false;
+        else
+        {
+            signUpButton.Enabled = false;
+            logInButton.Enabled = false;
+            usernameInput.Enabled = false;
+            passwordInput.Enabled = false;
+        }
+        
+        logOutButton.Click += button =>
+        {
+            Architect.GlobalSettings.ApiKey = "";
+            signUpButton.Enabled = true;
+            logInButton.Enabled = true;
+            usernameInput.Enabled = true;
+            passwordInput.Enabled = true;
+            button.Enabled = false;
+            _uploadButton.Enabled = false;
+        };
+
+        signUpButton.Click += async _ =>
+        {
+            if (!await SendAuthRequest(usernameInput.Text, passwordInput.Text, "/create", errorMessage)) return;
+            signUpButton.Enabled = false;
+            logInButton.Enabled = false;
+            usernameInput.Enabled = false;
+            passwordInput.Enabled = false;
+            logOutButton.Enabled = true;
+            _uploadButton.Enabled = true;
+            _deleteButton.Enabled = true;
+        };
+
+        logInButton.Click += async _ =>
+        {
+            if (!await SendAuthRequest(usernameInput.Text, passwordInput.Text, "/login", errorMessage)) return;
+            signUpButton.Enabled = false;
+            logInButton.Enabled = false;
+            usernameInput.Enabled = false;
+            passwordInput.Enabled = false;
+            logOutButton.Enabled = true;
+            _uploadButton.Enabled = true;
+            _deleteButton.Enabled = true;
+        };
+    }
+    
+    private static async Task<bool> SendAuthRequest(string username, string password, string path, TextObject errorMessage)
+    {
+        var jsonBody = JsonUtility.ToJson(new AuthRequestData
+        {
+            username = username,
+            password = password
+        });
+        
+        var request = new UnityWebRequest(URL + path, "POST");
+        
+        var bodyRaw = Encoding.UTF8.GetBytes(jsonBody);
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        
+        request.SetRequestHeader("Content-Type", "application/json");
+        
+        var operation = request.SendWebRequest();
+        while (!operation.isDone) await Task.Yield();
+        
+        var response = JsonConvert.DeserializeObject<Dictionary<string, string>>(request.downloadHandler.text);
+        if (!response.TryGetValue("key", out var value))
+        {
+            errorMessage.Text = response["error"];
+            return false;
+        }
+        Architect.GlobalSettings.ApiKey = value;
+        errorMessage.Text = "";
+        return true;
+    }
+
+    private static Button _uploadButton;
+    private static Button _deleteButton;
+
+    private static void SetupUploadArea(LayoutRoot layout)
+    {
+        var padding = new Padding(10, 5);
+        
+        _uploadButton = new Button(layout)
+        {
+            FontSize = 15,
+            Content = "Upload",
+            Padding = padding,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            Enabled = Architect.GlobalSettings.ApiKey.Length > 0
+        }.WithProp(GridLayout.Column, 2);
+        
+        _deleteButton = new Button(layout)
+        {
+            FontSize = 15,
+            Content = "Delete",
+            Padding = padding,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            Enabled = Architect.GlobalSettings.ApiKey.Length > 0
+        }.WithProp(GridLayout.Column, 2).WithProp(GridLayout.Row, 1);
+        
+        var nameInput = new TextInput(layout)
+        {
+            MinWidth = 320,
+            FontSize = 20,
+            Font = MagicUI.Core.UI.Perpetua,
+            Padding = padding,
+            VerticalAlignment = VerticalAlignment.Center,
+            HorizontalAlignment = HorizontalAlignment.Center
+        }.WithProp(GridLayout.Column, 1);
+        
+        var descInput = new TextInput(layout)
+        {
+            MinWidth = 320,
+            FontSize = 20,
+            Font = MagicUI.Core.UI.Perpetua,
+            Padding = padding,
+            VerticalAlignment = VerticalAlignment.Center,
+            HorizontalAlignment = HorizontalAlignment.Center
+        }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 1);
+        
+        _uploadArea = new GridLayout(layout, "Upload Area")
+        {
+            Padding = new Padding(50, 50),
+            HorizontalAlignment = HorizontalAlignment.Right,
+            VerticalAlignment = VerticalAlignment.Bottom,
+            ColumnDefinitions =
+            {
+                new GridDimension(0.5f, GridUnit.Proportional),
+                new GridDimension(1, GridUnit.Proportional),
+                new GridDimension(0.5f, GridUnit.Proportional)
+            },
+            RowDefinitions =
+            {
+                new GridDimension(1, GridUnit.Proportional),
+                new GridDimension(1, GridUnit.Proportional)
+            },
+            Children =
+            {
+                new TextObject(layout)
+                {
+                    FontSize = 15,
+                    Text = "Name",
+                    Padding = padding,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Center
+                },
+                new TextObject(layout)
+                {
+                    FontSize = 15,
+                    Text = "Description",
+                    Padding = padding,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Center
+                }.WithProp(GridLayout.Row, 1),
+                nameInput,
+                descInput,
+                _uploadButton,
+                _deleteButton
+            },
+            Visibility = Visibility.Hidden
+        };
+
+        _uploadButton.Click += _ =>
+        {
+            UploadLevel(nameInput.Text, descInput.Text);
+        };
+
+        _deleteButton.Click += _ =>
+        {
+            DeleteLevel(nameInput.Text);
+        };
+    }
+
+    private static void UploadLevel(string name, string desc)
+    {
+        var form = new WWWForm();
+        
+        form.AddField("key", Architect.GlobalSettings.ApiKey);
+        form.AddField("name", name);
+        form.AddField("desc", desc);
+        
+        var jsonData = JsonConvert.SerializeObject(Architect.GlobalSettings.Edits, 
+            ObjectPlacement.ObjectPlacementConverter.Instance, 
+            ObjectPlacement.ObjectPlacementConverter.Vector3Converter);
+        
+        var jsonBytes = Encoding.UTF8.GetBytes(jsonData);
+        form.AddBinaryData("level", jsonBytes, "level.json", "application/json");
+        
+        var request = UnityWebRequest.Post(URL + "/upload", form);
+        
+        request.SendWebRequest();
+    }
+
+    private static void DeleteLevel(string name)
+    {
+        var jsonBody = JsonUtility.ToJson(new DeleteRequestData
+        {
+            key = Architect.GlobalSettings.ApiKey,
+            name = name
+        });
+        
+        var request = new UnityWebRequest(URL + "/delete", "POST");
+        
+        var bodyRaw = Encoding.UTF8.GetBytes(jsonBody);
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        
+        request.SetRequestHeader("Content-Type", "application/json");
+        
+        request.SendWebRequest();
     }
 }
