@@ -451,7 +451,7 @@ public static class CustomObjects
     public static int BoundNailDamage()
     {
         var num = GameManager.instance.playerData.GetInt("nailDamage");
-        return num <= 5 ? 5 : Mathf.RoundToInt(num * 0.8f);
+        return num >= 13 ? 13 : Mathf.RoundToInt(num * 0.8f);
     }
 
     public static bool ShouldBindNail()
