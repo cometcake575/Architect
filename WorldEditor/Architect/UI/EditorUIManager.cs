@@ -429,7 +429,7 @@ public static class EditorUIManager
             correctRow++;
         }
         
-        var cursorSprite = WeSpriteUtils.Load("cursor");
+        var cursorSprite = ResourceUtils.Load("cursor");
         var cursorImagedButton = CreateImagedButton(layout, cursorSprite, "Cursor", 0, 0, -1);
         cursorImagedButton.Item1.WithProp(GridLayout.Column, 0).WithProp(GridLayout.Row, correctRow);
         cursorImagedButton.Item2.WithProp(GridLayout.Column, 0).WithProp(GridLayout.Row, correctRow);

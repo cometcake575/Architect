@@ -20,6 +20,11 @@ public class BroadcasterGroup
         EventBroadcasterType.ZoneEnter,
         EventBroadcasterType.ZoneExit
     );
+    
+    public static readonly BroadcasterGroup Bindings = new(
+        EventBroadcasterType.OnBind,
+        EventBroadcasterType.OnUnbind
+    );
 
     public readonly EventBroadcasterType[] Types;
     

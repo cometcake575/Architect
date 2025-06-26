@@ -1,11 +1,12 @@
 using System.Reflection;
+using SFCore.Utils;
 using UnityEngine;
 
 namespace Architect.Util;
 
-public static class WeSpriteUtils
+public static class ResourceUtils
 {
-    internal static Sprite Load(string spriteName) {
+    internal static Sprite Load(string spriteName, FilterMode filterMode = FilterMode.Bilinear) {
         var asm = Assembly.GetExecutingAssembly();
         using var s = asm.GetManifestResourceStream($"Architect.Resources.{spriteName}.png");
         if (s == null) return null;
@@ -14,7 +15,21 @@ public static class WeSpriteUtils
         var tex = new Texture2D(2, 2);
         tex.LoadImage(buffer, true);
         var sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+        sprite.texture.filterMode = filterMode;
         return sprite;
+    }
+
+    internal static AudioClip LoadClip(string clipName)
+    {
+        var asm = Assembly.GetExecutingAssembly();
+        using var s = asm.GetManifestResourceStream($"Architect.Resources.{clipName}.wav");
+
+        if (s == null) return null;
+
+        var buffer = new byte[s.Length];
+        _ = s.Read(buffer, 0, buffer.Length);
+
+        return WavUtils.ToAudioClip(buffer);
     }
 
     public static Vector3 FixOffset(Vector3 offset, bool flipped, int rotation, float scale)

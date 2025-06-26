@@ -80,8 +80,8 @@ public static class MenuUIManager
 
     private static void SetupSwitchArea(LayoutRoot layout)
     {
-        var architectKnight = WeSpriteUtils.Load("architect_knight");
-        var sleepingKnight = WeSpriteUtils.Load("sleeping_knight");
+        var architectKnight = ResourceUtils.Load("architect_knight");
+        var sleepingKnight = ResourceUtils.Load("sleeping_knight");
 
         var img = new Image(layout, architectKnight)
         {

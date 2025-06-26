@@ -27,6 +27,8 @@ public class ConfigGroup
     
     internal static ConfigGroup Twisters;
     
+    internal static ConfigGroup WatcherKnights;
+    
     internal static ConfigGroup Cocoon;
     
     internal static ConfigGroup Breakable;
@@ -35,7 +37,7 @@ public class ConfigGroup
     
     internal static ConfigGroup Tolls;
     
-    internal static ConfigGroup Sawblade;
+    internal static ConfigGroup MovingObjects;
     
     internal static ConfigGroup Tablets;
     
@@ -44,6 +46,8 @@ public class ConfigGroup
     internal static ConfigGroup Grub;
     
     internal static ConfigGroup BattleGate;
+    
+    internal static ConfigGroup Bindings;
 
     internal static void Initialize()
     {
@@ -137,6 +141,17 @@ public class ConfigGroup
             }))
         );
 
+        WatcherKnights = new ConfigGroup(Enemies,
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Start Awake", (o, value) =>
+            {
+                if (!value.GetValue()) return;
+                o.LocateMyFSM("Black Knight").AddCustomAction("Rest", fsm =>
+                {
+                    fsm.SendEvent("WAKE");
+                });
+            }))
+        );
+
         Breakable = new ConfigGroup(All,
             Attributes.ConfigManager.RegisterConfigType(MakePersistenceConfigType("Stay Broken"))
         );
@@ -167,26 +182,26 @@ public class ConfigGroup
             }))
         );
 
-        Sawblade = new ConfigGroup(All,
+        MovingObjects = new ConfigGroup(All,
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Track Distance", (o, value) =>
             {
-                o.GetOrAddComponent<MovingSawblade>().trackDistance = value.GetValue();
+                o.GetOrAddComponent<MovingObject>().trackDistance = value.GetValue();
             })),
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Speed", (o, value) =>
             {
-                o.GetOrAddComponent<MovingSawblade>().speed = value.GetValue();
+                o.GetOrAddComponent<MovingObject>().speed = value.GetValue();
             })),
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Pause Time", (o, value) =>
             {
-                o.GetOrAddComponent<MovingSawblade>().pauseTime = value.GetValue();
+                o.GetOrAddComponent<MovingObject>().pauseTime = value.GetValue();
             })),
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Start Offset", (o, value) =>
             {
-                o.GetOrAddComponent<MovingSawblade>().offset = value.GetValue();
+                o.GetOrAddComponent<MovingObject>().offset = value.GetValue();
             })),
             Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Track Rotation", (o, value) =>
             {
-                o.GetOrAddComponent<MovingSawblade>().rotation = value.GetValue();
+                o.GetOrAddComponent<MovingObject>().rotation = value.GetValue();
             }))
         );
         
@@ -227,6 +242,24 @@ public class ConfigGroup
                     if (!value.GetValue()) return;
                     var fsm = o.LocateMyFSM("BG Control");
                     fsm.SetState("Open");
+                })
+            )
+        );
+
+        Bindings = new ConfigGroup(
+            All,
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Binding Active", (o, value) =>
+                {
+                    if (value.GetValue()) return;
+                    o.GetComponent<CustomBinder>().active = false;
+                })
+            ),
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Reversible", (o, value) =>
+                {
+                    if (!value.GetValue()) return;
+                    o.GetComponent<CustomBinder>().reversible = true;
                 })
             )
         );

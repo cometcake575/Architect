@@ -120,7 +120,7 @@ public class PlaceableObject : SelectableObject
         }
         else def = sprite.CurrentSprite;
 
-        _sprite = WeSpriteUtils.ConvertFrom2DToolkit(def, 64 / sprite.scale.x);
+        _sprite = ResourceUtils.ConvertFrom2DToolkit(def, 64 / sprite.scale.x);
         
         if (def.flipped != tk2dSpriteDefinition.FlipMode.None) _rotation += 90;
         _rotation += sprite.gameObject.transform.rotation.eulerAngles.z;

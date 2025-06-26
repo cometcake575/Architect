@@ -7,5 +7,7 @@ public enum EventBroadcasterType
     OnPull,
     LoadedPulled,
     ZoneEnter,
-    ZoneExit
+    ZoneExit,
+    OnBind,
+    OnUnbind
 }

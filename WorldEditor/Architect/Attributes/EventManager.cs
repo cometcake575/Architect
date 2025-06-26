@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Architect.Attributes.Broadcasters;
 using Architect.Attributes.Receivers;
 using Modding;
@@ -81,7 +82,7 @@ public static class EventManager
     public static void BroadcastEvent(string name)
     {
         if (!Events.TryGetValue(name, out var @event)) return;
-        foreach (var receiver in @event)
+        foreach (var receiver in @event.Where(receiver => receiver && receiver.gameObject))
         {
             receiver.ReceiveEvent();
         }

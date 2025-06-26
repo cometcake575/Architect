@@ -72,6 +72,12 @@ public static class ContentPacks
             .WithBroadcasterGroup(BroadcasterGroup.Enemies);
     }
 
+    private static AbstractPackElement CreateSolid(string scene, string path, string name, int weight = 0)
+    {
+        return new GInternalPackElement(scene, path, name, "Solids", weight)
+            .WithRotationGroup(RotationGroup.Four);
+    }
+
     internal static void PreloadInternalPacks()
     {
         // If there weren't any placements these didn't end up initialized, so they're initialized here
@@ -82,14 +88,14 @@ public static class ContentPacks
         {
             Create("Tutorial_01", "_Props/Stalactite Hazard", "Stalactite", "Hazards")
                 .WithRotationGroup(RotationGroup.Eight),
-            Create("Tutorial_01", "_Scenery/plat_float_01", "Platform 1", "Solids"),
-            Create("Tutorial_01", "_Scenery/plat_float_07", "Platform 2", "Solids"),
-            Create("Tutorial_01", "_Scenery/plat_float_08", "Platform 3", "Solids"),
-            Create("Tutorial_01", "_Scenery/plat_float_10", "Platform 4", "Solids"),
-            Create("Tutorial_01", "_Scenery/plat_float_14", "Platform 5", "Solids"),
-            Create("Tutorial_01", "_Scenery/plat_float_17", "Platform 6", "Solids"),
-            Create("Tutorial_01", "_Scenery/plat_float_18", "Platform 7", "Solids"),
-            Create("Tutorial_01", "_Scenery/plat_float_20", "Platform 8", "Solids"),
+            CreateSolid("Tutorial_01", "_Scenery/plat_float_01", "Platform 1"),
+            CreateSolid("Tutorial_01", "_Scenery/plat_float_07", "Platform 2"),
+            CreateSolid("Tutorial_01", "_Scenery/plat_float_08", "Platform 3"),
+            CreateSolid("Tutorial_01", "_Scenery/plat_float_10", "Platform 4"),
+            CreateSolid("Tutorial_01", "_Scenery/plat_float_14", "Platform 5"),
+            CreateSolid("Tutorial_01", "_Scenery/plat_float_17", "Platform 6"),
+            CreateSolid("Tutorial_01", "_Scenery/plat_float_18", "Platform 7"),
+            CreateSolid("Tutorial_01", "_Scenery/plat_float_20", "Platform 8"),
             Create("Tutorial_01", "_Props/Tut_tablet_top (2)", "King's Pass Lore Tablet", "Interactable", weight:LoreTabletWeight)
                 .WithConfigGroup(ConfigGroup.Tablets),
             Create("Tutorial_01", "_Props/Health Cocoon", "Lifeblood Cocoon", "Interactable", weight:MiscInteractableWeight)
@@ -176,14 +182,14 @@ public static class ContentPacks
             Create("Fungus3_26", "Zap Cloud", "Charged Lumaflies", "Enemies"),
             Create("Fungus3_26", "Jelly Egg Bomb", "Jelly Egg Bomb", "Hazards")
                 .WithRotationGroup(RotationGroup.Eight),
-            Create("Fungus3_26", "fung_plat_float_01", "Fog Canyon Platform 1", "Solids"),
-            Create("Fungus3_26", "fung_plat_float_04", "Fog Canyon Platform 2", "Solids"),
-            Create("Fungus3_26", "fung_plat_float_05", "Fog Canyon Platform 3", "Solids"),
-            Create("Fungus3_26", "fung_plat_float_06", "Fog Canyon Platform 4", "Solids"),
-            Create("Fungus3_26", "fung_plat_float_07", "Fog Canyon Platform 5", "Solids"),
-            Create("Fungus3_26", "fung_plat_float_08", "Fog Canyon Platform 6", "Solids"),
-            Create("Fungus3_archive_02", "fung temple_plat_float_small", "Archives Platform S", "Solids"),
-            Create("Fungus3_archive_02", "fung_temple_plat_float (1)", "Archives Platform L", "Solids"),
+            CreateSolid("Fungus3_26", "fung_plat_float_01", "Fog Canyon Platform 1"),
+            CreateSolid("Fungus3_26", "fung_plat_float_04", "Fog Canyon Platform 2"),
+            CreateSolid("Fungus3_26", "fung_plat_float_05", "Fog Canyon Platform 3"),
+            CreateSolid("Fungus3_26", "fung_plat_float_06", "Fog Canyon Platform 4"),
+            CreateSolid("Fungus3_26", "fung_plat_float_07", "Fog Canyon Platform 5"),
+            CreateSolid("Fungus3_26", "fung_plat_float_08", "Fog Canyon Platform 6"),
+            CreateSolid("Fungus3_archive_02", "fung temple_plat_float_small", "Archives Platform S"),
+            CreateSolid("Fungus3_archive_02", "fung_temple_plat_float (1)", "Archives Platform L"),
             Create("Fungus3_archive", "RestBench", "Archive Bench", "Interactable", weight:BenchWeight)
         });
         RegisterInternalPack(new ContentPack("Fungal Wastes", "Assets from the Fungal Wastes")
@@ -204,10 +210,10 @@ public static class ContentPacks
             Create("Fungus2_18", "_Props/Bounce Shrooms 1/Bounce Shroom B (1)", "Bouncy Mushroom", "Interactable", weight:MiscInteractableWeight, offset:15.5f)
                 .FlipVertical()
                 .WithRotationGroup(RotationGroup.Eight),
-            Create("Fungus2_04", "mush_plat_float_01", "Fungal Wastes Platform 1", "Solids"),
-            Create("Fungus2_18", "_Scenery/mush_plat_float_03", "Fungal Wastes Platform 2", "Solids"),
-            Create("Fungus2_18", "_Scenery/mush_plat_float_04", "Fungal Wastes Platform 3", "Solids"),
-            Create("Fungus2_04", "mush_plat_float_05", "Fungal Wastes Platform 4", "Solids"),
+            CreateSolid("Fungus2_04", "mush_plat_float_01", "Fungal Wastes Platform 1"),
+            CreateSolid("Fungus2_18", "_Scenery/mush_plat_float_03", "Fungal Wastes Platform 2"),
+            CreateSolid("Fungus2_18", "_Scenery/mush_plat_float_04", "Fungal Wastes Platform 3"),
+            CreateSolid("Fungus2_04", "mush_plat_float_05", "Fungal Wastes Platform 4"),
             new LeverPackElement("Fungus2_04", "Mantis Lever", "Mantis Lever", weight:LeverWeight),
             Create("Fungus2_04", "Mantis Gate", "Mantis Gate", "Interactable", weight:GateWeight)
                 .WithReceiverGroup(ReceiverGroup.Gates)
@@ -224,8 +230,8 @@ public static class ContentPacks
             CreateEnemy("Fungus3_48", "Grass Hopper", "Loodle"),
             CreateEnemy("Fungus3_10", "Battle Scene/Completed/Mantis Heavy", "Mantis Traitor"),
             CreateEnemy("Fungus3_48", "Mantis Heavy Flyer", "Mantis Petra"),
-            Create("Fungus3_34", "Royal Gardens Plat S", "Queen's Gardens Collapsing Platform S", "Solids"),
-            Create("Fungus3_34", "Royal Gardens Plat L", "Queen's Gardens Collapsing Platform L", "Solids"),
+            CreateSolid("Fungus3_34", "Royal Gardens Plat S", "Queen's Gardens Collapsing Platform S"),
+            CreateSolid("Fungus3_34", "Royal Gardens Plat L", "Queen's Gardens Collapsing Platform L"),
             new TollBenchElement(weight:BenchWeight)
         });
         RegisterInternalPack(new ContentPack("City of Tears", "Assets from the City of Tears")
@@ -253,10 +259,10 @@ public static class ContentPacks
             CreateEnemy("Ruins_House_02", "Gorgeous Husk", "Gorgeous Husk"),
             Create("Ruins2_08", "ruind_bridge_roof_01 (1)/ruind_bridge_roof_04_spikes", "Roof Spikes", "Hazards")
                 .WithRotationGroup(RotationGroup.Eight),
-            Create("Ruins1_03", "_Scenery/ruin_plat_float_01", "City Platform 1", "Solids"),
-            Create("Ruins1_03", "_Scenery/ruin_plat_float_01_wide", "City Platform 2", "Solids"),
-            Create("Ruins1_03", "_Scenery/ruin_plat_float_02", "City Platform 3", "Solids"),
-            Create("Ruins1_03", "_Scenery/ruin_plat_float_05", "City Platform 4", "Solids"),
+            CreateSolid("Ruins1_03", "_Scenery/ruin_plat_float_01", "City Platform 1"),
+            CreateSolid("Ruins1_03", "_Scenery/ruin_plat_float_01_wide", "City Platform 2"),
+            CreateSolid("Ruins1_03", "_Scenery/ruin_plat_float_02", "City Platform 3"),
+            CreateSolid("Ruins1_03", "_Scenery/ruin_plat_float_05", "City Platform 4"),
             Create("Ruins1_25", "Ruins Vial Empty", "Soul Vial", "Interactable", weight:SoulSourceWeight)
                 .WithConfigGroup(ConfigGroup.Breakable),
             Create("Ruins1_24", "Soul Totem 1", "Thin Soul Totem", "Interactable", weight:SoulSourceWeight)
@@ -265,7 +271,7 @@ public static class ContentPacks
                 .WithRotationGroup(RotationGroup.Eight),
             Create("Ruins1_32", "Soul Totem 5", "Leaning Soul Totem", "Interactable", weight:SoulSourceWeight)
                 .WithRotationGroup(RotationGroup.Eight),
-            Create("Ruins_Bathhouse", "ruins_mage_building_0011_a_royal_plat", "Pleasure House Platform", "Solids"),
+            CreateSolid("Ruins_Bathhouse", "ruins_mage_building_0011_a_royal_plat", "Pleasure House Platform"),
             Create("Ruins_Bathhouse", "RestBench", "Pleasure House Bench", "Interactable", weight:BenchWeight),
             new MillibellePackElement(weight:MiscInteractableWeight)
         });
@@ -290,11 +296,9 @@ public static class ContentPacks
                 .WithRotationGroup(RotationGroup.Four),
             CreateEnemy("Mines_20", "Crystallised Lazer Bug (3)", "Crystal Crawler").FlipHorizontal()
                 .WithRotationGroup(RotationGroup.Four),
-            Create("Mines_20", "mines_metal_grate_06", "Metal Grate", "Solids")
-                .WithRotationGroup(RotationGroup.Four),
-            Create("Mines_20", "plat_float_06", "Crystal Peak Platform", "Solids"),
-            Create("Mines_31", "Mines Platform", "Crystal Peak Rotating Platform", "Solids")
-                .WithRotationGroup(RotationGroup.Three),
+            CreateSolid("Mines_20", "mines_metal_grate_06", "Metal Grate"),
+            CreateSolid("Mines_20", "plat_float_06", "Crystal Peak Platform"),
+            CreateSolid("Mines_31", "Mines Platform", "Crystal Peak Rotating Platform"),
             Create("Mines_37", "stomper_offset", "Crystal Peak Stomper (Slow)", "Hazards")
                 .WithRotationGroup(RotationGroup.Four),
             Create("Mines_37", "stomper_fast", "Crystal Peak Stomper (Fast)", "Hazards")
@@ -308,7 +312,7 @@ public static class ContentPacks
             CreateEnemy("Deepnest_East_07", "Super Spitter", "Primal Aspid"),
             new HopperPackElement("Deepnest_East_06", "Hopper", "Hopper", true),
             new HopperPackElement("Deepnest_East_06", "Giant Hopper (1)", "Great Hopper", false),
-            Create("Ruins2_11_b", "jar_col_plat", "Tower of Love Platform", "Solids"),
+            CreateSolid("Ruins2_11_b", "jar_col_plat", "Tower of Love Platform"),
             Create("Deepnest_East_06", "RestBench", "Nailmaster Oro's Bench", "Interactable", weight:NailmasterBenchWeight),
             
             // Colosseum of Fools
@@ -329,13 +333,13 @@ public static class ContentPacks
             CreateEnemy("Hive_03_c", "Bee Stinger (4)", "Hive Soldier"),
             CreateEnemy("Hive_03_c", "Big Bee", "Hive Guardian"),
             new HatcherPackElement("Hive_01", "Zombie Hive", "Hatcher Cage (1)", "Husk Hive", "Hive Zombie"),
-            Create("Hive_03_c", "hive_plat_01 (4)", "Hive Platform 1", "Solids"),
-            Create("Hive_03_c", "hive_plat_02 (2)", "Hive Platform 2", "Solids"),
-            Create("Hive_03_c", "hive_plat_03 (3)", "Hive Platform 3", "Solids"),
-            Create("Hive_03_c", "hive_plat_04 (4)", "Hive Platform 4", "Solids"),
-            Create("Hive_03_c", "hive_plat_brk_02", "Breakable Hive Platform 1", "Solids"),
-            Create("Hive_03_c", "hive_plat_brk_03 (1)", "Breakable Hive Platform 2", "Solids"),
-            Create("Hive_03_c", "hive_plat_brk_04", "Breakable Hive Platform 3", "Solids"),
+            CreateSolid("Hive_03_c", "hive_plat_01 (4)", "Hive Platform 1"),
+            CreateSolid("Hive_03_c", "hive_plat_02 (2)", "Hive Platform 2"),
+            CreateSolid("Hive_03_c", "hive_plat_03 (3)", "Hive Platform 3"),
+            CreateSolid("Hive_03_c", "hive_plat_04 (4)", "Hive Platform 4"),
+            CreateSolid("Hive_03_c", "hive_plat_brk_02", "Breakable Hive Platform 1"),
+            CreateSolid("Hive_03_c", "hive_plat_brk_03 (1)", "Breakable Hive Platform 2"),
+            CreateSolid("Hive_03_c", "hive_plat_brk_04", "Breakable Hive Platform 3"),
             Create("Hive_03_c", "Hive Breakable Pillar (5)", "Hive Breakable Wall", "Interactable", weight:BreakableWallsWeight)
                 .WithRotationGroup(RotationGroup.Four)
                 .WithConfigGroup(ConfigGroup.Breakable)
@@ -368,10 +372,10 @@ public static class ContentPacks
         });
         RegisterInternalPack(new ContentPack("The Abyss", "Assets from The Abyss")
         {
-            Create("Abyss_06_Core", "_Scenery/abyss_plat_float_01", "Abyss Platform 1", "Solids"),
-            Create("Abyss_06_Core", "_Scenery/abyss_plat_float_02", "Abyss Platform 2", "Solids"),
-            Create("Abyss_06_Core", "_Scenery/abyss_plat_float_03", "Abyss Platform 3", "Solids"),
-            Create("Abyss_06_Core", "_Scenery/abyss_plat_float_04", "Abyss Platform 4", "Solids"),
+            CreateSolid("Abyss_06_Core", "_Scenery/abyss_plat_float_01", "Abyss Platform 1"),
+            CreateSolid("Abyss_06_Core", "_Scenery/abyss_plat_float_02", "Abyss Platform 2"),
+            CreateSolid("Abyss_06_Core", "_Scenery/abyss_plat_float_03", "Abyss Platform 3"),
+            CreateSolid("Abyss_06_Core", "_Scenery/abyss_plat_float_04", "Abyss Platform 4"),
             new VoidTendrilsElement(),
             new ShadeSiblingElement()
         });
@@ -379,12 +383,12 @@ public static class ContentPacks
         {
             Create("White_Palace_18", "White Palace Fly", "Wingsmould", "Enemies").FlipVertical(),
             CreateEnemy("White_Palace_11", "Royal Gaurd", "Kingsmould"),
-            Create("White_Palace_07", "wp_plat_float_01_wide (1)", "White Palace Platform 1", "Solids"),
-            Create("White_Palace_07", "wp_plat_float_07", "White Palace Platform 2", "Solids"),
-            Create("White_Palace_07", "wp_plat_float_03", "White Palace Platform 3", "Solids"),
-            Create("White_Palace_07", "wp_plat_float_05 (1)", "White Palace Platform 4", "Solids"),
+            CreateSolid("White_Palace_07", "wp_plat_float_01_wide (1)", "White Palace Platform 1"),
+            CreateSolid("White_Palace_07", "wp_plat_float_07", "White Palace Platform 2"),
+            CreateSolid("White_Palace_07", "wp_plat_float_03", "White Palace Platform 3"),
+            CreateSolid("White_Palace_07", "wp_plat_float_05 (1)", "White Palace Platform 4"),
             Create("White_Palace_07", "wp_saw", "White Palace Saw", "Hazards")
-                .WithConfigGroup(ConfigGroup.Sawblade),
+                .WithConfigGroup(ConfigGroup.MovingObjects),
             Create("White_Palace_07", "wp_trap_spikes", "White Palace Moving Spikes", "Hazards")
                 .WithRotationGroup(RotationGroup.Eight),
             Create("White_Palace_03_hub", "White_ Spikes", "White Palace Spikes", "Hazards")
@@ -400,17 +404,26 @@ public static class ContentPacks
         });
         RegisterInternalPack(new ContentPack("Godhome", "Assets from Godhome")
         {
-            Create("GG_Atrium_Roof", "gg_plat_float_small", "Godhome Platform S", "Solids"),
-            Create("GG_Workshop", "gg_plat_float_wide", "Godhome Platform L", "Solids"),
+            CreateSolid("GG_Atrium_Roof", "gg_plat_float_small", "Godhome Platform S"),
+            CreateSolid("GG_Workshop", "gg_plat_float_wide", "Godhome Platform L"),
             Create("GG_Workshop", "RestBench (1)", "Godhome Bench", "Interactable", weight:SpecialBenchWeight),
             new MultiPartInternalElement("GG_Atrium_Roof", "RestBench (1)", "GG_bench_metal_0001_1", "Godhome Roof Bench", "Interactable", weight:SpecialBenchWeight)
         });
         /*RegisterInternalPack(new ContentPack("Bosses", "Various bosses from throughout the game")
         {
+            CreateEnemy("GG_Watcher_Knights", "Battle Control/Black Knight 1", "Watcher Knight")
+                .WithConfigGroup(ConfigGroup.WatcherKnights)
+                .WithReceiverGroup(ReceiverGroup.WatcherKnights)
+        });*/
+        /*RegisterInternalPack(new ContentPack("Experimental", "Experimental Features - These will be moved to a regular pack when confirmed to work")
+        {
             new VengeflyKingElement(),
             CreateEnemy("Crossroads_04", "_Enemies/Giant Fly", "Gruz Mother", category:"Bosses"),
             CreateEnemy("GG_Mega_Moss_Charger", "Mega Moss Charger", "Massive Moss Charger", category:"Bosses").FlipVertical(),
-            CreateEnemy("GG_Hornet_1", "Boss Holder/Hornet Boss 1", "Hornet Protector", category:"Bosses")
+            CreateEnemy("GG_Hornet_1", "Boss Holder/Hornet Boss 1", "Hornet Protector", category:"Bosses"),
+            CreateEnemy("GG_Flukemarm", "Fluke Mother", "Flukemarm"),
+           CreateEnemy("GG_Crystal_Guardian", "Mega Zombie Beam Miner (1)", "Crystal Guardian"),
+           CreateEnemy("GG_Crystal_Guardian_2", "Battle Scene/Zombie Beam Miner Rematch", "Enraged Guardian")
         });*/
     }
 }

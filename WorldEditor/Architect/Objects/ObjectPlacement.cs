@@ -60,7 +60,7 @@ public class ObjectPlacement
     {
         if (PlaceableObject.AllObjects[_name] is not PlaceableObject selected) return;
         
-        _obj = new GameObject { transform = { position = _pos + WeSpriteUtils.FixOffset(selected.Offset, _flipped, _rotation, _scale) } };
+        _obj = new GameObject { transform = { position = _pos + ResourceUtils.FixOffset(selected.Offset, _flipped, _rotation, _scale) } };
 
         var renderer = _obj.AddComponent<SpriteRenderer>();
         renderer.color = new Color(1, 1, 1, 0.5f);

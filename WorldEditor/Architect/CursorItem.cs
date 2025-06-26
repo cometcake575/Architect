@@ -38,7 +38,7 @@ public static class CursorItem
         NeedsRefreshing = false;
 
         var renderer = _obj.GetComponent<SpriteRenderer>();
-        _offset = WeSpriteUtils.FixOffset(selected.Offset, EditorManager.IsFlipped, EditorManager.Rotation, EditorManager.Scale);
+        _offset = ResourceUtils.FixOffset(selected.Offset, EditorManager.IsFlipped, EditorManager.Rotation, EditorManager.Scale);
         GhostPlacementUtils.SetupForPlacement(_obj, renderer, selected, EditorManager.IsFlipped, EditorManager.Rotation, EditorManager.Scale);
     }
 

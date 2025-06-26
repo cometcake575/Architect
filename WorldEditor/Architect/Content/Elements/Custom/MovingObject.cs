@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Architect.Content.Elements.Custom;
 
-public class MovingSawblade : MonoBehaviour
+public class MovingObject : MonoBehaviour
 {
     public float trackDistance = 10;
     public float offset;
@@ -12,7 +12,7 @@ public class MovingSawblade : MonoBehaviour
 
     private Vector3 _startPos;
     private float _pauseRemaining;
-
+    
     private void Awake()
     {
         _startPos = transform.position;

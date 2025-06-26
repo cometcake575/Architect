@@ -15,7 +15,7 @@ internal class EraserObject : SelectableObject
 
     private static Sprite PrepareSprite()
     {
-        return WeSpriteUtils.Load("eraser");
+        return ResourceUtils.Load("eraser");
     }
 
     public override void OnClickInWorld(Vector3 pos, bool first)

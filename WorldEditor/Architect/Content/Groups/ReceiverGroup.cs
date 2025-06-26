@@ -17,6 +17,8 @@ public class ReceiverGroup
     
     internal static ReceiverGroup Enemies;
     
+    //internal static ReceiverGroup WatcherKnights;
+    
     internal static void Initialize()
     {
         if (_initialized) return;
@@ -32,6 +34,8 @@ public class ReceiverGroup
         BattleGate = new ReceiverGroup(Gates, EventManager.RegisterEventReceiverType(CloseGateType.Instance));
 
         Enemies = new ReceiverGroup(All, EventManager.RegisterEventReceiverType(DieType.Instance));
+        
+        //WatcherKnights = new ReceiverGroup(Enemies, EventManager.RegisterEventReceiverType(WatcherWakeType.Instance));
     }
 
     public readonly EventReceiverType[] Types;
