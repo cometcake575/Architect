@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Architect.Content.Groups;
 using Architect.Util;
+using HutongGames.PlayMaker;
+using HutongGames.PlayMaker.Actions;
 using Modding;
 using MonoMod.RuntimeDetour;
 using Satchel;
@@ -49,6 +51,7 @@ public static class CustomObjects
             CreateBinding("dash", "Dash Binding", clip),
             CreateBinding("claw", "Mantis Claw Binding", clip),
             CreateBinding("cdash", "Crystal Heart Binding", clip),
+            CreateBinding("tear", "Isma's Tear Binding", clip),
             CreateBinding("wings", "Monarch Wings Binding", clip),
             CreateBinding("dnail", "Dream Nail Binding", clip),
             CreateBinding("gate", "Dreamgate Binding", clip),
@@ -240,6 +243,9 @@ public static class CustomObjects
                 case "Dream Nail":
                     InitDreamNailBindings(self);
                     break;
+                case "Acid Armour Check":
+                    InitTearBinding(self);
+                    break;
             }
         };
 
@@ -300,6 +306,47 @@ public static class CustomObjects
         }, 2);
     }
 
+    private static readonly SetCollider DisableSwim = new()
+    {
+        active = false,
+        gameObject = new FsmOwnerDefault
+        {
+            OwnerOption = OwnerDefaultOption.UseOwner
+        }
+    };
+    
+    private static readonly SetDamageHeroAmount Damage = new()
+    {
+        damageDealt = 1,
+        target = new FsmOwnerDefault
+        {
+            OwnerOption = OwnerDefaultOption.UseOwner
+        }
+    };
+
+    private static void InitTearBinding(PlayMakerFSM fsm)
+    {
+        fsm.DisableAction("Check", 0);
+        fsm.AddCustomAction("Check", CustomTearAction);
+        fsm.AddGlobalTransition("REFRESH ACID ARMOUR", "Check");
+        var damager = fsm.TryGetState("Disable", out _);
+        fsm.AddState("Lost Tear").AddAction(damager ? Damage : DisableSwim);
+        
+        fsm.AddTransition("Check", "LOST", "Lost Tear");
+    }
+
+    private static void CustomTearAction(PlayMakerFSM makerFsm)
+    {
+        if (!BindingCheck(PlayerData.instance.hasAcidArmour, "tear"))
+        {
+            makerFsm.SendEvent("LOST");
+            return;
+        }
+            
+        makerFsm.SendEvent("DISABLE");
+        makerFsm.SendEvent("ENABLE");
+    }
+
     private static void InitDreamNailBindings(PlayMakerFSM fsm)
     {
         fsm.InsertCustomAction("Dream Gate?", makerFsm =>
@@ -325,20 +372,29 @@ public static class CustomObjects
             case "nail":
                 RefreshNailBinding();
                 break;
+            case "tear":
+                RefreshTearBinding();
+                break;
         }
+    }
+
+    private static void RefreshTearBinding()
+    {
+        PlayMakerFSM.BroadcastEvent("REFRESH ACID ARMOUR");
     }
 
     private static void RefreshNailBinding()
     {
-        if (_nailBound != ShouldBindNail() ) return;
+        if (_nailBound == ShouldBindNail()) return;
         _nailBound = !_nailBound;
         
-        EventRegister.SendEvent(ShouldBindNail() ? "SHOW BOUND NAIL" : "HIDE BOUND NAIL");
+        EventRegister.SendEvent(_nailBound ? "SHOW BOUND NAIL" : "HIDE BOUND NAIL");
+        PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
     }
 
     private static void RefreshShellBinding()
     {
-        if (_shellBound != ShouldBindShell()) return;
+        if (_shellBound == ShouldBindShell()) return;
         _shellBound = !_shellBound;
 
         var health = GameManager.instance.playerData.health;
@@ -451,12 +507,13 @@ public static class CustomObjects
     public static int BoundNailDamage()
     {
         var num = GameManager.instance.playerData.GetInt("nailDamage");
+        if (!ShouldBindNail()) return num;
         return num >= 13 ? 13 : Mathf.RoundToInt(num * 0.8f);
     }
 
     public static bool ShouldBindNail()
     {
-        if (BossSequenceController.IsInSequence) return ShouldBind(BossSequenceController.ChallengeBindings.Soul);
+        if (BossSequenceController.IsInSequence) return ShouldBind(BossSequenceController.ChallengeBindings.Nail);
         return !BindingCheck(true, "nail");
     }
 
