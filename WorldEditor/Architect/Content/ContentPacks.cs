@@ -118,8 +118,6 @@ public static class ContentPacks
             CreateEnemy("Crossroads_15", "_Enemies/Zombie Shield", "Husk Warrior"),
             CreateEnemy("Crossroads_21", "non_infected_event/Zombie Guard", "Husk Guard"),
             CreateEnemy("Crossroads_10_boss_defeated", "Prayer Room/Prayer Slug", "Maggot").FlipHorizontal(),
-            Create("Crossroads_10", "Chest", "Geo Chest", "Interactable", weight:MiscInteractableWeight)
-                .WithConfigGroup(ConfigGroup.GeoChest).FlipHorizontal(),
             CreateEnemy("Crossroads_ShamanTemple", "_Enemies/Roller", "Baldur"),
             new ElderBaldurElement(),
             new MenderbugElement(),
@@ -217,6 +215,8 @@ public static class ContentPacks
         });
         RegisterInternalPack(new ContentPack("Crystal Peak", "Assets from the Crystal Peak")
         {
+            Create("Mines_37", "Chest", "Geo Chest", "Interactable", weight:MiscInteractableWeight)
+                .WithConfigGroup(ConfigGroup.GeoChest).FlipHorizontal(),
             Create("Mines_31", "Soul Totem mini_horned", "Mini Soul Totem", "Interactable", weight:SoulSourceWeight)
                 .WithRotationGroup(RotationGroup.Eight),
             Create("Mines_31", "Soul Totem mini_two_horned", "Horned Soul Totem", "Interactable", weight:SoulSourceWeight)
