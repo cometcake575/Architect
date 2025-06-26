@@ -18,8 +18,8 @@ public static class ContentPacks
     public const int NailmasterBenchWeight = 6;
     public const int BenchWeight = 7;
     public const int LeverWeight = 8;
-    public const int GateWeight = 9; 
-    
+    public const int GateWeight = 9;
+
     internal static readonly List<ContentPack> Packs = new();
     private static readonly List<ContentPack> InternalPacks = new();
     
@@ -159,9 +159,9 @@ public static class ContentPacks
             CreateEnemy("Fungus1_22", "Moss Walker", "Mosscreep")
                 .WithRotationGroup(RotationGroup.Four),
             CreateEnemy("Fungus1_12", "Plant Turret", "Gulka")
-                .WithRotationGroup(RotationGroup.Four),
+                .WithRotationGroup(RotationGroup.All),
             Create("Fungus1_20_v02", "Zote Death/Head", "Zote Head", "Interactable", weight:MiscInteractableWeight)
-                .WithRotationGroup(RotationGroup.Eight),
+                .WithRotationGroup(RotationGroup.All),
             CreateEnemy("Fungus1_31", "_Enemies/Fat Fly (1)", "Obble").FlipVertical(),
             Create("Fungus1_37", "RestBench", "Stone Sanctuary Bench", "Interactable", weight:BenchWeight),
             Create("Room_Slug_Shrine", "RestBench", "Unn Shrine Bench", "Interactable", weight:BenchWeight),
@@ -194,14 +194,14 @@ public static class ContentPacks
             CreateEnemy("Fungus2_28", "Mushroom Roller", "Shrumal Warrior"),
             CreateEnemy("Fungus2_18", "Fung Crawler", "Ambloom"),
             CreateEnemy("Fungus2_04", "Mushroom Turret", "Sporg")
-                .WithRotationGroup(RotationGroup.Eight),
+                .WithRotationGroup(RotationGroup.All),
             CreateEnemy("Fungus2_12", "Mantis", "Mantis Warrior")
                 .WithConfigGroup(ConfigGroup.Mantis),
             CreateEnemy("Fungus2_12", "Mantis Flyer Child", "Mantis Youth").FlipHorizontal()
                 .WithConfigGroup(ConfigGroup.Mantis),
             Create("Fungus2_18", "_Props/Bounce Shrooms 1/Bounce Shroom B (1)", "Bouncy Mushroom", "Interactable", weight:MiscInteractableWeight, offset:15.5f)
                 .FlipVertical()
-                .WithRotationGroup(RotationGroup.Eight),
+                .WithRotationGroup(RotationGroup.All),
             CreateSolid("Fungus2_04", "mush_plat_float_01", "Fungal Wastes Platform 1"),
             CreateSolid("Fungus2_18", "_Scenery/mush_plat_float_03", "Fungal Wastes Platform 2"),
             CreateSolid("Fungus2_18", "_Scenery/mush_plat_float_04", "Fungal Wastes Platform 3"),
@@ -224,7 +224,7 @@ public static class ContentPacks
             Create("Mines_31", "Cave Spikes (4)", "Cave Spikes", "Hazards")
                 .WithRotationGroup(RotationGroup.Eight),
             Create("Mines_31", "Laser Turret", "Laser Crystal", "Hazards")
-                .WithRotationGroup(RotationGroup.Eight)
+                .WithRotationGroup(RotationGroup.All)
                 .WithConfigGroup(ConfigGroup.MovingObjects)
                 .FlipHorizontal(),
             new ZombieMylaPackElement(),
@@ -264,7 +264,7 @@ public static class ContentPacks
         RegisterInternalPack(new ContentPack("City of Tears", "Assets from the City of Tears")
         {
             new LeverPackElement("Ruins2_01", "Ruins Lever", "City Lever", weight:LeverWeight)
-                .WithRotationGroup(RotationGroup.Eight),
+                .WithRotationGroup(RotationGroup.All),
             Create("Ruins2_01", "Battle Gate", "Battle Gate", "Interactable", weight:GateWeight)
                 .WithRotationGroup(RotationGroup.Four)
                 .WithReceiverGroup(ReceiverGroup.BattleGate)
@@ -396,6 +396,7 @@ public static class ContentPacks
             CreateSolid("White_Palace_07", "wp_plat_float_05 (1)", "White Palace Platform 4"),
             Create("White_Palace_07", "wp_saw", "White Palace Saw", "Hazards")
                 .WithConfigGroup(ConfigGroup.MovingObjects),
+            new WhiteThornsElement(),
             Create("White_Palace_07", "wp_trap_spikes", "White Palace Moving Spikes", "Hazards")
                 .WithRotationGroup(RotationGroup.Eight),
             Create("White_Palace_03_hub", "White_ Spikes", "White Palace Spikes", "Hazards")

@@ -19,6 +19,8 @@ public static class EditorManager
     private static Vector3 _posToLoad;
     private static bool _loadPos;
     private static bool _needsReload;
+
+    private static float _rotProg;
     
     internal static Camera GameCamera;
     
@@ -106,18 +108,24 @@ public static class EditorManager
                 // Checks if it should rotate the selected item
                 if (pressedRotation)
                 {
-                    var i = placeable.PackElement.GetRotationGroup() switch
+                    var group = placeable.PackElement.GetRotationGroup();
+                    int i;
+                    if (group == RotationGroup.All)
+                    {
+                        _rotProg += Time.deltaTime * 60;
+                        i = Mathf.FloorToInt(_rotProg);
+                        _rotProg -= i;
+                    } else i = group switch
                     {
                         RotationGroup.Vertical => 180,
                         RotationGroup.Three => 90,
                         RotationGroup.Four => 90,
                         RotationGroup.Eight => 45,
-                        RotationGroup.All => 1,
                         _ => 0
                     };
-
+                    
                     Rotation = (Rotation + i) % 360;
-                    if (placeable.PackElement.GetRotationGroup() == RotationGroup.Three && Rotation == 180) Rotation = 270;
+                    if (group == RotationGroup.Three && Rotation == 180) Rotation = 270;
                     
                     // Refresh cursor representation
                     CursorItem.NeedsRefreshing = true;

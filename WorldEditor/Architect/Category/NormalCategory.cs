@@ -25,10 +25,12 @@ internal class NormalCategory : ObjectCategory
     internal void Sort()
     {
         _selectableObjects.Sort(Compare);
+        
+        if (GetName() == "Hazards") _selectableObjects.Reverse();
     }
 
     private static int Compare(SelectableObject obj1, SelectableObject obj2)
     {
-        return (obj1.GetWeight()).CompareTo(obj2.GetWeight());
+        return obj1.GetWeight().CompareTo(obj2.GetWeight());
     }
 }
