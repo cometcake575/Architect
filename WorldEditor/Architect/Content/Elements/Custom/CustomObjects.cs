@@ -414,8 +414,10 @@ public static class CustomObjects
 
     private static void RefreshCharmsBinding()
     {
-        if (ShouldBindCharms() && !_charmsBound)
+        if (ShouldBindCharms())
         {
+            if (_charmsBound) return;
+            
             _previousEquippedCharms = GameManager.instance.playerData.GetVariable<List<int>>("equippedCharms").ToArray();
             GameManager.instance.playerData.GetVariable<List<int>>("equippedCharms").Clear();
             _wasOvercharmed = GameManager.instance.playerData.GetBool("overcharmed");
@@ -439,6 +441,8 @@ public static class CustomObjects
             
             GameManager.instance.playerData.SetBool("overcharmed", _wasOvercharmed);
             EventRegister.SendEvent("HIDE BOUND CHARMS");
+
+            _charmsBound = false;
         }
     }
 
