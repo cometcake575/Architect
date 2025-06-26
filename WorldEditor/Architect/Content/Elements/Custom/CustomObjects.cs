@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Architect.Content.Groups;
 using Architect.Util;
+using Modding;
 using MonoMod.RuntimeDetour;
 using Satchel;
 using UnityEngine;
@@ -399,12 +400,21 @@ public static class CustomObjects
 
     public static bool ShouldBindSoul()
     {
-        return !BindingCheck(true, "soul");
+        return !BindingCheck(true, "soul") || ShouldBind(BossSequenceController.ChallengeBindings.Soul);
+
     }
 
     public static bool ShouldBindShell()
     {
-        return !BindingCheck(true, "shell");
+        return !BindingCheck(true, "shell") || ShouldBind(BossSequenceController.ChallengeBindings.Shell);
+    }
+
+    private static bool ShouldBind(BossSequenceController.ChallengeBindings binding)
+    {
+        var cd = ReflectionHelper.GetField<BossSequenceController.BossSequenceData>(typeof(BossSequenceController),
+            "currentData");
+        if (cd == null) return false;
+        return (cd.bindings & binding) == binding;
     }
 
     public static int BoundShell()
@@ -421,12 +431,12 @@ public static class CustomObjects
 
     public static bool ShouldBindNail()
     {
-        return !BindingCheck(true, "nail");
+        return !BindingCheck(true, "nail") || ShouldBind(BossSequenceController.ChallengeBindings.Nail);
     }
 
     public static bool ShouldBindCharms()
     {
-        return !BindingCheck(true, "charms");
+        return !BindingCheck(true, "charms") || ShouldBind(BossSequenceController.ChallengeBindings.Charms);
     }
 
     public static void InitializePantheonBindings()
