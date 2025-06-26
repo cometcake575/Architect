@@ -330,6 +330,8 @@ public static class ContentPacks
             new ColosseumPackElement("Room_Colosseum_Gold", "Colosseum Manager/Waves/Wave 6/Colosseum Cage Small", "Battle Obble", "Enemies"),
             new ColosseumPackElement("Room_Colosseum_Gold", "Colosseum Manager/Waves/Wave 9/Colosseum Cage Small (1)", "Death Loodle", "Enemies"),
             new TwisterPackElement("Room_Colosseum_Gold", "Colosseum Manager/Waves/Wave 25/Electric Mage New", "Volt Twister", "Electric Mage"),
+            new TamerBeastElement(),
+            
             Create("Room_Colosseum_02", "RestBench", "Colosseum Bench", "Interactable", weight:BenchWeight)
         });
         RegisterInternalPack(new ContentPack("The Hive", "Assets from the Hive")
@@ -414,21 +416,21 @@ public static class ContentPacks
             Create("GG_Workshop", "RestBench (1)", "Godhome Bench", "Interactable", weight:SpecialBenchWeight),
             new MultiPartInternalElement("GG_Atrium_Roof", "RestBench (1)", "GG_bench_metal_0001_1", "Godhome Roof Bench", "Interactable", weight:SpecialBenchWeight)
         });
-        /*RegisterInternalPack(new ContentPack("Bosses", "Various bosses from throughout the game")
-        {
-            CreateEnemy("GG_Watcher_Knights", "Battle Control/Black Knight 1", "Watcher Knight")
-                .WithConfigGroup(ConfigGroup.WatcherKnights)
-                .WithReceiverGroup(ReceiverGroup.WatcherKnights)
-        });*/
         /*RegisterInternalPack(new ContentPack("Experimental", "Experimental Features - These will be moved to a regular pack when confirmed to work")
         {
+           CreateEnemy("GG_God_Tamer", "Entry Object/Lancer", "God Tamer"),
+           CreateEnemy("GG_God_Tamer", "Entry Object", "God Tamer Full"),
+            new OblobbleElement(),
             new VengeflyKingElement(),
             CreateEnemy("Crossroads_04", "_Enemies/Giant Fly", "Gruz Mother", category:"Bosses"),
             CreateEnemy("GG_Mega_Moss_Charger", "Mega Moss Charger", "Massive Moss Charger", category:"Bosses").FlipVertical(),
             CreateEnemy("GG_Hornet_1", "Boss Holder/Hornet Boss 1", "Hornet Protector", category:"Bosses"),
             CreateEnemy("GG_Flukemarm", "Fluke Mother", "Flukemarm"),
            CreateEnemy("GG_Crystal_Guardian", "Mega Zombie Beam Miner (1)", "Crystal Guardian"),
-           CreateEnemy("GG_Crystal_Guardian_2", "Battle Scene/Zombie Beam Miner Rematch", "Enraged Guardian")
+           CreateEnemy("GG_Crystal_Guardian_2", "Battle Scene/Zombie Beam Miner Rematch", "Enraged Guardian"),
+           CreateEnemy("GG_Watcher_Knights", "Battle Control/Black Knight 1", "Watcher Knight")
+               .WithConfigGroup(ConfigGroup.WatcherKnights)
+               .WithReceiverGroup(ReceiverGroup.WatcherKnights)
         });*/
     }
 }
