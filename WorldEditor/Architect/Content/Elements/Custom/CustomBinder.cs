@@ -36,7 +36,17 @@ public class CustomBinder : MonoBehaviour
         
         CustomObjects.RefreshBinding(bindingType);
     }
-    
+
+    private void OnEnable()
+    {
+        CustomObjects.RefreshBinding(bindingType);
+    }
+
+    private void OnDisable()
+    {
+        CustomObjects.RefreshBinding(bindingType);
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (_used) return;
