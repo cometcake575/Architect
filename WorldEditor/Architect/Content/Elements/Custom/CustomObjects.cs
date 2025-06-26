@@ -310,6 +310,7 @@ public static class CustomObjects
 
     public static void RefreshBinding(string binding)
     {
+        if (BossSequenceController.IsInSequence) return;
         switch (binding)
         {
             case "charms":
@@ -329,23 +330,35 @@ public static class CustomObjects
 
     private static void RefreshNailBinding()
     {
+        if (_nailBound != ShouldBindNail() ) return;
+        _nailBound = !_nailBound;
+        
         EventRegister.SendEvent(ShouldBindNail() ? "SHOW BOUND NAIL" : "HIDE BOUND NAIL");
     }
 
     private static void RefreshShellBinding()
     {
+        if (_shellBound != ShouldBindShell()) return;
+        _shellBound = !_shellBound;
+
+        var health = GameManager.instance.playerData.health;
         GameManager.instance.playerData.MaxHealth();
+        GameManager.instance.playerData.health = health;
         PlayMakerFSM.BroadcastEvent("CHARM INDICATOR CHECK");
         PlayMakerFSM.BroadcastEvent("HUD IN");
     }
 
     private static int[] _previousEquippedCharms;
     private static bool _wasOvercharmed;
-    private static bool _storedCharms;
+    
+    private static bool _charmsBound;
+    private static bool _shellBound;
+    private static bool _soulBound;
+    private static bool _nailBound;
 
     private static void RefreshCharmsBinding()
     {
-        if (ShouldBindCharms())
+        if (ShouldBindCharms() && !_charmsBound)
         {
             _previousEquippedCharms = GameManager.instance.playerData.GetVariable<List<int>>("equippedCharms").ToArray();
             GameManager.instance.playerData.GetVariable<List<int>>("equippedCharms").Clear();
@@ -357,9 +370,9 @@ public static class CustomObjects
             
             EventRegister.SendEvent("SHOW BOUND CHARMS");
 
-            _storedCharms = true;
+            _charmsBound = true;
         }
-        else if (_storedCharms)
+        else if (_charmsBound)
         {
             GameManager.instance.playerData.SetVariable(
                 "equippedCharms",
@@ -375,6 +388,16 @@ public static class CustomObjects
 
     private static void RefreshSoulBinding()
     {
+        if (ShouldBindSoul() == _soulBound) return;
+        _soulBound = !_soulBound;
+        
+        if (_soulBound)
+        {
+            var soul = PlayerData.instance.MPCharge;
+            PlayerData.instance.ClearMP();
+            PlayerData.instance.AddMPCharge(Math.Min(soul, 33));
+        }
+        
         GameManager.instance.StartCoroutine(RefreshSoulBindingRoutine());
     }
 
@@ -384,10 +407,9 @@ public static class CustomObjects
         {
             yield return Task.Yield();
         }
-        if (ShouldBindSoul())
+        if (_soulBound)
         {
             EventRegister.SendEvent("BIND VESSEL ORB");
-            PlayerData.instance.MPCharge = Math.Min(PlayerData.instance.MPCharge, 33);
             GameManager.instance.soulOrb_fsm.SendEvent("MP LOSE");
             GameManager.instance.soulVessel_fsm.SendEvent("MP RESERVE DOWN");
         }
@@ -400,17 +422,20 @@ public static class CustomObjects
 
     public static bool ShouldBindSoul()
     {
-        return !BindingCheck(true, "soul") || ShouldBind(BossSequenceController.ChallengeBindings.Soul);
+        if (BossSequenceController.IsInSequence) return ShouldBind(BossSequenceController.ChallengeBindings.Soul);
+        return !BindingCheck(true, "soul");
 
     }
 
     public static bool ShouldBindShell()
     {
-        return !BindingCheck(true, "shell") || ShouldBind(BossSequenceController.ChallengeBindings.Shell);
+        if (BossSequenceController.IsInSequence) return ShouldBind(BossSequenceController.ChallengeBindings.Shell);
+        return !BindingCheck(true, "shell");
     }
 
     private static bool ShouldBind(BossSequenceController.ChallengeBindings binding)
     {
+        if (!BossSequenceController.IsInSequence) return false;
         var cd = ReflectionHelper.GetField<BossSequenceController.BossSequenceData>(typeof(BossSequenceController),
             "currentData");
         if (cd == null) return false;
@@ -431,12 +456,14 @@ public static class CustomObjects
 
     public static bool ShouldBindNail()
     {
-        return !BindingCheck(true, "nail") || ShouldBind(BossSequenceController.ChallengeBindings.Nail);
+        if (BossSequenceController.IsInSequence) return ShouldBind(BossSequenceController.ChallengeBindings.Soul);
+        return !BindingCheck(true, "nail");
     }
 
     public static bool ShouldBindCharms()
     {
-        return !BindingCheck(true, "charms") || ShouldBind(BossSequenceController.ChallengeBindings.Charms);
+        if (BossSequenceController.IsInSequence) return ShouldBind(BossSequenceController.ChallengeBindings.Charms);
+        return !BindingCheck(true, "charms");
     }
 
     public static void InitializePantheonBindings()
@@ -471,6 +498,7 @@ public static class CustomObjects
 
         On.GGCheckBoundSoul.OnEnter += (orig, self) =>
         {
+            if (BossSequenceController.IsInSequence) return;
             if (ShouldBindSoul())
             {
                 self.Fsm.Event(self.boundEvent);
@@ -482,6 +510,7 @@ public static class CustomObjects
         On.HeroController.SceneInit += (orig, self) =>
         {
             orig(self);
+            if (BossSequenceController.IsInSequence) return;
             
             RefreshCharmsBinding();
             RefreshNailBinding();
