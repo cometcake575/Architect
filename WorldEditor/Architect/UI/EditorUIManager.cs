@@ -856,7 +856,7 @@ public static class EditorUIManager
         if (nameText.Length > 0)
             foreach (var receiverType in placeable.PackElement.GetReceiverGroup().Types)
             {
-                if (eText.ToLower().Equals(receiverType.GetName().ToLower())) valid = true;
+                if (eText.ToLower().Equals(receiverType.ToLower())) valid = true;
             }
             
         add.Enabled = valid;

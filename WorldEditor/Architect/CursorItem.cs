@@ -26,8 +26,8 @@ public static class CursorItem
 
         var pos = Input.mousePosition;
         pos.z = -EditorManager.GameCamera.transform.position.z;
-        
-        var objPos = EditorManager.GameCamera.ScreenToWorldPoint(pos);
+
+        var objPos = EditorManager.GetWorldPos(pos);
         
         objPos.z = selected.GetZPos();
 

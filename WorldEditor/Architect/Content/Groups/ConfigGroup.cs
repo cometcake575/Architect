@@ -48,7 +48,9 @@ public class ConfigGroup
     internal static ConfigGroup BattleGate;
     
     internal static ConfigGroup Bindings;
-
+    
+    internal static ConfigGroup Conveyors;
+    
     internal static void Initialize()
     {
         if (_initialized) return;
@@ -261,6 +263,17 @@ public class ConfigGroup
                     if (!value.GetValue()) return;
                     o.GetComponent<CustomBinder>().reversible = true;
                 })
+            )
+        );
+
+        Conveyors = new ConfigGroup(
+            All,
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Belt Speed", (o, value) =>
+                {
+                    o.transform.GetChild(0).GetComponent<ConveyorBelt>().speed = value.GetValue();
+                    o.GetComponent<Animator>().speed = value.GetValue() / 8;
+                }, true)
             )
         );
     }

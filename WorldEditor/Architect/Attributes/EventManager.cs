@@ -33,13 +33,17 @@ public static class EventManager
         };
     }
 
-    public static EventReceiverType RegisterEventReceiverType(EventReceiverType eventReceiverType)
+    public static string RegisterEventReceiverType(string name, Action<GameObject> action)
     {
-        EventReceiverTypes[eventReceiverType.GetName()] = eventReceiverType;
-        return eventReceiverType;
+        EventReceiverTypes[name] = action;
+        return name;
+    }
+    
+    public static void RunEvent(string eventName, GameObject gameObject) {
+        EventReceiverTypes[eventName].Invoke(gameObject);
     }
 
-    private static readonly Dictionary<string, EventReceiverType> EventReceiverTypes = new();
+    private static readonly Dictionary<string, Action<GameObject>> EventReceiverTypes = new();
     
     private static readonly Dictionary<string, List<EventReceiverInstance>> Events = new();
 
@@ -56,12 +60,13 @@ public static class EventManager
 
     public static EventReceiver DeserializeReceiver(Dictionary<string, string> data)
     {
-        return EventReceiverTypes[data["type"]].Deserialize(data);
+        return new EventReceiver(data["type"], data["name"],
+            data.TryGetValue("times", out var value) ? Convert.ToInt32(value) : 1);
     }
 
     public static EventReceiver CreateReceiver(string type, string name, int times)
     {
-        return EventReceiverTypes[type.ToLower()].Create(name, times);
+        return new EventReceiver(type, name, times);
     }
 
     public static EventBroadcaster DeserializeBroadcaster(Dictionary<string, string> data)

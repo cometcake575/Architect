@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Architect.Content.Groups;
 using Architect.Objects;
@@ -34,6 +35,8 @@ public static class EditorManager
         };
 
         On.HeroController.CanAttack += (orig, self) => !IsEditing && orig(self);
+        
+        On.HeroController.CanSuperDash += (orig, self) => !IsEditing && orig(self);
 
         On.HeroController.CanCast += (orig, self) => !IsEditing && orig(self);
 
@@ -213,9 +216,40 @@ public static class EditorManager
         
         if (EditorUIManager.SelectedItem == null) return;
         if (!GameCamera) return;
+
+        var pos = GetWorldPos(Input.mousePosition);
+        EditorUIManager.SelectedItem.OnClickInWorld(pos, b1);
+
+        if (EditorUIManager.SelectedItem is not PlaceableObject) return;
+        if (Architect.GlobalSettings.Keybinds.LockAxis.IsPressed && HasValidLastPos) return;
         
-        var pos = Input.mousePosition;
-        pos.z = -GameCamera.transform.position.z;
-        EditorUIManager.SelectedItem.OnClickInWorld(GameCamera.ScreenToWorldPoint(pos), b1);
+        _lastX = pos.x;
+        _lastY = pos.y;
+        HasValidLastPos = true;
+    }
+
+    private static float _lastX;
+    private static float _lastY;
+    
+    private static bool HasValidLastPos
+    {
+        get => _validLastPosScene == GameManager.instance.sceneName;
+        set => _validLastPosScene = value ? GameManager.instance.sceneName : "";
+    }
+    
+    private static string _validLastPosScene;
+
+    public static Vector3 GetWorldPos(Vector3 mousePosition)
+    {
+        mousePosition.z = -GameCamera.transform.position.z;
+        var pos = GameCamera.ScreenToWorldPoint(mousePosition);
+
+        if (Architect.GlobalSettings.Keybinds.LockAxis.IsPressed && HasValidLastPos)
+        {
+            if (Math.Abs(_lastX - pos.x) > Math.Abs(_lastY - pos.y)) pos.y = _lastY;
+            else pos.x = _lastX;
+        }
+        
+        return pos;
     }
 }

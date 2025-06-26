@@ -2,6 +2,7 @@ using System.Linq;
 using Architect.Attributes;
 using Architect.Attributes.Receivers;
 using JetBrains.Annotations;
+using Satchel;
 
 namespace Architect.Content.Groups;
 
@@ -17,6 +18,8 @@ public class ReceiverGroup
     
     internal static ReceiverGroup Enemies;
     
+    internal static ReceiverGroup TeleportPoint;
+    
     //internal static ReceiverGroup WatcherKnights;
     
     internal static void Initialize()
@@ -25,22 +28,38 @@ public class ReceiverGroup
         _initialized = true;
 
         All = new ReceiverGroup(null, 
-            EventManager.RegisterEventReceiverType(DisableOnEventType.Instance),
-            EventManager.RegisterEventReceiverType(EnableOnEventType.Instance)
+            EventManager.RegisterEventReceiverType("disable", o => o.SetActive(false)),
+            EventManager.RegisterEventReceiverType("enable", o => o.SetActive(true))
         );
         
-        Gates = new ReceiverGroup(All, EventManager.RegisterEventReceiverType(OpenGateType.Instance));
+        Gates = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("open", o =>
+        {
+            foreach (var fsm in o.GetComponents<PlayMakerFSM>())
+            {
+                if (!fsm.TryGetState("Open", out var state)) continue;
+                fsm.SetState(state.Name);
+            }
+        }));
         
-        BattleGate = new ReceiverGroup(Gates, EventManager.RegisterEventReceiverType(CloseGateType.Instance));
+        BattleGate = new ReceiverGroup(Gates, EventManager.RegisterEventReceiverType("close", o =>
+        {
+            o.LocateMyFSM("BG Control").SetState("Close 1");
+        }));
 
-        Enemies = new ReceiverGroup(All, EventManager.RegisterEventReceiverType(DieType.Instance));
+        Enemies = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("die", o =>
+        {
+            o.GetComponent<HealthManager>().Die(null, AttackTypes.Generic, true);
+        }));
         
-        //WatcherKnights = new ReceiverGroup(Enemies, EventManager.RegisterEventReceiverType(WatcherWakeType.Instance));
+        TeleportPoint = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("teleport", o =>
+        {
+            HeroController.instance.transform.position = o.transform.position;
+        }));
     }
 
-    public readonly EventReceiverType[] Types;
+    public readonly string[] Types;
     
-    private ReceiverGroup([CanBeNull] ReceiverGroup parent, params EventReceiverType[] types)
+    private ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] types)
     {
         Types = parent != null ? types.Concat(parent.Types).ToArray() : types;
     }

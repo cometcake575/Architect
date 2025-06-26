@@ -125,15 +125,9 @@ public static class ContentPacks
             new MenderbugElement(),
             CreateEnemy("Crossroads_19", "_Enemies/Spitter", "Aspid Hunter"),
             new HatcherPackElement("Crossroads_19", "_Enemies/Hatcher", "Hatcher Cage (1)", "Aspid Mother", "Hatcher"),
-            Create("Crossroads_18", "Soul Totem mini_horned", "Mini Soul Totem", "Interactable", weight:SoulSourceWeight)
-                .WithRotationGroup(RotationGroup.Eight),
-            Create("Crossroads_25", "Soul Totem mini_two_horned", "Horned Soul Totem", "Interactable", weight:SoulSourceWeight)
-                .WithRotationGroup(RotationGroup.Eight),
             Create("Crossroads_36", "_Props/Soul Totem 4", "Angry Soul Totem", "Interactable", weight:SoulSourceWeight)
                 .WithRotationGroup(RotationGroup.Eight),
             Create("Crossroads_ShamanTemple", "Soul Totem 2", "Ancestral Mound Soul Totem", "Interactable", weight:SoulSourceWeight)
-                .WithRotationGroup(RotationGroup.Eight),
-            Create("Crossroads_25", "Cave Spikes tile", "Cave Spikes", "Hazards")
                 .WithRotationGroup(RotationGroup.Eight),
             Create("Crossroads_47", "RestBench", "Common Bench", "Interactable", weight:BenchWeight),
             Create("Crossroads_ShamanTemple", "BoneBench", "Ancestral Mound Bench", "Interactable", weight:BenchWeight),
@@ -221,6 +215,39 @@ public static class ContentPacks
             Create("Fungus2_26", "RestBench", "Leg Eater's Bench", "Interactable", weight:BenchWeight),
             Create("Fungus2_31", "RestBench", "Mantis Bench", "Interactable", weight:BenchWeight)
         });
+        RegisterInternalPack(new ContentPack("Crystal Peak", "Assets from the Crystal Peak")
+        {
+            Create("Mines_31", "Soul Totem mini_horned", "Mini Soul Totem", "Interactable", weight:SoulSourceWeight)
+                .WithRotationGroup(RotationGroup.Eight),
+            Create("Mines_31", "Soul Totem mini_two_horned", "Horned Soul Totem", "Interactable", weight:SoulSourceWeight)
+                .WithRotationGroup(RotationGroup.Eight),
+            Create("Mines_31", "Cave Spikes (4)", "Cave Spikes", "Hazards")
+                .WithRotationGroup(RotationGroup.Eight),
+            Create("Mines_31", "Laser Turret", "Laser Crystal", "Hazards")
+                .WithRotationGroup(RotationGroup.Eight)
+                .WithConfigGroup(ConfigGroup.MovingObjects)
+                .FlipHorizontal(),
+            new ZombieMylaPackElement(),
+            CreateEnemy("Mines_20", "Zombie Miner 1", "Husk Miner"),
+            CreateEnemy("Mines_25", "Zombie Beam Miner", "Crystallised Husk"),
+            CreateEnemy("Mines_20", "Crystal Crawler", "Blimback"),
+            CreateEnemy("Mines_20", "Mines Crawler", "Shardmite"),
+            CreateEnemy("Mines_25", "Crystal Flyer", "Crystal Hunter"),
+            Create("Mines_20", "Metal Gate v2", "Mines Gate", "Interactable", weight:GateWeight)
+                .WithReceiverGroup(ReceiverGroup.Gates)
+                .WithRotationGroup(RotationGroup.Four),
+            CreateEnemy("Mines_20", "Crystallised Lazer Bug (3)", "Crystal Crawler").FlipHorizontal()
+                .WithRotationGroup(RotationGroup.Four),
+            CreateSolid("Mines_20", "mines_metal_grate_06", "Metal Grate"),
+            CreateSolid("Mines_20", "plat_float_06", "Crystal Peak Platform"),
+            CreateSolid("Mines_31", "Mines Platform", "Crystal Peak Rotating Platform"),
+            new ConveyorBeltElement(),
+            Create("Mines_37", "stomper_offset", "Crystal Peak Stomper (Slow)", "Hazards")
+                .WithRotationGroup(RotationGroup.Four),
+            Create("Mines_37", "stomper_fast", "Crystal Peak Stomper (Fast)", "Hazards")
+                .WithRotationGroup(RotationGroup.Four),
+            new BreakableWallElement("Mines_25", "Breakable Wall", "Breakable Wall", weight:BreakableWallsWeight)
+        });
         RegisterInternalPack(new ContentPack("Queen's Gardens", "Assets from the Queen's Gardens")
         {
             new MossyVagabondElement(),
@@ -282,28 +309,6 @@ public static class ContentPacks
             CreateEnemy("GG_Pipeway", "Fat Fluke", "Flukemunga"),
             CreateEnemy("Waterways_01", "_Enemies/Inflater", "Hwurmp"),
             CreateEnemy("Waterways_01", "_Enemies/Flip Hopper", "Pilflip")
-        });
-        RegisterInternalPack(new ContentPack("Crystal Peak", "Assets from the Crystal Peak")
-        {
-            new ZombieMylaPackElement(),
-            CreateEnemy("Mines_20", "Zombie Miner 1", "Husk Miner"),
-            CreateEnemy("Mines_25", "Zombie Beam Miner", "Crystallised Husk"),
-            CreateEnemy("Mines_20", "Crystal Crawler", "Blimback"),
-            CreateEnemy("Mines_20", "Mines Crawler", "Shardmite"),
-            CreateEnemy("Mines_25", "Crystal Flyer", "Crystal Hunter"),
-            Create("Mines_20", "Metal Gate v2", "Mines Gate", "Interactable", weight:GateWeight)
-                .WithReceiverGroup(ReceiverGroup.Gates)
-                .WithRotationGroup(RotationGroup.Four),
-            CreateEnemy("Mines_20", "Crystallised Lazer Bug (3)", "Crystal Crawler").FlipHorizontal()
-                .WithRotationGroup(RotationGroup.Four),
-            CreateSolid("Mines_20", "mines_metal_grate_06", "Metal Grate"),
-            CreateSolid("Mines_20", "plat_float_06", "Crystal Peak Platform"),
-            CreateSolid("Mines_31", "Mines Platform", "Crystal Peak Rotating Platform"),
-            Create("Mines_37", "stomper_offset", "Crystal Peak Stomper (Slow)", "Hazards")
-                .WithRotationGroup(RotationGroup.Four),
-            Create("Mines_37", "stomper_fast", "Crystal Peak Stomper (Fast)", "Hazards")
-                .WithRotationGroup(RotationGroup.Four),
-            new BreakableWallElement("Mines_25", "Breakable Wall", "Breakable Wall", weight:BreakableWallsWeight)
         });
         RegisterInternalPack(new ContentPack("Kingdom's Edge", "Assets from Kingdom's Edge")
         {

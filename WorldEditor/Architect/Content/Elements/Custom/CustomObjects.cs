@@ -28,6 +28,9 @@ public static class CustomObjects
         {
             new SimplePackElement(CreateHazardRespawnPoint(), "Hazard Respawn Point", "Custom",
                 ResourceUtils.Load("hazard_respawn_point")),
+            new SimplePackElement(CreateObject("Teleport Point"), "Teleport Point", "Custom",
+                ResourceUtils.Load("teleport_point"))
+                .WithReceiverGroup(ReceiverGroup.TeleportPoint),
             new SimplePackElement(CreateTriggerZone(), "Trigger Zone", "Custom",
                     ResourceUtils.Load("trigger_zone", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.TriggerZones),
@@ -75,6 +78,16 @@ public static class CustomObjects
         collider.isTrigger = true;
 
         point.AddComponent<CustomDamager>().damageAmount = damage;
+
+        point.SetActive(false);
+        Object.DontDestroyOnLoad(point);
+
+        return point;
+    }
+
+    private static GameObject CreateObject(string name)
+    {
+        var point = new GameObject(name);
 
         point.SetActive(false);
         Object.DontDestroyOnLoad(point);

@@ -11,7 +11,7 @@ public class EventReceiverInstance : MonoBehaviour
     {
         _calls++;
         if (_calls < Receiver?.RequiredCalls) return;
-        Receiver?.ReceiveEvent(this);
+        if (Receiver != null) EventManager.RunEvent(Receiver.TypeName, gameObject);
         _calls = 0;
     }
 

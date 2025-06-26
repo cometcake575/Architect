@@ -122,7 +122,7 @@ public class ObjectPlacement
         {
             var instance = obj.AddComponent<EventReceiverInstance>();
             instance.Receiver = receiver;
-            EventManager.RegisterEventReceiver(receiver.EventName, instance);
+            EventManager.RegisterEventReceiver(receiver.Name, instance);
         }
 
         foreach (var c in _config)
