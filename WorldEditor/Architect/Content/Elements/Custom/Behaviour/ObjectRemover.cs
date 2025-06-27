@@ -78,3 +78,8 @@ public class RoomClearerConfig : MonoBehaviour
     
     public bool removeMusic = true;
 }
+
+public class ObjectRemoverConfig : MonoBehaviour
+{
+    public string objectPath = "";
+}

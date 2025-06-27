@@ -58,6 +58,8 @@ public class ConfigGroup
     
     internal static ConfigGroup RoomClearer;
     
+    internal static ConfigGroup ObjectRemover;
+    
     internal static ConfigGroup HazardRespawnPoint;
     
     internal static void Initialize()
@@ -370,6 +372,16 @@ public class ConfigGroup
             )
         );
 
+        ObjectRemover = new ConfigGroup(
+            Invisible,
+            Attributes.ConfigManager.RegisterConfigType(
+                new StringConfigType("Path", (o, value) =>
+                {
+                    o.GetOrAddComponent<ObjectRemoverConfig>().objectPath = value.GetValue();
+                }, true)
+            )
+        );
+
         HazardRespawnPoint = new ConfigGroup(
             Invisible,
             Attributes.ConfigManager.RegisterConfigType(
@@ -377,7 +389,7 @@ public class ConfigGroup
                 {
                     if (value.GetValue()) return;
                     o.RemoveComponent<Collider2D>();
-                }, true)
+                })
             )
         );
     }

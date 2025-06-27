@@ -46,6 +46,19 @@ public static class RoomObjects
                 
                 return objects.Select(obj => obj.GetOrAddComponent<Disabler>()).ToArray();
             }).WithConfigGroup(ConfigGroup.RoomClearer),
+            CreateRoomEditor("object_remover", "Remove Object", o =>
+            {
+                var config = o.GetComponent<ObjectRemoverConfig>();
+                GameObject point = null;
+                
+                if (config)
+                {
+                    try { point = o.scene.FindGameObject(config.objectPath); }
+                    catch (ArgumentException) { }
+                }
+
+                return point is not null ? new[] { point.GetOrAddComponent<Disabler>() } : new Disabler[] { };
+            }).WithConfigGroup(ConfigGroup.ObjectRemover),
             CreateRoomEditor("hrp_remover", "Remove Hazard Respawn Point", o =>
             {
                 var objects = Object.FindObjectsOfType<HazardRespawnTrigger>();
