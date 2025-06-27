@@ -11,7 +11,7 @@ internal class ShadeSiblingElement : InternalPackElement
 
     public ShadeSiblingElement() : base("Shade Sibling", "Enemies")
     {
-        WithConfigGroup(ConfigGroup.Abyss);
+        WithConfigGroup(ConfigGroup.VisibleAbyss);
     }
 
     public override GameObject GetPrefab(bool flipped, int rotation)

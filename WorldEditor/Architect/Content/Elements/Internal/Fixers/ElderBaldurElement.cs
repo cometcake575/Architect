@@ -13,6 +13,7 @@ internal class ElderBaldurElement : InternalPackElement
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
         WithConfigGroup(ConfigGroup.Enemies);
         WithReceiverGroup(ReceiverGroup.Enemies);
+        FlipHorizontal();
     }
 
     public override bool DisableScaleParent()
@@ -37,7 +38,8 @@ internal class ElderBaldurElement : InternalPackElement
 
     public override void PostSpawn(GameObject gameObject, bool flipped, int rotation, float scale)
     {
-        if (!flipped) return;
+        gameObject.transform.SetScaleX(-_gameObject.transform.GetScaleX());
+        if (flipped) return;
         var fsm = gameObject.LocateMyFSM("Blocker Control");
         fsm.FsmVariables.GetFsmBool("Facing Right").Value = false;
     }

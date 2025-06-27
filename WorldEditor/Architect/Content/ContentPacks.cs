@@ -243,9 +243,11 @@ public static class ContentPacks
             CreateSolid("Mines_31", "Mines Platform", "Crystal Peak Rotating Platform"),
             new ConveyorBeltElement(),
             Create("Mines_37", "stomper_offset", "Crystal Peak Stomper (Slow)", "Hazards")
-                .WithRotationGroup(RotationGroup.Four),
+                .WithRotationGroup(RotationGroup.Four)
+                .WithConfigGroup(ConfigGroup.Invisible),
             Create("Mines_37", "stomper_fast", "Crystal Peak Stomper (Fast)", "Hazards")
-                .WithRotationGroup(RotationGroup.Four),
+                .WithRotationGroup(RotationGroup.Four)
+                .WithConfigGroup(ConfigGroup.Invisible),
             new BreakableWallElement("Mines_25", "Breakable Wall", "Breakable Wall", weight:BreakableWallsWeight)
         });
         RegisterInternalPack(new ContentPack("Queen's Gardens", "Assets from the Queen's Gardens")

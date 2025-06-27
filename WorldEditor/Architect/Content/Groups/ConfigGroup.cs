@@ -46,6 +46,8 @@ public class ConfigGroup
     
     internal static ConfigGroup Abyss;
     
+    internal static ConfigGroup VisibleAbyss;
+    
     internal static ConfigGroup Grub;
     
     internal static ConfigGroup BattleGate;
@@ -233,7 +235,16 @@ public class ConfigGroup
             }))
         );
 
-        Abyss = new ConfigGroup(Generic,
+        Abyss = new ConfigGroup(Invisible,
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Ignore Void Heart", (o, value) =>
+                {
+                    if (value.GetValue()) o.GetComponent<VhEffects>().ForceDisable();
+                })
+            )
+        );
+
+        VisibleAbyss = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Ignore Void Heart", (o, value) =>
                 {
