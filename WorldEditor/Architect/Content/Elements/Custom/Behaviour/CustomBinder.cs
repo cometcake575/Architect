@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using Architect.Attributes;
 using Architect.Attributes.Broadcasters;
-using JetBrains.Annotations;
 using UnityEngine;
 
-namespace Architect.Content.Elements.Custom;
+namespace Architect.Content.Elements.Custom.Behaviour;
 
 public class CustomBinder : MonoBehaviour
 {

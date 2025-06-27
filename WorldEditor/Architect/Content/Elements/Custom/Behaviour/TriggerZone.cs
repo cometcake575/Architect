@@ -2,7 +2,7 @@ using Architect.Attributes;
 using Architect.Attributes.Broadcasters;
 using UnityEngine;
 
-namespace Architect.Content.Elements.Custom;
+namespace Architect.Content.Elements.Custom.Behaviour;
 
 public class TriggerZone : MonoBehaviour
 {

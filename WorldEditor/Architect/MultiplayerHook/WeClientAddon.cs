@@ -1,4 +1,4 @@
-using Architect.Content.Elements.Custom;
+using Architect.Content.Elements.Custom.Behaviour;
 using Architect.MultiplayerHook.Packets;
 using Architect.Util;
 using Hkmp.Api.Client;
@@ -55,6 +55,6 @@ public class WeClientAddon : ClientAddon
     }
 
     protected override string Name => "Architect";
-    protected override string Version => "1.2.2.1";
+    protected override string Version => "1.3.0.0";
     public override bool NeedsNetwork => true;
 }

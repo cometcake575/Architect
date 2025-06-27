@@ -51,6 +51,7 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
         ContentPacks.AfterPreload(preloadedObjects);
         
         CustomObjects.Initialize();
+        RoomObjects.Initialize();
         
         EditorManager.Initialize();
         PlacementManager.Initialize();

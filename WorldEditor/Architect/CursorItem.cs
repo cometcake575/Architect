@@ -45,7 +45,7 @@ public static class CursorItem
     private static void SetupObject()
     {
         NeedsRefreshing = true;
-        _obj = new GameObject();
+        _obj = new GameObject { name = "[Architect] Cursor Preview" };
         _obj.AddComponent<SpriteRenderer>().color = new Color(1, 0.2f, 0.2f, 0.5f);
         Object.DontDestroyOnLoad(_obj);
     }

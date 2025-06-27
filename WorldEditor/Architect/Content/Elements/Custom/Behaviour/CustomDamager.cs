@@ -1,7 +1,7 @@
 using GlobalEnums;
 using UnityEngine;
 
-namespace Architect.Content.Elements.Custom;
+namespace Architect.Content.Elements.Custom.Behaviour;
 
 public class CustomDamager : MonoBehaviour
 {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Architect.Attributes.Config;
 using Architect.Content.Elements.Custom;
+using Architect.Content.Elements.Custom.Behaviour;
 using Architect.Content.Elements.Internal.Fixers;
 using HutongGames.PlayMaker.Actions;
 using JetBrains.Annotations;
@@ -50,6 +51,8 @@ public class ConfigGroup
     internal static ConfigGroup Bindings;
     
     internal static ConfigGroup Conveyors;
+    
+    internal static ConfigGroup RoomClearer;
     
     internal static void Initialize()
     {
@@ -273,6 +276,73 @@ public class ConfigGroup
                 {
                     o.transform.GetChild(0).GetComponent<ConveyorBelt>().speed = value.GetValue();
                     o.GetComponent<Animator>().speed = value.GetValue() / 8;
+                }, true)
+            )
+        );
+
+        RoomClearer = new ConfigGroup(
+            All,
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Remove Transitions", (o, value) =>
+                {
+                    if (value.GetValue()) return;
+                    o.GetOrAddComponent<RoomClearerConfig>().removeTransitions = false;
+                }, true)
+            ),
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Remove Benches", (o, value) =>
+                {
+                    if (value.GetValue()) return;
+                    o.GetOrAddComponent<RoomClearerConfig>().removeBenches = false;
+                }, true)
+            ),
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Remove Props", (o, value) =>
+                {
+                    if (value.GetValue()) return;
+                    o.GetOrAddComponent<RoomClearerConfig>().removeProps = false;
+                }, true)
+            ),
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Remove Scenery", (o, value) =>
+                {
+                    if (value.GetValue()) return;
+                    o.GetOrAddComponent<RoomClearerConfig>().removeScenery = false;
+                }, true)
+            ),
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Remove Blur", (o, value) =>
+                {
+                    if (value.GetValue()) return;
+                    o.GetOrAddComponent<RoomClearerConfig>().removeBlur = false;
+                }, true)
+            ),
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Remove Tilemap", (o, value) =>
+                {
+                    if (value.GetValue()) return;
+                    o.GetOrAddComponent<RoomClearerConfig>().removeTilemap = false;
+                }, true)
+            ),
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Remove NPCs", (o, value) =>
+                {
+                    if (value.GetValue()) return;
+                    o.GetOrAddComponent<RoomClearerConfig>().removeNpcs = false;
+                }, true)
+            ),
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Remove Camera Lock", (o, value) =>
+                {
+                    if (value.GetValue()) return;
+                    o.GetOrAddComponent<RoomClearerConfig>().removeCameraLocks = false;
+                }, true)
+            ),
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Remove Music", (o, value) =>
+                {
+                    if (value.GetValue()) return;
+                    o.GetOrAddComponent<RoomClearerConfig>().removeMusic = false;
                 }, true)
             )
         );

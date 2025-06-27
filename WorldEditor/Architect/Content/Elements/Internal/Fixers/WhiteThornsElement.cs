@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Architect.Content.Elements.Custom;
+using Architect.Content.Elements.Custom.Behaviour;
 using Architect.Content.Groups;
 using UnityEngine;
 

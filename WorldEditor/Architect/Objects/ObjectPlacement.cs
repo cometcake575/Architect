@@ -60,7 +60,11 @@ public class ObjectPlacement
     {
         if (PlaceableObject.AllObjects[_name] is not PlaceableObject selected) return;
         
-        _obj = new GameObject { transform = { position = _pos + ResourceUtils.FixOffset(selected.Offset, _flipped, _rotation, _scale) } };
+        _obj = new GameObject
+        {
+            transform = { position = _pos + ResourceUtils.FixOffset(selected.Offset, _flipped, _rotation, _scale) },
+            name = "[Architect] Object Preview"
+        };
 
         var renderer = _obj.AddComponent<SpriteRenderer>();
         renderer.color = new Color(1, 1, 1, 0.5f);
@@ -74,7 +78,7 @@ public class ObjectPlacement
         var prefab = packElement.GetPrefab(_flipped, _rotation);
         
         var obj = Object.Instantiate(prefab, _pos, prefab.transform.rotation);
-        obj.name = _name + " (" + _id + ")";
+        obj.name = "[Architect] " + _name + " (" + _id + ")";
         
         if (!Mathf.Approximately(_scale, 1))
         {

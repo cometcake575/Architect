@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Architect.Content.Elements.Custom.Behaviour;
 using Architect.Content.Groups;
 using Architect.Util;
 using HutongGames.PlayMaker;
@@ -26,11 +27,6 @@ public static class CustomObjects
 
         var customs = new ContentPack("Custom", "Custom assets that don't exist in the base game")
         {
-            new SimplePackElement(CreateHazardRespawnPoint(), "Hazard Respawn Point", "Custom",
-                ResourceUtils.Load("hazard_respawn_point")),
-            new SimplePackElement(CreateObject("Teleport Point"), "Teleport Point", "Custom",
-                ResourceUtils.Load("teleport_point"))
-                .WithReceiverGroup(ReceiverGroup.TeleportPoint),
             new SimplePackElement(CreateTriggerZone(), "Trigger Zone", "Custom",
                     ResourceUtils.Load("trigger_zone", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.TriggerZones),
@@ -78,31 +74,6 @@ public static class CustomObjects
         collider.isTrigger = true;
 
         point.AddComponent<CustomDamager>().damageAmount = damage;
-
-        point.SetActive(false);
-        Object.DontDestroyOnLoad(point);
-
-        return point;
-    }
-
-    private static GameObject CreateObject(string name)
-    {
-        var point = new GameObject(name);
-
-        point.SetActive(false);
-        Object.DontDestroyOnLoad(point);
-
-        return point;
-    }
-
-    private static GameObject CreateHazardRespawnPoint()
-    {
-        var point = new GameObject("Hazard Respawn Point");
-
-        point.AddComponent<HazardRespawnTrigger>().respawnMarker = point.AddComponent<CustomHazardRespawnMarker>();
-
-        var collider = point.AddComponent<CircleCollider2D>();
-        collider.isTrigger = true;
 
         point.SetActive(false);
         Object.DontDestroyOnLoad(point);
