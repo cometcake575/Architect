@@ -18,7 +18,9 @@ public class ConfigGroup
 {
     private static bool _initialized;
     
-    internal static ConfigGroup All;
+    internal static ConfigGroup Invisible;
+    
+    internal static ConfigGroup Generic;
 
     internal static ConfigGroup GeoChest;
     
@@ -54,18 +56,28 @@ public class ConfigGroup
     
     internal static ConfigGroup RoomClearer;
     
+    internal static ConfigGroup HazardRespawnPoint;
+    
     internal static void Initialize()
     {
         if (_initialized) return;
         _initialized = true;
         
-        All = new ConfigGroup(null,
+        Invisible = new ConfigGroup(null,
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Active", (o, value) =>
             {
                 o.SetActive(value.GetValue());
-            })));
+            }))
+        );
+        
+        Generic = new ConfigGroup(Invisible,
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Visible", (o, value) =>
+            {
+                foreach (var renderer in o.GetComponentsInChildren<Renderer>()) renderer.enabled = value.GetValue();
+            }))
+        );
 
-        GeoChest = new ConfigGroup(All,
+        GeoChest = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Large Geo", (o, value) =>
             {
                 o.LocateMyFSM("Chest Control").FsmVariables.FindFsmInt("Geo Large").Value = value.GetValue();
@@ -80,7 +92,7 @@ public class ConfigGroup
             }))
         );
         
-        Enemies = new ConfigGroup(All,
+        Enemies = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Health", (o, value) =>
             {
                 o.GetComponent<HealthManager>().hp = Mathf.Abs(value.GetValue());
@@ -157,7 +169,7 @@ public class ConfigGroup
             }))
         );
 
-        Breakable = new ConfigGroup(All,
+        Breakable = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(MakePersistenceConfigType("Stay Broken"))
         );
 
@@ -168,7 +180,7 @@ public class ConfigGroup
             }))
         );
 
-        Levers = new ConfigGroup(All,
+        Levers = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(MakePersistenceConfigType("Stay Activated"))
         );
 
@@ -187,7 +199,7 @@ public class ConfigGroup
             }))
         );
 
-        MovingObjects = new ConfigGroup(All,
+        MovingObjects = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Track Distance", (o, value) =>
             {
                 o.GetOrAddComponent<MovingObject>().trackDistance = value.GetValue();
@@ -211,7 +223,7 @@ public class ConfigGroup
         );
         
         ModHooks.LanguageGetHook += (key, title, orig) => title == "Custom" ? CustomTexts[key] : orig;
-        Tablets = new ConfigGroup(All,
+        Tablets = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Content", (o, value) =>
             {
                 var fsm = o.LocateMyFSM("Inspection");
@@ -221,7 +233,7 @@ public class ConfigGroup
             }))
         );
 
-        Abyss = new ConfigGroup(All,
+        Abyss = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Ignore Void Heart", (o, value) =>
                 {
@@ -240,7 +252,7 @@ public class ConfigGroup
         );
 
         BattleGate = new ConfigGroup(
-            All,
+            Generic,
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Start Opened", (o, value) =>
                 {
@@ -252,7 +264,7 @@ public class ConfigGroup
         );
 
         Bindings = new ConfigGroup(
-            All,
+            Generic,
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Binding Active", (o, value) =>
                 {
@@ -270,7 +282,7 @@ public class ConfigGroup
         );
 
         Conveyors = new ConfigGroup(
-            All,
+            Generic,
             Attributes.ConfigManager.RegisterConfigType(
                 new FloatConfigType("Belt Speed", (o, value) =>
                 {
@@ -281,7 +293,7 @@ public class ConfigGroup
         );
 
         RoomClearer = new ConfigGroup(
-            All,
+            Invisible,
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Remove Transitions", (o, value) =>
                 {
@@ -343,6 +355,17 @@ public class ConfigGroup
                 {
                     if (value.GetValue()) return;
                     o.GetOrAddComponent<RoomClearerConfig>().removeMusic = false;
+                }, true)
+            )
+        );
+
+        HazardRespawnPoint = new ConfigGroup(
+            Invisible,
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Contact Trigger", (o, value) =>
+                {
+                    if (value.GetValue()) return;
+                    o.RemoveComponent<Collider2D>();
                 }, true)
             )
         );

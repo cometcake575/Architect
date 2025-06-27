@@ -20,6 +20,8 @@ public class ReceiverGroup
     
     internal static ReceiverGroup TeleportPoint;
     
+    internal static ReceiverGroup HazardRespawnPoint;
+    
     //internal static ReceiverGroup WatcherKnights;
     
     internal static void Initialize()
@@ -54,6 +56,11 @@ public class ReceiverGroup
         TeleportPoint = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("teleport", o =>
         {
             HeroController.instance.transform.position = o.transform.position;
+        }));
+        
+        HazardRespawnPoint = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("set_spawn", o =>
+        {
+            PlayerData.instance.SetHazardRespawn(o.GetComponent<HazardRespawnMarker>());
         }));
     }
 

@@ -29,7 +29,8 @@ public static class CustomObjects
         {
             new SimplePackElement(CreateTriggerZone(), "Trigger Zone", "Custom",
                     ResourceUtils.Load("trigger_zone", FilterMode.Point))
-                .WithBroadcasterGroup(BroadcasterGroup.TriggerZones),
+                .WithBroadcasterGroup(BroadcasterGroup.TriggerZones)
+                .WithConfigGroup(ConfigGroup.Invisible),
             new SimplePackElement(CreateZoteTrophy(), "Winner's Trophy", "Custom"),
             CreateTemporaryAbilityGranter("dash_crystal", "Dash", false, "Dash Crystal"),
             CreateTemporaryAbilityGranter("single_dash_crystal", "Dash", true, "Single Use Dash Crystal"),

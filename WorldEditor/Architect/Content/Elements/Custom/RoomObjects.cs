@@ -18,10 +18,13 @@ public static class RoomObjects
         var edits = new ContentPack("Room Edits", "Tools used to edit rooms")
         {
             new SimplePackElement(CreateHazardRespawnPoint(), "Hazard Respawn Point", "Room Edits",
-                ResourceUtils.Load("hazard_respawn_point")),
+                ResourceUtils.Load("hazard_respawn_point"))
+                .WithConfigGroup(ConfigGroup.HazardRespawnPoint)
+                .WithReceiverGroup(ReceiverGroup.HazardRespawnPoint),
             new SimplePackElement(CreateObject("Teleport Point"), "Teleport Point", "Room Edits",
                     ResourceUtils.Load("teleport_point"))
-                .WithReceiverGroup(ReceiverGroup.TeleportPoint),
+                .WithReceiverGroup(ReceiverGroup.TeleportPoint)
+                .WithConfigGroup(ConfigGroup.Invisible),
             CreateRoomEditor("room_remover", "Clear Room", o =>
             {
                 var objects = o.scene.GetRootGameObjects()
@@ -60,7 +63,7 @@ public static class RoomObjects
                 }
 
                 return point is not null ? new[] { point.gameObject.GetOrAddComponent<Disabler>() } : new Disabler[] { };
-            }),
+            }).WithConfigGroup(ConfigGroup.Invisible),
             CreateRoomEditor("door_remover", "Remove Transition", o =>
             {
                 var objects = Object.FindObjectsOfType<TransitionPoint>();
@@ -78,7 +81,7 @@ public static class RoomObjects
                 }
                 
                 return point is not null ? new[] { point.gameObject.GetOrAddComponent<Disabler>() } : new Disabler[] { };
-            })
+            }).WithConfigGroup(ConfigGroup.Invisible)
         };
         ContentPacks.RegisterPack(edits);
     }

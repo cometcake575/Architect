@@ -15,7 +15,7 @@ public abstract class AbstractPackElement
     private bool _flipHorizontal;
     private BroadcasterGroup _broadcasterGroup = BroadcasterGroup.EmptyGroup;
     private ReceiverGroup _receiverGroup = ReceiverGroup.All;
-    private ConfigGroup _configGroup = ConfigGroup.All;
+    private ConfigGroup _configGroup = ConfigGroup.Generic;
     private RotationGroup _rotationGroup = RotationGroup.None;
 
     internal readonly int Weight;
