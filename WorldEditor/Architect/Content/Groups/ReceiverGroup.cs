@@ -58,7 +58,7 @@ public class ReceiverGroup
             HeroController.instance.transform.position = o.transform.position;
         }));
         
-        HazardRespawnPoint = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("set_spawn", o =>
+        HazardRespawnPoint = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("setspawn", o =>
         {
             PlayerData.instance.SetHazardRespawn(o.GetComponent<HazardRespawnMarker>());
         }));
