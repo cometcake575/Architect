@@ -62,7 +62,7 @@ public static class RoomObjects
                     }
                 }
 
-                return point is not null ? new[] { point.gameObject.GetOrAddComponent<Disabler>() } : new Disabler[] { };
+                return point is not null && lowest <= 5 ? new[] { point.gameObject.GetOrAddComponent<Disabler>() } : new Disabler[] { };
             }).WithConfigGroup(ConfigGroup.Invisible),
             CreateRoomEditor("door_remover", "Remove Transition", o =>
             {
@@ -80,7 +80,7 @@ public static class RoomObjects
                     }
                 }
                 
-                return point is not null ? new[] { point.gameObject.GetOrAddComponent<Disabler>() } : new Disabler[] { };
+                return point is not null && lowest <= 5 ? new[] { point.gameObject.GetOrAddComponent<Disabler>() } : new Disabler[] { };
             }).WithConfigGroup(ConfigGroup.Invisible)
         };
         ContentPacks.RegisterPack(edits);
