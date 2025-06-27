@@ -60,7 +60,7 @@ public static class EventManager
 
     public static EventReceiver DeserializeReceiver(Dictionary<string, string> data)
     {
-        return new EventReceiver(data["type"], data["name"],
+        return new EventReceiver(data["type"].ToLower(), data["name"],
             data.TryGetValue("times", out var value) ? Convert.ToInt32(value) : 1);
     }
 
