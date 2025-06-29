@@ -17,8 +17,9 @@ public static class ContentPacks
     public const int SpecialBenchWeight = 5;
     public const int NailmasterBenchWeight = 6;
     public const int BenchWeight = 7;
-    public const int LeverWeight = 8;
-    public const int GateWeight = 9;
+    public const int NpcWeight = 8;
+    public const int LeverWeight = 9;
+    public const int GateWeight = 10;
 
     internal static readonly List<ContentPack> Packs = new();
     private static readonly List<ContentPack> InternalPacks = new();
@@ -300,9 +301,10 @@ public static class ContentPacks
                 .WithRotationGroup(RotationGroup.Eight),
             Create("Ruins1_32", "Soul Totem 5", "Leaning Soul Totem", "Interactable", weight:SoulSourceWeight)
                 .WithRotationGroup(RotationGroup.Eight),
-            CreateSolid("Ruins_Bathhouse", "ruins_mage_building_0011_a_royal_plat", "Pleasure House Platform"),
+            CreateSolid("Ruins2_01", "ruins_mage_building_0011_a_royal_plat", "Pleasure House Platform"),
+            CreateSolid("Ruins2_01", "ruins_plat_royal_02", "Royal Platform"),
             Create("Ruins_Bathhouse", "RestBench", "Pleasure House Bench", "Interactable", weight:BenchWeight),
-            new MillibellePackElement(weight:MiscInteractableWeight)
+            new MillibellePackElement(weight:NpcWeight)
         });
         RegisterInternalPack(new ContentPack("Royal Waterways", "Assets from the Royal Waterways")
         {
@@ -374,10 +376,11 @@ public static class ContentPacks
             CreateEnemy("Deepnest_Spider_Town", "Spider Mini", "Deephunter")
                 .WithRotationGroup(RotationGroup.Four),
             CreateEnemy("Deepnest_Spider_Town", "Tiny Spider", "Deepling"),
-            CreateEnemy("Deepnest_42", "Spider Flyer", "Little Weaver"),
+            CreateEnemy("Deepnest_41", "Spider Flyer", "Little Weaver"),
             CreateEnemy("Deepnest_Spider_Town", "Slash Spider", "Stalking Devout").FlipVertical(),
             CreateEnemy("Deepnest_Spider_Town", "Egg Sac", "Bluggsac"),
-            Create("Deepnest_Spider_Town", "RestBench Return", "Beast's Den Bench", "Interactable", weight:BenchWeight)
+            Create("Deepnest_Spider_Town", "RestBench Return", "Beast's Den Bench", "Interactable", weight:BenchWeight),
+            new MidwifeElement(weight:NpcWeight)
         });
         RegisterInternalPack(new ContentPack("The Abyss", "Assets from The Abyss")
         {
@@ -417,10 +420,18 @@ public static class ContentPacks
             CreateSolid("GG_Atrium_Roof", "gg_plat_float_small", "Godhome Platform S"),
             CreateSolid("GG_Workshop", "gg_plat_float_wide", "Godhome Platform L"),
             Create("GG_Workshop", "RestBench (1)", "Godhome Bench", "Interactable", weight:SpecialBenchWeight),
-            new MultiPartInternalElement("GG_Atrium_Roof", "RestBench (1)", "GG_bench_metal_0001_1", "Godhome Roof Bench", "Interactable", weight:SpecialBenchWeight)
+            new MultiPartInternalElement("GG_Atrium_Roof", "RestBench (1)", "GG_bench_metal_0001_1", "Godhome Roof Bench", "Interactable", weight:SpecialBenchWeight),
+            Create("GG_Engine", "Godseeker EngineRoom NPC", "Godseeker", "Interactable", weight:NpcWeight)
+                .FlipHorizontal()
+                .WithConfigGroup(ConfigGroup.Godseeker)
         });
         /*RegisterInternalPack(new ContentPack("Experimental", "Experimental Features - These will be moved to a regular pack when confirmed to work")
-        {
+        {,
+           CreateEnemy("GG_Nailmasters", "Brothers/Oro", "Oro"),
+           CreateEnemy("GG_Nailmasters", "Brothers/Mato", "Mato"),
+           CreateEnemy("GG_Nailmasters", "Brothers", "Brothers"),
+           CreateEnemy("GG_Painter", "Battle Scene/Sheo Boss", "Sheo"),
+           CreateEnemy("GG_Painter", "Battle Scene", "Sheo 2"),
            CreateEnemy("GG_God_Tamer", "Entry Object/Lancer", "God Tamer"),
            CreateEnemy("GG_God_Tamer", "Entry Object", "God Tamer Full"),
             new OblobbleElement(),

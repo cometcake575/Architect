@@ -36,16 +36,22 @@ public static class RoomObjects
                     if (!clearer.removeBenches) objects = objects.Where(obj => !obj.GetComponent<RestBench>());
                     if (!clearer.removeScenery) objects = objects.Where(obj => !obj.name.StartsWith("_Scenery") && obj.name != "Acid Control v2");
                     if (!clearer.removeTilemap) objects = objects.Where(obj => !obj.name.Contains("TileMap"));
-                    if (!clearer.removeBlur) objects = objects.Where(obj => !obj.GetComponent<BlurPlane>());
+                    if (!clearer.removeBlur) objects = objects.Where(obj => !obj.GetComponentInChildren<BlurPlane>());
                     if (!clearer.removeProps) objects = objects.Where(obj => !obj.name.StartsWith("_Props"));
                     if (!clearer.removeTransitions) objects = objects.Where(obj => !obj.name.StartsWith("_Transition Gates"));
-                    if (!clearer.removeCameraLocks) objects = objects.Where(obj => !obj.name.StartsWith("_CameraLocks"));
+                    if (!clearer.removeCameraLocks) objects = objects.Where(obj => !obj.name.StartsWith("_CameraLock"));
                     if (!clearer.removeMusic) objects = objects.Where(obj => !obj.GetComponent<MusicRegion>());
-                    if (!clearer.removeNpcs) objects = objects.Where(obj => !obj.name.StartsWith("_NPCs"));
+                    if (!clearer.removeNpcs) objects = objects.Where(obj => !obj.name.StartsWith("NPC"));
                 }
                 
                 return objects.Select(obj => obj.GetOrAddComponent<Disabler>()).ToArray();
             }).WithConfigGroup(ConfigGroup.RoomClearer),
+            CreateRoomEditor("hrp_remover", "Remove Hazard Respawn Point", FindObjectsToDisable<HazardRespawnTrigger>)
+                .WithConfigGroup(ConfigGroup.Invisible),
+            CreateRoomEditor("door_remover", "Remove Transition", FindObjectsToDisable<TransitionPoint>)
+                .WithConfigGroup(ConfigGroup.Invisible),
+            CreateRoomEditor("enemy_remover", "Remove Enemy", FindObjectsToDisable<HealthManager>)
+                .WithConfigGroup(ConfigGroup.Invisible),
             CreateRoomEditor("object_remover", "Remove Object", o =>
             {
                 var config = o.GetComponent<ObjectRemoverConfig>();
@@ -58,45 +64,31 @@ public static class RoomObjects
                 }
 
                 return point is not null ? new[] { point.GetOrAddComponent<Disabler>() } : new Disabler[] { };
-            }).WithConfigGroup(ConfigGroup.ObjectRemover),
-            CreateRoomEditor("hrp_remover", "Remove Hazard Respawn Point", o =>
-            {
-                var objects = Object.FindObjectsOfType<HazardRespawnTrigger>();
-                var lowest = float.MaxValue;
-                HazardRespawnTrigger point = null;
-                foreach (var obj in objects)
-                {
-                    var dist = (obj.transform.position - o.transform.position).magnitude;
-
-                    if (dist < lowest)
-                    {
-                        lowest = dist;
-                        point = obj;
-                    }
-                }
-
-                return point is not null && lowest <= 5 ? new[] { point.gameObject.GetOrAddComponent<Disabler>() } : new Disabler[] { };
-            }).WithConfigGroup(ConfigGroup.Invisible),
-            CreateRoomEditor("door_remover", "Remove Transition", o =>
-            {
-                var objects = Object.FindObjectsOfType<TransitionPoint>();
-                var lowest = float.MaxValue;
-                TransitionPoint point = null;
-                foreach (var obj in objects)
-                {
-                    var dist = (obj.transform.position - o.transform.position).magnitude;
-
-                    if (dist < lowest)
-                    {
-                        lowest = dist;
-                        point = obj;
-                    }
-                }
-                
-                return point is not null && lowest <= 5 ? new[] { point.gameObject.GetOrAddComponent<Disabler>() } : new Disabler[] { };
-            }).WithConfigGroup(ConfigGroup.Invisible)
+            }).WithConfigGroup(ConfigGroup.ObjectRemover)
         };
         ContentPacks.RegisterPack(edits);
+    }
+
+    private static Disabler[] FindObjectsToDisable<T>(GameObject disabler) where T : MonoBehaviour
+    {
+        var objects = disabler.scene.GetRootGameObjects()
+            .SelectMany(root => root.GetComponentsInChildren<T>(true))
+            .Select(obj => obj.gameObject);
+        
+        var lowest = float.MaxValue;
+        GameObject point = null;
+        foreach (var obj in objects)
+        {
+            var dist = (obj.transform.position - disabler.transform.position).sqrMagnitude;
+
+            if (dist < lowest)
+            {
+                lowest = dist;
+                point = obj;
+            }
+        }
+        
+        return point is not null && lowest <= 25 ? new[] { point.gameObject.GetOrAddComponent<Disabler>() } : new Disabler[] { };
     }
 
     private static readonly Dictionary<string, Func<GameObject, Disabler[]>> EditActions = new();

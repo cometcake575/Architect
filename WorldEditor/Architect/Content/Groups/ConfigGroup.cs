@@ -5,6 +5,7 @@ using Architect.Attributes.Config;
 using Architect.Content.Elements.Custom;
 using Architect.Content.Elements.Custom.Behaviour;
 using Architect.Content.Elements.Internal.Fixers;
+using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using JetBrains.Annotations;
 using Modding;
@@ -61,6 +62,10 @@ public class ConfigGroup
     internal static ConfigGroup ObjectRemover;
     
     internal static ConfigGroup HazardRespawnPoint;
+    
+    internal static ConfigGroup Godseeker;
+    
+    internal static ConfigGroup Midwife;
     
     internal static void Initialize()
     {
@@ -226,14 +231,17 @@ public class ConfigGroup
             }))
         );
         
-        ModHooks.LanguageGetHook += (key, title, orig) => title == "Custom" ? CustomTexts[key] : orig;
+        ModHooks.LanguageGetHook += (key, _, orig) => CustomTexts.TryGetValue(key, out var customText) ? customText : orig;
+
         Tablets = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Content", (o, value) =>
             {
                 var fsm = o.LocateMyFSM("Inspection");
-                fsm.FsmVariables.GetFsmString("Convo Name").Value = o.name;
+                var id = "Custom Tablet " + o.name;
+                
+                fsm.FsmVariables.GetFsmString("Convo Name").Value = id;
                 fsm.FsmVariables.GetFsmString("Sheet Name").Value = "Custom";
-                CustomTexts[o.name] = value.GetValue();
+                CustomTexts[id] = value.GetValue();
             }))
         );
 
@@ -391,6 +399,58 @@ public class ConfigGroup
                     o.RemoveComponent<Collider2D>();
                 })
             )
+        );
+
+        Godseeker = new ConfigGroup(
+            Generic,
+            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("First Convo", (o, value) =>
+            {
+                var fsm = o.LocateMyFSM("Conversation Control");
+                var id = "Custom Godseeker First " + o.name;
+                
+                fsm.AddCustomAction("Init", makerFsm =>
+                {
+                    makerFsm.FsmVariables.FindFsmBool("Door Completed").Value = false;
+                    makerFsm.FsmVariables.FindFsmString("First Cell").Value = id;
+                });
+                CustomTexts[id] = value.GetValue();
+            })),
+            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Repeat Convo", (o, value) =>
+            {
+                var fsm = o.LocateMyFSM("Conversation Control");
+                var id = "Custom Godseeker Repeat " + o.name;
+                
+                fsm.AddCustomAction("Init", makerFsm =>
+                {
+                    makerFsm.FsmVariables.FindFsmBool("Door Completed").Value = false;
+                    makerFsm.FsmVariables.FindFsmString("Repeat Cell").Value = id;
+                });
+                CustomTexts[id] = value.GetValue();
+            }))
+        );
+
+        Midwife = new ConfigGroup(
+            Generic,
+            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Convo Text", (o, value) =>
+            {
+                var fsm = o.transform.GetChild(1).gameObject.LocateMyFSM("Conversation Control");
+                var id = "Custom Midwife " + o.name;
+                
+                fsm.DisableAction("Convo Choice", 1);
+                fsm.DisableAction("Convo Choice", 2);
+                fsm.DisableAction("Convo Choice", 3);
+                fsm.DisableAction("Convo Choice", 4);
+
+                fsm.GetAction<CallMethodProper>("Repeat", 0).parameters[0].stringValue = id;
+                CustomTexts[id] = value.GetValue();
+            })),
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Start Angered", (o, value) =>
+            {
+                if (value.GetValue()) o.transform.GetChild(1).gameObject.LocateMyFSM("Conversation Control").AddCustomAction("Idle", fsm =>
+                {
+                    fsm.SetState("Talk Finish");
+                });
+            }))
         );
     }
 

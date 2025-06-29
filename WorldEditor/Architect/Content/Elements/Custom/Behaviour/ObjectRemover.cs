@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -32,6 +33,15 @@ public class Disabler : MonoBehaviour
     public List<string> disablers = new();
     
     private bool _enableByDefault;
+
+    private void OnEnable()
+    {
+        if (disablers.Count > 0)
+        {
+            _enableByDefault = true;
+            gameObject.SetActive(false);
+        }
+    }
 
     public void Disable(string enableName)
     {
