@@ -63,6 +63,16 @@ public static class ConfigurationScreen
                 Anchor = TextAnchor.UpperCenter
             }
         };
+        if (Architect.UsingMultiplayer) elements.Insert(2, new HorizontalOption(
+            name: "Collaboration Mode",
+            description: "Shares edits as soon as they're made to allow working together online using HKMP",
+            values: values,
+            applySetting: i =>
+            {
+                globalSettings.CollaborationMode = i == 0;
+            },
+            loadSetting: () => globalSettings.CollaborationMode ? 0 : 1
+        ));
         elements.AddRange(ContentPacks.Packs.Select(pack => new HorizontalOption(name: pack.GetName(), description: pack.GetDescription(), values: values, applySetting: i => { globalSettings.ContentPackSettings[pack.GetName()] = i == 0; }, loadSetting: () => globalSettings.ContentPackSettings[pack.GetName()] ? 0 : 1)).Cast<Element>());
         _menuRef ??= new Menu(
             name: Architect.Instance.Name,

@@ -54,6 +54,11 @@ public class ObjectPlacement
     private readonly float _scale;
     private readonly string _id;
 
+    public string GetId()
+    {
+        return _id;
+    }
+
     private GameObject _obj;
 
     internal void PlaceGhost()

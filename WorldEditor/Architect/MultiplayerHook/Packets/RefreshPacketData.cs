@@ -1,32 +1,32 @@
-using System.Collections.Generic;
-using Architect.Objects;
-using Architect.Util;
 using Hkmp.Networking.Packet;
-using Newtonsoft.Json;
 
 namespace Architect.MultiplayerHook.Packets;
 
 public class RefreshPacketData : IPacketData
 {
-    public List<ObjectPlacement> Edits;
     public string SceneName;
+    public int TotalPackets;
+    public int PacketId;
+    public byte[] Edits;
+    public string Guid;
     
     public void WriteData(IPacket packet)
     {
+        packet.Write(PacketId);
+        packet.Write(TotalPackets);
         packet.Write(SceneName);
-        var json = JsonConvert.SerializeObject(Edits, 
-            ObjectPlacement.ObjectPlacementConverter.Instance, 
-            ObjectPlacement.ObjectPlacementConverter.Vector3Converter);
+        packet.Write(Guid);
         
-        var bytes = ZipUtils.Zip(json);
-        
-        packet.Write(bytes.Length);
-        foreach (var b in bytes) packet.Write(b);
+        packet.Write(Edits.Length);
+        foreach (var b in Edits) packet.Write(b);
     }
 
     public void ReadData(IPacket packet)
     {
+        PacketId = packet.ReadInt();
+        TotalPackets = packet.ReadInt();
         SceneName = packet.ReadString();
+        Guid = packet.ReadString();
         
         var count = packet.ReadInt();
         
@@ -36,9 +36,7 @@ public class RefreshPacketData : IPacketData
             bytes[i] = packet.ReadByte();
         }
 
-        var json = ZipUtils.Unzip(bytes);
-        
-        Edits = JsonConvert.DeserializeObject<List<ObjectPlacement>>(json);
+        Edits = bytes;
     }
 
     public bool IsReliable => true;

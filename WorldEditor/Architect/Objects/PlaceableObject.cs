@@ -7,6 +7,7 @@ using Architect.Attributes.Receivers;
 using UnityEngine;
 using Architect.Content.Elements;
 using Architect.Content.Elements.Internal;
+using Architect.MultiplayerHook;
 using Architect.UI;
 using Architect.Util;
 
@@ -39,6 +40,9 @@ public class PlaceableObject : SelectableObject
         
         PlacementManager.GetCurrentPlacements().Add(placement);
         placement.PlaceGhost();
+
+        if (!Architect.UsingMultiplayer || !Architect.GlobalSettings.CollaborationMode) return;
+        HkmpHook.Place(placement, GameManager.instance.sceneName);
     }
 
     public override bool IsFavourite()

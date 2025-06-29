@@ -15,6 +15,8 @@ public class WorldEditorGlobalSettings
 
     public bool CanEnableEditing = false;
     
+    public bool CollaborationMode = false;
+    
     [JsonConverter(typeof(PlayerActionSetConverter))]
     public readonly WorldEditorKeyBinds Keybinds = new();
 

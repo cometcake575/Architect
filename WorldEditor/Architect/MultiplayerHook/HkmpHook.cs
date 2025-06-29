@@ -1,4 +1,6 @@
+using System.Threading.Tasks;
 using Architect.MultiplayerHook.Packets;
+using Architect.Objects;
 using Hkmp.Api.Client;
 using Hkmp.Api.Server;
 using Hkmp.Networking.Packet;
@@ -18,7 +20,17 @@ public static class HkmpHook
 
     public static void Refresh()
     {
-        _clientAddon.Refresh();
+        Task.Run(() => _clientAddon.Refresh());
+    }
+
+    public static void Erase(string guid, string scene)
+    {
+        _clientAddon.Erase(guid, scene);
+    }
+
+    public static void Place(ObjectPlacement placement, string scene)
+    {
+        _clientAddon.Place(placement, scene);
     }
 
     public static void BroadcastWin()
@@ -32,6 +44,8 @@ public static class HkmpHook
         {
             PacketId.Refresh => new RefreshPacketData(),
             PacketId.Win => new WinPacketData(),
+            PacketId.Edit => new EditPacketData(),
+            PacketId.Erase => new ErasePacketData(),
             _ => null
         };
     }

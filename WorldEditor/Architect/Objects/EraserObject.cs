@@ -1,4 +1,5 @@
 using System.Linq;
+using Architect.MultiplayerHook;
 using Architect.Util;
 using UnityEngine;
 
@@ -21,7 +22,12 @@ internal class EraserObject : SelectableObject
     public override void OnClickInWorld(Vector3 pos, bool first)
     {
         var pl = PlacementManager.GetCurrentPlacements().FirstOrDefault(placement => placement.Touching(pos));
-        pl?.Destroy();
+        if (pl == null) return;
+        pl.Destroy();
+
+        if (!Architect.UsingMultiplayer || !Architect.GlobalSettings.CollaborationMode) return;
+        var id = pl.GetId();
+        HkmpHook.Erase(id, GameManager.instance.sceneName);
     }
 
     public override bool IsFavourite()
