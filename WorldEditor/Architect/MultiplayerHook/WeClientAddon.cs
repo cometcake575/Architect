@@ -69,7 +69,7 @@ public class WeClientAddon : ClientAddon
         {
             if (!Architect.GlobalSettings.CollaborationMode) return;
             Architect.GlobalSettings.Edits[packet.SceneName].Add(packet.Edit);
-            if (packet.SceneName == GameManager.instance.sceneName)
+            if (packet.SceneName == GameManager.instance.sceneName && EditorManager.IsEditing)
             {
                 packet.Edit.PlaceGhost();
             }
@@ -79,7 +79,7 @@ public class WeClientAddon : ClientAddon
         {
             if (!Architect.GlobalSettings.CollaborationMode) return;
 
-            if (packet.SceneName == GameManager.instance.sceneName)
+            if (packet.SceneName == GameManager.instance.sceneName && EditorManager.IsEditing)
             {
                 var objects = Architect.GlobalSettings.Edits[packet.SceneName]
                     .Where(obj => obj.GetId() == packet.Id).ToArray();
@@ -172,6 +172,6 @@ public class WeClientAddon : ClientAddon
     }
 
     protected override string Name => "Architect";
-    protected override string Version => "1.4.0.0";
+    protected override string Version => "1.4.0.1";
     public override bool NeedsNetwork => true;
 }
