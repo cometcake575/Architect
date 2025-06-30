@@ -1,3 +1,4 @@
+using Architect.Attributes.Config;
 using UnityEngine;
 using Architect.Objects;
 using Architect.UI;
@@ -38,8 +39,16 @@ public static class CursorItem
         NeedsRefreshing = false;
 
         var renderer = _obj.GetComponent<SpriteRenderer>();
+        var scaleX = EditorManager.Scale;
+        var scaleY = EditorManager.Scale;
+
+        if (EditorUIManager.ConfigValues.TryGetValue("width", out var widthVal) && widthVal is FloatConfigValue width) scaleX *= width.GetValue();
+        if (EditorUIManager.ConfigValues.TryGetValue("height", out var heightVal) && heightVal is FloatConfigValue height) scaleY *= height.GetValue();
+        if (EditorUIManager.ConfigValues.TryGetValue("layer", out var layerVal) && layerVal is IntConfigValue layer)
+            renderer.sortingOrder = layer.GetValue();
+        
         _offset = ResourceUtils.FixOffset(selected.Offset, EditorManager.IsFlipped, EditorManager.Rotation, EditorManager.Scale);
-        GhostPlacementUtils.SetupForPlacement(_obj, renderer, selected, EditorManager.IsFlipped, EditorManager.Rotation, EditorManager.Scale);
+        GhostPlacementUtils.SetupForPlacement(_obj, renderer, selected, EditorManager.IsFlipped, EditorManager.Rotation, scaleX, scaleY);
     }
 
     private static void SetupObject()

@@ -56,7 +56,6 @@ internal class ShadeSiblingElement : InternalPackElement
 internal class VoidTendrilsElement : InternalPackElement
 {
     private GameObject _gameObject;
-    private Vector3 _scale;
 
     public VoidTendrilsElement() : base("Void Tendrils", "Hazards")
     {
@@ -77,21 +76,7 @@ internal class VoidTendrilsElement : InternalPackElement
     internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
     {
         _gameObject = preloads["Abyss_16"]["Abyss Tendrils"];
-        _scale = _gameObject.transform.localScale;
-        _gameObject.transform.localScale = new Vector3(1, 1.2f, 1);
-
         _gameObject.AddComponent<VoidTendrilsVhEffects>();
-    }
-
-    public override Vector3 ExtraOffset()
-    {
-        return new Vector3(0, -0.5f, 0);
-    }
-
-    public override void PostSpawn(GameObject gameObject, bool flipped, int rotation, float scale)
-    {
-        var ls = gameObject.transform.localScale;
-        gameObject.transform.localScale = new Vector3(ls.x * _scale.x, ls.y * _scale.y, ls.z * _scale.z);
     }
 
     internal class VoidTendrilsVhEffects : VhEffects

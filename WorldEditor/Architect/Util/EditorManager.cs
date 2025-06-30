@@ -137,7 +137,7 @@ public static class EditorManager
 
             if (scaleUp != scaleDown)
             {
-                Scale = Mathf.Max(Scale + (scaleUp ? 1 : -1) * Time.deltaTime, 0.2f);
+                Scale = Mathf.Max(Scale + (scaleUp ? 1 : -1) * Time.deltaTime, 0.1f);
                 CursorItem.NeedsRefreshing = true;
             }
         }

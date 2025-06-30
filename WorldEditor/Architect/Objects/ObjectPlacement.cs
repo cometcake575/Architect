@@ -71,10 +71,30 @@ public class ObjectPlacement
             name = "[Architect] Object Preview"
         };
 
-        var renderer = _obj.AddComponent<SpriteRenderer>();
-        renderer.color = new Color(1, 1, 1, 0.5f);
+        var scaleX = _scale;
+        var scaleY = _scale;
+
+        var r = 1f;
+        var g = 1f;
+        var b = 1f;
+        var a = 0.5f;
         
-        GhostPlacementUtils.SetupForPlacement(_obj, renderer, selected, _flipped, _rotation, _scale);
+        var renderer = _obj.AddComponent<SpriteRenderer>();
+        
+        foreach (var config in _config)
+        {
+            if (config.GetName() == "width" && config is FloatConfigValue width) scaleX *= width.GetValue();
+            else if (config.GetName() == "height" && config is FloatConfigValue height) scaleY *= height.GetValue();
+            else if (config.GetName() == "r" && config is FloatConfigValue red) r = red.GetValue();
+            else if (config.GetName() == "g" && config is FloatConfigValue green) g = green.GetValue();
+            else if (config.GetName() == "b" && config is FloatConfigValue blue) b = blue.GetValue();
+            else if (config.GetName() == "a" && config is FloatConfigValue alpha) a *= alpha.GetValue();
+            else if (config.GetName() == "layer" && config is IntConfigValue layer) renderer.sortingOrder = layer.GetValue(); 
+        }
+
+        renderer.color = new Color(r, g, b, a);
+        
+        GhostPlacementUtils.SetupForPlacement(_obj, renderer, selected, _flipped, _rotation, scaleX, scaleY);
     }
 
     internal void SpawnObject()

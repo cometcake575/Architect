@@ -78,6 +78,7 @@ public class PlaceableObject : SelectableObject
         if (PackElement.GetSprite())
         {
             _sprite = PackElement.GetSprite();
+            Scale = prefab.transform.lossyScale;
             return;
         }
         
@@ -86,6 +87,7 @@ public class PlaceableObject : SelectableObject
         var spriteRenderer = prefab.gameObject.GetComponent<SpriteRenderer>();
         if (spriteRenderer)
         {
+            Scale = spriteRenderer.gameObject.transform.lossyScale;
             _sprite = spriteRenderer.sprite;
             _rotation += spriteRenderer.gameObject.transform.rotation.eulerAngles.z;
             return;
@@ -107,6 +109,7 @@ public class PlaceableObject : SelectableObject
         var cSpriteRenderer = prefab.gameObject.GetComponentInChildren<SpriteRenderer>();
         if (!cSpriteRenderer) return;
         
+        Scale = cSpriteRenderer.gameObject.transform.lossyScale;
         _sprite = cSpriteRenderer.sprite;
         Offset += prefab.transform.InverseTransformPoint(cSpriteRenderer.gameObject.transform.position);
         _rotation += cSpriteRenderer.gameObject.transform.rotation.eulerAngles.z;
@@ -114,6 +117,8 @@ public class PlaceableObject : SelectableObject
 
     private void PrepareSpriteWithTk2D(tk2dSprite sprite)
     {
+        Scale = sprite.gameObject.transform.lossyScale;
+        
         var animator = sprite.gameObject.GetComponent<tk2dSpriteAnimator>();
         tk2dSpriteDefinition def;
 
@@ -124,8 +129,7 @@ public class PlaceableObject : SelectableObject
         }
         else def = sprite.CurrentSprite;
 
-        _sprite = ResourceUtils.ConvertFrom2DToolkit(def, 64 / sprite.scale.x);
-        
+        _sprite = ResourceUtils.ConvertFrom2DToolkit(def, 1 / (sprite.scale.x * sprite.GetCurrentSpriteDef().texelSize.x));
         if (def.flipped != tk2dSpriteDefinition.FlipMode.None) _rotation += 90;
         _rotation += sprite.gameObject.transform.rotation.eulerAngles.z;
         Offset = def.GetBounds().center;
@@ -141,6 +145,7 @@ public class PlaceableObject : SelectableObject
     public readonly AbstractPackElement PackElement;
 
     public Vector3 Offset;
+    public Vector2 Scale = Vector2.one;
     private float _zPosition;
     private readonly int _weight;
 
@@ -154,7 +159,6 @@ public class PlaceableObject : SelectableObject
 
         var prefab = element.GetPrefab(false, 0);
         PreparePlacementData(prefab);
-        Offset = prefab.transform.rotation * Offset + PackElement.ExtraOffset();
     }
 
     public static SelectableObject Create(AbstractPackElement element)

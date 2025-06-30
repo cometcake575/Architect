@@ -559,6 +559,8 @@ public static class EditorUIManager
                 }
                 else ConfigValues.Remove(type.Name);
 
+                CursorItem.NeedsRefreshing = true;
+
                 button.Enabled = false;
             };
 

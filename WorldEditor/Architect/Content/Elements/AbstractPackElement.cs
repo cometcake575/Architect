@@ -123,10 +123,5 @@ public abstract class AbstractPackElement
         return false;
     }
 
-    public virtual Vector3 ExtraOffset()
-    {
-        return Vector3.zero;
-    }
-
     public virtual void PostSpawn(GameObject gameObject, bool flipped, int rotation, float scale) { }
 }

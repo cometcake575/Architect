@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Architect.Attributes.Config;
-using Architect.Content.Elements.Custom;
 using Architect.Content.Elements.Custom.Behaviour;
 using Architect.Content.Elements.Internal.Fixers;
-using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using JetBrains.Annotations;
 using Modding;
@@ -39,7 +37,9 @@ public class ConfigGroup
     
     internal static ConfigGroup Levers;
     
-    internal static ConfigGroup Tolls;
+    internal static ConfigGroup TollBench;
+    
+    internal static ConfigGroup Toll;
     
     internal static ConfigGroup MovingObjects;
     
@@ -66,6 +66,12 @@ public class ConfigGroup
     internal static ConfigGroup Godseeker;
     
     internal static ConfigGroup Midwife;
+    
+    internal static ConfigGroup Timers;
+    
+    internal static ConfigGroup Decorations;
+    
+    internal static ConfigGroup Colours;
     
     internal static void Initialize()
     {
@@ -193,7 +199,7 @@ public class ConfigGroup
             Attributes.ConfigManager.RegisterConfigType(MakePersistenceConfigType("Stay Activated"))
         );
 
-        Tolls = new ConfigGroup(Levers,
+        TollBench = new ConfigGroup(Levers,
             Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Cost", (o, value) =>
             {
                 foreach (var fsm in o.GetComponents<PlayMakerFSM>())
@@ -205,6 +211,23 @@ public class ConfigGroup
                         intValue = value.GetValue()
                     }, 2);
                 }
+            }))
+        );
+
+        Toll = new ConfigGroup(TollBench,
+            
+            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Text", (o, value) =>
+            {
+                var fsm = o.LocateMyFSM("Toll Machine");
+                
+                var id = "Custom Toll Text " + o.name;
+                CustomTexts[id] = value.GetValue();
+                
+                fsm.InsertAction("Send Text", new SetStringValue
+                {
+                    stringVariable = fsm.FsmVariables.GetFsmString("Prompt Convo"),
+                    stringValue = id
+                }, 2);
             }))
         );
 
@@ -279,7 +302,8 @@ public class ConfigGroup
                 {
                     if (!value.GetValue()) return;
                     var fsm = o.LocateMyFSM("BG Control");
-                    fsm.SetState("Open");
+                    if (fsm) fsm.SetState("Open");
+                    else o.LocateMyFSM("FSM").SendEvent("DOWN");
                 })
             )
         );
@@ -450,6 +474,72 @@ public class ConfigGroup
                 {
                     fsm.SetState("Talk Finish");
                 });
+            }))
+        );
+
+        Timers = new ConfigGroup(
+            Invisible,
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Start Delay", (o, value) =>
+            {
+                o.GetComponent<Timer>().startDelay = value.GetValue();
+            })),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Repeat Delay", (o, value) =>
+            {
+                o.GetComponent<Timer>().repeatDelay = value.GetValue();
+            })),
+            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Max Calls", (o, value) =>
+            {
+                o.GetComponent<Timer>().maxCalls = value.GetValue();
+            }))
+        );
+
+        Decorations = new ConfigGroup(Generic,
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Z Offset", (o, value) =>
+            {
+                o.transform.SetPositionZ(o.transform.GetPositionZ() + value.GetValue());
+            }))
+        );
+
+        Colours = new ConfigGroup(Generic,
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("width", (o, value) =>
+            {
+                o.transform.SetScaleX(o.transform.GetScaleX() * value.GetValue());
+            })),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("height", (o, value) =>
+            {
+                o.transform.SetScaleY(o.transform.GetScaleY() * value.GetValue());
+            })),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("r", (o, value) =>
+            {
+                var sr = o.GetComponent<SpriteRenderer>();
+                var color = sr.color;
+                color.r = value.GetValue();
+                sr.color = color;
+            })),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("g", (o, value) =>
+            {
+                var sr = o.GetComponent<SpriteRenderer>();
+                var color = sr.color;
+                color.g = value.GetValue();
+                sr.color = color;
+            })),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("b", (o, value) =>
+            {
+                var sr = o.GetComponent<SpriteRenderer>();
+                var color = sr.color;
+                color.b = value.GetValue();
+                sr.color = color;
+            })),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("a", (o, value) =>
+            {
+                var sr = o.GetComponent<SpriteRenderer>();
+                var color = sr.color;
+                color.a = value.GetValue();
+                sr.color = color;
+            })),
+            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("layer", (o, value) =>
+            {
+                o.GetComponent<SpriteRenderer>().sortingOrder = value.GetValue();
             }))
         );
     }

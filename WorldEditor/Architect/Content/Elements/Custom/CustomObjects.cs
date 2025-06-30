@@ -31,6 +31,12 @@ public static class CustomObjects
                     ResourceUtils.Load("trigger_zone", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.TriggerZones)
                 .WithConfigGroup(ConfigGroup.Invisible),
+            new SimplePackElement(CreateTimer(), "Timer", "Custom",
+                    ResourceUtils.Load("timer", FilterMode.Point))
+                .WithBroadcasterGroup(BroadcasterGroup.Timers)
+                .WithConfigGroup(ConfigGroup.Timers),
+            new SimplePackElement(CreateSquare(), "Coloured Square", "Custom")
+                .WithConfigGroup(ConfigGroup.Colours),
             new SimplePackElement(CreateZoteTrophy(), "Winner's Trophy", "Custom"),
             CreateTemporaryAbilityGranter("dash_crystal", "Dash", false, "Dash Crystal"),
             CreateTemporaryAbilityGranter("single_dash_crystal", "Dash", true, "Single Use Dash Crystal"),
@@ -92,6 +98,34 @@ public static class CustomObjects
         collider.size = new Vector2(0.32f, 0.32f);
 
         point.AddComponent<TriggerZone>();
+
+        point.SetActive(false);
+        Object.DontDestroyOnLoad(point);
+
+        return point;
+    }
+
+    private static GameObject CreateTimer()
+    {
+        var point = new GameObject("Timer");
+        point.transform.localScale *= 10;
+
+        point.AddComponent<Timer>();
+
+        point.SetActive(false);
+        Object.DontDestroyOnLoad(point);
+
+        return point;
+    }
+
+    private static GameObject CreateSquare()
+    {
+        var sprite = ResourceUtils.Load("square", FilterMode.Point);
+        
+        var point = new GameObject("Square");
+        point.transform.localScale *= 10;
+
+        point.AddComponent<SpriteRenderer>().sprite = sprite;
 
         point.SetActive(false);
         Object.DontDestroyOnLoad(point);

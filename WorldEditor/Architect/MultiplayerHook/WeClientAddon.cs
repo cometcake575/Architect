@@ -92,6 +92,7 @@ public class WeClientAddon : ClientAddon
 
     public void Place(ObjectPlacement placement, string scene)
     {
+        if (!_api.NetClient.IsConnected) return;
         _api.NetClient.GetNetworkSender<PacketId>(this)
             .SendSingleData(PacketId.Edit, new EditPacketData
             {
@@ -102,6 +103,7 @@ public class WeClientAddon : ClientAddon
 
     public void Erase(string guid, string scene)
     {
+        if (!_api.NetClient.IsConnected) return;
         _api.NetClient.GetNetworkSender<PacketId>(this)
             .SendSingleData(PacketId.Erase, new ErasePacketData
             {
@@ -172,6 +174,6 @@ public class WeClientAddon : ClientAddon
     }
 
     protected override string Name => "Architect";
-    protected override string Version => "1.4.0.1";
+    protected override string Version => "1.5.0.0";
     public override bool NeedsNetwork => true;
 }

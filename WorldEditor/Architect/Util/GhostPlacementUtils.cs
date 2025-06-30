@@ -5,12 +5,11 @@ namespace Architect.Util;
 
 public static class GhostPlacementUtils
 {
-    public static void SetupForPlacement(GameObject obj, SpriteRenderer renderer, PlaceableObject selected, bool flipped, int rotation, float scale)
+    public static void SetupForPlacement(GameObject obj, SpriteRenderer renderer, PlaceableObject selected, bool flipped, int rotation, float scaleX, float scaleY)
     {
         renderer.sprite = selected.GetSprite();
 
-        var prefab = selected.PackElement.GetPrefab(flipped, rotation);
-        obj.transform.localScale = prefab.transform.localScale * scale;
+        obj.transform.localScale = new Vector2(scaleX, scaleY) * selected.Scale;
         
         var visualRotation = selected.GetSpriteRotation();
         

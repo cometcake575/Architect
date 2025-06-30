@@ -11,7 +11,7 @@ internal sealed class LeverPackElement : GInternalPackElement
 {
     public LeverPackElement(string scene, string path, string name, int weight = 0) : base(scene, path, name, "Interactable", weight)
     {
-        WithBroadcasterGroup(BroadcasterGroup.Levers);
+        WithBroadcasterGroup(BroadcasterGroup.PersistentLevers);
         WithConfigGroup(ConfigGroup.Levers);
     }
 

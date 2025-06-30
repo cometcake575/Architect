@@ -1,8 +1,9 @@
 using System.Linq;
 using Architect.Attributes;
-using Architect.Attributes.Receivers;
 using JetBrains.Annotations;
+using Modding;
 using Satchel;
+using UnityEngine;
 
 namespace Architect.Content.Groups;
 
@@ -22,6 +23,8 @@ public class ReceiverGroup
     
     internal static ReceiverGroup HazardRespawnPoint;
     
+    internal static ReceiverGroup Stompers;
+    
     //internal static ReceiverGroup WatcherKnights;
     
     internal static void Initialize()
@@ -38,6 +41,9 @@ public class ReceiverGroup
         {
             foreach (var fsm in o.GetComponents<PlayMakerFSM>())
             {
+                fsm.SendEvent("DOWN");
+                fsm.SendEvent("OPEN");
+                fsm.SendEvent("DEACTIVATE");
                 if (!fsm.TryGetState("Open", out var state)) continue;
                 fsm.SetState(state.Name);
             }
@@ -45,7 +51,9 @@ public class ReceiverGroup
         
         BattleGate = new ReceiverGroup(Gates, EventManager.RegisterEventReceiverType("close", o =>
         {
-            o.LocateMyFSM("BG Control").SetState("Close 1");
+            var bgControl = o.LocateMyFSM("BG Control");
+            if (bgControl) bgControl.SetState("Close 1");
+            else o.LocateMyFSM("FSM").SendEvent("UP"); 
         }));
 
         Enemies = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("die", o =>
@@ -62,6 +70,21 @@ public class ReceiverGroup
         {
             PlayerData.instance.SetHazardRespawn(o.GetComponent<HazardRespawnMarker>());
         }));
+
+        Stompers = new ReceiverGroup(All,
+            EventManager.RegisterEventReceiverType("start", o =>
+            {
+                ReflectionHelper.SetFieldSafe(o.GetComponentInChildren<StopAnimatorsAtPoint>(), "shouldStop", false);
+                o.GetComponentInChildren<Animator>().enabled = true;
+            }),
+            EventManager.RegisterEventReceiverType("stopinstant", o =>
+            {
+                o.GetComponentInChildren<StopAnimatorsAtPoint>().stopInstantEvent.ReceiveEvent();
+            }),
+            EventManager.RegisterEventReceiverType("stop", o =>
+            {
+                o.GetComponentInChildren<StopAnimatorsAtPoint>().stopEvent.ReceiveEvent();
+            }));
     }
 
     public readonly string[] Types;

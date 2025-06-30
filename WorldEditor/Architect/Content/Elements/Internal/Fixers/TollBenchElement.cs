@@ -10,7 +10,7 @@ internal class TollBenchElement : InternalPackElement
 
     public TollBenchElement(int weight) : base("Toll Bench", "Interactable", weight)
     {
-        WithConfigGroup(ConfigGroup.Tolls);
+        WithConfigGroup(ConfigGroup.TollBench);
     }
 
     public override GameObject GetPrefab(bool flipped, int rotation)

@@ -16,6 +16,11 @@ public class BroadcasterGroup
         EventBroadcasterType.LoadedPulled
     );
     
+    public static readonly BroadcasterGroup PersistentLevers = new(
+        EventBroadcasterType.OnPull,
+        EventBroadcasterType.LoadedPulled
+    );
+    
     public static readonly BroadcasterGroup TriggerZones = new(
         EventBroadcasterType.ZoneEnter,
         EventBroadcasterType.ZoneExit
@@ -24,6 +29,15 @@ public class BroadcasterGroup
     public static readonly BroadcasterGroup Bindings = new(
         EventBroadcasterType.OnBind,
         EventBroadcasterType.OnUnbind
+    );
+    
+    public static readonly BroadcasterGroup Timers = new(
+        EventBroadcasterType.OnCall
+    );
+    
+    public static readonly BroadcasterGroup Tolls = new(
+        EventBroadcasterType.OnPay,
+        EventBroadcasterType.LoadedPaid
     );
 
     public readonly EventBroadcasterType[] Types;

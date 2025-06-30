@@ -48,14 +48,13 @@ internal sealed class HatcherPackElement : GInternalPackElement
         cage.name = gameObject.name + " Cage";
 
         var fsm = gameObject.LocateMyFSM(_fsmName);
-        var index = 1;
         if (!fsm.TryGetState("Init", out var state))
         {
             state = fsm.GetValidState("Initiate");
-            index = 2;
         }
 
-        state.GetAction<FindGameObject>(index).objectName = cage.name;
+        var fgo = state.GetAction<FindGameObject>(1) ?? state.GetAction<FindGameObject>(2);
+        fgo.objectName = cage.name;
         
         gameObject.AddComponent<PlacedHatcher>().cage = cage;
     }
@@ -79,16 +78,26 @@ internal sealed class HatcherPackElement : GInternalPackElement
         
         On.CorpseHatcher.Smash += (orig, self) =>
         {
-            var toEnable = DisableOthers(self.GetComponent<PlacedHatcher>());
-            orig(self);
-            EnableOthers(toEnable);
+            var hatcher = self.GetComponent<PlacedHatcher>();
+            if (hatcher)
+            {
+                var toEnable = DisableOthers(hatcher);
+                orig(self);
+                EnableOthers(toEnable);
+            }
+            else orig(self);
         };
         
         On.CorpseZomHive.LandEffects += (orig, self) =>
         {
-            var toEnable = DisableOthers(self.GetComponent<PlacedHatcher>());
-            orig(self);
-            EnableOthers(toEnable);
+            var hatcher = self.GetComponent<PlacedHatcher>();
+            if (hatcher)
+            {
+                var toEnable = DisableOthers(hatcher);
+                orig(self);
+                EnableOthers(toEnable);
+            }
+            else orig(self);
         };
     }
 

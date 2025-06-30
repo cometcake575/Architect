@@ -9,5 +9,8 @@ public enum EventBroadcasterType
     ZoneEnter,
     ZoneExit,
     OnBind,
-    OnUnbind
+    OnUnbind,
+    OnCall,
+    OnPay,
+    LoadedPaid
 }
