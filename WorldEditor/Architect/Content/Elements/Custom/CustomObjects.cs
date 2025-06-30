@@ -21,6 +21,8 @@ public static class CustomObjects
     internal static readonly HashSet<string> TemporaryAbilities = new();
     internal static readonly Dictionary<string, List<CustomBinder>> Bindings = new();
 
+    private const int ShapeWeight = 1;
+
     public static void Initialize()
     {
         var clip = ResourceUtils.LoadClip("Bindings.chain_cut");
@@ -35,7 +37,11 @@ public static class CustomObjects
                     ResourceUtils.Load("timer", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.Timers)
                 .WithConfigGroup(ConfigGroup.Timers),
-            new SimplePackElement(CreateSquare(), "Coloured Square", "Custom")
+            new SimplePackElement(CreateShape("square"), "Coloured Square", "Decorations", weight:ShapeWeight)
+                .WithConfigGroup(ConfigGroup.Colours),
+            new SimplePackElement(CreateShape("circle"), "Coloured Circle", "Decorations", weight:ShapeWeight)
+                .WithConfigGroup(ConfigGroup.Colours),
+            new SimplePackElement(CreateShape("triangle"), "Coloured Triangle", "Decorations", weight:ShapeWeight)
                 .WithConfigGroup(ConfigGroup.Colours),
             new SimplePackElement(CreateZoteTrophy(), "Winner's Trophy", "Custom"),
             CreateTemporaryAbilityGranter("dash_crystal", "Dash", false, "Dash Crystal"),
@@ -118,12 +124,11 @@ public static class CustomObjects
         return point;
     }
 
-    private static GameObject CreateSquare()
+    private static GameObject CreateShape(string name)
     {
-        var sprite = ResourceUtils.Load("square", FilterMode.Point);
+        var sprite = ResourceUtils.Load(name);
         
-        var point = new GameObject("Square");
-        point.transform.localScale *= 10;
+        var point = new GameObject("Shape (" + name + ")");
 
         point.AddComponent<SpriteRenderer>().sprite = sprite;
 
