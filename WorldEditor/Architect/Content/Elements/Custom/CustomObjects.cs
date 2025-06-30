@@ -129,6 +129,7 @@ public static class CustomObjects
         var sprite = ResourceUtils.Load(name);
         
         var point = new GameObject("Shape (" + name + ")");
+        point.transform.localScale /= 3;
 
         point.AddComponent<SpriteRenderer>().sprite = sprite;
 
