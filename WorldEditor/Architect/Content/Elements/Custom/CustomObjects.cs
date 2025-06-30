@@ -41,8 +41,7 @@ public static class CustomObjects
                 .WithConfigGroup(ConfigGroup.Colours)
                 .WithRotationGroup(RotationGroup.All),
             new SimplePackElement(CreateShape("circle"), "Coloured Circle", "Decorations", weight:ShapeWeight)
-                .WithConfigGroup(ConfigGroup.Colours)
-                .WithRotationGroup(RotationGroup.All),
+                .WithConfigGroup(ConfigGroup.Colours),
             new SimplePackElement(CreateShape("triangle"), "Coloured Triangle", "Decorations", weight:ShapeWeight)
                 .WithConfigGroup(ConfigGroup.Colours)
                 .WithRotationGroup(RotationGroup.All),
