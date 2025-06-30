@@ -38,11 +38,14 @@ public static class CustomObjects
                 .WithBroadcasterGroup(BroadcasterGroup.Timers)
                 .WithConfigGroup(ConfigGroup.Timers),
             new SimplePackElement(CreateShape("square"), "Coloured Square", "Decorations", weight:ShapeWeight)
-                .WithConfigGroup(ConfigGroup.Colours),
+                .WithConfigGroup(ConfigGroup.Colours)
+                .WithRotationGroup(RotationGroup.All),
             new SimplePackElement(CreateShape("circle"), "Coloured Circle", "Decorations", weight:ShapeWeight)
-                .WithConfigGroup(ConfigGroup.Colours),
+                .WithConfigGroup(ConfigGroup.Colours)
+                .WithRotationGroup(RotationGroup.All),
             new SimplePackElement(CreateShape("triangle"), "Coloured Triangle", "Decorations", weight:ShapeWeight)
-                .WithConfigGroup(ConfigGroup.Colours),
+                .WithConfigGroup(ConfigGroup.Colours)
+                .WithRotationGroup(RotationGroup.All),
             new SimplePackElement(CreateZoteTrophy(), "Winner's Trophy", "Custom"),
             CreateTemporaryAbilityGranter("dash_crystal", "Dash", false, "Dash Crystal"),
             CreateTemporaryAbilityGranter("single_dash_crystal", "Dash", true, "Single Use Dash Crystal"),

@@ -46,6 +46,7 @@ public static class CursorItem
         if (EditorUIManager.ConfigValues.TryGetValue("height", out var heightVal) && heightVal is FloatConfigValue height) scaleY *= height.GetValue();
         if (EditorUIManager.ConfigValues.TryGetValue("layer", out var layerVal) && layerVal is IntConfigValue layer)
             renderer.sortingOrder = layer.GetValue();
+        else renderer.sortingOrder = 0;
         
         _offset = ResourceUtils.FixOffset(selected.Offset, EditorManager.IsFlipped, EditorManager.Rotation, EditorManager.Scale);
         GhostPlacementUtils.SetupForPlacement(_obj, renderer, selected, EditorManager.IsFlipped, EditorManager.Rotation, scaleX, scaleY);
