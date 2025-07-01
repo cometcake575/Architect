@@ -3,7 +3,6 @@ using System.Linq;
 using Architect.Configuration;
 using Architect.Content;
 using Satchel.BetterMenus;
-using Satchel.BetterMenus.Config;
 using UnityEngine;
 
 namespace Architect.UI;
@@ -45,6 +44,10 @@ public static class ConfigurationScreen
                 playerAction: globalSettings.Keybinds.RotateItem
             ),
             new KeyBind(
+                name: "Use Unsafe Rotations",
+                playerAction: globalSettings.Keybinds.UnsafeRotation
+            ),
+            new KeyBind(
                 name: "Decrease Scale",
                 playerAction: globalSettings.Keybinds.DecreaseScale
             ),
@@ -73,7 +76,7 @@ public static class ConfigurationScreen
             },
             loadSetting: () => globalSettings.CollaborationMode ? 0 : 1
         ));
-        elements.AddRange(ContentPacks.Packs.Select(pack => new HorizontalOption(name: pack.GetName(), description: pack.GetDescription(), values: values, applySetting: i => { globalSettings.ContentPackSettings[pack.GetName()] = i == 0; }, loadSetting: () => globalSettings.ContentPackSettings[pack.GetName()] ? 0 : 1)).Cast<Element>());
+        elements.AddRange(ContentPacks.Packs.Select(pack => new HorizontalOption(name: pack.GetName(), description: pack.GetDescription(), values: values, applySetting: i => { globalSettings.ContentPackSettings[pack.GetName()] = i == 0; }, loadSetting: () => globalSettings.ContentPackSettings[pack.GetName()] ? 0 : 1)));
         _menuRef ??= new Menu(
             name: Architect.Instance.Name,
             elements: elements.ToArray()

@@ -24,7 +24,7 @@ internal sealed class LeverPackElement : GInternalPackElement
         GameObject.transform.localScale = scale;
     }
 
-    public override void PostSpawn(GameObject gameObject, bool flipped, int rotation, float scale)
+    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         var fsm = gameObject.LocateMyFSM("Switch Control");
         fsm.AddCustomAction("Activated", makerFsm =>

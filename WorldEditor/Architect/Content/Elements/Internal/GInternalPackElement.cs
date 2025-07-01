@@ -36,7 +36,7 @@ internal class GInternalPackElement : InternalPackElement
         GameObject.transform.SetPositionZ(z);
     }
 
-    public override GameObject GetPrefab(bool flipped, int rotation)
+    public override GameObject GetPrefab(bool flipped, float rotation)
     {
         return GameObject;
     }

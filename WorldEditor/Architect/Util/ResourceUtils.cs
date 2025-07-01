@@ -32,7 +32,7 @@ public static class ResourceUtils
         return WavUtils.ToAudioClip(buffer);
     }
 
-    public static Vector3 FixOffset(Vector3 offset, bool flipped, int rotation, float scale)
+    public static Vector3 FixOffset(Vector3 offset, bool flipped, float rotation, float scale)
     {
         if (flipped) offset.x = -offset.x;
         return Quaternion.Euler(0, 0, rotation) * (offset * scale);

@@ -209,7 +209,7 @@ public static class EditorUIManager
             }
         };
 
-        var categoriesGrid = SetupCategories(layout).WithProp(GridLayout.Row, 0);
+        var categoriesGrid = SetupCategories(layout);
         _leftSideGrid.Children.Add(categoriesGrid);
 
         SetupConfigGrid(layout);

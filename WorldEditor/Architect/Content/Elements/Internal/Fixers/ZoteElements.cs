@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Architect.Content.Groups;
-using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using Satchel;
 using UnityEngine;
@@ -22,7 +21,7 @@ internal class ZotelingElement : InternalPackElement
         _path = path;
     }
 
-    public override GameObject GetPrefab(bool flipped, int rotation)
+    public override GameObject GetPrefab(bool flipped, float rotation)
     {
         return GameObject;
     }
@@ -37,7 +36,7 @@ internal class ZotelingElement : InternalPackElement
         GameObject = preloads["GG_Mighty_Zote"]["Battle Control/" + _path];
     }
 
-    public override void PostSpawn(GameObject gameObject, bool flipped, int rotation, float scale)
+    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         var control = gameObject.LocateMyFSM("Control");
         for (var i = 1; i <= 5; i++) control.DisableAction("Spawn Antic", i);
@@ -60,7 +59,7 @@ internal class BallZotelingElement : InternalPackElement
         _type = type;
     }
 
-    public override GameObject GetPrefab(bool flipped, int rotation)
+    public override GameObject GetPrefab(bool flipped, float rotation)
     {
         return _gameObject;
     }
@@ -75,7 +74,7 @@ internal class BallZotelingElement : InternalPackElement
         _gameObject = preloads["GG_Mighty_Zote"]["Battle Control/Zotelings/Ordeal Zoteling"];
     }
 
-    public override void PostSpawn(GameObject gameObject, bool flipped, int rotation, float scale)
+    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         var control = gameObject.LocateMyFSM("Control");
         control.DisableAction("Ball", 2);
@@ -103,7 +102,7 @@ internal sealed class TallZotelingElement : ZotelingElement
         if (constrain) constrain.enabled = false;
     }
 
-    public override void PostSpawn(GameObject gameObject, bool flipped, int rotation, float scale)
+    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         base.PostSpawn(gameObject, flipped, rotation, scale);
         
@@ -117,7 +116,7 @@ internal sealed class FatZotelingElement : ZotelingElement
 {
     public FatZotelingElement() : base("Fat Zotes/Zote Crew Fat (1)", "Heavy Zoteling") { }
 
-    public override void PostSpawn(GameObject gameObject, bool flipped, int rotation, float scale)
+    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         base.PostSpawn(gameObject, flipped, rotation, scale);
         

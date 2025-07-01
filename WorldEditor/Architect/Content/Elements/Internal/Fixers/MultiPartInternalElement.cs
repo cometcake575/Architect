@@ -17,7 +17,7 @@ internal class MultiPartInternalElement : InternalPackElement
         _extra = extra;
     }
 
-    public override GameObject GetPrefab(bool flipped, int rotation)
+    public override GameObject GetPrefab(bool flipped, float rotation)
     {
         return _gameObject;
     }

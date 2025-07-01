@@ -230,7 +230,8 @@ public static class ContentPacks
             CreateEnemy("Fungus2_12", "Mantis", "Mantis Warrior")
                 .WithConfigGroup(ConfigGroup.Mantis),
             CreateEnemy("Fungus2_12", "Mantis Flyer Child", "Mantis Youth").FlipHorizontal()
-                .WithConfigGroup(ConfigGroup.Mantis),
+                .WithConfigGroup(ConfigGroup.Mantis)
+                .WithRotationGroup(RotationGroup.Four),
             Create("Fungus2_18", "_Props/Bounce Shrooms 1/Bounce Shroom B (1)", "Bouncy Mushroom", "Interactable", weight:MiscInteractableWeight, offset:15.5f)
                 .FlipVertical()
                 .WithRotationGroup(RotationGroup.All),
@@ -272,7 +273,8 @@ public static class ContentPacks
                 .WithRotationGroup(RotationGroup.Four),
             CreateSolid("Mines_20", "mines_metal_grate_06", "Metal Grate"),
             CreateSolid("Mines_20", "plat_float_06", "Crystal Peak Platform"),
-            CreateSolid("Mines_31", "Mines Platform", "Crystal Peak Rotating Platform"),
+            Create("Mines_31", "Mines Platform", "Crystal Peak Rotating Platform", "Interactable")
+                .WithRotationGroup(RotationGroup.Four),
             new ConveyorBeltElement(),
             Create("Mines_37", "stomper_offset", "Crystal Peak Stomper (Slow)", "Hazards")
                 .WithRotationGroup(RotationGroup.Four)
@@ -295,8 +297,8 @@ public static class ContentPacks
             CreateEnemy("Fungus3_48", "Grass Hopper", "Loodle"),
             CreateEnemy("Fungus3_10", "Battle Scene/Completed/Mantis Heavy", "Mantis Traitor"),
             CreateEnemy("Fungus3_48", "Mantis Heavy Flyer", "Mantis Petra"),
-            CreateSolid("Fungus3_34", "Royal Gardens Plat S", "Queen's Gardens Collapsing Platform S"),
-            CreateSolid("Fungus3_34", "Royal Gardens Plat L", "Queen's Gardens Collapsing Platform L"),
+            Create("Fungus3_34", "Royal Gardens Plat S", "Queen's Gardens Collapsing Platform S", "Interactable"),
+            Create("Fungus3_34", "Royal Gardens Plat L", "Queen's Gardens Collapsing Platform L", "Interactable"),
             new TollBenchElement(weight:BenchWeight)
         });
         RegisterInternalPack(new ContentPack("City of Tears", "Assets from the City of Tears")
@@ -341,7 +343,8 @@ public static class ContentPacks
             CreateSolid("Ruins2_01", "ruins_plat_royal_02", "Royal Platform"),
             Create("Ruins_Bathhouse", "RestBench", "Pleasure House Bench", "Interactable", weight:BenchWeight),
             new MillibellePackElement(weight:NpcWeight),
-            new ReusableLeverElement(weight:LeverWeight)
+            new ReusableLeverElement(weight:LeverWeight),
+            new WatcherKnightElement()
         });
         RegisterInternalPack(new ContentPack("Royal Waterways", "Assets from the Royal Waterways")
         {
@@ -373,7 +376,6 @@ public static class ContentPacks
             new ColosseumPackElement("Room_Colosseum_Gold", "Colosseum Manager/Waves/Wave 9/Colosseum Cage Small (1)", "Death Loodle", "Enemies"),
             new TwisterPackElement("Room_Colosseum_Gold", "Colosseum Manager/Waves/Wave 25/Electric Mage New", "Volt Twister", "Electric Mage"),
             new TamerBeastElement(),
-            
             Create("Room_Colosseum_02", "RestBench", "Colosseum Bench", "Interactable", weight:BenchWeight)
         });
         RegisterInternalPack(new ContentPack("The Hive", "Assets from the Hive")
@@ -486,15 +488,10 @@ public static class ContentPacks
            CreateEnemy("GG_God_Tamer", "Entry Object/Lancer", "God Tamer"),
            CreateEnemy("GG_God_Tamer", "Entry Object", "God Tamer Full"),
             new OblobbleElement(),
-            new VengeflyKingElement(),
-            CreateEnemy("Crossroads_04", "_Enemies/Giant Fly", "Gruz Mother", category:"Bosses"),
             CreateEnemy("GG_Mega_Moss_Charger", "Mega Moss Charger", "Massive Moss Charger", category:"Bosses").FlipVertical(),
             CreateEnemy("GG_Hornet_1", "Boss Holder/Hornet Boss 1", "Hornet Protector", category:"Bosses"),
            CreateEnemy("GG_Crystal_Guardian", "Mega Zombie Beam Miner (1)", "Crystal Guardian"),
            CreateEnemy("GG_Crystal_Guardian_2", "Battle Scene/Zombie Beam Miner Rematch", "Enraged Guardian"),
-           CreateEnemy("GG_Watcher_Knights", "Battle Control/Black Knight 1", "Watcher Knight")
-               .WithConfigGroup(ConfigGroup.WatcherKnights)
-               .WithReceiverGroup(ReceiverGroup.WatcherKnights)
         });*/
     }
 }

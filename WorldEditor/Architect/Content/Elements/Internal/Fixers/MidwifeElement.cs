@@ -14,7 +14,7 @@ internal class MidwifeElement : InternalPackElement
         WithConfigGroup(ConfigGroup.Midwife);
     }
 
-    public override GameObject GetPrefab(bool flipped, int rotation)
+    public override GameObject GetPrefab(bool flipped, float rotation)
     {
         return _gameObject;
     }
@@ -29,7 +29,7 @@ internal class MidwifeElement : InternalPackElement
         _gameObject = preloads["Deepnest_41"]["Happy Spider NPC"];
     }
 
-    public override void PostSpawn(GameObject gameObject, bool flipped, int rotation, float scale)
+    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         if (flipped == (rotation == 180)) return;
         gameObject.transform.GetChild(1).gameObject.LocateMyFSM("npc_control").FsmVariables

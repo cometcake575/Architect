@@ -6,7 +6,7 @@ namespace Architect.Content.Elements;
 
 public abstract class AbstractPackElement
 {
-    public abstract GameObject GetPrefab(bool flipped, int rotation);
+    public abstract GameObject GetPrefab(bool flipped, float rotation);
 
     private readonly string _name;
     private readonly string _category;
@@ -123,5 +123,5 @@ public abstract class AbstractPackElement
         return false;
     }
 
-    public virtual void PostSpawn(GameObject gameObject, bool flipped, int rotation, float scale) { }
+    public virtual void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale) { }
 }

@@ -14,7 +14,7 @@ internal class ShadeSiblingElement : InternalPackElement
         WithConfigGroup(ConfigGroup.VisibleAbyss);
     }
 
-    public override GameObject GetPrefab(bool flipped, int rotation)
+    public override GameObject GetPrefab(bool flipped, float rotation)
     {
         return _gameObject;
     }
@@ -31,7 +31,7 @@ internal class ShadeSiblingElement : InternalPackElement
         _gameObject.AddComponent<ShadeSiblingVhEffects>();
     }
 
-    public override void PostSpawn(GameObject gameObject, bool flipped, int rotation, float scale)
+    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         var pos = gameObject.transform.position;
         pos.y -= 6.5f;
@@ -63,7 +63,7 @@ internal class VoidTendrilsElement : InternalPackElement
         WithConfigGroup(ConfigGroup.Abyss);
     }
 
-    public override GameObject GetPrefab(bool flipped, int rotation)
+    public override GameObject GetPrefab(bool flipped, float rotation)
     {
         return _gameObject;
     }

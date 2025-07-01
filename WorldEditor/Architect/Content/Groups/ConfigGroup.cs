@@ -23,6 +23,8 @@ public class ConfigGroup
 
     internal static ConfigGroup GeoChest;
     
+    internal static ConfigGroup KeyListeners;
+    
     internal static ConfigGroup Enemies;
     
     internal static ConfigGroup Mantis;
@@ -70,6 +72,8 @@ public class ConfigGroup
     internal static ConfigGroup Timers;
     
     internal static ConfigGroup Decorations;
+    
+    internal static ConfigGroup Stretchable;
     
     internal static ConfigGroup Colours;
     
@@ -493,6 +497,19 @@ public class ConfigGroup
             }))
         );
 
+        KeyListeners = new ConfigGroup(
+            Invisible,
+            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Key", (o, value) =>
+            {
+                if (!Enum.TryParse<KeyCode>(value.GetValue(), true, out var key)) return;
+                o.GetComponent<KeyListener>().key = key;
+            })),
+            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Type", (o, value) =>
+            {
+                o.GetComponent<KeyListener>().listenMode = value.GetValue();
+            }, false, "Press", "Release", "Hold"))
+        );
+
         Decorations = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Z Offset", (o, value) =>
             {
@@ -500,7 +517,7 @@ public class ConfigGroup
             }))
         );
 
-        Colours = new ConfigGroup(Generic,
+        Stretchable = new ConfigGroup(Invisible,
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("width", (o, value) =>
             {
                 o.transform.SetScaleX(o.transform.GetScaleX() * value.GetValue());
@@ -508,7 +525,10 @@ public class ConfigGroup
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("height", (o, value) =>
             {
                 o.transform.SetScaleY(o.transform.GetScaleY() * value.GetValue());
-            })),
+            }))
+        );
+
+        Colours = new ConfigGroup(Stretchable,
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("r", (o, value) =>
             {
                 var sr = o.GetComponent<SpriteRenderer>();
@@ -540,7 +560,23 @@ public class ConfigGroup
             Attributes.ConfigManager.RegisterConfigType(new IntConfigType("layer", (o, value) =>
             {
                 o.GetComponent<SpriteRenderer>().sortingOrder = value.GetValue();
-            }))
+            })),
+            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("collision", (o, value) =>
+            {
+                switch (value.GetValue())
+                {
+                    case 0:
+                        o.RemoveComponent<Collider2D>();
+                        break;
+                    case 1:
+                        o.AddComponent<CustomDamager>().damageAmount = 1;
+                        break;
+                    case 2:
+                        o.GetComponent<Collider2D>().isTrigger = false;
+                        o.layer = 8;
+                        break;
+                }
+            }, false, "None", "Hazard", "Solid"))
         );
     }
 

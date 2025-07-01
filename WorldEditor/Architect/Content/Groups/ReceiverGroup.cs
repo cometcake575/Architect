@@ -25,7 +25,7 @@ public class ReceiverGroup
     
     internal static ReceiverGroup Stompers;
     
-    //internal static ReceiverGroup WatcherKnights;
+    internal static ReceiverGroup WatcherKnights;
     
     internal static void Initialize()
     {
@@ -85,6 +85,10 @@ public class ReceiverGroup
             {
                 o.GetComponentInChildren<StopAnimatorsAtPoint>().stopEvent.ReceiveEvent();
             }));
+
+        WatcherKnights = new ReceiverGroup(Enemies,
+            EventManager.RegisterEventReceiverType("wake", o => o.LocateMyFSM("Black Knight").SendEvent("WAKE"))
+        );
     }
 
     public readonly string[] Types;

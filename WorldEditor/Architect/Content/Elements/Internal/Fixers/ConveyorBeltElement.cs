@@ -8,13 +8,13 @@ internal class ConveyorBeltElement : InternalPackElement
 {
     private GameObject _gameObject;
 
-    public ConveyorBeltElement() : base("Crystal Peak Conveyor Belt", "Solids")
+    public ConveyorBeltElement() : base("Crystal Peak Conveyor Belt", "Interactable")
     {
         WithRotationGroup(RotationGroup.Three);
         WithConfigGroup(ConfigGroup.Conveyors);
     }
 
-    public override GameObject GetPrefab(bool flipped, int rotation)
+    public override GameObject GetPrefab(bool flipped, float rotation)
     {
         return _gameObject;
     }
@@ -53,7 +53,7 @@ internal class ConveyorBeltElement : InternalPackElement
         col.SetActive(true);
     }
 
-    public override void PostSpawn(GameObject gameObject, bool flipped, int rotation, float scale)
+    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         var belt = gameObject.transform.GetChild(0).gameObject.GetComponent<ConveyorBelt>();
         if (flipped == (rotation == 270)) belt.speed = -belt.speed;

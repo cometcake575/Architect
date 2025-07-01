@@ -15,7 +15,7 @@ internal sealed class MossyVagabondElement : InternalPackElement
         WithReceiverGroup(ReceiverGroup.Enemies);
     }
 
-    public override GameObject GetPrefab(bool flipped, int rotation)
+    public override GameObject GetPrefab(bool flipped, float rotation)
     {
         return _gameObject;
     }

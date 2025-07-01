@@ -11,7 +11,7 @@ internal class GrubfatherElement : InternalPackElement
     {
     }
 
-    public override GameObject GetPrefab(bool flipped, int rotation)
+    public override GameObject GetPrefab(bool flipped, float rotation)
     {
         return _gameObject;
     }
@@ -26,7 +26,7 @@ internal class GrubfatherElement : InternalPackElement
         _gameObject = preloads["Crossroads_38"]["Fat Grub King"];
     }
 
-    public override void PostSpawn(GameObject gameObject, bool flipped, int rotation, float scale)
+    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         gameObject.LocateMyFSM("FSM").enabled = false;
     }

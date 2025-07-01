@@ -39,6 +39,10 @@ public class BroadcasterGroup
         EventBroadcasterType.OnPay,
         EventBroadcasterType.LoadedPaid
     );
+    
+    public static readonly BroadcasterGroup KeyListeners = new(
+        EventBroadcasterType.KeyPress
+    );
 
     public readonly EventBroadcasterType[] Types;
     

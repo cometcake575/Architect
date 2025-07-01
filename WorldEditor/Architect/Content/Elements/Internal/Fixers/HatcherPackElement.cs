@@ -40,7 +40,7 @@ internal sealed class HatcherPackElement : GInternalPackElement
         _cageObject = preloads[_scene][_cagePath];
     }
     
-    public override void PostSpawn(GameObject gameObject, bool flipped, int rotation, float scale)
+    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         var cage = Object.Instantiate(_cageObject);
         cage.SetActive(true);

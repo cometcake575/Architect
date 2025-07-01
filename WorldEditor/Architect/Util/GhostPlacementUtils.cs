@@ -5,7 +5,7 @@ namespace Architect.Util;
 
 public static class GhostPlacementUtils
 {
-    public static void SetupForPlacement(GameObject obj, SpriteRenderer renderer, PlaceableObject selected, bool flipped, int rotation, float scaleX, float scaleY)
+    public static void SetupForPlacement(GameObject obj, SpriteRenderer renderer, PlaceableObject selected, bool flipped, float rotation, float scaleX, float scaleY)
     {
         renderer.sprite = selected.GetSprite();
 

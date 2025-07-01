@@ -12,5 +12,6 @@ public enum EventBroadcasterType
     OnUnbind,
     OnCall,
     OnPay,
-    LoadedPaid
+    LoadedPaid,
+    KeyPress
 }

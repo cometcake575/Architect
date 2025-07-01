@@ -32,19 +32,18 @@ public static class CustomObjects
             new SimplePackElement(CreateTriggerZone(), "Trigger Zone", "Custom",
                     ResourceUtils.Load("trigger_zone", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.TriggerZones)
-                .WithConfigGroup(ConfigGroup.Invisible),
+                .WithConfigGroup(ConfigGroup.Stretchable),
             new SimplePackElement(CreateTimer(), "Timer", "Custom",
                     ResourceUtils.Load("timer", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.Timers)
                 .WithConfigGroup(ConfigGroup.Timers),
-            new SimplePackElement(CreateShape("square"), "Coloured Square", "Decorations", weight:ShapeWeight)
-                .WithConfigGroup(ConfigGroup.Colours)
-                .WithRotationGroup(RotationGroup.All),
-            new SimplePackElement(CreateShape("circle"), "Coloured Circle", "Decorations", weight:ShapeWeight)
-                .WithConfigGroup(ConfigGroup.Colours),
-            new SimplePackElement(CreateShape("triangle"), "Coloured Triangle", "Decorations", weight:ShapeWeight)
-                .WithConfigGroup(ConfigGroup.Colours)
-                .WithRotationGroup(RotationGroup.All),
+            new SimplePackElement(CreateKeyListener(), "Key Listener", "Custom",
+                    ResourceUtils.Load("key_listener", FilterMode.Point))
+                .WithBroadcasterGroup(BroadcasterGroup.KeyListeners)
+                .WithConfigGroup(ConfigGroup.KeyListeners),
+            CreateSquare(),
+            CreateCircle(),
+            CreateTriangle(),
             new SimplePackElement(CreateZoteTrophy(), "Winner's Trophy", "Custom"),
             CreateTemporaryAbilityGranter("dash_crystal", "Dash", false, "Dash Crystal"),
             CreateTemporaryAbilityGranter("single_dash_crystal", "Dash", true, "Single Use Dash Crystal"),
@@ -78,6 +77,62 @@ public static class CustomObjects
         InitializeHooks();
     }
 
+    private static AbstractPackElement CreateSquare()
+    {
+        var square = CreateShape("square");
+        
+        var collider = square.AddComponent<BoxCollider2D>();
+        collider.isTrigger = true;
+        collider.size = new Vector2(10, 10);
+        
+        return new SimplePackElement(square, "Coloured Square", "Decorations", weight: ShapeWeight)
+            .WithConfigGroup(ConfigGroup.Colours)
+            .WithRotationGroup(RotationGroup.All);
+    }
+
+    private static AbstractPackElement CreateCircle()
+    {
+        var circle = CreateShape("circle");
+        
+        var collider = circle.AddComponent<PolygonCollider2D>();
+        collider.isTrigger = true;
+
+        var points = new Vector2[24];
+        for (var i = 0; i < 24; i++)
+        {
+            var angle = 2 * Mathf.PI * i / 24;
+            var x = Mathf.Cos(angle) * 5;
+            var y = Mathf.Sin(angle) * 5;
+            points[i] = new Vector2(x, y);
+        }
+
+        collider.pathCount = 1;
+        collider.SetPath(0, points);
+        
+        return new SimplePackElement(circle, "Coloured Circle", "Decorations", weight: ShapeWeight)
+            .WithConfigGroup(ConfigGroup.Colours)
+            .WithRotationGroup(RotationGroup.All);
+    }
+
+    private static AbstractPackElement CreateTriangle()
+    {
+        var triangle = CreateShape("triangle");
+        
+        var collider = triangle.AddComponent<EdgeCollider2D>();
+        collider.isTrigger = true;
+        collider.points = new[]
+        {
+            new Vector2(-5, -4.17f),
+            new Vector2(0, 4.45f),
+            new Vector2(5, -4.17f),
+            new Vector2(-5, -4.17f)
+        };
+        
+        return new SimplePackElement(triangle, "Coloured Triangle", "Decorations", weight: ShapeWeight)
+            .WithConfigGroup(ConfigGroup.Colours)
+            .WithRotationGroup(RotationGroup.All);
+    }
+
     private static GameObject CreateDamagingOrb(string path, string name, int damage)
     {
         var sprite = ResourceUtils.Load(path);
@@ -106,6 +161,19 @@ public static class CustomObjects
         collider.size = new Vector2(0.32f, 0.32f);
 
         point.AddComponent<TriggerZone>();
+
+        point.SetActive(false);
+        Object.DontDestroyOnLoad(point);
+
+        return point;
+    }
+
+    private static GameObject CreateKeyListener()
+    {
+        var point = new GameObject("Key Listener");
+        point.transform.localScale *= 10;
+
+        point.AddComponent<KeyListener>();
 
         point.SetActive(false);
         Object.DontDestroyOnLoad(point);
@@ -426,9 +494,9 @@ public static class CustomObjects
 
         var health = GameManager.instance.playerData.health;
         GameManager.instance.playerData.MaxHealth();
-        GameManager.instance.playerData.health = health;
         PlayMakerFSM.BroadcastEvent("CHARM INDICATOR CHECK");
         PlayMakerFSM.BroadcastEvent("HUD IN");
+        GameManager.instance.playerData.health = health;
     }
 
     private static int[] _previousEquippedCharms;

@@ -13,15 +13,13 @@ public static class EditorManager
 {
     internal static bool IsEditing;
     internal static bool IsFlipped;
-    internal static int Rotation;
+    internal static float Rotation;
     internal static float Scale = 1;
 
     private static Vector3 _posToLoad;
     private static bool _loadPos;
     private static bool _needsReload;
 
-    private static float _rotProg;
-    
     internal static Camera GameCamera;
     
     public static void Initialize()
@@ -37,6 +35,8 @@ public static class EditorManager
         };
 
         On.HeroController.CanAttack += (orig, self) => !IsEditing && orig(self);
+        
+        On.HeroController.CanDreamNail += (orig, self) => !IsEditing && orig(self);
         
         On.HeroController.CanSuperDash += (orig, self) => !IsEditing && orig(self);
 
@@ -64,17 +64,17 @@ public static class EditorManager
 
     private static void EditorUpdate()
     {
-        if (!Architect.GlobalSettings.CanEnableEditing) return;
-        
-        if (!GameCamera) GameCamera = Camera.allCameras.FirstOrDefault(cam => cam.gameObject.name.Equals("tk2dCamera"));
-        
         var paused = GameManager.instance.isPaused;
-
+        
         if (_needsReload && !paused && !HeroController.instance.controlReqlinquished)
         {
             _needsReload = false;
             ReloadScene();
         }
+        
+        if (!Architect.GlobalSettings.CanEnableEditing) return;
+        
+        if (!GameCamera) GameCamera = Camera.allCameras.FirstOrDefault(cam => cam.gameObject.name.Equals("tk2dCamera"));
         
         CheckToggle(paused);
         
@@ -97,24 +97,24 @@ public static class EditorManager
             }
 
             // Checks that the selected item is rotatable
-            if (placeable.PackElement.GetRotationGroup() != RotationGroup.None)
+            var group = Architect.GlobalSettings.Keybinds.UnsafeRotation.IsPressed ?  
+                RotationGroup.All
+                : placeable.PackElement.GetRotationGroup();
+            if (group != RotationGroup.None)
             {
                 // If the rotation group is full 360, rotate when held down, otherwise only rotate when first pressed
                 var pressedRotation =
-                    placeable.PackElement.GetRotationGroup() == RotationGroup.All
+                    group == RotationGroup.All
                         ? Architect.GlobalSettings.Keybinds.RotateItem.IsPressed
                         : Architect.GlobalSettings.Keybinds.RotateItem.WasPressed;
 
                 // Checks if it should rotate the selected item
                 if (pressedRotation)
                 {
-                    var group = placeable.PackElement.GetRotationGroup();
-                    int i;
+                    float i;
                     if (group == RotationGroup.All)
                     {
-                        _rotProg += Time.deltaTime * 60;
-                        i = Mathf.FloorToInt(_rotProg);
-                        _rotProg -= i;
+                        i = Time.deltaTime * 60;
                     } else i = group switch
                     {
                         RotationGroup.Vertical => 180,
@@ -125,7 +125,7 @@ public static class EditorManager
                     };
                     
                     Rotation = (Rotation + i) % 360;
-                    if (group == RotationGroup.Three && Rotation == 180) Rotation = 270;
+                    if (group == RotationGroup.Three && Mathf.Approximately(Rotation, 180)) Rotation = 270;
                     
                     // Refresh cursor representation
                     CursorItem.NeedsRefreshing = true;

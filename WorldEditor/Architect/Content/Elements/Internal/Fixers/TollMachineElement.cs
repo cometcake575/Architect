@@ -17,7 +17,7 @@ internal class TollMachineElement : InternalPackElement
         WithConfigGroup(ConfigGroup.Toll);
     }
 
-    public override GameObject GetPrefab(bool flipped, int rotation)
+    public override GameObject GetPrefab(bool flipped, float rotation)
     {
         return _gameObject;
     }
@@ -32,7 +32,7 @@ internal class TollMachineElement : InternalPackElement
         _gameObject = preloads["Fungus1_31"]["Toll Gate Machine"];
     }
 
-    public override void PostSpawn(GameObject gameObject, bool flipped, int rotation, float scale)
+    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         var fsm = gameObject.LocateMyFSM("Toll Machine");
         fsm.DisableAction("Open Gates", 1);

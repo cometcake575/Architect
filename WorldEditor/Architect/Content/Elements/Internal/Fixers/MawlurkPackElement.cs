@@ -22,7 +22,7 @@ internal sealed class MawlurkPackElement : InternalPackElement
         return true;
     }
 
-    public override GameObject GetPrefab(bool flipped, int rotation)
+    public override GameObject GetPrefab(bool flipped, float rotation)
     {
         return rotation == 180 ? _inverted : _normal;
     }

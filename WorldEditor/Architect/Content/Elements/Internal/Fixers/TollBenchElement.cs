@@ -13,7 +13,7 @@ internal class TollBenchElement : InternalPackElement
         WithConfigGroup(ConfigGroup.TollBench);
     }
 
-    public override GameObject GetPrefab(bool flipped, int rotation)
+    public override GameObject GetPrefab(bool flipped, float rotation)
     {
         return _gameObject;
     }
@@ -28,7 +28,7 @@ internal class TollBenchElement : InternalPackElement
         _gameObject = preloads["Fungus3_50"]["Toll Machine Bench"];
     }
 
-    public override void PostSpawn(GameObject gameObject, bool flipped, int rotation, float scale)
+    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         gameObject.transform.GetChild(2).name = gameObject.name + " Bench";
     }

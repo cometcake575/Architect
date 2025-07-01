@@ -50,7 +50,7 @@ public class ObjectPlacement
     private readonly string _name;
     private readonly Vector3 _pos;
     private readonly bool _flipped;
-    private readonly int _rotation;
+    private readonly float _rotation;
     private readonly float _scale;
     private readonly string _id;
 
@@ -88,7 +88,7 @@ public class ObjectPlacement
             else if (config.GetName() == "r" && config is FloatConfigValue red) r = red.GetValue();
             else if (config.GetName() == "g" && config is FloatConfigValue green) g = green.GetValue();
             else if (config.GetName() == "b" && config is FloatConfigValue blue) b = blue.GetValue();
-            else if (config.GetName() == "a" && config is FloatConfigValue alpha) a *= alpha.GetValue();
+            else if (config.GetName() == "a" && config is FloatConfigValue alpha) a *= Mathf.Max(0.15f, alpha.GetValue());
             else if (config.GetName() == "layer" && config is IntConfigValue layer) renderer.sortingOrder = layer.GetValue(); 
         }
 
@@ -169,7 +169,7 @@ public class ObjectPlacement
         string name, 
         Vector3 pos, 
         bool flipped, 
-        int rotation, 
+        float rotation, 
         float scale, 
         string id, 
         EventBroadcaster[] broadcasters, 
@@ -262,7 +262,7 @@ public class ObjectPlacement
             var id = "";
             var pos = Vector3.zero;
             var flipped = true;
-            var rotation = 0;
+            var rotation = 0f;
             var scale = 1f;
             
             var broadcasters = Array.Empty<EventBroadcaster>();
@@ -300,8 +300,8 @@ public class ObjectPlacement
                                     flipped = (bool)reader.Value;
                                     break;
                                 case "rotation":
-                                    reader.ReadAsInt32();
-                                    rotation = (int)reader.Value;
+                                    reader.ReadAsDouble();
+                                    rotation = (float)(double)reader.Value;
                                     break;
                                 case "scale":
                                     reader.ReadAsDouble();
