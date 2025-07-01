@@ -35,12 +35,16 @@ public static class CustomObjects
                 .WithConfigGroup(ConfigGroup.Stretchable),
             new SimplePackElement(CreateTimer(), "Timer", "Custom",
                     ResourceUtils.Load("timer", FilterMode.Point))
-                .WithBroadcasterGroup(BroadcasterGroup.Timers)
+                .WithBroadcasterGroup(BroadcasterGroup.Callable)
                 .WithConfigGroup(ConfigGroup.Timers),
             new SimplePackElement(CreateKeyListener(), "Key Listener", "Custom",
                     ResourceUtils.Load("key_listener", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.KeyListeners)
                 .WithConfigGroup(ConfigGroup.KeyListeners),
+            new SimplePackElement(CreateRelay(), "Relay", "Custom",
+                    ResourceUtils.Load("event_relay", FilterMode.Point))
+                .WithBroadcasterGroup(BroadcasterGroup.Callable)
+                .WithReceiverGroup(ReceiverGroup.Relays),
             CreateSquare(),
             CreateCircle(),
             CreateTriangle(),
@@ -176,6 +180,18 @@ public static class CustomObjects
         point.AddComponent<KeyListener>();
 
         point.SetActive(false);
+        Object.DontDestroyOnLoad(point);
+
+        return point;
+    }
+
+    private static GameObject CreateRelay()
+    {
+        var point = new GameObject("Relay");
+        point.transform.localScale *= 10;
+
+        point.SetActive(false);
+        point.AddComponent<Relay>();
         Object.DontDestroyOnLoad(point);
 
         return point;

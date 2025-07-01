@@ -1,5 +1,7 @@
 using System.Linq;
 using Architect.Attributes;
+using Architect.Attributes.Broadcasters;
+using Architect.Content.Elements.Custom.Behaviour;
 using JetBrains.Annotations;
 using Modding;
 using Satchel;
@@ -26,6 +28,8 @@ public class ReceiverGroup
     internal static ReceiverGroup Stompers;
     
     internal static ReceiverGroup WatcherKnights;
+    
+    internal static ReceiverGroup Relays;
     
     internal static void Initialize()
     {
@@ -88,6 +92,16 @@ public class ReceiverGroup
 
         WatcherKnights = new ReceiverGroup(Enemies,
             EventManager.RegisterEventReceiverType("wake", o => o.LocateMyFSM("Black Knight").SendEvent("WAKE"))
+        );
+
+        Relays = new ReceiverGroup(Enemies,
+            EventManager.RegisterEventReceiverType("call", o =>
+            {
+                var relay = o.GetComponent<Relay>();
+                if (!relay.canCall) return;
+                relay.canCall = false;
+                EventManager.BroadcastEvent(o, EventBroadcasterType.OnCall);
+            })
         );
     }
 
