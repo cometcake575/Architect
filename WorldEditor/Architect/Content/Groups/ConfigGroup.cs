@@ -4,6 +4,7 @@ using System.Linq;
 using Architect.Attributes.Config;
 using Architect.Content.Elements.Custom.Behaviour;
 using Architect.Content.Elements.Internal.Fixers;
+using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using JetBrains.Annotations;
 using Modding;
@@ -31,7 +32,9 @@ public class ConfigGroup
     
     internal static ConfigGroup Twisters;
     
-    internal static ConfigGroup WatcherKnights;
+    internal static ConfigGroup Awakable;
+    
+    internal static ConfigGroup GruzMother;
     
     internal static ConfigGroup Cocoon;
     
@@ -177,14 +180,35 @@ public class ConfigGroup
             }))
         );
 
-        WatcherKnights = new ConfigGroup(Enemies,
+        Awakable = new ConfigGroup(Enemies,
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Start Awake", (o, value) =>
             {
                 if (!value.GetValue()) return;
-                o.LocateMyFSM("Black Knight").AddCustomAction("Rest", fsm =>
+                var bigFly = o.LocateMyFSM("Big Fly Control");
+                if (bigFly)
                 {
-                    fsm.SendEvent("WAKE");
-                });
+                    bigFly.AddCustomAction("Init", _ =>
+                    {
+                        bigFly.SendEvent("GG BOSS");
+                    });
+                    return;
+                }
+                foreach (var fsm in o.GetComponents<PlayMakerFSM>())
+                {
+                    if (!fsm.TryGetState("Rest", out var state) && !fsm.TryGetState("Sleep", out state)) continue;
+                    state.AddCustomAction(_ =>
+                    {
+                        fsm.SendEvent("WAKE");
+                    });
+                }
+            }))
+        );
+
+        GruzMother = new ConfigGroup(Awakable,
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Spawn Gruzzers", (o, value) =>
+            {
+                if (value.GetValue()) return;
+                o.GetComponent<GruzMotherElement.GruzMotherConfig>().spawnGruzzers = false;
             }))
         );
 

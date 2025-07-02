@@ -62,12 +62,13 @@ internal class VengeflyKingElement : InternalPackElement
 internal class GruzMotherElement : InternalPackElement
 {
     private GameObject _gameObject;
+    private GameObject _child;
 
     public GruzMotherElement() : base("Gruz Mother", "Enemies")
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
-        WithReceiverGroup(ReceiverGroup.Enemies);
-        WithConfigGroup(ConfigGroup.Enemies);
+        WithReceiverGroup(ReceiverGroup.Awakable);
+        WithConfigGroup(ConfigGroup.GruzMother);
     }
 
     public override GameObject GetPrefab(bool flipped, float rotation)
@@ -78,15 +79,38 @@ internal class GruzMotherElement : InternalPackElement
     internal override void AddPreloads(List<(string, string)> preloadInfo)
     {
         preloadInfo.Add(("Crossroads_04", "_Enemies/Giant Fly"));
+        preloadInfo.Add(("Crossroads_04", "_Enemies/Fly Spawn"));
     }
 
     internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
     {
         _gameObject = preloads["Crossroads_04"]["_Enemies/Giant Fly"];
+        _child = preloads["Crossroads_04"]["_Enemies/Fly Spawn"];
+        
+        var child = _gameObject.transform.GetChild(2).gameObject;
+        child.gameObject.RemoveComponent<PolygonCollider2D>();
+        var box = child.AddComponent<BoxCollider2D>();
+        box.isTrigger = true;
+        box.size *= 10;
+
+        _gameObject.AddComponent<GruzMotherConfig>();
     }
 
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
+        if (!gameObject.GetComponent<GruzMotherConfig>().spawnGruzzers) return;
+        var flySpawn = Object.Instantiate(_child);
+        flySpawn.name = gameObject.name + " Fly Spawn";
+        flySpawn.SetActive(true);
+
+        gameObject.GetComponent<EnemyDeathEffects>().PreInstantiate();
+        gameObject.transform.GetChild(3).gameObject.LocateMyFSM("burster").GetAction<FindGameObject>("Initiate", 4)
+            .objectName = flySpawn.name;
+    }
+
+    internal class GruzMotherConfig : MonoBehaviour
+    {
+        public bool spawnGruzzers = true;
     }
 }
 
@@ -163,8 +187,8 @@ internal class WatcherKnightElement : InternalPackElement
     public WatcherKnightElement() : base("Watcher Knight", "Enemies")
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
-        WithReceiverGroup(ReceiverGroup.WatcherKnights);
-        WithConfigGroup(ConfigGroup.WatcherKnights);
+        WithReceiverGroup(ReceiverGroup.Awakable);
+        WithConfigGroup(ConfigGroup.Awakable);
     }
 
     public override GameObject GetPrefab(bool flipped, float rotation)
@@ -185,15 +209,15 @@ internal class WatcherKnightElement : InternalPackElement
     }
 }
 
-internal class GrimmElement : InternalPackElement
+internal class SoulWarriorElement : InternalPackElement
 {
     private GameObject _gameObject;
 
-    public GrimmElement() : base("Troupe Master Grimm", "Enemies")
+    public SoulWarriorElement() : base("Soul Warrior", "Enemies")
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
-        WithReceiverGroup(ReceiverGroup.Enemies);
-        WithConfigGroup(ConfigGroup.Enemies);
+        WithReceiverGroup(ReceiverGroup.Awakable);
+        WithConfigGroup(ConfigGroup.Awakable);
     }
 
     public override GameObject GetPrefab(bool flipped, float rotation)
@@ -203,11 +227,30 @@ internal class GrimmElement : InternalPackElement
 
     internal override void AddPreloads(List<(string, string)> preloadInfo)
     {
-        preloadInfo.Add(("GG_Grimm", "Grimm Scene"));
+        preloadInfo.Add(("GG_Mage_Knight", "Mage Knight"));
     }
 
     internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
     {
-        _gameObject = preloads["GG_Grimm"]["Grimm Scene"];
+        _gameObject = preloads["GG_Mage_Knight"]["Mage Knight"];
+    }
+
+    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
+    {
+        var body = gameObject.GetComponent<Rigidbody2D>();
+        var fsm = gameObject.LocateMyFSM("Mage Knight");
+        
+        fsm.InsertCustomAction("Side Tele Aim", makerFsm =>
+        {
+            makerFsm.FsmVariables.FindFsmFloat("Floor Y").Value = makerFsm.gameObject.transform.position.y;
+        }, 0);
+        fsm.InsertCustomAction("Up Tele Aim", _ =>
+        {
+            body.gravityScale = 0;
+        }, 0);
+        fsm.InsertCustomAction("Idle", _ =>
+        {
+            body.gravityScale = 1;
+        }, 0);
     }
 }

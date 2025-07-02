@@ -27,7 +27,7 @@ public class ReceiverGroup
     
     internal static ReceiverGroup Stompers;
     
-    internal static ReceiverGroup WatcherKnights;
+    internal static ReceiverGroup Awakable;
     
     internal static ReceiverGroup Relays;
     
@@ -90,13 +90,21 @@ public class ReceiverGroup
                 o.GetComponentInChildren<StopAnimatorsAtPoint>().stopEvent.ReceiveEvent();
             }));
 
-        WatcherKnights = new ReceiverGroup(Enemies,
-            EventManager.RegisterEventReceiverType("wake", o => o.LocateMyFSM("Black Knight").SendEvent("WAKE"))
+        Awakable = new ReceiverGroup(Enemies,
+            EventManager.RegisterEventReceiverType("wake", o =>
+            { 
+                foreach (var fsm in o.GetComponents<PlayMakerFSM>())
+                {
+                    fsm.SendEvent("TAKE DAMAGE");
+                    fsm.SendEvent("WAKE");
+                }
+            })
         );
 
         Relays = new ReceiverGroup(Enemies,
             EventManager.RegisterEventReceiverType("call", o =>
             {
+                if (!o.activeInHierarchy) return;
                 var relay = o.GetComponent<Relay>();
                 if (!relay.canCall) return;
                 relay.canCall = false;

@@ -113,6 +113,7 @@ public static class ContentPacks
         RegisterInternalPack(new ContentPack("Forgotten Crossroads", "Assets from the regular Forgotten Crossroads")
         {
             CreateEnemy("Crossroads_07", "Uninfected Parent/Fly", "Gruzzer"),
+            new GruzMotherElement(),
             CreateEnemy("Crossroads_07", "_Enemies/Crawler", "Crawlid"),
             CreateEnemy("Crossroads_07", "_Enemies/Climber 3", "Tiktik")
                 .WithRotationGroup(RotationGroup.Four),
@@ -190,14 +191,13 @@ public static class ContentPacks
             Create("Fungus1_31", "Toll Gate", "Toll Gate", "Interactable", weight:GateWeight)
                 .WithReceiverGroup(ReceiverGroup.Gates)
                 .WithRotationGroup(RotationGroup.Four),
-            
-            Create("Fungus1_31", "Toll Gate", "Toll Gate", "Interactable", weight:GateWeight)
-                .WithReceiverGroup(ReceiverGroup.Gates),
             new TollMachineElement(weight:LeverWeight),
             
             Create("Fungus1_37", "RestBench", "Stone Sanctuary Bench", "Interactable", weight:BenchWeight),
             Create("Room_Slug_Shrine", "RestBench", "Unn Shrine Bench", "Interactable", weight:BenchWeight),
-            Create("Fungus1_15", "RestBench", "Nailmaster Sheo's Bench", "Interactable", weight:NailmasterBenchWeight)
+            Create("Fungus1_15", "RestBench", "Nailmaster Sheo's Bench", "Interactable", weight:NailmasterBenchWeight),
+            
+            //CreateEnemy("GG_Hornet_1", "Boss Holder/Hornet Boss 1", "Hornet Protector")
         });
         RegisterInternalPack(new ContentPack("Fog Canyon", "Assets from Fog Canyon")
         {
@@ -319,6 +319,7 @@ public static class ContentPacks
             new TwisterPackElement("Ruins1_30", "Mage", "Spell Twister", "Mage"),
             CreateEnemy("Ruins1_30", "Mage Blob 1", "Mistake"),
             CreateEnemy("Ruins1_30", "Mage Balloon", "Folly"),
+            new SoulWarriorElement(),
             CreateEnemy("Ruins2_01", "Royal Zombie Coward (1)", "Cowardly Husk"),
             CreateEnemy("Ruins2_01", "Royal Zombie 1 (1)", "Husk Dandy"),
             CreateEnemy("Ruins2_01", "Royal Zombie Fat (2)", "Gluttonous Husk"),
@@ -489,7 +490,6 @@ public static class ContentPacks
            CreateEnemy("GG_God_Tamer", "Entry Object", "God Tamer Full"),
             new OblobbleElement(),
             CreateEnemy("GG_Mega_Moss_Charger", "Mega Moss Charger", "Massive Moss Charger", category:"Bosses").FlipVertical(),
-            CreateEnemy("GG_Hornet_1", "Boss Holder/Hornet Boss 1", "Hornet Protector", category:"Bosses"),
            CreateEnemy("GG_Crystal_Guardian", "Mega Zombie Beam Miner (1)", "Crystal Guardian"),
            CreateEnemy("GG_Crystal_Guardian_2", "Battle Scene/Zombie Beam Miner Rematch", "Enraged Guardian"),
         });*/
