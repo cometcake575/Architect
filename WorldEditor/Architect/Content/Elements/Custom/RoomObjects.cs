@@ -64,8 +64,7 @@ public static class RoomObjects
                 }
 
                 return point is not null ? new[] { point.GetOrAddComponent<Disabler>() } : new Disabler[] { };
-            }).WithConfigGroup(ConfigGroup.ObjectRemover),
-            CreateTransitionPoint()
+            }).WithConfigGroup(ConfigGroup.ObjectRemover)
         };
         ContentPacks.RegisterPack(edits);
     }

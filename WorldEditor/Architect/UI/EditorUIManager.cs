@@ -140,7 +140,7 @@ public static class EditorUIManager
     private static void RefreshSelectedItem(LayoutRoot layout)
     {
         RotationChoice.Text = "0";
-        ScaleChoice.Text = "0";
+        ScaleChoice.Text = "1";
         
         ConfigValues.Clear();
         Broadcasters.Clear();
@@ -251,7 +251,7 @@ public static class EditorUIManager
             ContentType = InputField.ContentType.DecimalNumber,
             HorizontalAlignment = HorizontalAlignment.Right,
             MinWidth = 80,
-            Text = "0",
+            Text = "1",
             Padding = new Padding(20, 10)
         }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 1);
         ScaleChoice.TextChanged += (_, s) =>
