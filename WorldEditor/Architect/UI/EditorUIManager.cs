@@ -238,7 +238,7 @@ public static class EditorUIManager
             HorizontalAlignment = HorizontalAlignment.Right,
             MinWidth = 80,
             Text = "0",
-            Padding = new Padding(20, 0)
+            Padding = new Padding(20, 10)
         }.WithProp(GridLayout.Column, 1);
         RotationChoice.TextChanged += (_, s) =>
         {
@@ -252,7 +252,7 @@ public static class EditorUIManager
             HorizontalAlignment = HorizontalAlignment.Right,
             MinWidth = 80,
             Text = "0",
-            Padding = new Padding(20, 0)
+            Padding = new Padding(20, 10)
         }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 1);
         ScaleChoice.TextChanged += (_, s) =>
         {
@@ -277,12 +277,14 @@ public static class EditorUIManager
                 new TextObject(layout, "Rotation Text")
                 {
                     Text = "Rotation",
-                    HorizontalAlignment = HorizontalAlignment.Left
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    Padding = new Padding(0, 10)
                 },
                 new TextObject(layout, "Scale Text")
                 {
                     Text = "Scale",
-                    HorizontalAlignment = HorizontalAlignment.Left
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    Padding = new Padding(0, 10)
                 }.WithProp(GridLayout.Row, 1),
                 RotationChoice,
                 ScaleChoice
