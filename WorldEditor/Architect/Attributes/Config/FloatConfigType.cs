@@ -14,7 +14,7 @@ public class FloatConfigType : ConfigType<FloatConfigValue>
 
     public override ConfigValue Deserialize(string data)
     {
-        return new FloatConfigValue(this, Convert.ToSingle(data));
+        return new FloatConfigValue(this, Convert.ToSingle(data.Replace(",", "."), CultureInfo.InvariantCulture));
     }
 
     public override ConfigElement CreateInput(LayoutRoot root, Button apply)

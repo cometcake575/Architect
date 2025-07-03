@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Architect.Attributes;
 using Architect.Attributes.Broadcasters;
@@ -240,7 +241,7 @@ public static class EditorUIManager
             Text = "0",
             Padding = new Padding(20, 10)
         }.WithProp(GridLayout.Column, 1);
-        RotationChoice.TextChanged += (_, s) =>
+        RotationChoice.TextEditFinished += (_, s) =>
         {
             EditorManager.Rotation = Convert.ToSingle(s);
             CursorItem.NeedsRefreshing = true;
@@ -254,9 +255,9 @@ public static class EditorUIManager
             Text = "1",
             Padding = new Padding(20, 10)
         }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 1);
-        ScaleChoice.TextChanged += (_, s) =>
+        ScaleChoice.TextEditFinished += (_, s) =>
         {
-            EditorManager.Scale = Convert.ToSingle(s);
+            EditorManager.Scale = Convert.ToSingle(s.Replace(",", "."), CultureInfo.InvariantCulture);
             CursorItem.NeedsRefreshing = true;
         };
         
