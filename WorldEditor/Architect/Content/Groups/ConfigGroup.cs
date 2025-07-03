@@ -187,20 +187,11 @@ public class ConfigGroup
                 var bigFly = o.LocateMyFSM("Big Fly Control");
                 if (bigFly)
                 {
-                    bigFly.AddCustomAction("Init", _ =>
-                    {
-                        bigFly.SendEvent("GG BOSS");
-                    });
+                    bigFly.AddCustomAction("Init", _ => { bigFly.SendEvent("GG BOSS"); });
                     return;
                 }
-                foreach (var fsm in o.GetComponents<PlayMakerFSM>())
-                {
-                    if (!fsm.TryGetState("Rest", out var state) && !fsm.TryGetState("Sleep", out state)) continue;
-                    state.AddCustomAction(_ =>
-                    {
-                        fsm.SendEvent("WAKE");
-                    });
-                }
+                
+                o.LocateMyFSM("Black Knight").AddCustomAction("Sleep", fsm => fsm.SendEvent("WAKE"));
             }))
         );
 
@@ -209,7 +200,7 @@ public class ConfigGroup
             {
                 if (value.GetValue()) return;
                 o.GetComponent<GruzMotherElement.GruzMotherConfig>().spawnGruzzers = false;
-            }))
+            }, true))
         );
 
         Breakable = new ConfigGroup(Generic,

@@ -146,7 +146,7 @@ public static class ContentPacks
             Create("Crossroads_ShamanTemple", "BoneBench", "Ancestral Mound Bench", "Interactable", weight:BenchWeight),
             Create("Crossroads_04", "RestBench", "Salubra's Bench", "Interactable", weight:BenchWeight),
             Create("Room_Final_Boss_Atrium", "RestBench", "Black Egg Bench", "Interactable", weight:SpecialBenchWeight),
-            new GrubfatherElement(weight:MiscInteractableWeight),
+            new GrubfatherElement(weight:NpcWeight),
             Create("Crossroads_07", "_Scenery/plat_lift_06", "Lift Platform S", "Solids"),
             Create("Crossroads_07", "_Scenery/plat_lift_05", "Lift Platform L", "Solids"),
             Create("Crossroads_31", "Grub Bottle", "Grub Bottle", "Interactable", weight:MiscInteractableWeight)
@@ -273,9 +273,9 @@ public static class ContentPacks
                 .WithRotationGroup(RotationGroup.Four),
             CreateSolid("Mines_20", "mines_metal_grate_06", "Metal Grate"),
             CreateSolid("Mines_20", "plat_float_06", "Crystal Peak Platform"),
-            Create("Mines_31", "Mines Platform", "Crystal Peak Rotating Platform", "Interactable")
+            Create("Mines_31", "Mines Platform", "Crystal Peak Rotating Platform", "Interactable", weight:MiscInteractableWeight)
                 .WithRotationGroup(RotationGroup.Four),
-            new ConveyorBeltElement(),
+            new ConveyorBeltElement(weight:MiscInteractableWeight),
             Create("Mines_37", "stomper_offset", "Crystal Peak Stomper (Slow)", "Hazards")
                 .WithRotationGroup(RotationGroup.Four)
                 .WithReceiverGroup(ReceiverGroup.Stompers)
@@ -297,8 +297,8 @@ public static class ContentPacks
             CreateEnemy("Fungus3_48", "Grass Hopper", "Loodle"),
             CreateEnemy("Fungus3_10", "Battle Scene/Completed/Mantis Heavy", "Mantis Traitor"),
             CreateEnemy("Fungus3_48", "Mantis Heavy Flyer", "Mantis Petra"),
-            Create("Fungus3_34", "Royal Gardens Plat S", "Queen's Gardens Collapsing Platform S", "Interactable"),
-            Create("Fungus3_34", "Royal Gardens Plat L", "Queen's Gardens Collapsing Platform L", "Interactable"),
+            Create("Fungus3_34", "Royal Gardens Plat S", "Queen's Gardens Collapsing Platform S", "Interactable", weight:MiscInteractableWeight),
+            Create("Fungus3_34", "Royal Gardens Plat L", "Queen's Gardens Collapsing Platform L", "Interactable", weight:MiscInteractableWeight),
             new TollBenchElement(weight:BenchWeight)
         });
         RegisterInternalPack(new ContentPack("City of Tears", "Assets from the City of Tears")

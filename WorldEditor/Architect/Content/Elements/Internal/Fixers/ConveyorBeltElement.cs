@@ -8,7 +8,7 @@ internal class ConveyorBeltElement : InternalPackElement
 {
     private GameObject _gameObject;
 
-    public ConveyorBeltElement() : base("Crystal Peak Conveyor Belt", "Interactable")
+    public ConveyorBeltElement(int weight) : base("Crystal Peak Conveyor Belt", "Interactable", weight:weight)
     {
         WithRotationGroup(RotationGroup.Three);
         WithConfigGroup(ConfigGroup.Conveyors);

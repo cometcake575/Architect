@@ -62,7 +62,7 @@ internal class VengeflyKingElement : InternalPackElement
 internal class GruzMotherElement : InternalPackElement
 {
     private GameObject _gameObject;
-    private GameObject _child;
+    private static GameObject _child;
 
     public GruzMotherElement() : base("Gruz Mother", "Enemies")
     {
@@ -96,21 +96,25 @@ internal class GruzMotherElement : InternalPackElement
         _gameObject.AddComponent<GruzMotherConfig>();
     }
 
-    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
-    {
-        if (!gameObject.GetComponent<GruzMotherConfig>().spawnGruzzers) return;
-        var flySpawn = Object.Instantiate(_child);
-        flySpawn.name = gameObject.name + " Fly Spawn";
-        flySpawn.SetActive(true);
-
-        gameObject.GetComponent<EnemyDeathEffects>().PreInstantiate();
-        gameObject.transform.GetChild(3).gameObject.LocateMyFSM("burster").GetAction<FindGameObject>("Initiate", 4)
-            .objectName = flySpawn.name;
-    }
-
     internal class GruzMotherConfig : MonoBehaviour
     {
         public bool spawnGruzzers = true;
+
+        private void Update()
+        {
+            if (!spawnGruzzers) return;
+            var child = gameObject.transform.GetChild(3);
+            if (child)
+            {
+                var flySpawn = Instantiate(_child);
+                flySpawn.name = gameObject.name + " Fly Spawn";
+                flySpawn.SetActive(true);
+                
+                child.gameObject.LocateMyFSM("burster").GetAction<FindGameObject>("Initiate", 4)
+                    .objectName = flySpawn.name;
+                spawnGruzzers = false;
+            }
+        }
     }
 }
 
@@ -216,8 +220,8 @@ internal class SoulWarriorElement : InternalPackElement
     public SoulWarriorElement() : base("Soul Warrior", "Enemies")
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
-        WithReceiverGroup(ReceiverGroup.Awakable);
-        WithConfigGroup(ConfigGroup.Awakable);
+        WithReceiverGroup(ReceiverGroup.Enemies);
+        WithConfigGroup(ConfigGroup.Enemies);
     }
 
     public override GameObject GetPrefab(bool flipped, float rotation)
@@ -239,6 +243,11 @@ internal class SoulWarriorElement : InternalPackElement
     {
         var body = gameObject.GetComponent<Rigidbody2D>();
         var fsm = gameObject.LocateMyFSM("Mage Knight");
+        
+        fsm.AddCustomAction("Rest", makerFsm =>
+        {
+            makerFsm.SendEvent("WAKE");
+        });
         
         fsm.InsertCustomAction("Side Tele Aim", makerFsm =>
         {
