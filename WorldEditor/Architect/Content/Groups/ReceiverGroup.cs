@@ -95,6 +95,7 @@ public class ReceiverGroup
             { 
                 foreach (var fsm in o.GetComponents<PlayMakerFSM>())
                 {
+                    fsm.SendEvent("HERO ENTER");
                     fsm.SendEvent("TAKE DAMAGE");
                     fsm.SendEvent("WAKE");
                 }
