@@ -118,8 +118,9 @@ public static class ContentPacks
             CreateEnemy("Crossroads_07", "_Enemies/Climber 3", "Tiktik")
                 .WithRotationGroup(RotationGroup.Four),
             CreateEnemy("Crossroads_16", "Uninfected Parent/Buzzer", "Vengefly"),
+            new VengeflyKingElement(),
             Create("Crossroads_12", "_Enemies/Worm", "Goam", "Enemies")
-                .WithRotationGroup(RotationGroup.Four),
+                .WithRotationGroup(RotationGroup.Eight),
             CreateEnemy("Crossroads_21", "non_infected_event/Zombie Runner", "Wandering Husk"),
             CreateEnemy("Crossroads_21", "Zombie Barger", "Husk Bully"),
             CreateEnemy("Crossroads_16", "_Enemies/Zombie Hornhead", "Husk Hornhead"),

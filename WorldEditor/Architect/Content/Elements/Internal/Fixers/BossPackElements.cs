@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Architect.Content.Groups;
 using HutongGames.PlayMaker;
@@ -15,7 +16,7 @@ internal class VengeflyKingElement : InternalPackElement
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
         WithReceiverGroup(ReceiverGroup.Enemies);
-        WithConfigGroup(ConfigGroup.Enemies);
+        WithConfigGroup(ConfigGroup.VengeflyKing);
     }
 
     public override GameObject GetPrefab(bool flipped, float rotation)
@@ -31,31 +32,76 @@ internal class VengeflyKingElement : InternalPackElement
     internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
     {
         _gameObject = preloads["GG_Vengefly"]["Giant Buzzer Col"];
+        _gameObject.AddComponent<VkConfig>();
     }
 
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
+        var config = gameObject.GetComponent<VkConfig>();
+        var targetPlayer = config.targetPlayer;
+        var vengeflyRule = config.vengeflyRule;
+        
         var fsm = gameObject.LocateMyFSM("Big Buzzer");
         
         fsm.DisableAction("Init", 3);
         
         var pos = gameObject.transform.position;
-        Architect.Instance.Log(pos);
         
-        fsm.AddAction("Title?", new SetFloatValue
+        fsm.AddCustomAction("Swoop Antic", makerFsm =>
         {
-            floatVariable = new FsmFloat("Swoop Height"),
-            floatValue = pos.y - 3.28f
+            makerFsm.FsmVariables.FindFsmFloat("Swoop Height").Value = 
+                targetPlayer ? HeroController.instance.transform.position.y + 1
+                : pos.y - 3.28f;
         });
         
-        fsm.InsertCustomAction("Swoop Direction", makerFsm =>
+        var s1 = fsm.GetAction<CreateObject>("Summon", 1);
+        var s2 = fsm.GetAction<CreateObject>("Summon", 3);
+        switch (vengeflyRule)
         {
-            Architect.Instance.Log(makerFsm.FsmVariables.GetFsmFloat("Swoop Height"));
-            Architect.Instance.Log(makerFsm.FsmVariables.GetFsmFloat("Swoop Target"));
-        }, 6);
+            // Disabled
+            case 0:
+                s1.Enabled = false;
+                s2.Enabled = false;
+                return;
+            // Locked offset
+            case 1:
+                s1.position = new Vector3(pos.x - 17.48f, pos.y + 7.72f, pos.z + 16.99f);
+                s2.position = new Vector3(pos.x + 1.52f, pos.y + 7.72f, pos.z + 16.99f);
+                break;
+            // Offset to current VK position
+            default:
+                s2.storeObject = s1.storeObject;
+
+                fsm.InsertCustomAction("Summon", makerFsm =>
+                {
+                    var obj = makerFsm.FsmVariables.FindFsmGameObject("Buzzer Instance").Value;
+                    var mpos = makerFsm.transform.position;
+                    if (obj) obj.transform.position = new Vector3(mpos.x + 20.3926f *
+                        (makerFsm.transform.GetScaleX() > 0
+                            ? -1
+                            : 1), mpos.y + 6.9023f, 17);
+                }, 4);
+                
+                fsm.InsertCustomAction("Summon", makerFsm =>
+                {
+                    var obj = makerFsm.FsmVariables.FindFsmGameObject("Buzzer Instance").Value;
+                    var mpos = makerFsm.transform.position;
+                    if (obj) obj.transform.position = new Vector3(mpos.x + 1.3926f *
+                                                                            (makerFsm.transform.GetScaleX() > 0
+                                                                                ? -1
+                                                                                : 1), mpos.y + 6.9023f, 17);
+                }, 2);
+                
+                break;
+        }
+
+    }
+
+    internal class VkConfig : MonoBehaviour
+    {
+        public bool targetPlayer;
         
-        fsm.GetAction<CreateObject>("Summon", 1).position = new Vector3(pos.x - 17.48f, pos.y + 7.72f, pos.z + 16.99f);
-        fsm.GetAction<CreateObject>("Summon", 3).position = new Vector3(pos.x + 1.52f, pos.y + 7.72f, pos.z + 16.99f);
+        public int vengeflyRule = 1;
     }
 }
 
@@ -93,10 +139,10 @@ internal class GruzMotherElement : InternalPackElement
         box.isTrigger = true;
         box.size *= 10;
 
-        _gameObject.AddComponent<GruzMotherConfig>();
+        _gameObject.AddComponent<GmConfig>();
     }
 
-    internal class GruzMotherConfig : MonoBehaviour
+    internal class GmConfig : MonoBehaviour
     {
         public bool spawnGruzzers = true;
 
@@ -106,13 +152,16 @@ internal class GruzMotherElement : InternalPackElement
             var child = gameObject.transform.GetChild(3);
             if (child)
             {
+                spawnGruzzers = false;
                 var flySpawn = Instantiate(_child);
                 flySpawn.name = gameObject.name + " Fly Spawn";
                 flySpawn.SetActive(true);
                 
-                child.gameObject.LocateMyFSM("burster").GetAction<FindGameObject>("Initiate", 4)
-                    .objectName = flySpawn.name;
-                spawnGruzzers = false;
+                child.gameObject.LocateMyFSM("corpse").AddCustomAction("Blow", fsm =>
+                {
+                    fsm.FsmVariables.FindFsmGameObject("Burster").Value.LocateMyFSM("burster").GetAction<FindGameObject>("Initiate", 4)
+                        .objectName = flySpawn.name;
+                });
             }
         }
     }

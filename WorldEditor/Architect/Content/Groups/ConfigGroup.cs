@@ -4,7 +4,6 @@ using System.Linq;
 using Architect.Attributes.Config;
 using Architect.Content.Elements.Custom.Behaviour;
 using Architect.Content.Elements.Internal.Fixers;
-using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using JetBrains.Annotations;
 using Modding;
@@ -35,6 +34,8 @@ public class ConfigGroup
     internal static ConfigGroup Awakable;
     
     internal static ConfigGroup GruzMother;
+    
+    internal static ConfigGroup VengeflyKing;
     
     internal static ConfigGroup Cocoon;
     
@@ -199,8 +200,25 @@ public class ConfigGroup
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Spawn Gruzzers", (o, value) =>
             {
                 if (value.GetValue()) return;
-                o.GetComponent<GruzMotherElement.GruzMotherConfig>().spawnGruzzers = false;
+                o.GetComponent<GruzMotherElement.GmConfig>().spawnGruzzers = false;
             }, true))
+        );
+
+        VengeflyKing = new ConfigGroup(Awakable,
+            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Dive Height", (o, value) =>
+            {
+                Architect.Instance.Log("Checking to target player");
+                if (value.GetValue() == 0) return;
+                Architect.Instance.Log("Setting to target player");
+                o.GetComponent<VengeflyKingElement.VkConfig>().targetPlayer = true;
+                // By default, Vengeflies will be at an offset if the VK is targeting the player
+                // The config option is applied later and therefore overrides this
+                o.GetComponent<VengeflyKingElement.VkConfig>().vengeflyRule = 2;
+            }, true, "Default", "Player")),
+            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Vengeflies", (o, value) =>
+            {
+                o.GetComponent<VengeflyKingElement.VkConfig>().vengeflyRule = value.GetValue();
+            }, true, "Off", "Default", "Offset"))
         );
 
         Breakable = new ConfigGroup(Generic,

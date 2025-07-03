@@ -64,7 +64,8 @@ public static class RoomObjects
                 }
 
                 return point is not null ? new[] { point.GetOrAddComponent<Disabler>() } : new Disabler[] { };
-            }).WithConfigGroup(ConfigGroup.ObjectRemover)
+            }).WithConfigGroup(ConfigGroup.ObjectRemover),
+            CreateTransitionPoint()
         };
         ContentPacks.RegisterPack(edits);
     }
@@ -105,6 +106,26 @@ public static class RoomObjects
         Object.DontDestroyOnLoad(obj);
         obj.SetActive(false);
         return new SimplePackElement(obj, name, "Room Edits", sprite);
+    }
+    
+    private static SimplePackElement CreateTransitionPoint()
+    {
+        var obj = new GameObject
+        {
+            name = "top Transition Point"
+        };
+
+        var point = obj.AddComponent<TransitionPoint>();
+        point.nonHazardGate = true;
+        point.targetScene = "Town";
+        
+        obj.AddComponent<BoxCollider2D>().size = new Vector2(10, 10);
+
+        var sprite = ResourceUtils.Load("square", FilterMode.Point);
+
+        Object.DontDestroyOnLoad(obj);
+        obj.SetActive(false);
+        return new SimplePackElement(obj, "top Transition Point", "Room Edits", sprite);
     }
 
     public static Disabler[] GetObjects(ObjectRemover editor)
