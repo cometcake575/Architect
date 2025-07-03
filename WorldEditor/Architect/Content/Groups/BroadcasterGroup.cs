@@ -8,6 +8,7 @@ public class BroadcasterGroup
     
     public static readonly BroadcasterGroup Enemies = new(
         EventBroadcasterType.OnDeath,
+        EventBroadcasterType.OnDamage,
         EventBroadcasterType.LoadedDead
     );
     

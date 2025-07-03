@@ -3,6 +3,7 @@ namespace Architect.Attributes.Broadcasters;
 public enum EventBroadcasterType
 {
     OnDeath,
+    OnDamage,
     LoadedDead,
     OnPull,
     LoadedPulled,

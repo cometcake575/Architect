@@ -46,9 +46,16 @@ public class ObjectPlacement
             : null;
     }
 
+    public void Move(Vector3 pos)
+    {
+        pos.z = _pos.z;
+        _pos = pos;
+        if (_obj) _obj.transform.position = pos;
+    }
+
+    private Vector3 _pos;
     private PlaceableObject _placeableObject;
     private readonly string _name;
-    private readonly Vector3 _pos;
     private readonly bool _flipped;
     private readonly float _rotation;
     private readonly float _scale;

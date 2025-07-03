@@ -19,6 +19,12 @@ public static class EventManager
             if (received) return;
             BroadcastEvent(effects.gameObject, EventBroadcasterType.OnDeath);
         };
+
+        On.HealthManager.TakeDamage += (orig, self, instance) =>
+        {
+            BroadcastEvent(self.gameObject, EventBroadcasterType.OnDamage);
+            orig(self, instance);
+        };
         
         On.HealthManager.Awake += (orig, self) =>
         {

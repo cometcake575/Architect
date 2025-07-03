@@ -139,6 +139,9 @@ public static class EditorUIManager
     // Refreshes the currently selected item, resetting configuration applied to the object
     private static void RefreshSelectedItem(LayoutRoot layout)
     {
+        RotationChoice.Text = "0";
+        ScaleChoice.Text = "0";
+        
         ConfigValues.Clear();
         Broadcasters.Clear();
         Receivers.Clear();
@@ -149,6 +152,9 @@ public static class EditorUIManager
                 break;
             case -2:
                 SelectedItem = EraserObject.Instance;
+                break;
+            case -3:
+                SelectedItem = DragObject.Instance;
                 break;
             default:
             {
@@ -212,11 +218,81 @@ public static class EditorUIManager
         var categoriesGrid = SetupCategories(layout);
         _leftSideGrid.Children.Add(categoriesGrid);
 
+        var extraControlsGrid = SetupExtraControls(layout)
+            .WithProp(GridLayout.Column, 1);
+        _leftSideGrid.Children.Add(extraControlsGrid);
+
         SetupConfigGrid(layout);
         
         PauseOptions.Add(_leftSideGrid);
     }
 
+    public static TextInput RotationChoice;
+    public static TextInput ScaleChoice;
+
+    private static GridLayout SetupExtraControls(LayoutRoot layout)
+    {
+        RotationChoice = new TextInput(layout, "Rotation Input")
+        {
+            ContentType = InputField.ContentType.DecimalNumber,
+            HorizontalAlignment = HorizontalAlignment.Right,
+            MinWidth = 80,
+            Text = "0",
+            Padding = new Padding(20, 0)
+        }.WithProp(GridLayout.Column, 1);
+        RotationChoice.TextChanged += (_, s) =>
+        {
+            EditorManager.Rotation = Convert.ToSingle(s);
+            CursorItem.NeedsRefreshing = true;
+        };
+
+        ScaleChoice = new TextInput(layout, "Scale Input")
+        {
+            ContentType = InputField.ContentType.DecimalNumber,
+            HorizontalAlignment = HorizontalAlignment.Right,
+            MinWidth = 80,
+            Text = "0",
+            Padding = new Padding(20, 0)
+        }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 1);
+        ScaleChoice.TextChanged += (_, s) =>
+        {
+            EditorManager.Scale = Convert.ToSingle(s);
+            CursorItem.NeedsRefreshing = true;
+        };
+        
+        var grid = new GridLayout(layout, "Extra Controls")
+        {
+            RowDefinitions =
+            {
+                new GridDimension(1, GridUnit.Proportional),
+                new GridDimension(1, GridUnit.Proportional)
+            },
+            ColumnDefinitions =
+            {
+                new GridDimension(1, GridUnit.Proportional),
+                new GridDimension(1, GridUnit.Proportional)
+            },
+            Children =
+            {
+                new TextObject(layout, "Rotation Text")
+                {
+                    Text = "Rotation",
+                    HorizontalAlignment = HorizontalAlignment.Left
+                },
+                new TextObject(layout, "Scale Text")
+                {
+                    Text = "Scale",
+                    HorizontalAlignment = HorizontalAlignment.Left
+                }.WithProp(GridLayout.Row, 1),
+                RotationChoice,
+                ScaleChoice
+            },
+            VerticalAlignment = VerticalAlignment.Center
+        }.WithProp(GridLayout.ColumnSpan, 2);
+
+        return grid;
+    }
+    
     private static void SetupConfigGrid(LayoutRoot layout)
     {
         var configButton = new Button(layout, "Config Choice")
@@ -402,6 +478,7 @@ public static class EditorUIManager
             ColumnDefinitions =
             {
                 new GridDimension(1, GridUnit.Proportional),
+                new GridDimension(1, GridUnit.Proportional),
                 new GridDimension(1, GridUnit.Proportional)
             },
             RowDefinitions =
@@ -420,7 +497,7 @@ public static class EditorUIManager
                 VerticalAlignment = VerticalAlignment.Bottom,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 Content = "Reshare Level (HKMP)"
-            }.WithProp(GridLayout.Column, 0).WithProp(GridLayout.ColumnSpan, 2).WithProp(GridLayout.Row, correctRow);
+            }.WithProp(GridLayout.Column, 0).WithProp(GridLayout.ColumnSpan, 3).WithProp(GridLayout.Row, correctRow);
             multiplayerRefresh.Click += _ =>
             {
                 HkmpHook.Refresh();
@@ -436,9 +513,15 @@ public static class EditorUIManager
         extraSettings.Children.Add(cursorImagedButton.Item1);
         extraSettings.Children.Add(cursorImagedButton.Item2);
 
+        var dragImagedButton = CreateImagedButton(layout, DragObject.Instance.GetSprite(), "Drag", 0, 0, -3);
+        dragImagedButton.Item1.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, correctRow);
+        dragImagedButton.Item2.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, correctRow);
+        extraSettings.Children.Add(dragImagedButton.Item1);
+        extraSettings.Children.Add(dragImagedButton.Item2);
+
         var eraserImagedButton = CreateImagedButton(layout, EraserObject.Instance.GetSprite(), "Eraser", 0, 0, -2);
-        eraserImagedButton.Item1.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, correctRow);
-        eraserImagedButton.Item2.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, correctRow);
+        eraserImagedButton.Item1.WithProp(GridLayout.Column, 2).WithProp(GridLayout.Row, correctRow);
+        eraserImagedButton.Item2.WithProp(GridLayout.Column, 2).WithProp(GridLayout.Row, correctRow);
         extraSettings.Children.Add(eraserImagedButton.Item1);
         extraSettings.Children.Add(eraserImagedButton.Item2);
         
