@@ -116,7 +116,7 @@ public class ReceiverGroup
 
     public readonly string[] Types;
     
-    private ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] types)
+    public ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] types)
     {
         Types = parent != null ? types.Concat(parent.Types).ToArray() : types;
     }

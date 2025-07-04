@@ -27,10 +27,10 @@ public static class RoomObjects
                 .WithConfigGroup(ConfigGroup.Invisible),
             CreateRoomEditor("room_remover", "Clear Room", o =>
             {
-                var objects = o.scene.GetRootGameObjects()
-                    .Where(obj => !obj.name.StartsWith("[Architect]"));
-
                 var clearer = o.GetComponent<RoomClearerConfig>();
+
+                IEnumerable<GameObject> objects = o.scene.GetRootGameObjects().Where(obj => !obj.name.StartsWith("[Architect]"));
+                
                 if (clearer)
                 {
                     if (!clearer.removeBenches) objects = objects.Where(obj => !obj.GetComponent<RestBench>());
@@ -63,7 +63,7 @@ public static class RoomObjects
                     catch (ArgumentException) { }
                 }
 
-                return point is not null ? new[] { point.GetOrAddComponent<Disabler>() } : new Disabler[] { };
+                return point is not null ? [point.GetOrAddComponent<Disabler>()] : [];
             }).WithConfigGroup(ConfigGroup.ObjectRemover)
         };
         ContentPacks.RegisterPack(edits);
@@ -88,7 +88,7 @@ public static class RoomObjects
             }
         }
         
-        return point is not null && lowest <= 25 ? new[] { point.gameObject.GetOrAddComponent<Disabler>() } : new Disabler[] { };
+        return point is not null && lowest <= 25 ? [point.gameObject.GetOrAddComponent<Disabler>()] : [];
     }
 
     private static readonly Dictionary<string, Func<GameObject, Disabler[]>> EditActions = new();
