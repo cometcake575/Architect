@@ -1,54 +1,22 @@
-using Architect.Attributes.Broadcasters;
-
 namespace Architect.Content.Groups;
 
 public class BroadcasterGroup
 {
-    internal static readonly BroadcasterGroup EmptyGroup = new();
-    
-    public static readonly BroadcasterGroup Enemies = new(
-        EventBroadcasterType.OnDeath,
-        EventBroadcasterType.OnDamage,
-        EventBroadcasterType.LoadedDead
-    );
-    
-    public static readonly BroadcasterGroup Levers = new(
-        EventBroadcasterType.OnPull,
-        EventBroadcasterType.LoadedPulled
-    );
-    
-    public static readonly BroadcasterGroup PersistentLevers = new(
-        EventBroadcasterType.OnPull,
-        EventBroadcasterType.LoadedPulled
-    );
-    
-    public static readonly BroadcasterGroup TriggerZones = new(
-        EventBroadcasterType.ZoneEnter,
-        EventBroadcasterType.ZoneExit
-    );
-    
-    public static readonly BroadcasterGroup Bindings = new(
-        EventBroadcasterType.OnBind,
-        EventBroadcasterType.OnUnbind
-    );
-    
-    public static readonly BroadcasterGroup Callable = new(
-        EventBroadcasterType.OnCall
-    );
-    
-    public static readonly BroadcasterGroup Tolls = new(
-        EventBroadcasterType.OnPay,
-        EventBroadcasterType.LoadedPaid
-    );
-    
-    public static readonly BroadcasterGroup KeyListeners = new(
-        EventBroadcasterType.KeyPress
-    );
+    public static readonly string[] EmptyGroup = [];
 
-    public readonly EventBroadcasterType[] Types;
+    public static readonly string[] Enemies = ["OnDeath", "OnDamage", "LoadedDead"];
+
+    public static readonly string[] Levers = ["OnPull"];
     
-    private BroadcasterGroup(params EventBroadcasterType[] types)
-    {
-        Types = types;
-    }
+    public static readonly string[] PersistentLevers = ["OnPull", "LoadedPulled"];
+    
+    public static readonly string[] TriggerZones = ["ZoneEnter", "ZoneExit"];
+
+    public static readonly string[] Bindings = ["OnBind", "OnUnbind"];
+
+    public static readonly string[] Callable = ["OnCall"];
+
+    public static readonly string[] Tolls = ["OnPay", "LoadedPaid"];
+
+    public static readonly string[] KeyListeners = ["KeyPress"];
 }

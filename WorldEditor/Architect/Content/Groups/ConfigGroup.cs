@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Architect.Attributes.Config;
+using Architect.Content.Elements.Custom;
 using Architect.Content.Elements.Custom.Behaviour;
+using Architect.Content.Elements.Custom.SaL;
 using Architect.Content.Elements.Internal.Fixers;
 using HutongGames.PlayMaker.Actions;
 using JetBrains.Annotations;
@@ -13,7 +15,7 @@ using UnityEngine;
 
 namespace Architect.Content.Groups;
 
-public class ConfigGroup
+public class ConfigGroup([CanBeNull] ConfigGroup parent, params ConfigType[] types)
 {
     private static bool _initialized;
     
@@ -611,6 +613,8 @@ public class ConfigGroup
                 }
             }, false, "None", "Hazard", "Solid"))
         );
+        
+        SaLGroups.InitializeConfig();
     }
 
     public static ConfigType MakePersistenceConfigType(string name, Action<GameObject> action = null)
@@ -644,10 +648,5 @@ public class ConfigGroup
 
     private static readonly Dictionary<string, string> CustomTexts = new();
 
-    public readonly ConfigType[] Types;
-    
-    private ConfigGroup([CanBeNull] ConfigGroup parent, params ConfigType[] types)
-    {
-        Types = parent != null ? types.Concat(parent.Types).ToArray() : types;
-    }
+    public readonly ConfigType[] Types = parent != null ? types.Concat(parent.Types).ToArray() : types;
 }

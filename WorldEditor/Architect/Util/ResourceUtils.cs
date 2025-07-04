@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using SFCore.Utils;
 using UnityEngine;
@@ -6,15 +7,29 @@ namespace Architect.Util;
 
 public static class ResourceUtils
 {
-    internal static Sprite Load(string spriteName, FilterMode filterMode = FilterMode.Bilinear) {
-        var asm = Assembly.GetExecutingAssembly();
-        using var s = asm.GetManifestResourceStream($"Architect.Resources.{spriteName}.png");
+    internal static Sprite Load(string spritePath, FilterMode filterMode = FilterMode.Bilinear, Type modType = null, float ppu = 100)
+    {
+        Assembly asm;
+        string path;
+
+        if (modType != null)
+        {
+            asm = modType.Assembly;
+            path = spritePath;
+        } else
+        {
+            asm = Assembly.GetExecutingAssembly();
+            path = $"Architect.Resources.{spritePath}.png";
+        }
+        
+        using var s = asm.GetManifestResourceStream(path);
         if (s == null) return null;
         var buffer = new byte[s.Length];
         _ = s.Read(buffer, 0, buffer.Length);
         var tex = new Texture2D(2, 2);
         tex.LoadImage(buffer, true);
-        var sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+        
+        var sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), ppu);
         sprite.texture.filterMode = filterMode;
         return sprite;
     }

@@ -8,8 +8,8 @@
         <Product>Architect</Product>
         <Description>A mod to add platforms, enemies and more to change areas in the game with an in-game level editor.</Description>
         <Copyright>Copyright © Arun Kapila 2025</Copyright>
-        <AssemblyVersion>1.6.0.2</AssemblyVersion>
-        <FileVersion>1.6.0.2</FileVersion>
+        <AssemblyVersion>1.6.1.0</AssemblyVersion>
+        <FileVersion>1.6.1.0</FileVersion>
         <OutputPath>bin\$(Configuration)\</OutputPath>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
@@ -343,6 +343,9 @@
         </Reference>
         <Reference Include="HKMP">
             <HintPath>/Users/arunkapila/Library/Application Support/Steam/steamapps/common/Hollow Knight/hollow_knight.app/Contents/Resources/Data/Managed/Mods/HKMP/HKMP.dll</HintPath>
+        </Reference>
+        <Reference Include="ScatteredAndLost">
+            <HintPath>/Users/arunkapila/Library/Application Support/Steam/steamapps/common/Hollow Knight/hollow_knight.app/Contents/Resources/Data/Managed/Mods/Scattered and Lost/HK8YPlando.dll</HintPath>
         </Reference>
     </ItemGroup>
     <ItemGroup>

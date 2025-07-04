@@ -53,7 +53,7 @@ public class CustomBinder : MonoBehaviour
         active = !active;
         _renderer.sprite = active ? enabledSprite : disabledSprite;
         
-        EventManager.BroadcastEvent(gameObject, active ? EventBroadcasterType.OnBind : EventBroadcasterType.OnUnbind);
+        EventManager.BroadcastEvent(gameObject, active ? "OnBind" : "OnUnbind");
         
         if (_source) _source.PlayOneShot(clip, 1f);
         

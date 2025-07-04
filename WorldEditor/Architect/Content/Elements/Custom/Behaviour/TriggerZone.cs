@@ -9,12 +9,12 @@ public class TriggerZone : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.gameObject.GetComponent<HeroController>()) return;
-        EventManager.BroadcastEvent(gameObject, EventBroadcasterType.ZoneEnter);
+        EventManager.BroadcastEvent(gameObject, "ZoneEnter");
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
         if (!other.gameObject.GetComponent<HeroController>()) return;
-        EventManager.BroadcastEvent(gameObject, EventBroadcasterType.ZoneExit);
+        EventManager.BroadcastEvent(gameObject, "ZoneExit");
     }
 }

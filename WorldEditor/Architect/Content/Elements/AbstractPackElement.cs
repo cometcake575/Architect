@@ -13,7 +13,7 @@ public abstract class AbstractPackElement
         
     private bool _flipVertical;
     private bool _flipHorizontal;
-    private BroadcasterGroup _broadcasterGroup = BroadcasterGroup.EmptyGroup;
+    private string[] _broadcasterGroup = BroadcasterGroup.EmptyGroup;
     private ReceiverGroup _receiverGroup = ReceiverGroup.All;
     private ConfigGroup _configGroup = ConfigGroup.Generic;
     private RotationGroup _rotationGroup = RotationGroup.None;
@@ -25,7 +25,7 @@ public abstract class AbstractPackElement
         return null;
     }
 
-    internal BroadcasterGroup GetBroadcasterGroup()
+    internal string[] GetBroadcasterGroup()
     {
         return _broadcasterGroup;
     }
@@ -45,7 +45,7 @@ public abstract class AbstractPackElement
         return _rotationGroup;
     }
 
-    public AbstractPackElement WithBroadcasterGroup(BroadcasterGroup group)
+    public AbstractPackElement WithBroadcasterGroup(string[] group)
     {
         _broadcasterGroup = group;
         return this;

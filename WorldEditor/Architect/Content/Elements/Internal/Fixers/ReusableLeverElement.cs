@@ -39,7 +39,7 @@ internal class ReusableLeverElement : InternalPackElement
         fsm.DisableAction("Send Msg", 2);
         fsm.InsertCustomAction("Check Already Called", makerFsm =>
         {
-            EventManager.BroadcastEvent(makerFsm.gameObject, EventBroadcasterType.OnPull);
+            EventManager.BroadcastEvent(makerFsm.gameObject, "OnPull");
         }, 0);
     }
 }

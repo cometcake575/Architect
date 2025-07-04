@@ -223,7 +223,7 @@ public static class EditorUIManager
             .WithProp(GridLayout.Column, 1);
         _leftSideGrid.Children.Add(extraControlsGrid);
 
-        SetupConfigGrid(layout);
+        SetupConfigArea(layout);
         
         PauseOptions.Add(_leftSideGrid);
     }
@@ -296,7 +296,7 @@ public static class EditorUIManager
         return grid;
     }
     
-    private static void SetupConfigGrid(LayoutRoot layout)
+    private static void SetupConfigArea(LayoutRoot layout)
     {
         var configButton = new Button(layout, "Config Choice")
         {
@@ -368,7 +368,7 @@ public static class EditorUIManager
 
     private static GridLayout SetupCategories(LayoutRoot layout)
     {
-        _categories = new List<ObjectCategory>();
+        _categories = [];
         
         SetCategory(FavouritesCategory.Instance);
 
@@ -595,23 +595,23 @@ public static class EditorUIManager
             VerticalAlignment = VerticalAlignment.Center,
             ColumnDefinitions =
             {
-                new GridDimension(1, GridUnit.Proportional),
-                new GridDimension(1, GridUnit.Proportional),
-                new GridDimension(1, GridUnit.Proportional)
+                new GridDimension(2, GridUnit.Proportional),
+                new GridDimension(2, GridUnit.Proportional),
+                new GridDimension(2, GridUnit.Proportional)
             }
         }.WithProp(GridLayout.Row, 1).WithProp(GridLayout.ColumnSpan, 3);
 
         var i = 0;
         foreach (var type in placeable.PackElement.GetConfigGroup().Types)
         {
-            _configGrid.RowDefinitions.Add(new GridDimension(1, GridUnit.Proportional));
+            _configGrid.RowDefinitions.Add(new GridDimension(4, GridUnit.Proportional));
             _configGrid.Children.Add(
                 new TextObject(layout, type.Name + " Description")
                 {
                     Text = type.Name,
                     VerticalAlignment = VerticalAlignment.Center,
                     HorizontalAlignment = HorizontalAlignment.Left,
-                    Padding = new Padding(0, 4)
+                    Padding = new Padding(0, 2)
                 }.WithProp(GridLayout.Row, i)
             );
 
@@ -621,7 +621,7 @@ public static class EditorUIManager
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Right,
                 MinWidth = 40,
-                Padding = new Padding(0, 4),
+                Padding = new Padding(0, 2),
                 Enabled = false
             }.WithProp(GridLayout.Row, i).WithProp(GridLayout.Column, 2);
             _configGrid.Children.Add(apply);
@@ -630,7 +630,7 @@ public static class EditorUIManager
 
             input.GetElement().VerticalAlignment = VerticalAlignment.Center;
             input.GetElement().HorizontalAlignment = HorizontalAlignment.Center;
-            input.GetElement().Padding = new Padding(0, 4);
+            input.GetElement().Padding = new Padding(0, 2);
             input.GetElement().WithProp(GridLayout.Row, i).WithProp(GridLayout.Column, 1);
 
             _configGrid.Children.Add(input.GetElement());
@@ -875,14 +875,13 @@ public static class EditorUIManager
         add.Click += button =>
         {
             button.Enabled = false;
-            if (!Enum.TryParse<EventBroadcasterType>(eventTypeInput.Text, true, out var type)) return;
 
-            var broadcaster = new EventBroadcaster(type, eventNameInput.Text);
+            var broadcaster = new EventBroadcaster(eventTypeInput.Text, eventNameInput.Text);
             Broadcasters.Add(broadcaster);
 
             var info = new TextObject(layout)
             {
-                Text = "Event: " + type + " | Name: " + eventNameInput.Text,
+                Text = "Event: " + eventTypeInput.Text + " | Name: " + eventNameInput.Text,
                 VerticalAlignment = VerticalAlignment.Bottom,
                 HorizontalAlignment = HorizontalAlignment.Center
             }.WithProp(GridLayout.ColumnSpan, 2).WithProp(GridLayout.Row, _broadcastersGrid.RowDefinitions.Count);
@@ -929,9 +928,9 @@ public static class EditorUIManager
         var valid = false;
 
         if (nameText.Length > 0)
-            foreach (var broadcastType in placeable.PackElement.GetBroadcasterGroup().Types)
+            foreach (var broadcastType in placeable.PackElement.GetBroadcasterGroup())
             {
-                if (eText.ToLower().Equals(broadcastType.ToString().ToLower())) valid = true;
+                if (eText.ToLower().Equals(broadcastType, StringComparison.InvariantCultureIgnoreCase)) valid = true;
             }
             
         add.Enabled = valid;

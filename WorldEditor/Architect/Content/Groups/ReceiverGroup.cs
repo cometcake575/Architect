@@ -1,7 +1,7 @@
 using System.Linq;
 using Architect.Attributes;
-using Architect.Attributes.Broadcasters;
 using Architect.Content.Elements.Custom.Behaviour;
+using Architect.Content.Elements.Custom.SaL;
 using JetBrains.Annotations;
 using Modding;
 using Satchel;
@@ -109,7 +109,7 @@ public class ReceiverGroup
                 var relay = o.GetComponent<Relay>();
                 if (!relay.canCall) return;
                 relay.canCall = false;
-                EventManager.BroadcastEvent(o, EventBroadcasterType.OnCall);
+                EventManager.BroadcastEvent(o, "OnCall");
             })
         );
     }

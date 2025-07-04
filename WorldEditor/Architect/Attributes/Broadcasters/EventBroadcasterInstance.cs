@@ -5,9 +5,9 @@ namespace Architect.Attributes.Broadcasters;
 public class EventBroadcasterInstance : MonoBehaviour
 {
     public string eventName;
-    public EventBroadcasterType eventBroadcasterType;
+    public string eventBroadcasterType;
 
-    public EventBroadcasterType GetEventType()
+    public string GetEventType()
     {
         return eventBroadcasterType;
     }

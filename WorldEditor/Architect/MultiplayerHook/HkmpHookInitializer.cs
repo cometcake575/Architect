@@ -1,6 +1,6 @@
 namespace Architect.MultiplayerHook;
 
-public static class HookInitializer
+public static class HkmpHookInitializer
 {
     public static void Initialize()
     {

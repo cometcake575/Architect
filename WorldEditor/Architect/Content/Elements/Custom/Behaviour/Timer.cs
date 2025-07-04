@@ -28,7 +28,7 @@ public class Timer : MonoBehaviour
         }
         
         _calls++;
-        EventManager.BroadcastEvent(gameObject, EventBroadcasterType.OnCall);
+        EventManager.BroadcastEvent(gameObject, "OnCall");
         if (maxCalls != -1 && _calls >= maxCalls)
         {
             _calls = 0;

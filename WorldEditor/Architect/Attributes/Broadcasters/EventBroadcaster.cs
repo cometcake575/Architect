@@ -4,10 +4,10 @@ namespace Architect.Attributes.Broadcasters;
 
 public class EventBroadcaster
 {
-    public readonly EventBroadcasterType EventBroadcasterType;
+    public readonly string EventBroadcasterType;
     public readonly string EventName;
 
-    public EventBroadcaster(EventBroadcasterType type, string name)
+    public EventBroadcaster(string type, string name)
     {
         EventBroadcasterType = type;
         EventName = name;
@@ -17,7 +17,7 @@ public class EventBroadcaster
     {
         return new Dictionary<string, string>
         {
-            ["type"] = EventBroadcasterType.ToString(),
+            ["type"] = EventBroadcasterType,
             ["name"] = EventName
         };
     }

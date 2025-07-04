@@ -17,6 +17,6 @@ public class KeyListener : MonoBehaviour
                 1 => Input.GetKeyUp(key),
                 _ => Input.GetKey(key)
             })) return;
-        EventManager.BroadcastEvent(gameObject, EventBroadcasterType.KeyPress);
+        EventManager.BroadcastEvent(gameObject, "KeyPress");
     }
 }

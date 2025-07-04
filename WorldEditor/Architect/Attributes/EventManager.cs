@@ -17,12 +17,12 @@ public static class EventManager
             ref bool _, ref bool _, ref bool _) =>
         {
             if (received) return;
-            BroadcastEvent(effects.gameObject, EventBroadcasterType.OnDeath);
+            BroadcastEvent(effects.gameObject, "OnDeath");
         };
 
         On.HealthManager.TakeDamage += (orig, self, instance) =>
         {
-            BroadcastEvent(self.gameObject, EventBroadcasterType.OnDamage);
+            BroadcastEvent(self.gameObject, "OnDamage");
             orig(self, instance);
         };
         
@@ -34,7 +34,7 @@ public static class EventManager
             if (!component) return;
             component.OnSetSaveState += value =>
             {
-                if (value) BroadcastEvent(self.gameObject, EventBroadcasterType.LoadedDead);
+                if (value) BroadcastEvent(self.gameObject, "LoadedDead");
             };
         };
     }
@@ -77,16 +77,16 @@ public static class EventManager
 
     public static EventBroadcaster DeserializeBroadcaster(Dictionary<string, string> data)
     {
-        return !Enum.TryParse(data["type"], out EventBroadcasterType @case) ? null : new EventBroadcaster(@case, data["name"]);
+        return new EventBroadcaster(data["type"], data["name"]);
     }
 
-    public static void BroadcastEvent(GameObject gameObject, EventBroadcasterType type)
+    public static void BroadcastEvent(GameObject gameObject, string type)
     {
         var broadcasters = gameObject.GetComponents<EventBroadcasterInstance>();
             
         foreach (var broadcaster in broadcasters)
         {
-            if (broadcaster.GetEventType().Equals(type)) broadcaster.Broadcast();
+            if (broadcaster.GetEventType().Equals(type, StringComparison.InvariantCultureIgnoreCase)) broadcaster.Broadcast();
         }
     }
     

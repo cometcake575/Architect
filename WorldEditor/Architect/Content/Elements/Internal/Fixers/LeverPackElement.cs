@@ -29,11 +29,11 @@ internal sealed class LeverPackElement : GInternalPackElement
         var fsm = gameObject.LocateMyFSM("Switch Control");
         fsm.AddCustomAction("Activated", makerFsm =>
         {
-            EventManager.BroadcastEvent(makerFsm.gameObject, EventBroadcasterType.LoadedPulled);
+            EventManager.BroadcastEvent(makerFsm.gameObject, "LoadedPulled");
         });
         fsm.AddCustomAction("Open", makerFsm =>
         {
-            EventManager.BroadcastEvent(makerFsm.gameObject, EventBroadcasterType.OnPull);
+            EventManager.BroadcastEvent(makerFsm.gameObject, "OnPull");
         });
     }
 }

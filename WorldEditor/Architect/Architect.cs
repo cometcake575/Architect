@@ -8,6 +8,7 @@ using Architect.Configuration;
 using UnityEngine;
 using Architect.Content;
 using Architect.Content.Elements.Custom;
+using Architect.Content.Elements.Custom.SaL;
 using Architect.MultiplayerHook;
 using Architect.Objects;
 using Architect.UI;
@@ -23,6 +24,11 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
     public static Architect Instance { get; private set; }
 
     public static bool UsingMultiplayer;
+
+    public static bool UsingSaL()
+    {
+        return ModHooks.GetMod("ScatteredAndLost") is Mod;
+    }
     
     public Architect() : base("Architect") { }
 
@@ -59,8 +65,13 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
         
         if (ModHooks.GetMod("HKMP") is Mod)
         {
-            HookInitializer.Initialize();
+            HkmpHookInitializer.Initialize();
             UsingMultiplayer = true;
+        }
+
+        if (UsingSaL())
+        {
+            SaLObjects.Initialize();
         }
         
         InitializeLayout();
@@ -77,7 +88,7 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
         
         _menuLayout = new LayoutRoot(true, "Architect Menu")
         {
-            VisibilityCondition = () => UIManager.instance.menuState == MainMenuState.MAIN_MENU
+            VisibilityCondition = () => UIManager.instance && UIManager.instance.menuState == MainMenuState.MAIN_MENU
         };
         MenuUIManager.Initialize(_menuLayout);
     }

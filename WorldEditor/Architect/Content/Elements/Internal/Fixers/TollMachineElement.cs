@@ -36,9 +36,9 @@ internal class TollMachineElement : InternalPackElement
     {
         var fsm = gameObject.LocateMyFSM("Toll Machine");
         fsm.DisableAction("Open Gates", 1);
-        fsm.AddCustomAction("Open Gates", makerFsm => EventManager.BroadcastEvent(makerFsm.gameObject, EventBroadcasterType.OnPay));
+        fsm.AddCustomAction("Open Gates", makerFsm => EventManager.BroadcastEvent(makerFsm.gameObject, "OnPay"));
         
         fsm.DisableAction("Activated", 0);
-        fsm.AddCustomAction("Activated", makerFsm => EventManager.BroadcastEvent(makerFsm.gameObject, EventBroadcasterType.LoadedPaid));
+        fsm.AddCustomAction("Activated", makerFsm => EventManager.BroadcastEvent(makerFsm.gameObject, "LoadedPaid"));
     }
 }
