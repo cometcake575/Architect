@@ -72,8 +72,8 @@ internal sealed class HatcherPackElement : GInternalPackElement
             orig(self);
             
             // Copies placed hatcher info to the corpse
-            self.GetComponentInChildren<Corpse>(true)
-                .gameObject.AddComponent<PlacedHatcher>().cage = self.GetComponent<PlacedHatcher>().cage;
+            var corpse = self.GetComponentInChildren<Corpse>(true);
+            corpse.gameObject.AddComponent<PlacedHatcher>().cage = self.GetComponent<PlacedHatcher>().cage;
         };
         
         On.CorpseHatcher.Smash += (orig, self) =>

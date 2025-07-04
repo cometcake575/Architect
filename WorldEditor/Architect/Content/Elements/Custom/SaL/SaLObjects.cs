@@ -34,7 +34,11 @@ public static class SaLObjects
         {
             var hooks = ReflectionHelper.GetType("HK8YPlando.Scripts.Framework.BumperHooks");
             var speed = ReflectionHelper.GetType("HK8YPlando.Scripts.Framework.BumperSpeedBehaviour");
-            if (self.gameObject.GetComponent(speed)) return;
+            if (self.gameObject.GetComponent(speed))
+            {
+                orig(self);
+                return;
+            }
             var comp = self.gameObject.AddComponent(speed);
 
             var field = hooks.GetField("behaviour", BindingFlags.NonPublic | BindingFlags.Static);

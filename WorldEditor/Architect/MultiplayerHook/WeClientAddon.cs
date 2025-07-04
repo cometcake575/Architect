@@ -174,6 +174,6 @@ public class WeClientAddon : ClientAddon
     }
 
     protected override string Name => "Architect";
-    protected override string Version => "1.6.1.1";
+    protected override string Version => "1.6.1.2";
     public override bool NeedsNetwork => true;
 }
