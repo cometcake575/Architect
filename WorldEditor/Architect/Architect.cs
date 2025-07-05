@@ -24,11 +24,6 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
     public static Architect Instance { get; private set; }
 
     public static bool UsingMultiplayer;
-
-    public static bool UsingSaL()
-    {
-        return ModHooks.GetMod("ScatteredAndLost") is Mod;
-    }
     
     public Architect() : base("Architect") { }
 
@@ -67,11 +62,6 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
         {
             HkmpHookInitializer.Initialize();
             UsingMultiplayer = true;
-        }
-
-        if (UsingSaL())
-        {
-            SaLObjects.Initialize();
         }
         
         InitializeLayout();
