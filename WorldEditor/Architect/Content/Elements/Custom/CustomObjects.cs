@@ -20,7 +20,7 @@ namespace Architect.Content.Elements.Custom;
 public static class CustomObjects
 {
     internal static readonly HashSet<string> TemporaryAbilities = [];
-    internal static readonly List<PlayerListener> PlayerListeners = [];
+    internal static readonly List<PlayerHook> PlayerListeners = [];
     internal static readonly Dictionary<string, List<CustomBinder>> Bindings = new();
 
     private const int ShapeWeight = 1;
@@ -48,9 +48,10 @@ public static class CustomObjects
                 .WithBroadcasterGroup(BroadcasterGroup.Callable)
                 .WithReceiverGroup(ReceiverGroup.Relays)
                 .WithConfigGroup(ConfigGroup.Relays),
-            new SimplePackElement(CreatePlayerListener(), "Player Event Listener", "Custom",
+            new SimplePackElement(CreatePlayerListener(), "Player Hook", "Custom",
                     ResourceUtils.Load("player_listener"))
-                .WithBroadcasterGroup(BroadcasterGroup.PlayerListener)
+                .WithBroadcasterGroup(BroadcasterGroup.PlayerHook)
+                .WithReceiverGroup(ReceiverGroup.PlayerHook)
                 .WithConfigGroup(ConfigGroup.Invisible),
             CreateSquare(),
             CreateCircle(),
@@ -206,11 +207,11 @@ public static class CustomObjects
 
     private static GameObject CreatePlayerListener()
     {
-        var point = new GameObject("Player Listener");
+        var point = new GameObject("Player Hook");
         point.transform.localScale *= 2;
 
         point.SetActive(false);
-        point.AddComponent<PlayerListener>();
+        point.AddComponent<PlayerHook>();
         Object.DontDestroyOnLoad(point);
 
         return point;
@@ -719,6 +720,7 @@ public static class CustomObjects
 
     private static void PlayerEvent(string name)
     {
+        Architect.Instance.Log(name);
         foreach (var listener in PlayerListeners)
         {
             EventManager.BroadcastEvent(listener.gameObject, name);
@@ -775,16 +777,10 @@ public static class CustomObjects
             orig(self);
         };
 
-        On.HeroController.FaceLeft += (orig, self) =>
+        On.HeroController.FlipSprite += (orig, self) =>
         {
-            PlayerEvent("FaceLeft");
             orig(self);
-        };
-
-        On.HeroController.FaceRight += (orig, self) =>
-        {
-            PlayerEvent("FaceRight");
-            orig(self);
+            PlayerEvent(self.cState.facingRight ? "FaceRight" : "FaceLeft");
         };
 
         On.HeroController.DoAttack += (orig, self) =>
@@ -798,11 +794,16 @@ public static class CustomObjects
             PlayerEvent("Dash");
             orig(self);
         };
-        
-        On.HeroController.SuperDash += (orig, self) =>
+
+        On.PlayMakerFSM.Awake += (orig, self) =>
         {
-            PlayerEvent("CrystalDash");
             orig(self);
+            switch (self.FsmName)
+            {
+                case "Superdash":
+                    self.InsertCustomAction("Dash Start", _ => PlayerEvent("CrystalDash"), 0);
+                    break;
+            }
         };
     }
 }

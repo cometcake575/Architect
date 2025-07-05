@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Architect.Content.Elements.Custom.Behaviour;
 
-public class PlayerListener : MonoBehaviour
+public class PlayerHook : MonoBehaviour
 {
     private void OnEnable()
     { 

@@ -20,7 +20,7 @@ public class BroadcasterGroup
 
     public static readonly string[] KeyListeners = ["KeyPress"];
     
-    public static readonly string[] PlayerListener = [
+    public static readonly string[] PlayerHook = [
         "OnDamage", 
         "OnHeal",
         "OnHazardRespawn", 

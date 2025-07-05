@@ -1,7 +1,7 @@
 using System.Linq;
 using Architect.Attributes;
 using Architect.Content.Elements.Custom.Behaviour;
-using Architect.Content.Elements.Custom.SaL;
+using GlobalEnums;
 using JetBrains.Annotations;
 using Modding;
 using Satchel;
@@ -30,6 +30,8 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
     internal static ReceiverGroup Awakable;
     
     internal static ReceiverGroup Relays;
+    
+    internal static ReceiverGroup PlayerHook;
     
     internal static void Initialize()
     {
@@ -120,6 +122,29 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
             {
                 var relay = o.GetComponent<Relay>();
                 relay.DisableRelay();
+            })
+        );
+
+        PlayerHook = new ReceiverGroup(All,
+            EventManager.RegisterEventReceiverType("kill_player", o =>
+            {
+                HeroController.instance.TakeDamage(o, CollisionSide.other, 999, 2);
+            }),
+            EventManager.RegisterEventReceiverType("damage_player", o =>
+            {
+                HeroController.instance.TakeDamage(o, CollisionSide.other, 1, 1);
+            }),
+            EventManager.RegisterEventReceiverType("hazard_player", o =>
+            {
+                HeroController.instance.TakeDamage(o, CollisionSide.other, 1, 2);
+            }),
+            EventManager.RegisterEventReceiverType("heal_player", _ =>
+            {
+                HeroController.instance.AddHealth(1);
+            }),
+            EventManager.RegisterEventReceiverType("full_heal_player", _ =>
+            {
+                HeroController.instance.MaxHealth();
             })
         );
     }

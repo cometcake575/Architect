@@ -297,7 +297,7 @@ public class ObjectPlacement
                             {
                                 case "name":
                                     reader.ReadAsString();
-                                    name = reader.Value as string;
+                                    name = Update(reader.Value as string);
                                     break;
                                 case "id":
                                     reader.ReadAsString();
@@ -378,5 +378,14 @@ public class ObjectPlacement
             }
             return config;
         }
+    }
+
+    internal static string Update(string old)
+    {
+        return old switch
+        {
+            "Player Event Listener" => "Player Hook",
+            _ => old
+        };
     }
 }
