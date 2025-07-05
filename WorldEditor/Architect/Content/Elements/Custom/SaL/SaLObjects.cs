@@ -4,7 +4,6 @@ using System.Reflection;
 using Architect.Util;
 using HK8YPlando;
 using HK8YPlando.Scripts.SharedLib;
-using HK8YPlando.Scripts.Framework;
 using MonoMod.Utils;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -25,7 +24,8 @@ public static class SaLObjects
             MakeArchitectObject(ScatteredAndLostSceneManagerAPI.LoadPrefab<GameObject>("Bumper"), "Bumper", "bumper")
                 .WithConfigGroup(SaLGroups.BumperConfig),
             MakeArchitectObject(ScatteredAndLostSceneManagerAPI.LoadPrefab<GameObject>("BubbleController"), "Bubble", "bubble")
-                .WithConfigGroup(SaLGroups.BubbleConfig)
+                .WithConfigGroup(SaLGroups.BubbleConfig),
+            CustomSaL.MakeCrystalObject()
         };
         
         ContentPacks.RegisterPack(pack);
@@ -65,6 +65,18 @@ public static class SaLObjects
             var info = comp.GetType().GetField(name, BindingFlags.Public | BindingFlags.Instance);
             if (info != null) info.SetValue(comp, value);
         }
+    }
+
+    public static float GetField(GameObject o, string classPath, string name)
+    {
+        var comp = o.GetComponent(classPath);
+        if (comp)
+        {
+            var info = comp.GetType().GetField(name, BindingFlags.Public | BindingFlags.Instance);
+            if (info != null) return (float) info.GetValue(comp);
+        }
+
+        return 1;
     }
 
     public static void SetProperty(GameObject o, string classPath, int value, string name)

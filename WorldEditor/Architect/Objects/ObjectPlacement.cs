@@ -50,7 +50,12 @@ public class ObjectPlacement
     {
         pos.z = _pos.z;
         _pos = pos;
-        if (_obj) _obj.transform.position = pos;
+        if (_obj) _obj.transform.position = pos + ResourceUtils.FixOffset(GetPlaceableObject().Offset, EditorManager.IsFlipped, EditorManager.Rotation, EditorManager.Scale);
+    }
+
+    public Vector3 GetPos()
+    {
+        return _pos;
     }
 
     private Vector3 _pos;

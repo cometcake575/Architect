@@ -296,8 +296,7 @@ public static class EditorManager
         if (Architect.UsingMultiplayer && Architect.GlobalSettings.CollaborationMode)
         {
             var id = _dragged.GetId();
-            HkmpHook.Erase(id, GameManager.instance.sceneName);
-            HkmpHook.Place(_dragged, GameManager.instance.sceneName);
+            HkmpHook.Update(id, GameManager.instance.sceneName, _dragged.GetPos());
         }
 
         _dragged = null;

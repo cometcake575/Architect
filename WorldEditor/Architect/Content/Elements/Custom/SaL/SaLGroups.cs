@@ -34,6 +34,9 @@ public static class SaLGroups
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Bump Strength", (o, value) =>
             {
                 SaLObjects.SetField(o, bumperPath, value.GetValue(), "VerticalScale");
+                SaLObjects.SetField(o, bumperPath, value.GetValue()/1.2f * SaLObjects.GetField(o, bumperPath, "HorizontalBumpX"), "HorizontalBumpX");
+                SaLObjects.SetField(o, bumperPath, value.GetValue()/1.2f * SaLObjects.GetField(o, bumperPath, "HorizontalBumpY"), "HorizontalBumpY");
+                SaLObjects.SetField(o, bumperPath, value.GetValue()/1.2f * SaLObjects.GetField(o, bumperPath, "HorizontalBumpYMax"), "HorizontalBumpYMax");
             })),
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Oscillation Radius", (o, value) =>
             {

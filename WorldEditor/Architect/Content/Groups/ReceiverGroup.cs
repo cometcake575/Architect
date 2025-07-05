@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Architect.Content.Groups;
 
-public class ReceiverGroup
+public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] types)
 {
     private static bool _initialized;
     
@@ -107,17 +107,22 @@ public class ReceiverGroup
             {
                 if (!o.activeInHierarchy) return;
                 var relay = o.GetComponent<Relay>();
-                if (!relay.canCall) return;
+                if (!relay.ShouldRelay()) return;
                 relay.canCall = false;
                 EventManager.BroadcastEvent(o, "OnCall");
+            }),
+            EventManager.RegisterEventReceiverType("enable_relay", o =>
+            {
+                var relay = o.GetComponent<Relay>();
+                relay.EnableRelay();
+            }),
+            EventManager.RegisterEventReceiverType("disable_relay", o =>
+            {
+                var relay = o.GetComponent<Relay>();
+                relay.DisableRelay();
             })
         );
     }
 
-    public readonly string[] Types;
-    
-    public ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] types)
-    {
-        Types = parent != null ? types.Concat(parent.Types).ToArray() : types;
-    }
+    public readonly string[] Types = parent != null ? types.Concat(parent.Types).ToArray() : types;
 }

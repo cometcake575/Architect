@@ -4,6 +4,7 @@ using Architect.Objects;
 using Hkmp.Api.Client;
 using Hkmp.Api.Server;
 using Hkmp.Networking.Packet;
+using UnityEngine;
 
 namespace Architect.MultiplayerHook;
 
@@ -23,6 +24,11 @@ public static class HkmpHook
         Task.Run(() => _clientAddon.Refresh());
     }
 
+    public static void Update(string guid, string scene, Vector3 pos)
+    {
+        _clientAddon.Update(guid, scene, pos);
+    }
+
     public static void Erase(string guid, string scene)
     {
         _clientAddon.Erase(guid, scene);
@@ -36,17 +42,5 @@ public static class HkmpHook
     public static void BroadcastWin()
     {
         _clientAddon.BroadcastWin();
-    }
-    
-    public static IPacketData InstantiatePacket(PacketId packetId)
-    {
-        return packetId switch
-        {
-            PacketId.Refresh => new RefreshPacketData(),
-            PacketId.Win => new WinPacketData(),
-            PacketId.Edit => new EditPacketData(),
-            PacketId.Erase => new ErasePacketData(),
-            _ => null
-        };
     }
 }

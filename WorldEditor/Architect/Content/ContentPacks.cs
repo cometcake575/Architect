@@ -300,6 +300,9 @@ public static class ContentPacks
             CreateEnemy("Fungus3_48", "Mantis Heavy Flyer", "Mantis Petra"),
             Create("Fungus3_34", "Royal Gardens Plat S", "Queen's Gardens Collapsing Platform S", "Interactable", weight:MiscInteractableWeight),
             Create("Fungus3_34", "Royal Gardens Plat L", "Queen's Gardens Collapsing Platform L", "Interactable", weight:MiscInteractableWeight),
+            new ShadeGateElement(weight:MiscInteractableWeight),
+            CreateSolid("Fungus3_44", "Royal_garden_plat_float_08", "Queen's Gardens Platform S"),
+            CreateSolid("Fungus3_44", "Royal_garden_plat_float_06", "Queen's Gardens Platform L"),
             new TollBenchElement(weight:BenchWeight)
         });
         RegisterInternalPack(new ContentPack("City of Tears", "Assets from the City of Tears")

@@ -718,7 +718,6 @@ public static class EditorUIManager
         
         var eventTypeInput = new TextInput(layout, "Trigger Type")
         {
-            ContentType = InputField.ContentType.Alphanumeric,
             VerticalAlignment = VerticalAlignment.Top,
             HorizontalAlignment = HorizontalAlignment.Center,
             MinWidth = 80

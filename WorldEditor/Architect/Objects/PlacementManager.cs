@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Architect.Attributes;
+using Architect.Content.Elements.Custom;
 using Architect.Util;
 
 namespace Architect.Objects;
@@ -32,6 +33,7 @@ public static class PlacementManager
 
     private static void LoadPlacements()
     {
+        CustomObjects.PlayerListeners.Clear();
         foreach (var placement in GetCurrentPlacements().Where(placement => placement.GetPlaceableObject() != null))
         {
             if (EditorManager.IsEditing) placement.PlaceGhost();

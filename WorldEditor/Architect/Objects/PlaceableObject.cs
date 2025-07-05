@@ -79,6 +79,7 @@ public class PlaceableObject : SelectableObject
         {
             _sprite = PackElement.GetSprite();
             Scale = prefab.transform.lossyScale;
+            Offset.z = -prefab.transform.GetPositionZ();
             return;
         }
         

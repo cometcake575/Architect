@@ -9,6 +9,11 @@ public static class ResourceUtils
 {
     internal static Sprite Load(string spritePath, FilterMode filterMode = FilterMode.Bilinear, Type modType = null, float ppu = 100)
     {
+        return Load(spritePath, new Vector2(0.5f, 0.5f), filterMode, modType, ppu);
+    }
+
+    internal static Sprite Load(string spritePath, Vector2 pivot, FilterMode filterMode = FilterMode.Bilinear, Type modType = null, float ppu = 100)
+    {
         Assembly asm;
         string path;
 
@@ -29,7 +34,7 @@ public static class ResourceUtils
         var tex = new Texture2D(2, 2);
         tex.LoadImage(buffer, true);
         
-        var sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), ppu);
+        var sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), pivot, ppu);
         sprite.texture.filterMode = filterMode;
         return sprite;
     }

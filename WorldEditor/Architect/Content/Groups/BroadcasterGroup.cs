@@ -19,4 +19,21 @@ public class BroadcasterGroup
     public static readonly string[] Tolls = ["OnPay", "LoadedPaid"];
 
     public static readonly string[] KeyListeners = ["KeyPress"];
+    
+    public static readonly string[] PlayerListener = [
+        "OnDamage", 
+        "OnHeal",
+        "OnHazardRespawn", 
+        "OnDeath",
+        "FaceLeft",
+        "FaceRight",
+        "Jump", 
+        "WallJump",
+        "DoubleJump",
+        "Land",
+        "HardLand",
+        "Dash",
+        "CrystalDash",
+        "Attack"
+    ];
 }

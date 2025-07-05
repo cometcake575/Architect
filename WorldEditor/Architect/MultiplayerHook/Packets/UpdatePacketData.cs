@@ -2,30 +2,33 @@ using Hkmp.Networking.Packet;
 
 namespace Architect.MultiplayerHook.Packets;
 
-public class EditPacketData : IPacketData
+public class UpdatePacketData : IPacketData
 {
+    public string Id;
     public string SceneName;
-    public byte[] Edits;
+
+    public float X;
+    public float Y;
+    public float Z;
     
     public void WriteData(IPacket packet)
     {
+        packet.Write(Id);
         packet.Write(SceneName);
         
-        packet.Write(Edits.Length);
-        foreach (var b in Edits) packet.Write(b);
+        packet.Write(X);
+        packet.Write(Y);
+        packet.Write(X);
     }
 
     public void ReadData(IPacket packet)
     {
+        Id = packet.ReadString();
         SceneName = packet.ReadString();
 
-        var count = packet.ReadInt();
-        Edits = new byte[count];
-        
-        for (var i = 0; i < count; i++)
-        {
-            Edits[i] = packet.ReadByte();
-        }
+        X = packet.ReadFloat();
+        Y = packet.ReadFloat();
+        Z = packet.ReadFloat();
     }
 
     public bool IsReliable => true;

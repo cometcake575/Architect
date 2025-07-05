@@ -7,6 +7,7 @@ using Architect.MultiplayerHook.Packets;
 using Architect.Objects;
 using Architect.Util;
 using Hkmp.Api.Client;
+using Hkmp.Networking.Packet;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -27,10 +28,11 @@ public class WeClientAddon : ClientAddon
         Logger.Info("Initializing client-side Architect addon!");
         _api = clientApi;
 
-        var netReceiver = clientApi.NetClient.GetNetworkReceiver<PacketId>(this, HkmpHook.InstantiatePacket);
+        var netReceiver = clientApi.NetClient.GetNetworkReceiver<PacketId>(this, InstantiatePacket);
 
         netReceiver.RegisterPacketHandler<RefreshPacketData>(PacketId.Refresh, packet =>
         {
+            Architect.Instance.Log("Receiving Refresh Packet [CLIENT]");
             if (packet.Guid != _currentPacketGroup)
             {
                 Architect.GlobalSettings.Edits[packet.SceneName].Clear();
@@ -63,21 +65,31 @@ public class WeClientAddon : ClientAddon
         });
 
         netReceiver.RegisterPacketHandler<WinPacketData>(PacketId.Win,
-            packet => { ZoteTrophy.WinScreen(packet.WinnerName); });
+            packet =>
+            {
+                Logger.Info("Receiving Edit Packet [CLIENT]");
+                ZoteTrophy.WinScreen(packet.WinnerName);
+            });
 
         netReceiver.RegisterPacketHandler<EditPacketData>(PacketId.Edit, packet =>
         {
             if (!Architect.GlobalSettings.CollaborationMode) return;
-            Architect.GlobalSettings.Edits[packet.SceneName].Add(packet.Edit);
+            Logger.Info("Receiving Edit Packet [CLIENT]");
+
+            var json = ZipUtils.Unzip(packet.Edits);
+            var edit = JsonConvert.DeserializeObject<ObjectPlacement>(json);
+            
+            Architect.GlobalSettings.Edits[packet.SceneName].Add(edit);
             if (packet.SceneName == GameManager.instance.sceneName && EditorManager.IsEditing)
             {
-                packet.Edit.PlaceGhost();
+                edit.PlaceGhost();
             }
         });
 
         netReceiver.RegisterPacketHandler<ErasePacketData>(PacketId.Erase, packet =>
         {
             if (!Architect.GlobalSettings.CollaborationMode) return;
+            Logger.Info("Receiving Erase Packet [CLIENT]");
 
             if (packet.SceneName == GameManager.instance.sceneName && EditorManager.IsEditing)
             {
@@ -88,22 +100,46 @@ public class WeClientAddon : ClientAddon
             }
             else Architect.GlobalSettings.Edits[packet.SceneName].RemoveAll(obj => obj.GetId() == packet.Id);
         });
+
+        netReceiver.RegisterPacketHandler<UpdatePacketData>(PacketId.Update, packet =>
+        {
+            if (!Architect.GlobalSettings.CollaborationMode) return;
+            Logger.Info("Receiving Update Packet [CLIENT]");
+
+            var objects = Architect.GlobalSettings.Edits[packet.SceneName]
+                .Where(obj => obj.GetId() == packet.Id).ToArray();
+
+            foreach (var obj in objects) obj.Move(new Vector3(packet.X, packet.Y, packet.Z));
+        });
     }
 
     public void Place(ObjectPlacement placement, string scene)
     {
         if (!_api.NetClient.IsConnected) return;
+
+        Logger.Info("Sending Place Packet");
+        
+        var json = JsonConvert.SerializeObject(placement,
+            ObjectPlacement.ObjectPlacementConverter.Instance,
+            ObjectPlacement.ObjectPlacementConverter.Vector3Converter);
+        var bytes = ZipUtils.Zip(json);
+
+        var packet = new EditPacketData
+        {
+            Edits = bytes,
+            SceneName = scene
+        };
+
         _api.NetClient.GetNetworkSender<PacketId>(this)
-            .SendSingleData(PacketId.Edit, new EditPacketData
-            {
-                SceneName = scene,
-                Edit = placement
-            });
+            .SendSingleData(PacketId.Edit, packet);
     }
 
     public void Erase(string guid, string scene)
     {
         if (!_api.NetClient.IsConnected) return;
+        
+        Logger.Info("Sending Erase Packet");
+        
         _api.NetClient.GetNetworkSender<PacketId>(this)
             .SendSingleData(PacketId.Erase, new ErasePacketData
             {
@@ -112,11 +148,30 @@ public class WeClientAddon : ClientAddon
             });
     }
 
+    public void Update(string guid, string scene, Vector3 pos)
+    {
+        if (!_api.NetClient.IsConnected) return;
+        
+        Logger.Info("Sending Update Packet");
+        
+        _api.NetClient.GetNetworkSender<PacketId>(this)
+            .SendSingleData(PacketId.Update, new UpdatePacketData
+            {
+                SceneName = scene,
+                Id = guid,
+                X = pos.x,
+                Y = pos.y,
+                Z = pos.z
+            });
+    }
+
     public async void Refresh()
     {
         try
         {
             if (!_api.NetClient.IsConnected) return;
+        
+            Logger.Info("Sending Refresh Packets");
         
             var scene = GameManager.instance.sceneName;
             var json = JsonConvert.SerializeObject(Architect.GlobalSettings.Edits[scene], 
@@ -166,14 +221,27 @@ public class WeClientAddon : ClientAddon
     public void BroadcastWin()
     {
         if (!_api.NetClient.IsConnected) return;
+        
         _api.NetClient.GetNetworkSender<PacketId>(this)
             .SendSingleData(PacketId.Win, new WinPacketData
             {
                 WinnerName = _api.ClientManager.Username
             });
     }
+    
+    public IPacketData InstantiatePacket(PacketId packetId)
+    {
+        return packetId switch
+        {
+            PacketId.Refresh => new RefreshPacketData(),
+            PacketId.Win => new WinPacketData(),
+            PacketId.Edit => new EditPacketData(),
+            PacketId.Erase => new ErasePacketData(),
+            _ => null
+        };
+    }
 
     protected override string Name => "Architect";
-    protected override string Version => "1.6.1.2";
+    protected override string Version => "1.7.0.0";
     public override bool NeedsNetwork => true;
 }

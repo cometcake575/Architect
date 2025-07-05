@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Architect.Attributes;
 using Architect.Content.Elements.Custom.Behaviour;
 using Architect.Content.Groups;
 using Architect.Util;
@@ -18,7 +19,8 @@ namespace Architect.Content.Elements.Custom;
 
 public static class CustomObjects
 {
-    internal static readonly HashSet<string> TemporaryAbilities = new();
+    internal static readonly HashSet<string> TemporaryAbilities = [];
+    internal static readonly List<PlayerListener> PlayerListeners = [];
     internal static readonly Dictionary<string, List<CustomBinder>> Bindings = new();
 
     private const int ShapeWeight = 1;
@@ -44,7 +46,12 @@ public static class CustomObjects
             new SimplePackElement(CreateRelay(), "Relay", "Custom",
                     ResourceUtils.Load("event_relay", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.Callable)
-                .WithReceiverGroup(ReceiverGroup.Relays),
+                .WithReceiverGroup(ReceiverGroup.Relays)
+                .WithConfigGroup(ConfigGroup.Relays),
+            new SimplePackElement(CreatePlayerListener(), "Player Event Listener", "Custom",
+                    ResourceUtils.Load("player_listener"))
+                .WithBroadcasterGroup(BroadcasterGroup.PlayerListener)
+                .WithConfigGroup(ConfigGroup.Invisible),
             CreateSquare(),
             CreateCircle(),
             CreateTriangle(),
@@ -90,7 +97,7 @@ public static class CustomObjects
         collider.size = new Vector2(10, 10);
         
         return new SimplePackElement(square, "Coloured Square", "Decorations", weight: ShapeWeight)
-            .WithConfigGroup(ConfigGroup.Colours)
+            .WithConfigGroup(ConfigGroup.Shapes)
             .WithRotationGroup(RotationGroup.All);
     }
 
@@ -114,7 +121,7 @@ public static class CustomObjects
         collider.SetPath(0, points);
         
         return new SimplePackElement(circle, "Coloured Circle", "Decorations", weight: ShapeWeight)
-            .WithConfigGroup(ConfigGroup.Colours)
+            .WithConfigGroup(ConfigGroup.Shapes)
             .WithRotationGroup(RotationGroup.All);
     }
 
@@ -133,7 +140,7 @@ public static class CustomObjects
         };
         
         return new SimplePackElement(triangle, "Coloured Triangle", "Decorations", weight: ShapeWeight)
-            .WithConfigGroup(ConfigGroup.Colours)
+            .WithConfigGroup(ConfigGroup.Shapes)
             .WithRotationGroup(RotationGroup.All);
     }
 
@@ -192,6 +199,18 @@ public static class CustomObjects
 
         point.SetActive(false);
         point.AddComponent<Relay>();
+        Object.DontDestroyOnLoad(point);
+
+        return point;
+    }
+
+    private static GameObject CreatePlayerListener()
+    {
+        var point = new GameObject("Player Listener");
+        point.transform.localScale *= 2;
+
+        point.SetActive(false);
+        point.AddComponent<PlayerListener>();
         Object.DontDestroyOnLoad(point);
 
         return point;
@@ -313,9 +332,27 @@ public static class CustomObjects
 
     private static void InitializeHooks()
     {
+        SetupPlayerListeners();
+        
+        On.PersistentBoolItem.Awake += (orig, self) =>
+        {
+            if (self.persistentBoolData == null) return;
+            orig(self);
+        };
+
+        On.HeroController.SceneInit += (orig, self) =>
+        {
+            orig(self);
+            if (BossSequenceController.IsInSequence) return;
+            
+            RefreshCharmsBinding();
+            RefreshNailBinding();
+            RefreshShellBinding();
+            RefreshSoulBinding();
+        };
+        
         InitializePantheonBindings();
-
-
+        
         // Bindings
         On.HeroController.CanDash += (orig, self) => BindingCheck(orig(self), "dash");
         On.HeroController.CanFocus += (orig, self) => BindingCheck(orig(self), "focus");
@@ -678,16 +715,95 @@ public static class CustomObjects
             }
             else orig(self);
         };
+    }
 
-        On.HeroController.SceneInit += (orig, self) =>
+    private static void PlayerEvent(string name)
+    {
+        Architect.Instance.Log(name);
+        foreach (var listener in PlayerListeners)
         {
+            EventManager.BroadcastEvent(listener.gameObject, name);
+        }
+    }
+    
+    private static void SetupPlayerListeners()
+    {
+        On.HeroController.TakeDamage += (orig, self, go, side, amount, type) =>
+        {
+            PlayerEvent("OnDamage");
+            if (type != 1) PlayerEvent("OnHazardRespawn");
+            orig(self, go, side, amount, type);
+        };
+
+        On.HeroController.AddHealth += (orig, self, amount) =>
+        {
+            PlayerEvent("OnHeal");
+            orig(self, amount);
+        };
+
+        ModHooks.BeforePlayerDeadHook += () =>
+        {
+            PlayerEvent("OnDeath");
+        };
+
+        On.HeroController.HeroJump += (orig, self) =>
+        {
+            PlayerEvent("Jump");
             orig(self);
-            if (BossSequenceController.IsInSequence) return;
-            
-            RefreshCharmsBinding();
-            RefreshNailBinding();
-            RefreshShellBinding();
-            RefreshSoulBinding();
+        };
+
+        On.HeroController.DoWallJump += (orig, self) =>
+        {
+            PlayerEvent("WallJump");
+            orig(self);
+        };
+
+        On.HeroController.DoDoubleJump += (orig, self) =>
+        {
+            PlayerEvent("DoubleJump");
+            orig(self);
+        };
+
+        On.HeroController.DoHardLanding += (orig, self) =>
+        {
+            PlayerEvent("HardLand");
+            orig(self);
+        };
+
+        On.HeroController.BackOnGround += (orig, self) =>
+        {
+            PlayerEvent("Land");
+            orig(self);
+        };
+
+        On.HeroController.FaceLeft += (orig, self) =>
+        {
+            PlayerEvent("FaceLeft");
+            orig(self);
+        };
+
+        On.HeroController.FaceRight += (orig, self) =>
+        {
+            PlayerEvent("FaceRight");
+            orig(self);
+        };
+
+        On.HeroController.DoAttack += (orig, self) =>
+        {
+            PlayerEvent("Attack");
+            orig(self);
+        };
+
+        On.HeroController.Dash += (orig, self) =>
+        {
+            PlayerEvent("Dash");
+            orig(self);
+        };
+        
+        On.HeroController.SuperDash += (orig, self) =>
+        {
+            PlayerEvent("CrystalDash");
+            orig(self);
         };
     }
 }

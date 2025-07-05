@@ -8,8 +8,8 @@
         <Product>Architect</Product>
         <Description>A mod to add platforms, enemies and more to change areas in the game with an in-game level editor.</Description>
         <Copyright>Copyright © Arun Kapila 2025</Copyright>
-        <AssemblyVersion>1.6.1.2</AssemblyVersion>
-        <FileVersion>1.6.1.2</FileVersion>
+        <AssemblyVersion>1.7.0.0</AssemblyVersion>
+        <FileVersion>1.7.0.0</FileVersion>
         <OutputPath>bin\$(Configuration)\</OutputPath>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
@@ -345,11 +345,12 @@
             <HintPath>/Users/arunkapila/Library/Application Support/Steam/steamapps/common/Hollow Knight/hollow_knight.app/Contents/Resources/Data/Managed/Mods/HKMP/HKMP.dll</HintPath>
         </Reference>
         <Reference Include="ScatteredAndLost">
-            <HintPath>/Users/arunkapila/Library/Application Support/Steam/steamapps/common/Hollow Knight/hollow_knight.app/Contents/Resources/Data/Managed/Mods/Scattered and Lost/HK8YPlando.dll</HintPath>
+            <HintPath>/Users/arunkapila/Library/Application Support/Steam/steamapps/common/Hollow Knight/hollow_knight.app/Contents/Resources/Data/Managed/Mods/Disabled/Scattered and Lost/HK8YPlando.dll</HintPath>
         </Reference>
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="Resources/*.png" />
+        <EmbeddedResource Include="Resources/ScatteredAndLost/*.png" />
         <EmbeddedResource Include="Resources/Bindings/*.png" />
         <EmbeddedResource Include="Resources/Bindings/chain_cut.wav" />
     </ItemGroup>

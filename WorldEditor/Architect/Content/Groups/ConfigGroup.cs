@@ -2,12 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Architect.Attributes.Config;
-using Architect.Content.Elements.Custom;
 using Architect.Content.Elements.Custom.Behaviour;
 using Architect.Content.Elements.Custom.SaL;
 using Architect.Content.Elements.Internal.Fixers;
 using HutongGames.PlayMaker.Actions;
-using JetBrains.Annotations;
 using Modding;
 using Modding.Utils;
 using Satchel;
@@ -15,7 +13,7 @@ using UnityEngine;
 
 namespace Architect.Content.Groups;
 
-public class ConfigGroup([CanBeNull] ConfigGroup parent, params ConfigType[] types)
+public class ConfigGroup
 {
     private static bool _initialized;
     
@@ -53,6 +51,8 @@ public class ConfigGroup([CanBeNull] ConfigGroup parent, params ConfigType[] typ
     
     internal static ConfigGroup Tablets;
     
+    internal static ConfigGroup Relays;
+    
     internal static ConfigGroup Abyss;
     
     internal static ConfigGroup VisibleAbyss;
@@ -83,13 +83,14 @@ public class ConfigGroup([CanBeNull] ConfigGroup parent, params ConfigType[] typ
     
     internal static ConfigGroup Colours;
     
+    internal static ConfigGroup Shapes;
+    
     internal static void Initialize()
     {
         if (_initialized) return;
         _initialized = true;
         
-        Invisible = new ConfigGroup(null,
-            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Active", (o, value) =>
+        Invisible = new ConfigGroup(Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Active", (o, value) =>
             {
                 o.SetActive(value.GetValue());
             }))
@@ -563,7 +564,7 @@ public class ConfigGroup([CanBeNull] ConfigGroup parent, params ConfigType[] typ
             }))
         );
 
-        Colours = new ConfigGroup(Stretchable,
+        Colours = new ConfigGroup(Invisible,
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("r", (o, value) =>
             {
                 var sr = o.GetComponent<SpriteRenderer>();
@@ -595,7 +596,10 @@ public class ConfigGroup([CanBeNull] ConfigGroup parent, params ConfigType[] typ
             Attributes.ConfigManager.RegisterConfigType(new IntConfigType("layer", (o, value) =>
             {
                 o.GetComponent<SpriteRenderer>().sortingOrder = value.GetValue();
-            })),
+            }))
+        );
+
+        Shapes = new ConfigGroup([Colours, Stretchable],
             Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("collision", (o, value) =>
             {
                 switch (value.GetValue())
@@ -612,6 +616,18 @@ public class ConfigGroup([CanBeNull] ConfigGroup parent, params ConfigType[] typ
                         break;
                 }
             }, false, "None", "Hazard", "Solid"))
+        );
+
+        Relays = new ConfigGroup(Generic,
+            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Relay ID", (o, value) =>
+            {
+                o.GetComponent<Relay>().id = value.GetValue();
+            })),
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Reset on Bench", (o, value) =>
+            {
+                if (!value.GetValue()) return;
+                o.GetComponent<Relay>().semiPersistent = true;
+            }))
         );
         
         SaLGroups.InitializeConfig();
@@ -648,5 +664,24 @@ public class ConfigGroup([CanBeNull] ConfigGroup parent, params ConfigType[] typ
 
     private static readonly Dictionary<string, string> CustomTexts = new();
 
-    public readonly ConfigType[] Types = parent != null ? types.Concat(parent.Types).ToArray() : types;
+    public readonly ConfigType[] Types;
+
+    public ConfigGroup(ConfigGroup[] parents, params ConfigType[] types)
+    {
+        Types = types;
+        foreach (var parent in parents)
+        {
+            Types = Types.Concat(parent.Types).ToArray();
+        }
+    }
+
+    public ConfigGroup(ConfigGroup parent, params ConfigType[] types)
+    {
+        Types = types.Concat(parent.Types).ToArray();
+    }
+
+    public ConfigGroup(params ConfigType[] types)
+    {
+        Types = types;
+    }
 }
