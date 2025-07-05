@@ -719,7 +719,6 @@ public static class CustomObjects
 
     private static void PlayerEvent(string name)
     {
-        Architect.Instance.Log(name);
         foreach (var listener in PlayerListeners)
         {
             EventManager.BroadcastEvent(listener.gameObject, name);
