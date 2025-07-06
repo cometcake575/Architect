@@ -295,7 +295,7 @@ internal class SoulWarriorElement : InternalPackElement
         var body = gameObject.GetComponent<Rigidbody2D>();
         var fsm = gameObject.LocateMyFSM("Mage Knight");
         
-        fsm.AddCustomAction("Rest", makerFsm =>
+        fsm.AddCustomAction("Sleep", makerFsm =>
         {
             makerFsm.SendEvent("WAKE");
         });

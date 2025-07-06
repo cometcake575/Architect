@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Architect.Attributes;
 using Architect.Content.Elements.Custom.Behaviour;
@@ -75,6 +76,7 @@ public static class CustomObjects
             CreateBinding("wraiths", "Howling Wraiths Binding", clip),
             CreateBinding("pogo", "Pogo Binding", clip),
             CreateBinding("dash", "Dash Binding", clip),
+            CreateBinding("shadow_dash", "Shadow Dash Binding", clip),
             CreateBinding("claw", "Mantis Claw Binding", clip),
             CreateBinding("cdash", "Crystal Heart Binding", clip),
             CreateBinding("tear", "Isma's Tear Binding", clip),
@@ -363,6 +365,15 @@ public static class CustomObjects
         On.HeroController.CanWallSlide += (orig, self) => BindingCheck(orig(self), "claw");
         On.HeroController.CanDoubleJump += (orig, self) => BindingCheck(orig(self), "wings");
         On.HeroController.CanDreamNail += (orig, self) => BindingCheck(orig(self), "dnail");
+
+        ModHooks.GetPlayerBoolHook += (name, orig) => name == "hasShadowDash" ? BindingCheck(orig, "shadow_dash") : orig;
+
+        On.ShadowGateColliderControl.FixedUpdate += (orig, self) =>
+        {
+            var unlocked = self.GetType().GetField("unlocked", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (unlocked != null) unlocked.SetValue(self, GameManager.instance.playerData.GetBool("hasShadowDash"));
+            orig(self);
+        };
 
         On.HeroController.Bounce += (orig, self) =>
         {

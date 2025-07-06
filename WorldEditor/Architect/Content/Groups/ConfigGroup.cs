@@ -197,7 +197,7 @@ public class ConfigGroup
                     return;
                 }
                 
-                o.LocateMyFSM("Black Knight").AddCustomAction("Sleep", fsm => fsm.SendEvent("WAKE"));
+                o.LocateMyFSM("Black Knight").AddCustomAction("Rest", fsm => fsm.SendEvent("WAKE"));
             }))
         );
 
