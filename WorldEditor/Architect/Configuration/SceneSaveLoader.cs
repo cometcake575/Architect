@@ -21,6 +21,7 @@ public static class SceneSaveLoader
         Directory.CreateDirectory(DataPath);
 
         UpdateLegacyData();
+        // TODO Add a way to save scheduled changes when game saves too
     }
 
     private static void UpdateLegacyData()

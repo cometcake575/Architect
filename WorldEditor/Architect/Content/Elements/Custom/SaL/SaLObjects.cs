@@ -14,7 +14,7 @@ public static class SaLObjects
 {
     public static void Initialize()
     {
-        var pack = new ContentPack("Scattered and Lost", "Celeste-themed assets from the Scattered and Lost mod")
+        var pack = new ContentPack("Architect S&L", "Architect's expansions for the Celeste themed Scattered and Lost mod")
         {
             MakeZipper(),
             MakeArchitectObject(ScatteredAndLostSceneManagerAPI.LoadPrefab<GameObject>("Switch"), "Coin Switch", "switch", 168.6f)

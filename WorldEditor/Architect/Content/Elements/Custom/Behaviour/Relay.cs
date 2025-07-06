@@ -8,12 +8,14 @@ public class Relay : MonoBehaviour
     
     public bool semiPersistent;
     public string id;
+    public float relayChance = 1;
     
     private PersistentBoolItem _item;
     private bool _shouldRelay;
 
     public bool ShouldRelay()
     {
+        if (Random.value > relayChance) return false;
         return canCall && _shouldRelay;
     }
 

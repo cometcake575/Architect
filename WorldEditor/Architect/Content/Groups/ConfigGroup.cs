@@ -608,6 +608,10 @@ public class ConfigGroup
             {
                 if (!value.GetValue()) return;
                 o.GetComponent<Relay>().semiPersistent = true;
+            })),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Relay Chance", (o, value) =>
+            {
+                o.GetComponent<Relay>().relayChance = value.GetValue();
             }))
         );
 
