@@ -365,7 +365,7 @@ public static class CustomObjects
         On.HeroController.CanWallSlide += (orig, self) => BindingCheck(orig(self), "claw");
         On.HeroController.CanDoubleJump += (orig, self) => BindingCheck(orig(self), "wings");
         On.HeroController.CanDreamNail += (orig, self) => BindingCheck(orig(self), "dnail");
-
+        
         ModHooks.GetPlayerBoolHook += (name, orig) => name == "hasShadowDash" ? BindingCheck(orig, "shadow_dash") : orig;
 
         On.ShadowGateColliderControl.FixedUpdate += (orig, self) =>

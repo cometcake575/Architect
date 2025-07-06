@@ -17,77 +17,77 @@ public class ConfigGroup
 {
     private static bool _initialized;
     
-    internal static ConfigGroup Invisible;
+    public static ConfigGroup Invisible;
     
-    internal static ConfigGroup Generic;
+    public static ConfigGroup Generic;
 
-    internal static ConfigGroup GeoChest;
+    public static ConfigGroup GeoChest;
     
-    internal static ConfigGroup KeyListeners;
+    public static ConfigGroup KeyListeners;
     
-    internal static ConfigGroup Enemies;
+    public static ConfigGroup Enemies;
     
-    internal static ConfigGroup Mantis;
+    public static ConfigGroup Mantis;
     
-    internal static ConfigGroup Twisters;
+    public static ConfigGroup Twisters;
     
-    internal static ConfigGroup Awakable;
+    public static ConfigGroup Awakable;
     
-    internal static ConfigGroup GruzMother;
+    public static ConfigGroup GruzMother;
     
-    internal static ConfigGroup VengeflyKing;
+    public static ConfigGroup VengeflyKing;
     
-    internal static ConfigGroup Cocoon;
+    public static ConfigGroup Cocoon;
     
-    internal static ConfigGroup Breakable;
+    public static ConfigGroup Breakable;
     
-    internal static ConfigGroup Levers;
+    public static ConfigGroup Levers;
     
-    internal static ConfigGroup TollBench;
+    public static ConfigGroup TollBench;
     
-    internal static ConfigGroup Toll;
+    public static ConfigGroup Toll;
     
-    internal static ConfigGroup MovingObjects;
+    public static ConfigGroup MovingObjects;
     
-    internal static ConfigGroup Tablets;
+    public static ConfigGroup Tablets;
     
-    internal static ConfigGroup Relays;
+    public static ConfigGroup Relays;
     
-    internal static ConfigGroup Abyss;
+    public static ConfigGroup Abyss;
     
-    internal static ConfigGroup VisibleAbyss;
+    public static ConfigGroup VisibleAbyss;
     
-    internal static ConfigGroup Grub;
+    public static ConfigGroup Grub;
     
-    internal static ConfigGroup BattleGate;
+    public static ConfigGroup BattleGate;
     
-    internal static ConfigGroup BrokenVessel;
+    public static ConfigGroup BrokenVessel;
     
-    internal static ConfigGroup Bindings;
+    public static ConfigGroup Bindings;
     
-    internal static ConfigGroup Conveyors;
+    public static ConfigGroup Conveyors;
     
-    internal static ConfigGroup RoomClearer;
+    public static ConfigGroup RoomClearer;
     
-    internal static ConfigGroup ObjectRemover;
+    public static ConfigGroup ObjectRemover;
     
-    internal static ConfigGroup HazardRespawnPoint;
+    public static ConfigGroup HazardRespawnPoint;
     
-    internal static ConfigGroup RepeatNpcs;
+    public static ConfigGroup RepeatNpcs;
     
-    internal static ConfigGroup Midwife;
+    public static ConfigGroup Midwife;
     
-    internal static ConfigGroup Timers;
+    public static ConfigGroup Timers;
     
-    internal static ConfigGroup Decorations;
+    public static ConfigGroup Decorations;
     
-    internal static ConfigGroup Stretchable;
+    public static ConfigGroup Stretchable;
     
-    internal static ConfigGroup Colours;
+    public static ConfigGroup Colours;
     
-    internal static ConfigGroup Shapes;
+    public static ConfigGroup Shapes;
     
-    internal static void Initialize()
+    public static void Initialize()
     {
         if (_initialized) return;
         _initialized = true;

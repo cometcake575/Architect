@@ -423,3 +423,33 @@ internal class BrokenVesselElement : GInternalPackElement
         public bool disableRoar = true;
     }
 }
+
+
+internal class PureVesselElement : InternalPackElement
+{
+    private GameObject _gameObject;
+
+    public PureVesselElement() : base("Pure Vessel", "Enemies")
+    {
+        WithBroadcasterGroup(BroadcasterGroup.Enemies);
+        WithReceiverGroup(ReceiverGroup.Enemies);
+        WithConfigGroup(ConfigGroup.Enemies);
+        FlipVertical();
+    }
+
+    public override GameObject GetPrefab(bool flipped, float rotation)
+    {
+        return _gameObject;
+    }
+
+    internal override void AddPreloads(List<(string, string)> preloadInfo)
+    {
+        preloadInfo.Add(("GG_Hollow_Knight", "Battle Scene/HK Prime"));
+    }
+
+    internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
+    {
+        _gameObject = preloads["GG_Hollow_Knight"]["Battle Scene/HK Prime"];
+        _gameObject.RemoveComponent<ConstrainPosition>();
+    }
+}

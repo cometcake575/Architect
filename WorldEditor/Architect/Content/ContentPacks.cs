@@ -261,7 +261,10 @@ public static class ContentPacks
                 .WithRotationGroup(RotationGroup.All)
                 .WithConfigGroup(ConfigGroup.MovingObjects)
                 .FlipHorizontal(),
-            new ZombieMylaPackElement(),
+            new ForceActivatedElement("Crossroads_45", "Zombie Myla", "Husk Myla", "Enemies")
+                .WithConfigGroup(ConfigGroup.Enemies)
+                .WithBroadcasterGroup(BroadcasterGroup.Enemies)
+                .WithReceiverGroup(ReceiverGroup.Enemies),
             CreateEnemy("Mines_20", "Zombie Miner 1", "Husk Miner"),
             CreateEnemy("Mines_25", "Zombie Beam Miner", "Crystallised Husk"),
             CreateEnemy("Mines_20", "Crystal Crawler", "Blimback"),
@@ -386,9 +389,9 @@ public static class ContentPacks
         RegisterInternalPack(new ContentPack("The Hive", "Assets from the Hive")
         {
             CreateEnemy("Hive_03_c", "Bee Hatchling Ambient (11)", "Hiveling"),
+            new HatcherPackElement("Hive_01", "Zombie Hive", "Hatcher Cage (1)", "Husk Hive", "Hive Zombie"),
             CreateEnemy("Hive_03_c", "Bee Stinger (4)", "Hive Soldier"),
             CreateEnemy("Hive_03_c", "Big Bee", "Hive Guardian"),
-            new HatcherPackElement("Hive_01", "Zombie Hive", "Hatcher Cage (1)", "Husk Hive", "Hive Zombie"),
             CreateSolid("Hive_03_c", "hive_plat_01 (4)", "Hive Platform 1"),
             CreateSolid("Hive_03_c", "hive_plat_02 (2)", "Hive Platform 2"),
             CreateSolid("Hive_03_c", "hive_plat_03 (3)", "Hive Platform 3"),
@@ -423,11 +426,24 @@ public static class ContentPacks
             CreateEnemy("Deepnest_33", "Zombie Hornhead Sp (2)", "Corpse Creeper (Husk Hornhead)"),
             CreateEnemy("Deepnest_17", "Baby Centipede", "Dirtcarver"),
             new HatcherPackElement("Deepnest_26b", "Centipede Hatcher (4)", "Centipede Cage", "Carver Hatcher", "Centipede Hatcher"),
-            CreateEnemy("Deepnest_Spider_Town", "Spider Mini", "Deephunter")
-                .WithRotationGroup(RotationGroup.Four),
-            CreateEnemy("Deepnest_Spider_Town", "Tiny Spider", "Deepling"),
-            CreateEnemy("Deepnest_41", "Spider Flyer", "Little Weaver"),
-            CreateEnemy("Deepnest_Spider_Town", "Slash Spider", "Stalking Devout").FlipVertical(),
+            new ForceActivatedElement("Deepnest_Spider_Town", "Spider Mini", "Deephunter", "Enemies")
+                .WithRotationGroup(RotationGroup.Four)
+                .WithConfigGroup(ConfigGroup.Enemies)
+                .WithBroadcasterGroup(BroadcasterGroup.Enemies)
+                .WithReceiverGroup(ReceiverGroup.Enemies),
+            new ForceActivatedElement("Deepnest_Spider_Town", "Tiny Spider", "Deepling", "Enemies")
+                .WithConfigGroup(ConfigGroup.Enemies)
+                .WithBroadcasterGroup(BroadcasterGroup.Enemies)
+                .WithReceiverGroup(ReceiverGroup.Enemies),
+            new ForceActivatedElement("Deepnest_41", "Spider Flyer", "Little Weaver", "Enemies")
+                .WithConfigGroup(ConfigGroup.Enemies)
+                .WithBroadcasterGroup(BroadcasterGroup.Enemies)
+                .WithReceiverGroup(ReceiverGroup.Enemies),
+            new ForceActivatedElement("Deepnest_Spider_Town", "Slash Spider", "Stalking Devout", "Enemies")
+                .WithConfigGroup(ConfigGroup.Enemies)
+                .WithBroadcasterGroup(BroadcasterGroup.Enemies)
+                .WithReceiverGroup(ReceiverGroup.Enemies)
+                .FlipVertical(),
             CreateEnemy("Deepnest_Spider_Town", "Egg Sac", "Bluggsac"),
             Create("Deepnest_Spider_Town", "RestBench Return", "Beast's Den Bench", "Interactable", weight:BenchWeight),
             new MidwifeElement(weight:NpcWeight)
@@ -481,7 +497,8 @@ public static class ContentPacks
             new BallZotelingElement("Winged Zoteling", "BUZZER").FlipHorizontal(),
             new BallZotelingElement("Hopping Zoteling", "HOPPER").FlipHorizontal(),
             new FatZotelingElement().FlipHorizontal(),
-            new TallZotelingElement().FlipHorizontal()/*,
+            new TallZotelingElement().FlipHorizontal()
+            /*,
             CreateEnemy("GG_Mighty_Zote", "Battle Control/Zote Balloon Ordeal", "Zote Balloon"),
             CreateEnemy("GG_Mighty_Zote", "Battle Control/Zote Salubra", "Zote's Curse"),
             CreateEnemy("GG_Mighty_Zote", "Battle Control/Zote Fluke", "Zotemon"),

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Architect.Attributes;
+using Architect.Configuration;
 using Architect.Content.Elements.Custom;
 using Architect.Util;
 
@@ -15,13 +16,10 @@ public static class PlacementManager
     {
         var sceneName = GameManager.instance.sceneName;
         if (_sceneName == sceneName) return _currentPlacements;
-
+        
+        if (EditorManager.IsEditing) SceneSaveLoader.SaveScene(_sceneName, _currentPlacements);
         _sceneName = sceneName;
-        
-        if (Architect.GlobalSettings.Edits.TryGetValue(_sceneName, out _currentPlacements)) return _currentPlacements;
-        
-        _currentPlacements = new List<ObjectPlacement>();
-        Architect.GlobalSettings.Edits[_sceneName] = _currentPlacements;
+        _currentPlacements = SceneSaveLoader.LoadScene(sceneName);
 
         return _currentPlacements;
     }

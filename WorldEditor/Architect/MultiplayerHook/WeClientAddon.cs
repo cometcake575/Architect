@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Architect.Configuration;
 using Architect.Content.Elements.Custom.Behaviour;
 using Architect.MultiplayerHook.Packets;
 using Architect.Objects;
@@ -35,7 +36,7 @@ public class WeClientAddon : ClientAddon
             Architect.Instance.Log("Receiving Refresh Packet [CLIENT]");
             if (packet.Guid != _currentPacketGroup)
             {
-                Architect.GlobalSettings.Edits[packet.SceneName].Clear();
+                SceneSaveLoader.WipeScene(packet.SceneName);
                 _packets.Clear();
                 _totalPacketCount = packet.TotalPackets;
                 _currentPacketGroup = packet.Guid;
@@ -53,8 +54,8 @@ public class WeClientAddon : ClientAddon
                 }
 
                 var json = ZipUtils.Unzip(bytes);
-                Architect.GlobalSettings.Edits[packet.SceneName] =
-                    JsonConvert.DeserializeObject<List<ObjectPlacement>>(json);
+                
+                SceneSaveLoader.SaveScene(packet.SceneName, json);
 
                 if (packet.SceneName == GameManager.instance.sceneName)
                 {
@@ -79,10 +80,14 @@ public class WeClientAddon : ClientAddon
             var json = ZipUtils.Unzip(packet.Edits);
             var edit = JsonConvert.DeserializeObject<ObjectPlacement>(json);
             
-            Architect.GlobalSettings.Edits[packet.SceneName].Add(edit);
-            if (packet.SceneName == GameManager.instance.sceneName && EditorManager.IsEditing)
+            if (packet.SceneName == GameManager.instance.sceneName)
             {
-                edit.PlaceGhost();
+                PlacementManager.GetCurrentPlacements().Add(edit);
+                if (EditorManager.IsEditing) edit.PlaceGhost();
+            }
+            else
+            {
+                SceneSaveLoader.ScheduleEdit(packet.SceneName, edit); // This will store it in a list to be added when the scene is next loaded, or saved when the game is next closed
             }
         });
 
@@ -91,14 +96,23 @@ public class WeClientAddon : ClientAddon
             if (!Architect.GlobalSettings.CollaborationMode) return;
             Logger.Info("Receiving Erase Packet [CLIENT]");
 
-            if (packet.SceneName == GameManager.instance.sceneName && EditorManager.IsEditing)
+            if (packet.SceneName == GameManager.instance.sceneName)
             {
-                var objects = Architect.GlobalSettings.Edits[packet.SceneName]
-                    .Where(obj => obj.GetId() == packet.Id).ToArray();
-                
-                foreach (var obj in objects) obj.Destroy();
+                if (EditorManager.IsEditing) {
+                    var objects = PlacementManager.GetCurrentPlacements()
+                        .Where(obj => obj.GetId() == packet.Id).ToArray();
+
+                    foreach (var obj in objects) obj.Destroy();
+                }
+                else
+                {
+                    PlacementManager.GetCurrentPlacements().RemoveAll(obj => obj.GetId() == packet.Id);
+                }
             }
-            else Architect.GlobalSettings.Edits[packet.SceneName].RemoveAll(obj => obj.GetId() == packet.Id);
+            else
+            {
+                SceneSaveLoader.ScheduleErase(packet.SceneName, packet.Id); // This will store it in a list to be added when the scene is next loaded, or saved when the game is next closed
+            }
         });
 
         netReceiver.RegisterPacketHandler<UpdatePacketData>(PacketId.Update, packet =>
@@ -106,10 +120,17 @@ public class WeClientAddon : ClientAddon
             if (!Architect.GlobalSettings.CollaborationMode) return;
             Logger.Info("Receiving Update Packet [CLIENT]");
 
-            var objects = Architect.GlobalSettings.Edits[packet.SceneName]
-                .Where(obj => obj.GetId() == packet.Id).ToArray();
+            if (packet.SceneName == GameManager.instance.sceneName)
+            {
+                var objects = PlacementManager.GetCurrentPlacements()
+                    .Where(obj => obj.GetId() == packet.Id).ToArray();
 
-            foreach (var obj in objects) obj.Move(new Vector3(packet.X, packet.Y, packet.Z));
+                foreach (var obj in objects) obj.Move(new Vector3(packet.X, packet.Y, packet.Z));
+            }
+            else
+            {
+                SceneSaveLoader.ScheduleUpdate(packet.SceneName, packet.Id, new Vector3(packet.X, packet.Y, packet.Z)); // This will store it in a list to be added when the scene is next loaded, or saved when the game is next closed
+            }
         });
     }
 
@@ -120,8 +141,8 @@ public class WeClientAddon : ClientAddon
         Logger.Info("Sending Place Packet");
         
         var json = JsonConvert.SerializeObject(placement,
-            ObjectPlacement.ObjectPlacementConverter.Instance,
-            ObjectPlacement.ObjectPlacementConverter.Vector3Converter);
+            SceneSaveLoader.Opc,
+            SceneSaveLoader.V3C);
         var bytes = ZipUtils.Zip(json);
 
         var packet = new EditPacketData
@@ -174,9 +195,7 @@ public class WeClientAddon : ClientAddon
             Logger.Info("Sending Refresh Packets");
         
             var scene = GameManager.instance.sceneName;
-            var json = JsonConvert.SerializeObject(Architect.GlobalSettings.Edits[scene], 
-                ObjectPlacement.ObjectPlacementConverter.Instance, 
-                ObjectPlacement.ObjectPlacementConverter.Vector3Converter);
+            var json = SceneSaveLoader.SerializeSceneData(PlacementManager.GetCurrentPlacements());
         
             var bytes = Split(ZipUtils.Zip(json), SplitSize);
         

@@ -7,7 +7,6 @@ using Architect.Attributes.Config;
 using Architect.Attributes.Receivers;
 using Architect.Content.Groups;
 using Architect.Util;
-using Modding.Converters;
 using Newtonsoft.Json;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -202,9 +201,6 @@ public class ObjectPlacement
 
     public class ObjectPlacementConverter : Newtonsoft.Json.JsonConverter<ObjectPlacement>
     {
-        public static readonly ObjectPlacementConverter Instance = new();
-        public static readonly Vector3Converter Vector3Converter = new();
-        
         public override void WriteJson(JsonWriter writer, ObjectPlacement value, JsonSerializer serializer)
         {
             writer.WriteStartObject();

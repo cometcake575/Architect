@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Architect.Configuration;
 using Architect.Objects;
 using Architect.Util;
 using MagicUI.Core;
@@ -170,7 +171,7 @@ public static class MenuUIManager
 
         var json = request.downloadHandler.text;
         
-        Architect.GlobalSettings.Edits = JsonConvert.DeserializeObject<Dictionary<string, List<ObjectPlacement>>>(json);
+        SceneSaveLoader.LoadAllScenes(JsonConvert.DeserializeObject<Dictionary<string, List<ObjectPlacement>>>(json));
         PlacementManager.InvalidateCache();
     }
 
@@ -729,9 +730,7 @@ public static class MenuUIManager
         form.AddField("name", name);
         form.AddField("desc", desc);
         
-        var jsonData = JsonConvert.SerializeObject(Architect.GlobalSettings.Edits, 
-            ObjectPlacement.ObjectPlacementConverter.Instance, 
-            ObjectPlacement.ObjectPlacementConverter.Vector3Converter);
+        var jsonData = SceneSaveLoader.SerializeAllScenes();
         
         var jsonBytes = Encoding.UTF8.GetBytes(jsonData);
         form.AddBinaryData("level", jsonBytes, "level.json", "application/json");

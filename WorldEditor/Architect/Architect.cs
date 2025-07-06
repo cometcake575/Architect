@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Modding;
 using System.Reflection;
 using Architect.Attributes;
@@ -51,6 +50,8 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
         
         ContentPacks.AfterPreload(preloadedObjects);
         
+        SceneSaveLoader.Initialize();
+        
         CustomObjects.Initialize();
         RoomObjects.Initialize();
         
@@ -97,15 +98,6 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
     
     public WorldEditorGlobalSettings OnSaveGlobal()
     {
-        var keysToRemove = GlobalSettings.Edits.Keys
-            .Where(key => GlobalSettings.Edits[key].Count == 0)
-            .ToList();
-
-        foreach (var s in keysToRemove)
-        {
-            GlobalSettings.Edits.Remove(s);
-        }
-        
         return GlobalSettings;
     }
     

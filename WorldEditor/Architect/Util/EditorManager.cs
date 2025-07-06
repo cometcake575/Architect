@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using Architect.Configuration;
 using Architect.Content.Groups;
 using Architect.MultiplayerHook;
 using Architect.Objects;
@@ -29,6 +30,12 @@ public static class EditorManager
         ModHooks.HeroUpdateHook += EditorUpdate;
 
         On.GameManager.EnterHero += LoadStoredPosition;
+
+        On.GameManager.SaveGame += (orig, self) =>
+        {
+            if (IsEditing) SceneSaveLoader.SaveScene(self.sceneName, PlacementManager.GetCurrentPlacements());
+            orig(self);
+        };
 
         On.QuitToMenu.Start += (orig, self) =>
         {
@@ -211,6 +218,8 @@ public static class EditorManager
         if (HeroController.instance.controlReqlinquished) return;
 
         HeroController.instance.AffectedByGravity(IsEditing);
+        if (IsEditing) SceneSaveLoader.SaveScene(GameManager.instance.sceneName, PlacementManager.GetCurrentPlacements()); 
+            
         IsEditing = !IsEditing;
 
         ReloadScene();

@@ -13,10 +13,11 @@ public static class ConfigurationScreen
     
     public static MenuScreen GetScreen(MenuScreen modListMenu, WorldEditorGlobalSettings globalSettings)
     {
-        string[] values = {
+        string[] values =
+        [
             "True",
             "False"
-        };
+        ];
         var elements = new List<Element>
         {
             new TextPanel("Editor"),
