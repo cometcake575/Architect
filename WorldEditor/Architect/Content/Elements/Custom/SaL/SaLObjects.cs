@@ -29,25 +29,6 @@ public static class SaLObjects
         };
         
         ContentPacks.RegisterPack(pack);
-
-        On.HeroController.SceneInit += (orig, self) =>
-        {
-            var hooks = ReflectionHelper.GetType("HK8YPlando.Scripts.Framework.BumperHooks");
-            var speed = ReflectionHelper.GetType("HK8YPlando.Scripts.Framework.BumperSpeedBehaviour");
-            if (self.gameObject.GetComponent(speed))
-            {
-                orig(self);
-                return;
-            }
-            var comp = self.gameObject.AddComponent(speed);
-
-            var field = hooks.GetField("behaviour", BindingFlags.NonPublic | BindingFlags.Static);
-            if (field == null) return;
-            
-            field.SetValue(null, comp);
-            
-            orig(self);
-        };
     }
 
     private static AbstractPackElement MakeArchitectObject(GameObject obj, string name, string path, float ppu = 100)
