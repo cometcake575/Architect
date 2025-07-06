@@ -237,11 +237,12 @@ public class WeClientAddon : ClientAddon
             PacketId.Win => new WinPacketData(),
             PacketId.Edit => new EditPacketData(),
             PacketId.Erase => new ErasePacketData(),
+            PacketId.Update => new UpdatePacketData(),
             _ => null
         };
     }
 
     protected override string Name => "Architect";
-    protected override string Version => "1.7.1.0";
+    protected override string Version => "1.7.2.0";
     public override bool NeedsNetwork => true;
 }

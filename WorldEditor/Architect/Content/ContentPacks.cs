@@ -410,7 +410,12 @@ public static class ContentPacks
             CreateEnemy("Abyss_17", "Lesser Mawlek", "Lesser Mawlek"),
             new MawlurkPackElement(),
             CreateEnemy("Abyss_04", "Abyss Crawler", "Shadow Creeper")
-                .WithRotationGroup(RotationGroup.Four)
+                .WithRotationGroup(RotationGroup.Four),
+            new BrokenVesselElement("GG_Broken_Vessel", "Infected Knight", "Broken Vessel"),
+            new BrokenVesselElement("Dream_03_Infected_Knight", "Lost Kin", "Lost Kin"),
+            CreateSolid("Dream_03_Infected_Knight", "dream_plat_small (1)", "Dream Platform S"),
+            CreateSolid("Dream_03_Infected_Knight", "dream_plat_med (7)", "Dream Platform M"),
+            CreateSolid("Dream_03_Infected_Knight", "dream_plat_large (3)", "Dream Platform L")
         });
         RegisterInternalPack(new ContentPack("Deepnest", "Assets from Deepnest")
         {
@@ -434,7 +439,8 @@ public static class ContentPacks
             CreateSolid("Abyss_06_Core", "_Scenery/abyss_plat_float_03", "Abyss Platform 3"),
             CreateSolid("Abyss_06_Core", "_Scenery/abyss_plat_float_04", "Abyss Platform 4"),
             new VoidTendrilsElement(),
-            new ShadeSiblingElement()
+            new ShadeSiblingElement(),
+            new HornetElement(weight:NpcWeight)
         });
         RegisterInternalPack(new ContentPack("White Palace", "Assets from the White Palace")
         {
@@ -467,9 +473,7 @@ public static class ContentPacks
             CreateSolid("GG_Workshop", "gg_plat_float_wide", "Godhome Platform L"),
             Create("GG_Workshop", "RestBench (1)", "Godhome Bench", "Interactable", weight:SpecialBenchWeight),
             new MultiPartInternalElement("GG_Atrium_Roof", "RestBench (1)", "GG_bench_metal_0001_1", "Godhome Roof Bench", "Interactable", weight:SpecialBenchWeight),
-            Create("GG_Engine", "Godseeker EngineRoom NPC", "Godseeker", "Interactable", weight:NpcWeight)
-                .FlipHorizontal()
-                .WithConfigGroup(ConfigGroup.Godseeker)
+            new GodseekerElement(weight:NpcWeight)
         });
         RegisterInternalPack(new ContentPack("Zoteboat", "Zotelings from the Eternal Ordeal")
         {

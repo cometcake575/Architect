@@ -73,6 +73,7 @@ public static class CustomObjects
             CreateBinding("spirit", "Vengeful Spirit Binding", clip),
             CreateBinding("dive", "Desolate Dive Binding", clip),
             CreateBinding("wraiths", "Howling Wraiths Binding", clip),
+            CreateBinding("pogo", "Pogo Binding", clip),
             CreateBinding("dash", "Dash Binding", clip),
             CreateBinding("claw", "Mantis Claw Binding", clip),
             CreateBinding("cdash", "Crystal Heart Binding", clip),
@@ -362,6 +363,11 @@ public static class CustomObjects
         On.HeroController.CanWallSlide += (orig, self) => BindingCheck(orig(self), "claw");
         On.HeroController.CanDoubleJump += (orig, self) => BindingCheck(orig(self), "wings");
         On.HeroController.CanDreamNail += (orig, self) => BindingCheck(orig(self), "dnail");
+
+        On.HeroController.Bounce += (orig, self) =>
+        {
+            if (BindingCheck(true, "pogo")) orig(self);
+        };
 
         On.HeroController.CanNailCharge += (orig, self) =>
         {
@@ -720,7 +726,6 @@ public static class CustomObjects
 
     private static void PlayerEvent(string name)
     {
-        Architect.Instance.Log(name);
         foreach (var listener in PlayerListeners)
         {
             EventManager.BroadcastEvent(listener.gameObject, name);

@@ -61,6 +61,8 @@ public class ConfigGroup
     
     internal static ConfigGroup BattleGate;
     
+    internal static ConfigGroup BrokenVessel;
+    
     internal static ConfigGroup Bindings;
     
     internal static ConfigGroup Conveyors;
@@ -71,7 +73,7 @@ public class ConfigGroup
     
     internal static ConfigGroup HazardRespawnPoint;
     
-    internal static ConfigGroup Godseeker;
+    internal static ConfigGroup RepeatNpcs;
     
     internal static ConfigGroup Midwife;
     
@@ -210,18 +212,13 @@ public class ConfigGroup
         VengeflyKing = new ConfigGroup(Awakable,
             Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Dive Height", (o, value) =>
             {
-                Architect.Instance.Log("Checking to target player");
-                if (value.GetValue() == 0) return;
-                Architect.Instance.Log("Setting to target player");
-                o.GetComponent<VengeflyKingElement.VkConfig>().targetPlayer = true;
-                // By default, Vengeflies will be at an offset if the VK is targeting the player
-                // The config option is applied later and therefore overrides this
-                o.GetComponent<VengeflyKingElement.VkConfig>().vengeflyRule = 2;
-            }, true, "Default", "Player")),
+                if (value.GetValue() == 1) return;
+                o.GetComponent<VengeflyKingElement.VkConfig>().targetPlayer = false;
+            }, true, "Vanilla", "Player")),
             Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Vengeflies", (o, value) =>
             {
                 o.GetComponent<VengeflyKingElement.VkConfig>().vengeflyRule = value.GetValue();
-            }, true, "Off", "Default", "Offset"))
+            }, true, "Off", "Vanilla", "Local"))
         );
 
         Breakable = new ConfigGroup(Generic,
@@ -465,31 +462,15 @@ public class ConfigGroup
             )
         );
 
-        Godseeker = new ConfigGroup(
+        RepeatNpcs = new ConfigGroup(
             Generic,
             Attributes.ConfigManager.RegisterConfigType(new StringConfigType("First Convo", (o, value) =>
             {
-                var fsm = o.LocateMyFSM("Conversation Control");
-                var id = "Custom Godseeker First " + o.name;
-                
-                fsm.AddCustomAction("Init", makerFsm =>
-                {
-                    makerFsm.FsmVariables.FindFsmBool("Door Completed").Value = false;
-                    makerFsm.FsmVariables.FindFsmString("First Cell").Value = id;
-                });
-                CustomTexts[id] = value.GetValue();
+                CustomTexts[o.GetComponent<NpcEditor>().SetFirstConvo()] = value.GetValue();
             })),
             Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Repeat Convo", (o, value) =>
             {
-                var fsm = o.LocateMyFSM("Conversation Control");
-                var id = "Custom Godseeker Repeat " + o.name;
-                
-                fsm.AddCustomAction("Init", makerFsm =>
-                {
-                    makerFsm.FsmVariables.FindFsmBool("Door Completed").Value = false;
-                    makerFsm.FsmVariables.FindFsmString("Repeat Cell").Value = id;
-                });
-                CustomTexts[id] = value.GetValue();
+                CustomTexts[o.GetComponent<NpcEditor>().SetRepeatConvo()] = value.GetValue();
             }))
         );
 
@@ -628,6 +609,23 @@ public class ConfigGroup
                 if (!value.GetValue()) return;
                 o.GetComponent<Relay>().semiPersistent = true;
             }))
+        );
+
+        BrokenVessel = new ConfigGroup(Enemies,
+            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Jump Zone", (o, value) =>
+            {
+                if (value.GetValue() != 1) return;
+                o.GetComponent<BrokenVesselElement.BrokenVesselConfig>().localJump = false;
+            }, true, "Local", "Arena")),
+            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Infected Balloons", (o, value) =>
+            {
+                o.GetComponent<BrokenVesselElement.BrokenVesselConfig>().balloons = value.GetValue();
+            }, true, "Local", "Arena", "Disabled")),
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Disable Roar", (o, value) =>
+            {
+                if (value.GetValue()) return;
+                o.GetComponent<BrokenVesselElement.BrokenVesselConfig>().disableRoar = false;
+            }, true))
         );
         
         SaLGroups.InitializeConfig();

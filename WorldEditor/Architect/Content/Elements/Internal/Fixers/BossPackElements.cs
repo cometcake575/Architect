@@ -40,6 +40,8 @@ internal class VengeflyKingElement : InternalPackElement
         var config = gameObject.GetComponent<VkConfig>();
         var targetPlayer = config.targetPlayer;
         var vengeflyRule = config.vengeflyRule;
+
+        if (vengeflyRule == -1) vengeflyRule = targetPlayer ? 2 : 1;
         
         var fsm = gameObject.LocateMyFSM("Big Buzzer");
         
@@ -99,9 +101,9 @@ internal class VengeflyKingElement : InternalPackElement
 
     internal class VkConfig : MonoBehaviour
     {
-        public bool targetPlayer;
+        public bool targetPlayer = true;
         
-        public int vengeflyRule = 1;
+        public int vengeflyRule = -1;
     }
 }
 
@@ -310,5 +312,114 @@ internal class SoulWarriorElement : InternalPackElement
         {
             body.gravityScale = 1;
         }, 0);
+    }
+}
+
+internal class BrokenVesselElement : GInternalPackElement
+{
+    public BrokenVesselElement(string scene, string path, string name) : base(scene, path, name, "Enemies", 0)
+    {
+        WithBroadcasterGroup(BroadcasterGroup.Enemies);
+        WithReceiverGroup(ReceiverGroup.Enemies);
+        WithConfigGroup(ConfigGroup.BrokenVessel);
+    }
+
+    public override GameObject GetPrefab(bool flipped, float rotation)
+    {
+        return GameObject;
+    }
+
+    internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
+    {
+        base.AfterPreload(preloads);
+        GameObject.AddComponent<BrokenVesselConfig>();
+    }
+
+    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
+    {
+        var config = gameObject.GetComponent<BrokenVesselConfig>();
+        
+        var fsm = gameObject.LocateMyFSM("IK Control");
+        
+        if (fsm.TryGetState("Set Pos", out var state)) state.DisableAction(1);
+        else
+        {
+            fsm.DisableAction("Set X", 0);
+            fsm.DisableAction("Set X", 2);
+            fsm.DisableAction("Intro Fall", 2);
+        }
+
+        foreach (var act in fsm.GetActions<PlayerDataBoolTest>("Init")) act.isFalse = act.isTrue;
+        
+        var waiting = fsm.GetAction<BoolTest>("Waiting", 3);
+        waiting.isFalse = waiting.isTrue;
+        
+        fsm.DisableAction("Close Gates", 0);
+        
+        if (config.disableRoar) fsm.DisableAction("Roar", 5);
+
+        var pos = fsm.gameObject.transform.position;
+
+        fsm.FsmVariables.FindFsmFloat("Min Dstab Height").Value = -100;
+
+        var aimJump2 = fsm.GetAction<RandomFloat>("Aim Jump 2", 0);
+        
+        if (config.localJump)
+        {
+            fsm.InsertCustomAction("Aim Jump", makerFsm =>
+            {
+                var newPos = makerFsm.gameObject.transform.position;
+                makerFsm.FsmVariables.FindFsmFloat("Left X").Value = newPos.x - 10.235f;
+                makerFsm.FsmVariables.FindFsmFloat("Right X").Value = newPos.x + 10.235f;
+            }, 0);
+
+            aimJump2.min = fsm.FsmVariables.FindFsmFloat("Left X");
+            aimJump2.max = fsm.FsmVariables.FindFsmFloat("Right X");
+        }
+        else
+        {
+            fsm.FsmVariables.FindFsmFloat("Left X").Value = pos.x - 10.235f;
+            fsm.FsmVariables.FindFsmFloat("Right X").Value = pos.x + 10.235f;
+            
+            aimJump2.min = pos.x - 1;
+            aimJump2.max = pos.x + 1;
+        }
+        
+        fsm.DisableAction("Set Height", 0);
+
+        var balloonFsm = gameObject.LocateMyFSM("Spawn Balloon");
+        switch (config.balloons)
+        {
+            case 0:
+                balloonFsm.InsertCustomAction("Spawn", makerFsm =>
+                {
+                    var newPos = makerFsm.gameObject.transform.position;
+                    makerFsm.FsmVariables.FindFsmFloat("X Min").Value = newPos.x - 9.55f;
+                    makerFsm.FsmVariables.FindFsmFloat("X Max").Value = newPos.x + 9.55f;
+                
+                    makerFsm.FsmVariables.FindFsmFloat("Y Min").Value = newPos.y;
+                    makerFsm.FsmVariables.FindFsmFloat("Y Max").Value = newPos.y + 5.26f;
+                }, 0);
+                break;
+            case 1:
+                fsm.FsmVariables.FindFsmFloat("X Min").Value = pos.x - 9.55f;
+                fsm.FsmVariables.FindFsmFloat("X Max").Value = pos.x + 9.55f;
+                
+                fsm.FsmVariables.FindFsmFloat("Y Min").Value = pos.y;
+                fsm.FsmVariables.FindFsmFloat("Y Max").Value = pos.y + 5.26f;
+                break;
+            default:
+                balloonFsm.RemoveState("Spawn");
+                break;
+        }
+    }
+
+    public class BrokenVesselConfig : MonoBehaviour
+    {
+        public bool localJump = true;
+        
+        public int balloons = 0;
+        
+        public bool disableRoar = true;
     }
 }

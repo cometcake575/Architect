@@ -31,7 +31,7 @@ internal class MidwifeElement : InternalPackElement
 
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
-        if (flipped == (rotation == 180)) return;
+        if (flipped == Mathf.Approximately(rotation, 180)) return;
         gameObject.transform.GetChild(1).gameObject.LocateMyFSM("npc_control").FsmVariables
             .FindFsmFloat("Move To Offset")
             .Value = -3;
