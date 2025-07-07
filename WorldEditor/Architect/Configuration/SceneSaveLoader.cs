@@ -21,7 +21,30 @@ public static class SceneSaveLoader
         Directory.CreateDirectory(DataPath);
 
         UpdateLegacyData();
-        // TODO Add a way to save scheduled changes when game saves too
+
+        On.GameManager.SaveGame += (orig, self) =>
+        {
+            List<string> scenes = [];
+            
+            scenes.AddRange(ScheduledErases.Keys);
+            scenes.AddRange(ScheduledEdits.Keys);
+            scenes.AddRange(ScheduledUpdates.Keys);
+
+            foreach (var scene in scenes)
+            {
+                var placements = LoadScene(scene);
+                if (ScheduledErases.TryGetValue(scene, out var erases)) placements.RemoveAll(obj => erases.Contains(obj.GetId()));
+                if (ScheduledEdits.TryGetValue(scene, out var edits)) placements.AddRange(edits);
+                if (ScheduledUpdates.TryGetValue(scene, out var updates))
+                    foreach (var pair in updates)
+                    {
+                        placements.First(obj => obj.GetId() == pair.Item1).Move(pair.Item2);
+                    }
+                SaveScene(scene, placements);
+            }
+            
+            orig(self);
+        };
     }
 
     private static void UpdateLegacyData()
