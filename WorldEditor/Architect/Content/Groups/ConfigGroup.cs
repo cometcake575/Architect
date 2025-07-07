@@ -87,6 +87,8 @@ public class ConfigGroup
     
     public static ConfigGroup Shapes;
     
+    public static ConfigGroup TextDisplay;
+    
     public static void Initialize()
     {
         if (_initialized) return;
@@ -630,6 +632,13 @@ public class ConfigGroup
                 if (value.GetValue()) return;
                 o.GetComponent<BrokenVesselElement.BrokenVesselConfig>().disableRoar = false;
             }, true))
+        );
+
+        TextDisplay = new ConfigGroup(Invisible,
+            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Content", (o, value) =>
+            {
+                CustomTexts[o.GetComponent<TextDisplay>().ID] = value.GetValue();
+            }))
         );
         
         SaLGroups.InitializeConfig();

@@ -49,6 +49,10 @@ public static class CustomObjects
                 .WithBroadcasterGroup(BroadcasterGroup.Callable)
                 .WithReceiverGroup(ReceiverGroup.Relays)
                 .WithConfigGroup(ConfigGroup.Relays),
+            new SimplePackElement(CreateTextDisplay(), "Text Display", "Custom",
+                    ResourceUtils.Load("text_display", FilterMode.Point))
+                .WithReceiverGroup(ReceiverGroup.TextDisplay)
+                .WithConfigGroup(ConfigGroup.TextDisplay),
             new SimplePackElement(CreatePlayerListener(), "Player Hook", "Custom",
                     ResourceUtils.Load("player_listener"))
                 .WithBroadcasterGroup(BroadcasterGroup.PlayerHook)
@@ -203,6 +207,18 @@ public static class CustomObjects
 
         point.SetActive(false);
         point.AddComponent<Relay>();
+        Object.DontDestroyOnLoad(point);
+
+        return point;
+    }
+
+    private static GameObject CreateTextDisplay()
+    {
+        var point = new GameObject("Text Display");
+        point.transform.localScale *= 10;
+
+        point.SetActive(false);
+        point.AddComponent<TextDisplay>();
         Object.DontDestroyOnLoad(point);
 
         return point;

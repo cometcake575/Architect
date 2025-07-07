@@ -33,6 +33,8 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
     
     internal static ReceiverGroup PlayerHook;
     
+    internal static ReceiverGroup TextDisplay;
+    
     internal static void Initialize()
     {
         if (_initialized) return;
@@ -145,6 +147,13 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
             EventManager.RegisterEventReceiverType("full_heal_player", _ =>
             {
                 HeroController.instance.MaxHealth();
+            })
+        );
+
+        TextDisplay = new ReceiverGroup(All,
+            EventManager.RegisterEventReceiverType("display", o =>
+            {
+                o.GetComponent<TextDisplay>().Display();
             })
         );
     }

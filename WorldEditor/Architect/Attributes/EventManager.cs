@@ -55,7 +55,7 @@ public static class EventManager
 
     public static void RegisterEventReceiver(string name, EventReceiverInstance receiver)
     {
-        if (!Events.ContainsKey(name)) Events[name] = new List<EventReceiverInstance>();
+        if (!Events.ContainsKey(name)) Events[name] = [];
         Events[name].Add(receiver);
     }
 
