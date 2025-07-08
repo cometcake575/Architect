@@ -1,4 +1,5 @@
 using System;
+using JetBrains.Annotations;
 using MagicUI.Core;
 using MagicUI.Elements;
 using UnityEngine;
@@ -14,9 +15,9 @@ public class BoolConfigType : ConfigType<BoolConfigValue>
         return new BoolConfigValue(this, Convert.ToBoolean(data));
     }
 
-    public override ConfigElement CreateInput(LayoutRoot root, Button apply)
+    public override ConfigElement CreateInput(LayoutRoot root, Button apply, string oldValue)
     {
-        return new BoolConfigElement(Name, root, apply);
+        return new BoolConfigElement(Name, root, apply, oldValue);
     }
 }
 
@@ -25,7 +26,7 @@ public class BoolConfigElement : ConfigElement
     private readonly Button _input;
     private bool _choice;
     
-    public BoolConfigElement(string name, LayoutRoot layout, Button apply)
+    public BoolConfigElement(string name, LayoutRoot layout, Button apply, [CanBeNull] string oldValue)
     {
         _input = new Button(layout, name + " Input")
         {
@@ -33,7 +34,11 @@ public class BoolConfigElement : ConfigElement
         };
         _choice = true;
 
-        _input.Content = "Unset";
+        if (oldValue != null)
+        {
+            _choice = oldValue == bool.TrueString;
+            _input.Content = _choice.ToString();
+        } else _input.Content = "Unset";
 
         _input.Click += button =>
         {

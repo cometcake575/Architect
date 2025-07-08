@@ -1,4 +1,5 @@
 using System;
+using JetBrains.Annotations;
 using MagicUI.Core;
 using MagicUI.Elements;
 using UnityEngine;
@@ -20,9 +21,9 @@ public class ChoiceConfigType : ConfigType<ChoiceConfigValue>
         return new ChoiceConfigValue(this, Convert.ToInt32(data));
     }
 
-    public override ConfigElement CreateInput(LayoutRoot root, Button apply)
+    public override ConfigElement CreateInput(LayoutRoot root, Button apply, string oldValue)
     {
-        return new ChoiceConfigElement(Name, root, apply, _options);
+        return new ChoiceConfigElement(Name, root, apply, _options, oldValue);
     }
 }
 
@@ -31,15 +32,16 @@ public class ChoiceConfigElement : ConfigElement
     private readonly Button _input;
     private int _choice;
     
-    public ChoiceConfigElement(string name, LayoutRoot layout, Button apply, string[] options)
+    public ChoiceConfigElement(string name, LayoutRoot layout, Button apply, string[] options, [CanBeNull] string oldValue)
     {
         _input = new Button(layout, name + " Input")
         {
             MinWidth = 20
         };
-        _choice = -1;
 
-        _input.Content = "Unset";
+        _choice = oldValue != null ? Array.IndexOf(options, oldValue) : -1;
+
+        _input.Content = oldValue ?? "Unset";
 
         _input.Click += button =>
         {

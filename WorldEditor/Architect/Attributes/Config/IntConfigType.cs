@@ -1,4 +1,5 @@
 using System;
+using JetBrains.Annotations;
 using MagicUI.Core;
 using MagicUI.Elements;
 using UnityEngine;
@@ -16,9 +17,9 @@ public class IntConfigType : ConfigType<IntConfigValue>
         return new IntConfigValue(this, Convert.ToInt32(data));
     }
 
-    public override ConfigElement CreateInput(LayoutRoot root, Button apply)
+    public override ConfigElement CreateInput(LayoutRoot root, Button apply, string oldValue)
     {
-        return new IntConfigElement(Name, root, apply);
+        return new IntConfigElement(Name, root, apply, oldValue);
     }
 }
 
@@ -26,16 +27,21 @@ public class IntConfigElement : ConfigElement
 {
     private readonly TextInput _input;
     
-    public IntConfigElement(string name, LayoutRoot layout, Button apply)
+    public IntConfigElement(string name, LayoutRoot layout, Button apply, [CanBeNull] string oldValue)
     {
         _input = new TextInput(layout, name + " Input")
         {
             MinWidth = 80,
             ContentType = InputField.ContentType.IntegerNumber
         };
+        
+        if (oldValue != null) _input.Text = oldValue;
+        var last = _input.Text;
 
-        _input.TextChanged += (_, _) =>
+        _input.TextChanged += (_, n) =>
         {
+            if (last == n) return;
+            last = n;
             apply.Enabled = true;
         };
     }

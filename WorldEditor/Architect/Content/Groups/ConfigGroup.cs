@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Architect.Attributes.Config;
 using Architect.Content.Elements.Custom.Behaviour;
 using Architect.Content.Elements.Custom.SaL;
@@ -122,6 +123,7 @@ public class ConfigGroup
             }))
         );
         
+        var enemyTypeField = typeof(HealthManager).GetField("enemyType", BindingFlags.NonPublic | BindingFlags.Instance);
         Enemies = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Health", (o, value) =>
             {
@@ -154,6 +156,10 @@ public class ConfigGroup
                 {
                     b = o.GetComponent<HealthManager>().isDead;
                 };
+            })),
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Give Soul", (o, value) =>
+            {
+                enemyTypeField?.SetValue(o.GetComponent<HealthManager>(), value.GetValue() ? 1 : 6);
             }))
         );
 

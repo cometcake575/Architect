@@ -61,9 +61,10 @@ public class ObjectPlacement
     private PlaceableObject _placeableObject;
     private readonly string _name;
     private readonly bool _flipped;
-    private readonly float _rotation;
-    private readonly float _scale;
     private readonly string _id;
+    
+    public readonly float Rotation;
+    public readonly float Scale;
 
     public string GetId()
     {
@@ -78,12 +79,12 @@ public class ObjectPlacement
         
         _obj = new GameObject
         {
-            transform = { position = _pos + ResourceUtils.FixOffset(selected.Offset, _flipped, _rotation, _scale) },
+            transform = { position = _pos + ResourceUtils.FixOffset(selected.Offset, _flipped, Rotation, Scale) },
             name = "[Architect] Object Preview"
         };
 
-        var scaleX = _scale;
-        var scaleY = _scale;
+        var scaleX = Scale;
+        var scaleY = Scale;
 
         var r = 1f;
         var g = 1f;
@@ -92,7 +93,7 @@ public class ObjectPlacement
         
         var renderer = _obj.AddComponent<SpriteRenderer>();
         
-        foreach (var config in _config)
+        foreach (var config in Config)
         {
             if (config.GetName() == "width" && config is FloatConfigValue width) scaleX *= width.GetValue();
             else if (config.GetName() == "height" && config is FloatConfigValue height) scaleY *= height.GetValue();
@@ -105,29 +106,29 @@ public class ObjectPlacement
 
         renderer.color = new Color(r, g, b, a);
         
-        GhostPlacementUtils.SetupForPlacement(_obj, renderer, selected, _flipped, _rotation, scaleX, scaleY);
+        GhostPlacementUtils.SetupForPlacement(_obj, renderer, selected, _flipped, Rotation, scaleX, scaleY);
     }
 
     internal void SpawnObject()
     {
         var packElement = GetPlaceableObject().PackElement;
-        var prefab = packElement.GetPrefab(_flipped, _rotation);
+        var prefab = packElement.GetPrefab(_flipped, Rotation);
         
         var obj = Object.Instantiate(prefab, _pos, prefab.transform.rotation);
         obj.name = "[Architect] " + _name + " (" + _id + ")";
         
-        if (!Mathf.Approximately(_scale, 1))
+        if (!Mathf.Approximately(Scale, 1))
         {
             if (obj.GetComponent<HealthManager>() && !packElement.DisableScaleParent())
             {
                 var par = new GameObject("Scale Parent") { transform = { position = _pos } };
                 obj.transform.parent = par.transform;
-                par.transform.localScale *= _scale;
+                par.transform.localScale *= Scale;
             }
-            else obj.transform.localScale *= _scale;
+            else obj.transform.localScale *= Scale;
         }
 
-        foreach (var c in _config)
+        foreach (var c in Config)
         {
             if (!c.PreAwake()) continue;
             c.Setup(obj);
@@ -135,7 +136,7 @@ public class ObjectPlacement
         
         obj.SetActive(true);
         
-        GetPlaceableObject().PackElement.PostSpawn(obj, _flipped, _rotation, _scale);
+        GetPlaceableObject().PackElement.PostSpawn(obj, _flipped, Rotation, Scale);
         
         if (!GetPlaceableObject().PackElement.OverrideFlip() && _flipped)
         {
@@ -147,34 +148,34 @@ public class ObjectPlacement
         if (!GetPlaceableObject().PackElement.OverrideRotation())
         {
             var rotation = obj.transform.rotation.eulerAngles;
-            rotation.z += _rotation;
+            rotation.z += Rotation;
             obj.transform.rotation = Quaternion.Euler(rotation);
         }
 
-        foreach (var broadcaster in _broadcasters)
+        foreach (var broadcaster in Broadcasters)
         {
             var instance = obj.AddComponent<EventBroadcasterInstance>();
             instance.eventBroadcasterType = broadcaster.EventBroadcasterType;
             instance.eventName = broadcaster.EventName;
         }
 
-        foreach (var receiver in _receivers)
+        foreach (var receiver in Receivers)
         {
             var instance = obj.AddComponent<EventReceiverInstance>();
             instance.Receiver = receiver;
             EventManager.RegisterEventReceiver(receiver.Name, instance);
         }
 
-        foreach (var c in _config)
+        foreach (var c in Config)
         {
             if (c.PreAwake()) continue;
             c.Setup(obj);
         }
     }
 
-    private readonly EventBroadcaster[] _broadcasters;
-    private readonly EventReceiver[] _receivers;
-    private readonly ConfigValue[] _config;
+    public readonly EventBroadcaster[] Broadcasters;
+    public readonly EventReceiver[] Receivers;
+    public readonly ConfigValue[] Config;
     
     public ObjectPlacement(
         string name, 
@@ -190,13 +191,13 @@ public class ObjectPlacement
         _name = name;
         _pos = pos;
         _flipped = flipped;
-        _scale = scale;
+        Scale = scale;
         _id = id;
-        _rotation = rotation;
+        Rotation = rotation;
 
-        _broadcasters = broadcasters;
-        _receivers = receivers;
-        _config = config;
+        Broadcasters = broadcasters;
+        Receivers = receivers;
+        Config = config;
     }
 
     public class ObjectPlacementConverter : Newtonsoft.Json.JsonConverter<ObjectPlacement>
@@ -207,22 +208,22 @@ public class ObjectPlacement
             
             WritePlacementInfo(writer, value, serializer);
             
-            if (value._broadcasters.Length > 0)
+            if (value.Broadcasters.Length > 0)
             {
                 writer.WritePropertyName("events");
-                serializer.Serialize(writer, value._broadcasters.Select(broadcaster => broadcaster.Serialize()).ToList());
+                serializer.Serialize(writer, value.Broadcasters.Select(broadcaster => broadcaster.Serialize()).ToList());
             }
 
-            if (value._receivers.Length > 0)
+            if (value.Receivers.Length > 0)
             {
                 writer.WritePropertyName("listeners");
-                serializer.Serialize(writer, value._receivers.Select(receiver => receiver.Serialize()).ToList());
+                serializer.Serialize(writer, value.Receivers.Select(receiver => receiver.Serialize()).ToList());
             }
 
-            if (value._config.Length > 0)
+            if (value.Config.Length > 0)
             {
                 writer.WritePropertyName("config");
-                serializer.Serialize(writer, value._config.ToDictionary(c => c.GetName(), c => c.SerializeValue()));
+                serializer.Serialize(writer, value.Config.ToDictionary(c => c.GetName(), c => c.SerializeValue()));
             }
             
             writer.WriteEndObject();
@@ -243,16 +244,16 @@ public class ObjectPlacement
             writer.WritePropertyName("flipped");
             writer.WriteValue(placement._flipped);
             
-            if (placement._rotation != 0)
+            if (placement.Rotation != 0)
             {
                 writer.WritePropertyName("rotation");
-                writer.WriteValue(placement._rotation);
+                writer.WriteValue(placement.Rotation);
             }
             
-            if (!Mathf.Approximately(placement._scale, 1))
+            if (!Mathf.Approximately(placement.Scale, 1))
             {
                 writer.WritePropertyName("scale");
-                writer.WriteValue(placement._scale);
+                writer.WriteValue(placement.Scale);
             }
             
             writer.WriteEndObject();

@@ -1,4 +1,5 @@
 using System;
+using JetBrains.Annotations;
 using MagicUI.Core;
 using MagicUI.Elements;
 using UnityEngine;
@@ -14,9 +15,9 @@ public class StringConfigType : ConfigType<StringConfigValue>
         return new StringConfigValue(this, data);
     }
 
-    public override ConfigElement CreateInput(LayoutRoot root, Button apply)
+    public override ConfigElement CreateInput(LayoutRoot root, Button apply, string oldValue)
     {
-        return new StringConfigElement(Name, root, apply);
+        return new StringConfigElement(Name, root, apply, oldValue);
     }
 }
 
@@ -24,15 +25,20 @@ public class StringConfigElement : ConfigElement
 {
     private readonly TextInput _input;
     
-    public StringConfigElement(string name, LayoutRoot layout, Button apply)
+    public StringConfigElement(string name, LayoutRoot layout, Button apply, [CanBeNull] string oldValue)
     {
         _input = new TextInput(layout, name + " Input")
         {
             MinWidth = 80
         };
+        
+        if (oldValue != null) _input.Text = oldValue;
+        var last = _input.Text;
 
-        _input.TextChanged += (_, _) =>
+        _input.TextChanged += (_, n) =>
         {
+            if (last == n) return;
+            last = n;
             apply.Enabled = true;
         };
     }

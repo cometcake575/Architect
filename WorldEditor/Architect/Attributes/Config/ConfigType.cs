@@ -1,4 +1,5 @@
 using System;
+using JetBrains.Annotations;
 using MagicUI.Core;
 using MagicUI.Elements;
 using UnityEngine;
@@ -18,7 +19,7 @@ public abstract class ConfigType
     
     public abstract ConfigValue Deserialize(string data);
 
-    public abstract ConfigElement CreateInput(LayoutRoot root, Button apply);
+    public abstract ConfigElement CreateInput(LayoutRoot root, Button apply, [CanBeNull] string oldValue);
     
     internal abstract void RunAction(GameObject obj, ConfigValue value);
 }

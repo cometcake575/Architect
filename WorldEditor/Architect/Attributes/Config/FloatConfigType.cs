@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using JetBrains.Annotations;
 using MagicUI.Core;
 using MagicUI.Elements;
 using UnityEngine;
@@ -17,17 +18,17 @@ public class FloatConfigType : ConfigType<FloatConfigValue>
         return new FloatConfigValue(this, Convert.ToSingle(data.Replace(",", "."), CultureInfo.InvariantCulture));
     }
 
-    public override ConfigElement CreateInput(LayoutRoot root, Button apply)
+    public override ConfigElement CreateInput(LayoutRoot root, Button apply, string oldValue)
     {
-        return new FloatConfigElement(Name, root, apply);
+        return new FloatConfigElement(Name, root, apply, oldValue);
     }
 }
 
 public class FloatConfigElement : ConfigElement
 {
     private readonly TextInput _input;
-    
-    public FloatConfigElement(string name, LayoutRoot layout, Button apply)
+
+    public FloatConfigElement(string name, LayoutRoot layout, Button apply, [CanBeNull] string oldValue)
     {
         _input = new TextInput(layout, name + " Input")
         {
@@ -35,8 +36,13 @@ public class FloatConfigElement : ConfigElement
             ContentType = InputField.ContentType.DecimalNumber
         };
 
-        _input.TextChanged += (_, _) =>
+        if (oldValue != null) _input.Text = oldValue;
+        var last = _input.Text;
+
+        _input.TextChanged += (_, n) =>
         {
+            if (last == n) return;
+            last = n;
             apply.Enabled = true;
         };
     }
