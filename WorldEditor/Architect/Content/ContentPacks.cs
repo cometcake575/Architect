@@ -386,6 +386,21 @@ public static class ContentPacks
             new TamerBeastElement(),
             Create("Room_Colosseum_02", "RestBench", "Colosseum Bench", "Interactable", weight:BenchWeight)
         });
+        RegisterInternalPack(new ContentPack("Zoteboat", "Zotelings from the Eternal Ordeal")
+        {
+            new ZotelingElement("Dormant Warriors/Zote Crew Normal (1)", "Zoteling The Mighty").FlipHorizontal(),
+            new BallZotelingElement("Winged Zoteling", "BUZZER").FlipHorizontal(),
+            new BallZotelingElement("Hopping Zoteling", "HOPPER").FlipHorizontal(),
+            new FatZotelingElement().FlipHorizontal(),
+            new TallZotelingElement().FlipHorizontal(),
+            new VolatileZotelingElement(),
+            new FlukeZotelingElement()
+            /*,
+            CreateEnemy("GG_Mighty_Zote", "Battle Control/Zote Balloon Ordeal", "Zote Balloon"),
+            CreateEnemy("GG_Mighty_Zote", "Battle Control/Zote Salubra", "Zote's Curse"),
+            CreateEnemy("GG_Mighty_Zote", "Battle Control/Zote Fluke", "Zotemon"),
+            CreateEnemy("GG_Mighty_Zote", "Battle Control/Zote Thwomp", "Zwomp"),*/
+        });
         RegisterInternalPack(new ContentPack("The Hive", "Assets from the Hive")
         {
             CreateEnemy("Hive_03_c", "Bee Hatchling Ambient (11)", "Hiveling"),
@@ -490,19 +505,6 @@ public static class ContentPacks
             Create("GG_Workshop", "RestBench (1)", "Godhome Bench", "Interactable", weight:SpecialBenchWeight),
             new MultiPartInternalElement("GG_Atrium_Roof", "RestBench (1)", "GG_bench_metal_0001_1", "Godhome Roof Bench", "Interactable", weight:SpecialBenchWeight),
             new GodseekerElement(weight:NpcWeight)
-        });
-        RegisterInternalPack(new ContentPack("Zoteboat", "Zotelings from the Eternal Ordeal")
-        {
-            new ZotelingElement("Dormant Warriors/Zote Crew Normal (1)", "Zoteling The Mighty").FlipHorizontal(),
-            new BallZotelingElement("Winged Zoteling", "BUZZER").FlipHorizontal(),
-            new BallZotelingElement("Hopping Zoteling", "HOPPER").FlipHorizontal(),
-            new FatZotelingElement().FlipHorizontal(),
-            new TallZotelingElement().FlipHorizontal()
-            /*,
-            CreateEnemy("GG_Mighty_Zote", "Battle Control/Zote Balloon Ordeal", "Zote Balloon"),
-            CreateEnemy("GG_Mighty_Zote", "Battle Control/Zote Salubra", "Zote's Curse"),
-            CreateEnemy("GG_Mighty_Zote", "Battle Control/Zote Fluke", "Zotemon"),
-            CreateEnemy("GG_Mighty_Zote", "Battle Control/Zote Thwomp", "Zwomp"),*/
         });
         /*RegisterInternalPack(new ContentPack("Experimental", "Experimental Features - These will be moved to a regular pack when confirmed to work")
         {,

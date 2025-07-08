@@ -39,9 +39,17 @@ public class ChoiceConfigElement : ConfigElement
             MinWidth = 20
         };
 
-        _choice = oldValue != null ? Array.IndexOf(options, oldValue) : -1;
-
-        _input.Content = oldValue ?? "Unset";
+        if (oldValue != null)
+        {
+            var oldIndex = Convert.ToInt32(oldValue);
+            _choice = oldIndex;
+            _input.Content = options[oldIndex];
+        }
+        else
+        {
+            _choice = -1;
+            _input.Content = "Unset";
+        }
 
         _input.Click += button =>
         {

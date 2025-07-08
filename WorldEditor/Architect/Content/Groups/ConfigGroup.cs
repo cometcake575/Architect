@@ -28,6 +28,8 @@ public class ConfigGroup
     
     public static ConfigGroup Enemies;
     
+    public static ConfigGroup FlukeZoteling;
+    
     public static ConfigGroup Mantis;
     
     public static ConfigGroup Twisters;
@@ -160,6 +162,14 @@ public class ConfigGroup
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Give Soul", (o, value) =>
             {
                 enemyTypeField?.SetValue(o.GetComponent<HealthManager>(), value.GetValue() ? 1 : 6);
+            }))
+        );
+
+        FlukeZoteling = new ConfigGroup(Enemies, 
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Max Flight Distance", (o, value) =>
+            {
+                var control = o.LocateMyFSM("Control");
+                control.GetAction<FloatCompare>("Climb", 3).float2 = o.transform.position.y + value.GetValue();
             }))
         );
 

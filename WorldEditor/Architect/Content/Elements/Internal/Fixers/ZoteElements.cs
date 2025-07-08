@@ -127,3 +127,114 @@ internal sealed class FatZotelingElement : ZotelingElement
         }, 2);
     }
 }
+
+internal sealed class VolatileZotelingElement : InternalPackElement
+{
+    private GameObject _gameObject;
+
+    public VolatileZotelingElement() : base("Volatile Zoteling", "Enemies")
+    {
+        WithBroadcasterGroup(BroadcasterGroup.Enemies);
+        WithConfigGroup(ConfigGroup.Enemies);
+        WithReceiverGroup(ReceiverGroup.Enemies);
+    }
+    
+    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
+    {
+        var control = gameObject.LocateMyFSM("Control");
+        control.AddCustomAction("Dormant", fsm => fsm.SendEvent("BALLOON SPAWN"));
+        gameObject.GetComponent<HealthManager>().hasSpecialDeath = false;
+        
+        control.DisableAction("Set Pos", 6);
+    }
+
+    public override GameObject GetPrefab(bool flipped, float rotation)
+    {
+        return _gameObject;
+    }
+
+    internal override void AddPreloads(List<(string, string)> preloadInfo)
+    {
+        preloadInfo.Add(("GG_Mighty_Zote", "Battle Control/Zote Balloon Ordeal"));
+    }
+
+    internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
+    {
+        _gameObject = preloads["GG_Mighty_Zote"]["Battle Control/Zote Balloon Ordeal"];
+    }
+}
+
+internal sealed class FlukeZotelingElement : InternalPackElement
+{
+    private GameObject _gameObject;
+
+    public FlukeZotelingElement() : base("Fluke Zoteling", "Enemies")
+    {
+        WithBroadcasterGroup(BroadcasterGroup.Enemies);
+        WithConfigGroup(ConfigGroup.FlukeZoteling);
+        WithReceiverGroup(ReceiverGroup.Enemies);
+    }
+    
+    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
+    {
+        var control = gameObject.LocateMyFSM("Control");
+        control.AddCustomAction("Dormant", fsm => fsm.SendEvent("GO"));
+        gameObject.GetComponent<HealthManager>().hasSpecialDeath = false;
+        
+        control.DisableAction("Pos", 3);
+
+        control.GetAction<FloatCompare>("Climb", 3).float2 = gameObject.transform.position.y + 18.88f;
+    }
+
+    public override GameObject GetPrefab(bool flipped, float rotation)
+    {
+        return _gameObject;
+    }
+
+    internal override void AddPreloads(List<(string, string)> preloadInfo)
+    {
+        preloadInfo.Add(("GG_Mighty_Zote", "Battle Control/Zote Fluke"));
+    }
+
+    internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
+    {
+        _gameObject = preloads["GG_Mighty_Zote"]["Battle Control/Zote Fluke"];
+    }
+}
+
+internal sealed class ZoteCurseElement : InternalPackElement
+{
+    private GameObject _gameObject;
+
+    public ZoteCurseElement() : base("Zote's Curse", "Enemies")
+    {
+        WithBroadcasterGroup(BroadcasterGroup.Enemies);
+        WithConfigGroup(ConfigGroup.Enemies);
+        WithReceiverGroup(ReceiverGroup.Enemies);
+    }
+    
+    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
+    {
+        var control = gameObject.LocateMyFSM("Control");
+        control.AddCustomAction("Dormant", fsm => fsm.SendEvent("START"));
+        gameObject.GetComponent<HealthManager>().hasSpecialDeath = false;
+        
+        control.DisableAction("Appear", 3);
+        control.DisableAction("Appear", 6);
+    }
+
+    public override GameObject GetPrefab(bool flipped, float rotation)
+    {
+        return _gameObject;
+    }
+
+    internal override void AddPreloads(List<(string, string)> preloadInfo)
+    {
+        preloadInfo.Add(("GG_Mighty_Zote", "Battle Control/Zote Salubra"));
+    }
+
+    internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
+    {
+        _gameObject = preloads["GG_Mighty_Zote"]["Battle Control/Zote Salubra"];
+    }
+}
