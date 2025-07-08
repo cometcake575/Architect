@@ -170,8 +170,19 @@ public static class MenuUIManager
         while (!operation.isDone) await Task.Yield();
 
         var json = request.downloadHandler.text;
+
+        try
+        {
+            var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+            SceneSaveLoader.LoadAllScenes(data);
+        }
+        catch
+        {
+            var legacyData = JsonConvert.DeserializeObject<Dictionary<string, List<ObjectPlacement>>>(json);
+            SceneSaveLoader.LoadAllScenes(legacyData);
+        }
+
         
-        SceneSaveLoader.LoadAllScenes(JsonConvert.DeserializeObject<Dictionary<string, List<ObjectPlacement>>>(json));
         PlacementManager.InvalidateCache();
     }
 

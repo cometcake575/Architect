@@ -200,7 +200,7 @@ public class ObjectPlacement
         Config = config;
     }
 
-    public class ObjectPlacementConverter : Newtonsoft.Json.JsonConverter<ObjectPlacement>
+    public class ObjectPlacementConverter : JsonConverter<ObjectPlacement>
     {
         public override void WriteJson(JsonWriter writer, ObjectPlacement value, JsonSerializer serializer)
         {
@@ -263,6 +263,8 @@ public class ObjectPlacement
             bool hasExistingValue,
             JsonSerializer serializer)
         {
+            Architect.Instance.Log(0);
+            
             // Required for deserialization
             ConfigGroup.Initialize();
             ReceiverGroup.Initialize();

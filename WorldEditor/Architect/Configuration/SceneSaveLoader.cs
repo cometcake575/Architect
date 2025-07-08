@@ -147,10 +147,22 @@ public static class SceneSaveLoader
         return JsonConvert.SerializeObject(data);
     }
 
+    public static void LoadAllScenes(Dictionary<string, string> placements)
+    {
+        WipeAllScenes();
+        foreach (var pair in placements)
+        {
+            SaveScene(pair.Key, pair.Value);
+        }
+    }
+
     public static void LoadAllScenes(Dictionary<string, List<ObjectPlacement>> placements)
     {
         WipeAllScenes();
-        foreach (var pair in placements) SaveScene(pair.Key, pair.Value);
+        foreach (var pair in placements)
+        {
+            SaveScene(pair.Key, pair.Value);
+        }
     }
 
     public static void ScheduleErase(string scene, string id)
