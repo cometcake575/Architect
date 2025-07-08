@@ -40,7 +40,7 @@ internal class ZotelingElement : InternalPackElement
     {
         var control = gameObject.LocateMyFSM("Control");
         for (var i = 1; i <= 5; i++) control.DisableAction("Spawn Antic", i);
-        control.SendEvent("SPAWN");
+        control.AddCustomAction("Dormant", fsm => fsm.SendEvent("SPAWN"));
         gameObject.GetComponent<HealthManager>().hasSpecialDeath = false;
     }
 }
@@ -82,7 +82,7 @@ internal class BallZotelingElement : InternalPackElement
         random.timeMin = 0.0001f;
         random.timeMax = 0.001f;
             
-        control.SendEvent("SPAWN");
+        control.AddCustomAction("Dormant", fsm => fsm.SendEvent("SPAWN"));
         gameObject.GetComponent<HealthManager>().hasSpecialDeath = false;
 
         control.DisableAction("Choice", 3);

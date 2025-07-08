@@ -38,6 +38,7 @@ internal class PickObject : SelectableObject
         
         EditorManager.Scale = pl.Scale;
         EditorManager.Rotation = pl.Rotation;
+        EditorManager.IsFlipped = pl.Flipped;
         
         EditorUIManager.ScaleChoice.Text = pl.Scale.ToString(CultureInfo.InvariantCulture);
         EditorUIManager.RotationChoice.Text = pl.Rotation.ToString(CultureInfo.InvariantCulture);

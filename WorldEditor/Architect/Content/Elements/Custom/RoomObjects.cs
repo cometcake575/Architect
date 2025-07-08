@@ -29,7 +29,7 @@ public static class RoomObjects
             {
                 var clearer = o.GetComponent<RoomClearerConfig>();
 
-                IEnumerable<GameObject> objects = o.scene.GetRootGameObjects().Where(obj => !obj.name.StartsWith("[Architect]"));
+                var objects = o.scene.GetRootGameObjects().Where(obj => !obj.name.StartsWith("[Architect]"));
                 
                 if (clearer)
                 {

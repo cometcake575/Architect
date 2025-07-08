@@ -60,11 +60,11 @@ public class ObjectPlacement
     private Vector3 _pos;
     private PlaceableObject _placeableObject;
     private readonly string _name;
-    private readonly bool _flipped;
     private readonly string _id;
     
     public readonly float Rotation;
     public readonly float Scale;
+    public readonly bool Flipped;
 
     public string GetId()
     {
@@ -79,7 +79,7 @@ public class ObjectPlacement
         
         _obj = new GameObject
         {
-            transform = { position = _pos + ResourceUtils.FixOffset(selected.Offset, _flipped, Rotation, Scale) },
+            transform = { position = _pos + ResourceUtils.FixOffset(selected.Offset, Flipped, Rotation, Scale) },
             name = "[Architect] Object Preview"
         };
 
@@ -106,13 +106,13 @@ public class ObjectPlacement
 
         renderer.color = new Color(r, g, b, a);
         
-        GhostPlacementUtils.SetupForPlacement(_obj, renderer, selected, _flipped, Rotation, scaleX, scaleY);
+        GhostPlacementUtils.SetupForPlacement(_obj, renderer, selected, Flipped, Rotation, scaleX, scaleY);
     }
 
     internal void SpawnObject()
     {
         var packElement = GetPlaceableObject().PackElement;
-        var prefab = packElement.GetPrefab(_flipped, Rotation);
+        var prefab = packElement.GetPrefab(Flipped, Rotation);
         
         var obj = Object.Instantiate(prefab, _pos, prefab.transform.rotation);
         obj.name = "[Architect] " + _name + " (" + _id + ")";
@@ -121,7 +121,7 @@ public class ObjectPlacement
         {
             if (obj.GetComponent<HealthManager>() && !packElement.DisableScaleParent())
             {
-                var par = new GameObject("Scale Parent") { transform = { position = _pos } };
+                var par = new GameObject("[Architect] Scale Parent") { transform = { position = _pos } };
                 obj.transform.parent = par.transform;
                 par.transform.localScale *= Scale;
             }
@@ -136,9 +136,9 @@ public class ObjectPlacement
         
         obj.SetActive(true);
         
-        GetPlaceableObject().PackElement.PostSpawn(obj, _flipped, Rotation, Scale);
+        GetPlaceableObject().PackElement.PostSpawn(obj, Flipped, Rotation, Scale);
         
-        if (!GetPlaceableObject().PackElement.OverrideFlip() && _flipped)
+        if (!GetPlaceableObject().PackElement.OverrideFlip() && Flipped)
         {
             var scale = obj.transform.localScale;
             scale.x = -scale.x;
@@ -190,7 +190,7 @@ public class ObjectPlacement
     {
         _name = name;
         _pos = pos;
-        _flipped = flipped;
+        Flipped = flipped;
         Scale = scale;
         _id = id;
         Rotation = rotation;
@@ -242,7 +242,7 @@ public class ObjectPlacement
             serializer.Serialize(writer, placement._pos);
 
             writer.WritePropertyName("flipped");
-            writer.WriteValue(placement._flipped);
+            writer.WriteValue(placement.Flipped);
             
             if (placement.Rotation != 0)
             {
