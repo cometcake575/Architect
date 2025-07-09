@@ -169,6 +169,8 @@ public class ObjectPlacement
         foreach (var c in Config)
         {
             if (c.PreAwake()) continue;
+            Architect.Instance.Log(c.GetName());
+            Architect.Instance.Log("DDD");
             c.Setup(obj);
         }
     }
@@ -263,8 +265,6 @@ public class ObjectPlacement
             bool hasExistingValue,
             JsonSerializer serializer)
         {
-            Architect.Instance.Log(0);
-            
             // Required for deserialization
             ConfigGroup.Initialize();
             ReceiverGroup.Initialize();

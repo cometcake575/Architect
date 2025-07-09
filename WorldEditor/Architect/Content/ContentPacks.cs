@@ -12,17 +12,17 @@ public static class ContentPacks
 {
     public const int SoulSourceWeight = 1;
     public const int BreakableWallsWeight = 2;
-    public const int MiscInteractableWeight = 3;
-    public const int LoreTabletWeight = 4;
-    public const int SpecialBenchWeight = 5;
-    public const int NailmasterBenchWeight = 6;
-    public const int BenchWeight = 7;
-    public const int NpcWeight = 8;
+    public const int LoreTabletWeight = 3;
+    public const int SpecialBenchWeight = 4;
+    public const int NailmasterBenchWeight = 5;
+    public const int BenchWeight = 6;
+    public const int NpcWeight = 7;
+    public const int MiscInteractableWeight = 8;
     public const int LeverWeight = 9;
     public const int GateWeight = 10;
 
-    internal static readonly List<ContentPack> Packs = new();
-    private static readonly List<ContentPack> InternalPacks = new();
+    internal static readonly List<ContentPack> Packs = [];
+    private static readonly List<ContentPack> InternalPacks = [];
     
     /**
      * Registers a new content pack.
@@ -76,7 +76,8 @@ public static class ContentPacks
     private static AbstractPackElement CreateSolid(string scene, string path, string name, int weight = 0)
     {
         return new GInternalPackElement(scene, path, name, "Solids", weight)
-            .WithRotationGroup(RotationGroup.Four);
+            .WithRotationGroup(RotationGroup.Four)
+            .WithConfigGroup(ConfigGroup.MovingObjects);
     }
 
     private static AbstractPackElement CreateDecoration(string scene, string path, string name, float offset = 0)
@@ -148,8 +149,10 @@ public static class ContentPacks
             Create("Crossroads_04", "RestBench", "Salubra's Bench", "Interactable", weight:BenchWeight),
             Create("Room_Final_Boss_Atrium", "RestBench", "Black Egg Bench", "Interactable", weight:SpecialBenchWeight),
             new GrubfatherElement(weight:NpcWeight),
-            Create("Crossroads_07", "_Scenery/plat_lift_06", "Lift Platform S", "Solids"),
-            Create("Crossroads_07", "_Scenery/plat_lift_05", "Lift Platform L", "Solids"),
+            Create("Crossroads_07", "_Scenery/plat_lift_06", "Lift Platform S", "Solids")
+                .WithRotationGroup(RotationGroup.Four),
+            Create("Crossroads_07", "_Scenery/plat_lift_05", "Lift Platform L", "Solids")
+                .WithRotationGroup(RotationGroup.Four),
             Create("Crossroads_31", "Grub Bottle", "Grub Bottle", "Interactable", weight:MiscInteractableWeight)
                 .WithConfigGroup(ConfigGroup.Grub),
             CreateDecoration("Crossroads_07", "_Scenery/brk_barrel_05", "Crossroads Barrel"),

@@ -299,13 +299,21 @@ public class ConfigGroup
             {
                 o.GetOrAddComponent<MovingObject>().pauseTime = value.GetValue();
             })),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Smoothing", (o, value) =>
+            {
+                o.GetOrAddComponent<MovingObject>().smoothing = value.GetValue();
+            })),
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Start Offset", (o, value) =>
             {
                 o.GetOrAddComponent<MovingObject>().offset = value.GetValue();
             })),
-            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Track Rotation", (o, value) =>
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Track Rotation", (o, value) =>
             {
                 o.GetOrAddComponent<MovingObject>().rotation = value.GetValue();
+            })),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Rotation over Time", (o, value) =>
+            {
+                o.GetOrAddComponent<MovingObject>().rotationOverTime = value.GetValue();
             }))
         );
         

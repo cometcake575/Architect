@@ -15,7 +15,7 @@ public static class SaLGroups
     {
         const string bubblePath = "HK8YPlando.Scripts.Platforming.BubbleController";
         BubbleConfig = new ConfigGroup(ConfigGroup.Generic,
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Speed", (o, value) =>
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Bubble Speed", (o, value) =>
             {
                 SaLObjects.SetField(o, bubblePath, value.GetValue(), "Speed");
             })),
@@ -83,7 +83,7 @@ public static class SaLGroups
             {
                 SaLObjects.SetField(o, zipperPath, value.GetValue(), "Accel");
             })),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Pause Time", (o, value) =>
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Zipper Pause Time", (o, value) =>
             {
                 SaLObjects.SetField(o, zipperPath, value.GetValue(), "PauseTime");
             })),

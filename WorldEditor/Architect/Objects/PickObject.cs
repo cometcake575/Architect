@@ -26,11 +26,7 @@ internal class PickObject : SelectableObject
         if (pl == null) return;
         EditorUIManager.SelectedItem = pl.GetPlaceableObject();
 
-        foreach (var config in pl.Config)
-        {
-            Architect.Instance.Log(config.GetName());
-            EditorUIManager.ConfigValues[config.GetName()] = config;
-        }
+        foreach (var config in pl.Config) EditorUIManager.ConfigValues[config.GetName()] = config;
         foreach (var broadcaster in pl.Broadcasters) EditorUIManager.Broadcasters.Add(broadcaster);
         foreach (var receiver in pl.Receivers) EditorUIManager.Receivers.Add(receiver);
         
