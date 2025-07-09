@@ -169,8 +169,6 @@ public class ObjectPlacement
         foreach (var c in Config)
         {
             if (c.PreAwake()) continue;
-            Architect.Instance.Log(c.GetName());
-            Architect.Instance.Log("DDD");
             c.Setup(obj);
         }
     }

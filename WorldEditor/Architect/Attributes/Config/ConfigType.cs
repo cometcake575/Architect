@@ -35,9 +35,7 @@ public abstract class ConfigType<TValue> : ConfigType where TValue : ConfigValue
 
     internal override void RunAction(GameObject obj, ConfigValue value)
     {
-        Architect.Instance.Log("AAA");
         _action.Invoke(obj, value as TValue);
-        Architect.Instance.Log("BBB");
     }
 }
 
@@ -68,7 +66,6 @@ public abstract class ConfigValue<TType> : ConfigValue where TType : ConfigType
 
     public override void Setup(GameObject obj)
     {
-        Architect.Instance.Log("000");
         _type.RunAction(obj, this);
     }
 
