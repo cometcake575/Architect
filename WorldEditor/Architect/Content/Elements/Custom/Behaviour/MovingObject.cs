@@ -16,13 +16,11 @@ public class MovingObject : MonoBehaviour
     private float _pauseRemaining;
     private Transform _movingPart;
     private bool _platform;
-    private float _targetSpeed;
     private float _currentSpeed;
     private bool _flipped;
 
     private void Awake()
     {
-        _targetSpeed = speed;
         _currentSpeed = speed;
         
         if (gameObject.layer == 8)
@@ -83,20 +81,20 @@ public class MovingObject : MonoBehaviour
         var newPos = _startPos + new Vector3(Mathf.Cos(radians), Mathf.Sin(radians), 0) * offset;
         _movingPart.position = newPos;
 
-        _currentSpeed = Mathf.Lerp(_currentSpeed, _targetSpeed, smoothing <= 0 ? 1 : Mathf.Min(Time.deltaTime / smoothing, 1));
+        _currentSpeed = Mathf.Lerp(_currentSpeed, speed, smoothing <= 0 ? 1 : Mathf.Min(Time.deltaTime / smoothing, 1));
         offset += _currentSpeed * Time.deltaTime;
         
         if (offset >= trackDistance && !_flipped)
         {
             _flipped = true;
             offset = 2 * trackDistance - offset;
-            _targetSpeed = -speed;
+            speed = -speed;
             _pauseRemaining = pauseTime;
         } else if (offset <= 0 && _flipped)
         {
             _flipped = false;
             offset = -offset;
-            _targetSpeed = speed;
+            speed = -speed;
             _pauseRemaining = pauseTime;
         }
     }
