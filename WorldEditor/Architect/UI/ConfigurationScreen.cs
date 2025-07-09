@@ -60,6 +60,10 @@ public static class ConfigurationScreen
                 name: "Lock Axis",
                 playerAction: globalSettings.Keybinds.LockAxis
             ),
+            new KeyBind(
+                name: "Moving Object Preview",
+                playerAction: globalSettings.Keybinds.TogglePreview
+            ),
             new TextPanel("Content Pack Toggles"),
             new TextPanel("Disable packs you don't need to reduce startup time and memory usage, changes are applied when game is rebooted.\n\nThings will break if you disable a pack that is in use!")
             {

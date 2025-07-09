@@ -6,22 +6,42 @@ public class MovingObject : MonoBehaviour
 {
     public float trackDistance = 10;
     public float offset;
-    public float speed = 5;
     public float pauseTime;
     public float rotation;
     public float rotationOverTime;
     public float smoothing = 0.5f;
 
+    private float _speed = 5;
+    private float _currentSpeed;
     private Vector3 _startPos;
     private float _pauseRemaining;
     private Transform _movingPart;
     private bool _platform;
-    private float _currentSpeed;
     private bool _flipped;
+
+    public void SetSpeed(float value)
+    {
+        _speed = value;
+        _currentSpeed = value;
+    }
+
+    public void PreviewReset()
+    {
+        _movingPart.localPosition = Vector3.zero;
+        trackDistance = 10;
+        offset = 0;
+        _speed = 5;
+        _currentSpeed = 5;
+        pauseTime = 0;
+        rotation = 0;
+        rotationOverTime = 0;
+        smoothing = 0.5f;
+        _flipped = false;
+    }
 
     private void Awake()
     {
-        _currentSpeed = speed;
+        _currentSpeed = _speed;
         
         if (gameObject.layer == 8)
         {
@@ -31,7 +51,7 @@ public class MovingObject : MonoBehaviour
         }
         else _movingPart = transform;
         
-        _startPos = _movingPart.position;
+        _startPos = _movingPart.localPosition;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -69,7 +89,7 @@ public class MovingObject : MonoBehaviour
             _pauseRemaining -= Time.deltaTime;
             if (_pauseRemaining < 0)
             {
-                offset += speed * -_pauseRemaining;
+                offset += _speed * -_pauseRemaining;
                 _pauseRemaining = 0;
             } else return;
         }
@@ -79,22 +99,22 @@ public class MovingObject : MonoBehaviour
         var radians = rotation * Mathf.Deg2Rad;
 
         var newPos = _startPos + new Vector3(Mathf.Cos(radians), Mathf.Sin(radians), 0) * offset;
-        _movingPart.position = newPos;
+        _movingPart.localPosition = newPos;
 
-        _currentSpeed = Mathf.Lerp(_currentSpeed, speed, smoothing <= 0 ? 1 : Mathf.Min(Time.deltaTime / smoothing, 1));
+        _currentSpeed = Mathf.Lerp(_currentSpeed, _speed, smoothing <= 0 ? 1 : Mathf.Min(Time.deltaTime / smoothing, 1));
         offset += _currentSpeed * Time.deltaTime;
         
         if (offset >= trackDistance && !_flipped)
         {
             _flipped = true;
             offset = 2 * trackDistance - offset;
-            speed = -speed;
+            _speed = -_speed;
             _pauseRemaining = pauseTime;
         } else if (offset <= 0 && _flipped)
         {
             _flipped = false;
             offset = -offset;
-            speed = -speed;
+            _speed = -_speed;
             _pauseRemaining = pauseTime;
         }
     }

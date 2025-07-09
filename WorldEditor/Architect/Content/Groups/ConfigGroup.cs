@@ -293,7 +293,7 @@ public class ConfigGroup
             })),
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Speed", (o, value) =>
             {
-                o.GetOrAddComponent<MovingObject>().speed = value.GetValue();
+                o.GetOrAddComponent<MovingObject>().SetSpeed(value.GetValue());
             }, true)),
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Pause Time", (o, value) =>
             {

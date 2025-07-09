@@ -37,14 +37,15 @@ internal class WhiteThornsElement : InternalPackElement
 
         col.isTrigger = true;
         
-        col.points = new Vector2[] { 
-            new (-3.672f, -1.265f),
-            new (-3.011f, 0.066f),
-            new (-1.469f, 0.777f),
-            new (0.474f, 1.282f),
-            new (2.353f, 0.813f),
-            new (3.754f, -0.674f)
-        };
+        col.points =
+        [
+            new Vector2(-3.672f, -1.265f),
+            new Vector2(-3.011f, 0.066f),
+            new Vector2(-1.469f, 0.777f),
+            new Vector2(0.474f, 1.282f),
+            new Vector2(2.353f, 0.813f),
+            new Vector2(3.754f, -0.674f)
+        ];
         
         _gameObject.AddComponent<CustomDamager>().damageAmount = 1;
     }
