@@ -159,10 +159,13 @@ public static class SceneSaveLoader
 
     public static void LoadAllScenes(Dictionary<string, string> placements)
     {
+        Architect.Instance.Log(2);
         WipeAllScenes();
+        Architect.Instance.Log(3);
         foreach (var pair in placements)
         {
-            Save(pair.Key, pair.Value);
+            Architect.Instance.Log(pair.Key);
+            Save("Architect/" + pair.Key, pair.Value);
         }
     }
 
@@ -171,6 +174,7 @@ public static class SceneSaveLoader
         WipeAllScenes();
         foreach (var pair in placements)
         {
+            Architect.Instance.Log(pair.Key);
             SaveScene(pair.Key, pair.Value);
         }
     }

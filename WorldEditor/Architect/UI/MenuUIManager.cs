@@ -173,11 +173,14 @@ public static class MenuUIManager
 
         try
         {
+            Architect.Instance.Log(0);
             var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+            Architect.Instance.Log(1);
             SceneSaveLoader.LoadAllScenes(data);
         }
         catch
         {
+            Architect.Instance.Log(4);
             var legacyData = JsonConvert.DeserializeObject<Dictionary<string, List<ObjectPlacement>>>(json);
             SceneSaveLoader.LoadAllScenes(legacyData);
         }
