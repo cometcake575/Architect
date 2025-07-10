@@ -35,7 +35,14 @@ public abstract class ConfigType<TValue> : ConfigType where TValue : ConfigValue
 
     internal override void RunAction(GameObject obj, ConfigValue value)
     {
-        _action.Invoke(obj, value as TValue);
+        try
+        {
+            _action.Invoke(obj, value as TValue);
+        }
+        catch
+        {
+            Architect.Instance.LogError("Error attempting to apply config \"" + value.GetName() + "\"");
+        }
     }
 }
 
