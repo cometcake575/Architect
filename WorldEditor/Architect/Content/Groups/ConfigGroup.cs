@@ -320,7 +320,7 @@ public class ConfigGroup
         ModHooks.LanguageGetHook += (key, _, orig) => CustomTexts.TryGetValue(key, out var customText) ? customText : orig;
 
         Tablets = new ConfigGroup(Generic,
-            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Content", (o, value) =>
+            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Tablet Text", (o, value) =>
             {
                 var fsm = o.LocateMyFSM("Inspection");
                 var id = "Custom Tablet " + o.name;
