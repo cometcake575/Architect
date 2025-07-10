@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using Architect.Category;
 using Architect.Configuration;
 using Architect.Content.Groups;
 using Architect.MultiplayerHook;
@@ -175,7 +176,7 @@ public static class EditorManager
         HeroController.instance.AffectedByGravity(false);
 
         var actions = InputHandler.Instance.inputActions;
-
+        
         if (paused) ShiftSelection(actions);
         else TryPlace();
 
@@ -249,6 +250,8 @@ public static class EditorManager
 
     private static void TryPlace()
     {
+        if (Architect.GlobalSettings.Keybinds.AddPrefab.WasPressed) PrefabsCategory.TryAddPrefab();
+        
         var b1 = Input.GetMouseButtonDown(0);
         var b2 = Input.GetMouseButton(0);
 

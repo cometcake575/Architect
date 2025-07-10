@@ -16,13 +16,25 @@ public class PlaceableObject : SelectableObject
     public override void OnClickInWorld(Vector3 pos, bool first)
     {
         if (!first) return;
+
+        var placement = MakePlacement(pos);
+        
+        PlacementManager.GetCurrentPlacements().Add(placement);
+        placement.PlaceGhost();
+
+        if (!Architect.UsingMultiplayer || !Architect.GlobalSettings.CollaborationMode) return;
+        HkmpHook.Place(placement, GameManager.instance.sceneName);
+    }
+
+    public ObjectPlacement MakePlacement(Vector3 pos = default)
+    {
         pos.z = GetZPos();
 
         var broadcasters = EditorUIManager.Broadcasters.ToArray();
         var receivers = EditorUIManager.Receivers.ToArray();
         var config = EditorUIManager.ConfigValues.Values.ToArray();
         
-        var placement = new ObjectPlacement(
+        return new ObjectPlacement(
             GetName(),
             pos, 
             EditorManager.IsFlipped, 
@@ -33,12 +45,6 @@ public class PlaceableObject : SelectableObject
             receivers,
             config
         );
-        
-        PlacementManager.GetCurrentPlacements().Add(placement);
-        placement.PlaceGhost();
-
-        if (!Architect.UsingMultiplayer || !Architect.GlobalSettings.CollaborationMode) return;
-        HkmpHook.Place(placement, GameManager.instance.sceneName);
     }
 
     public override bool IsFavourite()
@@ -148,7 +154,7 @@ public class PlaceableObject : SelectableObject
 
     private static int _nextWeight;
 
-    private PlaceableObject(AbstractPackElement element) : base(element.GetName())
+    public PlaceableObject(AbstractPackElement element) : base(element.GetName())
     {
         _weight = element.Weight * -1000 + _nextWeight;
         _nextWeight++;

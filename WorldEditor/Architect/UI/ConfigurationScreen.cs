@@ -64,6 +64,10 @@ public static class ConfigurationScreen
                 name: "Moving Object Preview",
                 playerAction: globalSettings.Keybinds.TogglePreview
             ),
+            new KeyBind(
+                name: "Add Prefab",
+                playerAction: globalSettings.Keybinds.AddPrefab
+            ),
             new TextPanel("Content Pack Toggles"),
             new TextPanel("Disable packs you don't need to reduce startup time and memory usage, changes are applied when game is rebooted.\n\nThings will break if you disable a pack that is in use!")
             {

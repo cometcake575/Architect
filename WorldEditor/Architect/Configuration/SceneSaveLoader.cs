@@ -17,8 +17,8 @@ public static class SceneSaveLoader
 
     internal static void Initialize()
     {
-        DataPath = Path.GetFullPath(Application.persistentDataPath + "/Architect/");
-        Directory.CreateDirectory(DataPath);
+        DataPath = Path.GetFullPath(Application.persistentDataPath + "/");
+        Directory.CreateDirectory(DataPath + "Architect/");
 
         UpdateLegacyData();
 
@@ -55,9 +55,14 @@ public static class SceneSaveLoader
         }
         
         Architect.GlobalSettings.Edits.Clear();
-    } 
-    
+    }
+
     public static List<ObjectPlacement> LoadScene(string name)
+    {
+        return Load("Architect/" + name);
+    }
+    
+    public static List<ObjectPlacement> Load(string name)
     {
         var path = DataPath + name + ".architect.json";
         if (!File.Exists(path)) return [];
@@ -89,14 +94,19 @@ public static class SceneSaveLoader
         
         return data;
     }
-
+    
     public static void SaveScene(string name, List<ObjectPlacement> placements)
     {
+        Save("Architect/" + name, placements);
+    }
+    
+    public static void Save(string name, List<ObjectPlacement> placements)
+    {
         var data = SerializeSceneData(placements);
-        SaveScene(name, data);
+        Save(name, data);
     }
 
-    public static void SaveScene(string name, string data)
+    public static void Save(string name, string data)
     {
         var path = DataPath + name + ".architect.json";
         if (File.Exists(path)) File.Delete(path);
@@ -111,13 +121,13 @@ public static class SceneSaveLoader
 
     public static void WipeScene(string name)
     {
-        var path = DataPath + name + ".architect.json";
+        var path = DataPath + "Architect/" + name + ".architect.json";
         if (File.Exists(path)) File.Delete(path);
     }
 
     public static void WipeAllScenes()
     {
-        foreach (var file in Directory.GetFiles(DataPath)) File.Delete(file);
+        foreach (var file in Directory.GetFiles(DataPath + "Architect/")) File.Delete(file);
     }
 
     public static List<ObjectPlacement> DeserializeSceneData(string data)
@@ -136,7 +146,7 @@ public static class SceneSaveLoader
     public static string SerializeAllScenes()
     {
         Dictionary<string, string> data = new();
-        foreach (var file in Directory.GetFiles(DataPath))
+        foreach (var file in Directory.GetFiles(DataPath + "Architect/"))
         {
             var name = Path.GetFileName(file);
             if (!name.EndsWith(".architect.json")) continue;
@@ -152,7 +162,7 @@ public static class SceneSaveLoader
         WipeAllScenes();
         foreach (var pair in placements)
         {
-            SaveScene(pair.Key, pair.Value);
+            Save(pair.Key, pair.Value);
         }
     }
 

@@ -19,6 +19,11 @@ public abstract class SelectableObject
         return 0;
     }
 
+    public virtual void AfterSelect()
+    {
+        
+    }
+
     public string GetName()
     {
         return _name;

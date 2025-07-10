@@ -12,6 +12,7 @@ public class WorldEditorKeyBinds : PlayerActionSet
     public PlayerAction DecreaseScale;
     public PlayerAction LockAxis;
     public PlayerAction TogglePreview;
+    public PlayerAction AddPrefab;
 
     public WorldEditorKeyBinds()
     {
@@ -23,6 +24,7 @@ public class WorldEditorKeyBinds : PlayerActionSet
         DecreaseScale = CreatePlayerAction("DecreaseScale");
         LockAxis = CreatePlayerAction("LockAxis");
         TogglePreview = CreatePlayerAction("TogglePreview");
+        AddPrefab = CreatePlayerAction("AddPrefab");
         
         ToggleEditor.AddDefaultBinding(Key.E);
         FlipItem.AddDefaultBinding(Key.F);
@@ -32,5 +34,6 @@ public class WorldEditorKeyBinds : PlayerActionSet
         IncreaseScale.AddDefaultBinding(Key.Equals);
         LockAxis.AddDefaultBinding(Key.RightShift);
         TogglePreview.AddDefaultBinding(Key.P);
+        AddPrefab.AddDefaultBinding(Key.Return);
     }
 }

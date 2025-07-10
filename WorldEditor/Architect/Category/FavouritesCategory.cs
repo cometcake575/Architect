@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Architect.Objects;
 
 namespace Architect.Category;
@@ -14,6 +13,11 @@ internal class FavouritesCategory : ObjectCategory
 
     internal override List<SelectableObject> GetObjects()
     {
-        return PlaceableObject.AllObjects.Values.ToList().FindAll(o => o.IsFavourite());
+        List<SelectableObject> favourites = [];
+        foreach (var favourite in Architect.GlobalSettings.Favourites)
+        {
+            if (PlaceableObject.AllObjects.TryGetValue(favourite, out var o)) favourites.Add(o);
+        }
+        return favourites;
     }
 }

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Architect.Attributes;
 using Architect.Attributes.Broadcasters;
 using Architect.Attributes.Config;
 using Architect.Attributes.Receivers;
@@ -56,6 +55,8 @@ public static class EditorUIManager
     private const int ItemsPerGroup = 9;
     private const string FilledStar = "★";
     private const string EmptyStar = "☆";
+    private const string Bin = "X";
+    private const string Nothing = " ";
 
     // All elements that should not appear when paused (everything except text info)
     internal static List<ArrangableElement> PauseOptions;
@@ -83,7 +84,7 @@ public static class EditorUIManager
     }
 
     // Refreshes the objects in the current selection (when filter or category change)
-    private static void RefreshObjects()
+    internal static void RefreshObjects()
     {
         _objects = _category.GetObjects().Where(obj => obj.GetName().IndexOf(_filter, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
     }
@@ -96,7 +97,7 @@ public static class EditorUIManager
     }
 
     // Refresh the object selection buttons
-    private static void RefreshButtons()
+    internal static void RefreshButtons()
     {
         var i = 0;
         var objects = GetObjects();
@@ -110,21 +111,21 @@ public static class EditorUIManager
                 pair.Item1.Content = "";
                 pair.Item3.Sprite = currentItem.GetSprite();
                 pair.Item3.GameObject.transform.rotation = Quaternion.Euler(0, 0, currentItem.GetSpriteRotation());
-                pair.Item2.Content = currentItem.IsFavourite() ? FilledStar : EmptyStar;
-                pair.Item2.ContentColor = currentItem.IsFavourite() ? Color.yellow : Color.white;
+                pair.Item2.Content = _category is PrefabsCategory ? Bin : currentItem.IsFavourite() ? FilledStar : EmptyStar;
+                pair.Item2.ContentColor = _category is PrefabsCategory ? Color.red : currentItem.IsFavourite() ? Color.yellow : Color.white;
             }
             else
             {
                 pair.Item1.Content = "Unset";
                 pair.Item3.Sprite = _blankSprite;
-                pair.Item2.Content = EmptyStar;
+                pair.Item2.Content = Nothing;
                 pair.Item2.ContentColor = Color.white;
             }
             i++;
         }
     }
 
-    // Toggles whether something is a favourite
+    // Toggles whether something is a favourite or deleted a prefab
     // Does not refresh grid, so that items can easily be readded if removed by accident
     private static void ToggleFavourite(int index)
     {
@@ -132,9 +133,13 @@ public static class EditorUIManager
         
         var objects = GetObjects();
         if (index >= objects.Count || objects[index] is not PlaceableObject obj) return;
-        
-        obj.ToggleFavourite();
-        RefreshButtons();
+
+        if (obj is PrefabObject prefab) prefab.Delete();
+        else
+        {
+            obj.ToggleFavourite();
+            RefreshButtons();
+        }
     }
 
     private static void UpdateSelectedItem()
@@ -401,6 +406,7 @@ public static class EditorUIManager
         }
         
         _categories.Add(new BlankCategory());
+        _categories.Add(new PrefabsCategory());
         _categories.Add(_category);
         
         var grid = new GridLayout(layout, "Categories")
@@ -576,6 +582,7 @@ public static class EditorUIManager
             _index = index;
             UpdateSelectedItem();
             RefreshSelectedItem();
+            SelectedItem?.AfterSelect();
         };
 
         PauseOptions.Add(img);
