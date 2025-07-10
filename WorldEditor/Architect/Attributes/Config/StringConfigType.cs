@@ -9,7 +9,7 @@ namespace Architect.Attributes.Config;
 public class StringConfigType : ConfigType<StringConfigValue>
 {
     public StringConfigType(string name, Action<GameObject, StringConfigValue> action, bool preAwake = false) : base(name, action, preAwake) { }
-
+    
     public override ConfigValue Deserialize(string data)
     {
         return new StringConfigValue(this, data);
