@@ -34,6 +34,7 @@ internal class PrefabsCategory : ObjectCategory
     {
         Prefabs.Remove(obj);
         Objects.RemoveAll(placement => placement.GetId() == obj.GetId());
+        SceneSaveLoader.Save("Prefabs", Objects);
         
         EditorUIManager.RefreshObjects();
         EditorUIManager.RefreshButtons();
