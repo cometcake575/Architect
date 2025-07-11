@@ -109,12 +109,14 @@ public class MovingObject : MonoBehaviour
             _flipped = true;
             offset = 2 * trackDistance - offset;
             _speed = -_speed;
+            rotationOverTime = -rotationOverTime;
             _pauseRemaining = pauseTime;
         } else if (offset <= 0 && _flipped)
         {
             _flipped = false;
             offset = -offset;
             _speed = -_speed;
+            rotationOverTime = -rotationOverTime;
             _pauseRemaining = pauseTime;
         }
     }
