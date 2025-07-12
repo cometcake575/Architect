@@ -8,8 +8,8 @@
         <Product>Architect</Product>
         <Description>A mod to add platforms, enemies and more to change areas in the game with an in-game level editor.</Description>
         <Copyright>Copyright © Arun Kapila 2025</Copyright>
-        <AssemblyVersion>1.8.5.5</AssemblyVersion>
-        <FileVersion>1.8.5.5</FileVersion>
+        <AssemblyVersion>1.8.6.0</AssemblyVersion>
+        <FileVersion>1.8.6.0</FileVersion>
         <OutputPath>bin\$(Configuration)\</OutputPath>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
