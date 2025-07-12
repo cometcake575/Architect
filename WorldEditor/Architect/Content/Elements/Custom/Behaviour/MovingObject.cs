@@ -5,14 +5,19 @@ namespace Architect.Content.Elements.Custom.Behaviour;
 public class MovingObject : MonoBehaviour
 {
     public float trackDistance = 10;
+    
     public float offset;
-    public float pauseTime;
     public float rotation;
-    public float rotationOverTime;
+    
+    public float pauseTime;
     public float smoothing = 0.5f;
 
     private float _speed = 5;
     private float _currentSpeed;
+    
+    private float _rotationSpeed;
+    private float _currentRotationSpeed;
+    
     private Vector3 _startPos;
     private float _pauseRemaining;
     private Transform _movingPart;
@@ -25,16 +30,27 @@ public class MovingObject : MonoBehaviour
         _currentSpeed = value;
     }
 
+    public void SetRotationSpeed(float value)
+    {
+        _rotationSpeed = value;
+        _currentRotationSpeed = value;
+    }
+
     public void PreviewReset()
     {
         _movingPart.localPosition = Vector3.zero;
         trackDistance = 10;
         offset = 0;
+        
         _speed = 5;
         _currentSpeed = 5;
+        
         pauseTime = 0;
         rotation = 0;
-        rotationOverTime = 0;
+        
+        _rotationSpeed = 0;
+        _currentRotationSpeed = 0;
+        
         smoothing = 0.5f;
         _flipped = false;
     }
@@ -94,8 +110,6 @@ public class MovingObject : MonoBehaviour
             } else return;
         }
 
-        rotation += rotationOverTime * Time.deltaTime;
-        
         var radians = rotation * Mathf.Deg2Rad;
 
         var newPos = _startPos + new Vector3(Mathf.Cos(radians), Mathf.Sin(radians), 0) * offset;
@@ -103,20 +117,25 @@ public class MovingObject : MonoBehaviour
 
         _currentSpeed = Mathf.Lerp(_currentSpeed, _speed, smoothing <= 0 ? 1 : Mathf.Min(Time.deltaTime / smoothing, 1));
         offset += _currentSpeed * Time.deltaTime;
+
+        _currentRotationSpeed = Mathf.Lerp(_currentRotationSpeed, _rotationSpeed, smoothing <= 0 ? 1 : Mathf.Min(Time.deltaTime / smoothing, 1));
+        rotation += _currentRotationSpeed * Time.deltaTime;
         
         if (offset >= trackDistance && !_flipped)
         {
             _flipped = true;
-            offset = 2 * trackDistance - offset;
+            
             _speed = -_speed;
-            rotationOverTime = -rotationOverTime;
+            _rotationSpeed = -_rotationSpeed;
+            
             _pauseRemaining = pauseTime;
         } else if (offset <= 0 && _flipped)
         {
             _flipped = false;
-            offset = -offset;
+            
             _speed = -_speed;
-            rotationOverTime = -rotationOverTime;
+            _rotationSpeed = -_rotationSpeed;
+            
             _pauseRemaining = pauseTime;
         }
     }

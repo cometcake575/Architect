@@ -71,7 +71,7 @@ public class Disabler : MonoBehaviour
 
 public class RoomClearerConfig : MonoBehaviour
 {
-    public bool removeTransitions = true;
+    public bool removeTransitions;
     
     public bool removeBenches = true;
     

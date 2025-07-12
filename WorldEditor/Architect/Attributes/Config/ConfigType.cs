@@ -11,6 +11,8 @@ public abstract class ConfigType
     public readonly string Name;
     public readonly bool PreAwake;
     
+    public string Id;
+    
     protected ConfigType(string name, bool preAwake)
     {
         Name = name;
@@ -41,7 +43,7 @@ public abstract class ConfigType<TValue> : ConfigType where TValue : ConfigValue
         }
         catch
         {
-            Architect.Instance.LogError("Error attempting to apply config \"" + value.GetName() + "\"");
+            Architect.Instance.LogError("Error attempting to apply config \"" + value.GetTypeId() + "\"");
         }
     }
 }
@@ -50,6 +52,8 @@ public abstract class ConfigValue
 {
     public abstract string SerializeValue();
 
+    public abstract string GetTypeId();
+    
     public abstract string GetName();
 
     public abstract bool PreAwake();
@@ -62,6 +66,11 @@ public abstract class ConfigValue<TType> : ConfigValue where TType : ConfigType
     protected ConfigValue(TType type)
     {
         _type = type;
+    }
+
+    public override string GetTypeId()
+    {
+        return _type.Id;
     }
 
     public override string GetName()

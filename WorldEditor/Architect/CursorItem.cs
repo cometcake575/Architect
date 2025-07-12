@@ -1,6 +1,5 @@
 using Architect.Attributes.Config;
 using Architect.Content.Elements.Custom.Behaviour;
-using Architect.Content.Groups;
 using UnityEngine;
 using Architect.Objects;
 using Architect.UI;
@@ -14,13 +13,15 @@ public static class CursorItem
 
     private static GameObject _obj;
     private static GameObject _display;
+    private static LocalTrailRenderer _trail;
 
     private static Vector3 _offset;
 
     private static MovingObject _movingComponent;
 
     private static bool _previewMode;
-    
+    private static readonly int Color1 = Shader.PropertyToID("_Color");
+
     public static void TryRefresh(bool disabled)
     {
         if (disabled || EditorUIManager.SelectedItem is not PlaceableObject selected || !EditorManager.GameCamera)
@@ -83,6 +84,18 @@ public static class CursorItem
         _movingComponent = _display.AddComponent<MovingObject>();
         _movingComponent.SetSpeed(0);
         
+        _trail = _display.AddComponent<LocalTrailRenderer>();
+        var line = _obj.AddComponent<LineRenderer>();
+        _trail.lineRenderer = line;
+        
+        line.startWidth = 0.1f;
+        line.startColor = Color.red;
+
+
+        var particleMaterial = new Material(Shader.Find("Sprites/Default"));
+        particleMaterial.SetColor(Color1, new Color(1, 0, 0, 0.2f));
+        line.material = particleMaterial;
+        
         Object.DontDestroyOnLoad(_obj);
     }
 
@@ -90,11 +103,13 @@ public static class CursorItem
     {
         ConfigValue cfgVal;
         
+        _trail.Reset();
         _movingComponent.PreviewReset();
-        
+
         if (!_previewMode)
         {
             _movingComponent.SetSpeed(0);
+            _trail.enabled = false;
             return;
         }
         
@@ -132,10 +147,14 @@ public static class CursorItem
         }
         if (EditorUIManager.ConfigValues.TryGetValue("Rotation over Time", out cfgVal) && cfgVal is FloatConfigValue rot)
         {
-            _movingComponent.rotationOverTime = rot.GetValue();
+            _movingComponent.SetRotationSpeed(rot.GetValue());
             movable = true;
         }
 
-        if (!movable) _movingComponent.SetSpeed(0);
+        if (!movable)
+        {
+            _movingComponent.SetSpeed(0);
+            _trail.enabled = false;
+        } else _trail.enabled = true;
     }
 }

@@ -95,13 +95,13 @@ public class ObjectPlacement
         
         foreach (var config in Config)
         {
-            if (config.GetName() == "width" && config is FloatConfigValue width) scaleX *= width.GetValue();
-            else if (config.GetName() == "height" && config is FloatConfigValue height) scaleY *= height.GetValue();
-            else if (config.GetName() == "r" && config is FloatConfigValue red) r = red.GetValue();
-            else if (config.GetName() == "g" && config is FloatConfigValue green) g = green.GetValue();
-            else if (config.GetName() == "b" && config is FloatConfigValue blue) b = blue.GetValue();
-            else if (config.GetName() == "a" && config is FloatConfigValue alpha) a *= Mathf.Max(0.15f, alpha.GetValue());
-            else if (config.GetName() == "layer" && config is IntConfigValue layer) renderer.sortingOrder = layer.GetValue(); 
+            if (config.GetTypeId() == "width" && config is FloatConfigValue width) scaleX *= width.GetValue();
+            else if (config.GetTypeId() == "height" && config is FloatConfigValue height) scaleY *= height.GetValue();
+            else if (config.GetTypeId() == "r" && config is FloatConfigValue red) r = red.GetValue();
+            else if (config.GetTypeId() == "g" && config is FloatConfigValue green) g = green.GetValue();
+            else if (config.GetTypeId() == "b" && config is FloatConfigValue blue) b = blue.GetValue();
+            else if (config.GetTypeId() == "a" && config is FloatConfigValue alpha) a *= Mathf.Max(0.15f, alpha.GetValue());
+            else if (config.GetTypeId() == "layer" && config is IntConfigValue layer) renderer.sortingOrder = layer.GetValue(); 
         }
 
         renderer.color = new Color(r, g, b, a);
@@ -223,7 +223,11 @@ public class ObjectPlacement
             if (value.Config.Length > 0)
             {
                 writer.WritePropertyName("config");
-                serializer.Serialize(writer, value.Config.ToDictionary(c => c.GetName(), c => c.SerializeValue()));
+                serializer.Serialize(writer, value.Config.ToDictionary(c =>
+                {
+                    Architect.Instance.Log(c.GetTypeId());
+                    return c.GetTypeId();
+                }, c => c.SerializeValue()));
             }
             
             writer.WriteEndObject();
