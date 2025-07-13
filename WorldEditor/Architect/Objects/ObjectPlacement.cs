@@ -342,7 +342,8 @@ public class ObjectPlacement
                 }
                 reader.Read();
             }
-            
+
+            name = Updater.UpdateObject(name);
             var placement = new ObjectPlacement(name, pos, flipped, rotation, scale, id, broadcasters, receivers, config);
 
             return placement;

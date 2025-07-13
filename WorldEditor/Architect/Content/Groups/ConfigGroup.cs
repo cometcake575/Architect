@@ -658,8 +658,6 @@ public class ConfigGroup
                 CustomTexts[o.GetComponent<TextDisplay>().ID] = value.GetValue();
             }), "textdisplay_text_content")
         );
-        
-        SaLGroups.InitializeConfig();
     }
 
     public static ConfigType MakePersistenceConfigType(string name, Action<GameObject> action = null)

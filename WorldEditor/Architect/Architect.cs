@@ -67,7 +67,7 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
 
         if (ModHooks.GetMod("ScatteredAndLost") is Mod)
         {
-            SaLObjects.Initialize();
+            CustomSaL.Initialize();
         }
         
         InitializeLayout();

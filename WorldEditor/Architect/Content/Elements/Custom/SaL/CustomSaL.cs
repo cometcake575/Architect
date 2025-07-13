@@ -5,8 +5,18 @@ using UnityEngine;
 
 namespace Architect.Content.Elements.Custom.SaL;
 
-public class CustomSaL
+public static class CustomSaL
 {
+    public static void Initialize()
+    {
+        var pack = new ContentPack("Architect S&L", "Architect's expansions for the Celeste themed Scattered and Lost mod")
+        {
+            MakeCrystalObject()
+        };
+        
+        ContentPacks.RegisterPack(pack);
+    }
+    
     private static GameObject MakeObject(string name, string sprite)
     {
         var obj = new GameObject { name = name };

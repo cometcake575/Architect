@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Architect.Attributes.Config;
+using Architect.Util;
 
 namespace Architect.Attributes;
 
@@ -19,6 +20,8 @@ public static class ConfigManager
 
     public static ConfigValue DeserializeConfigValue(string configType, string serializedValue)
     {
+        configType = Updater.UpdateConfig(configType);
+        
         return ConfigTypes.TryGetValue(configType, out var val) ? 
             val.Deserialize(serializedValue) : 
             LegacyConfigTypes[configType].Deserialize(serializedValue);
