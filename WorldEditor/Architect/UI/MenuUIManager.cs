@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Architect.Configuration;
 using Architect.Objects;
@@ -28,9 +29,11 @@ public static class MenuUIManager
     private static Button _leftButton;
     private static Button _rightButton;
 
-    private static readonly List<(TextObject, TextObject, Button)> DownloadChoices = new();
+    private static readonly List<(TextObject, TextObject, Button)> DownloadChoices = [];
     private static int _index;
     private static List<Dictionary<string, string>> _currentLevels;
+    
+    private static TextObject _success;
 
     private const string URL = "https://cometcake575.pythonanywhere.com";
 
@@ -41,6 +44,19 @@ public static class MenuUIManager
         SetupLoginArea(layout);
         SetupUploadArea(layout);
         SetupIndexButtons(layout);
+        SetupSuccessText(layout);
+    }
+
+    private static void SetupSuccessText(LayoutRoot layout)
+    {
+        _success = new TextObject(layout, "Success")
+        {
+            FontSize = 40,
+            ContentColor = Color.green,
+            VerticalAlignment = VerticalAlignment.Center,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Visibility = Visibility.Hidden
+        };
     }
 
     private static void SetupIndexButtons(LayoutRoot layout)
@@ -168,6 +184,7 @@ public static class MenuUIManager
         
         var operation = request.SendWebRequest();
         while (!operation.isDone) await Task.Yield();
+        if (request.responseCode != 200) return;
 
         var json = request.downloadHandler.text;
 
@@ -184,6 +201,11 @@ public static class MenuUIManager
 
         
         PlacementManager.InvalidateCache();
+
+        _success.Visibility = Visibility.Visible;
+        _success.Text = "Downloaded";
+        await Task.Delay(4000);
+        _success.Visibility = Visibility.Hidden;
     }
 
     private const float MenuFadeSpeed = 3.2f;
@@ -722,18 +744,18 @@ public static class MenuUIManager
             Visibility = Visibility.Hidden
         };
 
-        _uploadButton.Click += _ =>
+        _uploadButton.Click += async _ =>
         {
-            UploadLevel(nameInput.Text, descInput.Text);
+            await UploadLevel(nameInput.Text, descInput.Text);
         };
 
-        _deleteButton.Click += _ =>
+        _deleteButton.Click += async _ =>
         {
-            DeleteLevel(nameInput.Text);
+            await DeleteLevel(nameInput.Text);
         };
     }
 
-    private static void UploadLevel(string name, string desc)
+    private static async Task UploadLevel(string name, string desc)
     {
         var form = new WWWForm();
         
@@ -748,10 +770,17 @@ public static class MenuUIManager
         
         var request = UnityWebRequest.Post(URL + "/upload", form);
         
-        request.SendWebRequest();
+        var operation = request.SendWebRequest();
+        while (!operation.isDone) await Task.Yield();
+        if (request.responseCode != 201) return;
+
+        _success.Visibility = Visibility.Visible;
+        _success.Text = "Uploaded";
+        await Task.Delay(4000);
+        _success.Visibility = Visibility.Hidden;
     }
 
-    private static void DeleteLevel(string name)
+    private static async Task DeleteLevel(string name)
     {
         var jsonBody = JsonUtility.ToJson(new DeleteRequestData
         {
@@ -767,6 +796,13 @@ public static class MenuUIManager
         
         request.SetRequestHeader("Content-Type", "application/json");
         
-        request.SendWebRequest();
+        var operation = request.SendWebRequest();
+        while (!operation.isDone) await Task.Yield();
+        if (request.responseCode != 201) return;
+
+        _success.Visibility = Visibility.Visible;
+        _success.Text = "Deleted";
+        await Task.Delay(4000);
+        _success.Visibility = Visibility.Hidden;
     }
 }
