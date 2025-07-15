@@ -35,6 +35,8 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
     
     internal static ReceiverGroup TextDisplay;
     
+    internal static ReceiverGroup ObjectMover;
+    
     internal static void Initialize()
     {
         if (_initialized) return;
@@ -44,6 +46,11 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
             EventManager.RegisterEventReceiverType("disable", o => o.SetActive(false)),
             EventManager.RegisterEventReceiverType("enable", o => o.SetActive(true))
         );
+
+        ObjectMover = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("move", o =>
+        {
+            o.GetComponent<ObjectMover>().DoMove();
+        }));
         
         Gates = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("open", o =>
         {

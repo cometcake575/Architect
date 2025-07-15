@@ -4,6 +4,7 @@ using Architect.Attributes;
 using Architect.Configuration;
 using Architect.Content.Elements.Custom;
 using Architect.Util;
+using UnityEngine;
 
 namespace Architect.Objects;
 
@@ -29,13 +30,19 @@ public static class PlacementManager
         _sceneName = "Invalid";
     }
 
+    public static readonly Dictionary<string, GameObject> Objects = [];
+
     private static void LoadPlacements()
     {
+        Objects.Clear();
         CustomObjects.PlayerListeners.Clear();
         foreach (var placement in GetCurrentPlacements().Where(placement => placement.GetPlaceableObject() != null))
         {
             if (EditorManager.IsEditing) placement.PlaceGhost();
-            else placement.SpawnObject();
+            else
+            {
+                Objects[placement.GetId()] = placement.SpawnObject();
+            }
         }
     }
 

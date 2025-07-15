@@ -109,7 +109,7 @@ public class ObjectPlacement
         GhostPlacementUtils.SetupForPlacement(_obj, renderer, selected, Flipped, Rotation, scaleX, scaleY);
     }
 
-    internal void SpawnObject()
+    internal GameObject SpawnObject()
     {
         var packElement = GetPlaceableObject().PackElement;
         var prefab = packElement.GetPrefab(Flipped, Rotation);
@@ -171,6 +171,8 @@ public class ObjectPlacement
             if (c.PreAwake()) continue;
             c.Setup(obj);
         }
+
+        return obj;
     }
 
     public readonly EventBroadcaster[] Broadcasters;

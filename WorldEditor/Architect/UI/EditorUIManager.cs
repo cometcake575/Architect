@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Architect.Attributes.Broadcasters;
 using Architect.Attributes.Config;
 using Architect.Attributes.Receivers;
@@ -34,6 +35,7 @@ public static class EditorUIManager
     
     // Info about current selected item and buttons to change item
     private static TextObject _selectionInfo;
+    private static TextObject _extraInfo;
     private static List<(Button, Button, Image)> _selectionButtons;
     
     // Selectable objects
@@ -151,7 +153,7 @@ public static class EditorUIManager
         switch (_index)
         {
             case -1:
-                SelectedItem = null;
+                SelectedItem = CursorObject.Instance;
                 break;
             case -2:
                 SelectedItem = EraserObject.Instance;
@@ -380,6 +382,33 @@ public static class EditorUIManager
             MaxHeight = 20,
             Text = "Current Item: None"
         };
+
+        _extraInfo = new TextObject(layout)
+        {
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Top,
+            Padding = new Padding(0, 120),
+            MaxWidth = 1000,
+            MaxHeight = 20,
+            Text = "ID: None",
+            Visibility = Visibility.Hidden
+        };
+    }
+
+    private static int _lastInfoIndex;
+
+    public static async Task DisplayExtraInfo(string info)
+    {
+        _lastInfoIndex++;
+        var index = _lastInfoIndex;
+        
+        _extraInfo.Text = info;
+        _extraInfo.Visibility = Visibility.Visible;
+
+        await Task.Delay(5000);
+
+        if (_lastInfoIndex != index) return;
+        _extraInfo.Visibility = Visibility.Hidden;
     }
 
     private static GridLayout SetupCategories(LayoutRoot layout)
@@ -527,8 +556,7 @@ public static class EditorUIManager
             correctRow++;
         }
         
-        var cursorSprite = ResourceUtils.Load("cursor");
-        var cursorImagedButton = CreateImagedButton(layout, cursorSprite, "Cursor", 0, 0, -1);
+        var cursorImagedButton = CreateImagedButton(layout, CursorObject.Instance.GetSprite(), "Cursor", 0, 0, -1);
         cursorImagedButton.Item1.WithProp(GridLayout.Column, 0).WithProp(GridLayout.Row, correctRow);
         cursorImagedButton.Item2.WithProp(GridLayout.Column, 0).WithProp(GridLayout.Row, correctRow);
         extraSettings.Children.Add(cursorImagedButton.Item1);

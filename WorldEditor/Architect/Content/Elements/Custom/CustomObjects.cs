@@ -58,6 +58,10 @@ public static class CustomObjects
                 .WithBroadcasterGroup(BroadcasterGroup.PlayerHook)
                 .WithReceiverGroup(ReceiverGroup.PlayerHook)
                 .WithConfigGroup(ConfigGroup.Invisible),
+            new SimplePackElement(CreateObjectMover(), "Object Mover", "Custom",
+                    ResourceUtils.Load("object_mover"))
+                .WithReceiverGroup(ReceiverGroup.ObjectMover)
+                .WithConfigGroup(ConfigGroup.ObjectMover),
             CreateSquare(),
             CreateCircle(),
             CreateTriangle(),
@@ -231,6 +235,17 @@ public static class CustomObjects
 
         point.SetActive(false);
         point.AddComponent<PlayerHook>();
+        Object.DontDestroyOnLoad(point);
+
+        return point;
+    }
+
+    private static GameObject CreateObjectMover()
+    {
+        var point = new GameObject("Object Mover");
+
+        point.SetActive(false);
+        point.AddComponent<ObjectMover>();
         Object.DontDestroyOnLoad(point);
 
         return point;

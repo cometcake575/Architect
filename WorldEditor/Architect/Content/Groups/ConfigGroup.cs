@@ -92,6 +92,8 @@ public class ConfigGroup
     
     public static ConfigGroup TextDisplay;
     
+    public static ConfigGroup ObjectMover;
+    
     public static void Initialize()
     {
         if (_initialized) return;
@@ -108,6 +110,29 @@ public class ConfigGroup
             {
                 foreach (var renderer in o.GetComponentsInChildren<Renderer>()) renderer.enabled = value.GetValue();
             }), "visible")
+        );
+
+        ObjectMover = new ConfigGroup(Invisible,
+            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Movement Type", (o, value) =>
+            {
+                o.GetComponent<ObjectMover>().movementType = value.GetValue();
+            }, false, "Add", "Set"), "object_mover_type"),
+            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("ID/Path", (o, value) =>
+            {
+                o.GetComponent<ObjectMover>().id = value.GetValue();
+            }), "object_mover_identifier"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Rotation", (o, value) =>
+            {
+                o.GetComponent<ObjectMover>().rotation = value.GetValue();
+            }, true), "object_mover_rotation"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("X Movement", (o, value) =>
+            {
+                o.GetComponent<ObjectMover>().xMovement = value.GetValue();
+            }, true), "object_mover_x_move"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Y Movement", (o, value) =>
+            {
+                o.GetComponent<ObjectMover>().yMovement = value.GetValue();
+            }, true), "object_mover_y_move")
         );
 
         GeoChest = new ConfigGroup(Generic,

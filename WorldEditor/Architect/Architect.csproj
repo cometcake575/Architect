@@ -344,9 +344,6 @@
         <Reference Include="HKMP">
             <HintPath>/Users/arunkapila/Library/Application Support/Steam/steamapps/common/Hollow Knight/hollow_knight.app/Contents/Resources/Data/Managed/Mods/HKMP/HKMP.dll</HintPath>
         </Reference>
-        <Reference Include="ScatteredAndLost">
-            <HintPath>/Users/arunkapila/Library/Application Support/Steam/steamapps/common/Hollow Knight/hollow_knight.app/Contents/Resources/Data/Managed/Mods/Disabled/Scattered and Lost/HK8YPlando.dll</HintPath>
-        </Reference>
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="Resources/*.png" />
