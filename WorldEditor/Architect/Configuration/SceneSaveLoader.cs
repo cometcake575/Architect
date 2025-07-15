@@ -171,7 +171,6 @@ public static class SceneSaveLoader
         WipeAllScenes();
         foreach (var pair in placements)
         {
-            Architect.Instance.Log(pair.Key);
             SaveScene(pair.Key, pair.Value);
         }
     }

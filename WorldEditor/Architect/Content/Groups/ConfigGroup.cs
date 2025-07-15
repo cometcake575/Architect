@@ -187,7 +187,18 @@ public class ConfigGroup
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Give Soul", (o, value) =>
             {
                 enemyTypeField?.SetValue(o.GetComponent<HealthManager>(), value.GetValue() ? 1 : 6);
-            }), "enemy_give_soul")
+            }), "enemy_give_soul"),
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Invulnerable", (o, value) =>
+            {
+                if (!value.GetValue()) return;
+                o.GetComponent<HealthManager>().enabled = false;
+            }), "enemy_invulnerable"),
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Disable Enemy AI", (o, value) =>
+            {
+                if (!value.GetValue()) return;
+                foreach (var comp in o.GetComponents<PlayMakerFSM>()) comp.enabled = false;
+                o.GetComponent<HealthManager>().IsInvincible = false;
+            }), "enemy_ai_disabled")
         );
 
         FlukeZoteling = new ConfigGroup(Enemies, 

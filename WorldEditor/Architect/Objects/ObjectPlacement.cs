@@ -225,11 +225,7 @@ public class ObjectPlacement
             if (value.Config.Length > 0)
             {
                 writer.WritePropertyName("config");
-                serializer.Serialize(writer, value.Config.ToDictionary(c =>
-                {
-                    Architect.Instance.Log(c.GetTypeId());
-                    return c.GetTypeId();
-                }, c => c.SerializeValue()));
+                serializer.Serialize(writer, value.Config.ToDictionary(c => c.GetTypeId(), c => c.SerializeValue()));
             }
             
             writer.WriteEndObject();
