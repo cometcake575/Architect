@@ -191,13 +191,14 @@ public class ConfigGroup
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Invulnerable", (o, value) =>
             {
                 if (!value.GetValue()) return;
-                o.GetComponent<HealthManager>().enabled = false;
+                o.AddComponent<EnemyInvulnerabilityMarker>();
+                o.GetComponent<HealthManager>().IsInvincible = true;
             }), "enemy_invulnerable"),
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Disable Enemy AI", (o, value) =>
             {
                 if (!value.GetValue()) return;
                 foreach (var comp in o.GetComponents<PlayMakerFSM>()) comp.enabled = false;
-                o.GetComponent<HealthManager>().IsInvincible = false;
+                if (!o.GetComponent<EnemyInvulnerabilityMarker>()) o.GetComponent<HealthManager>().IsInvincible = false;
             }), "enemy_ai_disabled")
         );
 
@@ -747,4 +748,6 @@ public class ConfigGroup
     {
         Types = types;
     }
+    
+    public class EnemyInvulnerabilityMarker : MonoBehaviour;
 }
