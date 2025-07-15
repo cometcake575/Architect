@@ -11,6 +11,7 @@ using Modding;
 using Modding.Utils;
 using Satchel;
 using UnityEngine;
+using FsmUtil = SFCore.Utils.FsmUtil;
 
 namespace Architect.Content.Groups;
 
@@ -197,7 +198,9 @@ public class ConfigGroup
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Disable Enemy AI", (o, value) =>
             {
                 if (!value.GetValue()) return;
-                foreach (var comp in o.GetComponents<PlayMakerFSM>()) comp.enabled = false;
+                while (o.RemoveComponent<PlayMakerFSM>());
+                while (o.RemoveComponent<Climber>());
+                while (o.RemoveComponent<Walker>());
                 if (!o.GetComponent<EnemyInvulnerabilityMarker>()) o.GetComponent<HealthManager>().IsInvincible = false;
             }), "enemy_ai_disabled")
         );
