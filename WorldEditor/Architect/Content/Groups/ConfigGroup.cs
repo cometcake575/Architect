@@ -640,6 +640,7 @@ public class ConfigGroup
             }), "layer")
         );
 
+        var terrain = LayerMask.NameToLayer("Terrain");
         Shapes = new ConfigGroup([Colours, Stretchable],
             Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("collision", (o, value) =>
             {
@@ -653,10 +654,13 @@ public class ConfigGroup
                         break;
                     case 2:
                         o.GetComponent<Collider2D>().isTrigger = false;
-                        o.layer = 8;
+                        o.layer = terrain;
+                        break;
+                    case 3:
+                        o.GetComponent<Collider2D>().isTrigger = false;
                         break;
                 }
-            }, false, "None", "Hazard", "Solid"), "shape_collision")
+            }, false, "None", "Hazard", "Terrain", "Solid"), "shape_collision")
         );
 
         Relays = new ConfigGroup(Generic,
@@ -751,6 +755,19 @@ public class ConfigGroup
     {
         Types = types;
     }
-    
-    public class EnemyInvulnerabilityMarker : MonoBehaviour;
+
+    public class EnemyInvulnerabilityMarker : MonoBehaviour
+    {
+        private HealthManager _manager;
+        
+        private void Awake()
+        {
+            _manager = GetComponent<HealthManager>();
+        }
+
+        private void Update()
+        {
+            _manager.IsInvincible = true;
+        }
+    }
 }

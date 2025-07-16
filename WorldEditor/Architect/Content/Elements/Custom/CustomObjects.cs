@@ -58,6 +58,10 @@ public static class CustomObjects
                 .WithBroadcasterGroup(BroadcasterGroup.PlayerHook)
                 .WithReceiverGroup(ReceiverGroup.PlayerHook)
                 .WithConfigGroup(ConfigGroup.Invisible),
+            new SimplePackElement(CreateEnemyBarrier(), "Enemy Barrier", "Custom",
+                    ResourceUtils.Load("enemy_barrier"))
+                .WithReceiverGroup(ReceiverGroup.ObjectMover)
+                .WithConfigGroup(ConfigGroup.ObjectMover),
             new SimplePackElement(CreateObjectMover(), "Object Mover", "Custom",
                     ResourceUtils.Load("object_mover"))
                 .WithReceiverGroup(ReceiverGroup.ObjectMover)
@@ -246,6 +250,21 @@ public static class CustomObjects
 
         point.SetActive(false);
         point.AddComponent<ObjectMover>();
+        Object.DontDestroyOnLoad(point);
+
+        return point;
+    }
+
+    private static GameObject CreateEnemyBarrier()
+    {
+        var point = new GameObject("Enemy Barrier");
+        var heroOnly = LayerMask.NameToLayer("Hero Only");
+        
+        point.AddComponent<BoxCollider2D>().size = new Vector2(2, 2);
+        point.transform.localScale *= 5f / 3;
+        point.layer = heroOnly;
+        
+        point.SetActive(false);
         Object.DontDestroyOnLoad(point);
 
         return point;
