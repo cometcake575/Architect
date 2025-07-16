@@ -268,7 +268,8 @@ public static class ContentPacks
                 .WithConfigGroup(ConfigGroup.Enemies)
                 .WithBroadcasterGroup(BroadcasterGroup.Enemies)
                 .WithReceiverGroup(ReceiverGroup.Enemies),
-            CreateEnemy("Mines_20", "Zombie Miner 1", "Husk Miner"),
+            CreateEnemy("Mines_20", "Zombie Miner 1", "Husk Miner")
+                .FlipVertical(),
             CreateEnemy("Mines_25", "Zombie Beam Miner", "Crystallised Husk"),
             CreateEnemy("Mines_20", "Crystal Crawler", "Blimback"),
             CreateEnemy("Mines_20", "Mines Crawler", "Shardmite"),

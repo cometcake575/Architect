@@ -756,7 +756,11 @@ public static class CustomObjects
 
         On.GGCheckBoundSoul.OnEnter += (orig, self) =>
         {
-            if (BossSequenceController.IsInSequence) return;
+            if (BossSequenceController.IsInSequence)
+            {
+                orig(self);
+                return;
+            }
             if (ShouldBindSoul())
             {
                 self.Fsm.Event(self.boundEvent);
