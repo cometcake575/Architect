@@ -38,7 +38,7 @@ public class ObjectMover : MonoBehaviour
 
         if (!_object) return;
 
-        if (movementType == 0)
+        if (movementType != 0)
         {
             _object.transform.rotation = _rotation;
             
