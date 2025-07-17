@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Architect.Attributes;
 using Architect.Configuration;
 using Architect.Content.Elements.Custom.Behaviour;
 using Architect.MultiplayerHook.Packets;
@@ -70,6 +71,13 @@ public class WeClientAddon : ClientAddon
             {
                 Logger.Info("Receiving Edit Packet [CLIENT]");
                 ZoteTrophy.WinScreen(packet.WinnerName);
+            });
+
+        netReceiver.RegisterPacketHandler<RelayPacketData>(PacketId.Relay,
+            packet =>
+            {
+                Logger.Info("Receiving Relay Packet [CLIENT]");
+                EventManager.BroadcastEvent(packet.EventName);
             });
 
         netReceiver.RegisterPacketHandler<EditPacketData>(PacketId.Edit, packet =>
@@ -186,6 +194,17 @@ public class WeClientAddon : ClientAddon
             });
     }
 
+    public void BroadcastEvent(string name)
+    {
+        if (!_api.NetClient.IsConnected) return;
+        
+        _api.NetClient.GetNetworkSender<PacketId>(this)
+            .SendSingleData(PacketId.Relay, new RelayPacketData
+            {
+                EventName = name
+            });
+    }
+
     public async void Refresh()
     {
         try
@@ -257,11 +276,12 @@ public class WeClientAddon : ClientAddon
             PacketId.Edit => new EditPacketData(),
             PacketId.Erase => new ErasePacketData(),
             PacketId.Update => new UpdatePacketData(),
+            PacketId.Relay => new RelayPacketData(),
             _ => null
         };
     }
 
     protected override string Name => "Architect";
-    protected override string Version => "1.8.8.2";
+    protected override string Version => "1.9.0.0";
     public override bool NeedsNetwork => true;
 }

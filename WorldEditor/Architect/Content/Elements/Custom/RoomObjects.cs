@@ -52,6 +52,8 @@ public static class RoomObjects
                 .WithConfigGroup(ConfigGroup.Invisible),
             CreateRoomEditor("enemy_remover", "Remove Enemy", FindObjectsToDisable<HealthManager>)
                 .WithConfigGroup(ConfigGroup.Invisible),
+            CreateRoomEditor("collision_remover", "Remove Solid", FindObjectsToDisable<Collider2D>)
+                .WithConfigGroup(ConfigGroup.Invisible),
             CreateRoomEditor("object_remover", "Remove Object", o =>
             {
                 var config = o.GetComponent<ObjectRemoverConfig>();
@@ -69,7 +71,7 @@ public static class RoomObjects
         ContentPacks.RegisterPack(edits);
     }
 
-    private static Disabler[] FindObjectsToDisable<T>(GameObject disabler) where T : MonoBehaviour
+    private static Disabler[] FindObjectsToDisable<T>(GameObject disabler) where T : UnityEngine.Behaviour
     {
         var objects = disabler.scene.GetRootGameObjects()
             .SelectMany(root => root.GetComponentsInChildren<T>(true))
@@ -101,6 +103,8 @@ public static class RoomObjects
         obj.AddComponent<ObjectRemover>().triggerName = id;
         
         var sprite = ResourceUtils.Load(id, FilterMode.Point);
+        obj.layer = 10;
+        obj.transform.position += new Vector3(0, 0, 0.1f);
 
         Object.DontDestroyOnLoad(obj);
         obj.SetActive(false);

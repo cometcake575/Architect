@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Architect.Attributes;
-using Architect.Attributes.Broadcasters;
 using Architect.Content.Groups;
 using Satchel;
 using UnityEngine;
@@ -27,6 +26,11 @@ internal sealed class LeverPackElement : GInternalPackElement
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         var fsm = gameObject.LocateMyFSM("Switch Control");
+        
+        var str = fsm.FsmVariables.FindFsmString("Player Data");
+        if (str != null) str.Value = "";
+        
+        fsm.RemoveTransition("Activated", "FINISHED");
         fsm.AddCustomAction("Activated", makerFsm =>
         {
             EventManager.BroadcastEvent(makerFsm.gameObject, "LoadedPulled");

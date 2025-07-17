@@ -12,8 +12,8 @@ public class EventBroadcasterInstance : MonoBehaviour
         return eventBroadcasterType;
     }
 
-    public void Broadcast()
+    public void Broadcast(bool multiplayer)
     { 
-        EventManager.BroadcastEvent(eventName);
+        EventManager.BroadcastEvent(eventName, multiplayer);
     }
 }

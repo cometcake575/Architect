@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Architect.Attributes.Broadcasters;
 using Architect.Attributes.Receivers;
+using Architect.MultiplayerHook;
 using Modding;
 using UnityEngine;
 
@@ -80,18 +81,19 @@ public static class EventManager
         return new EventBroadcaster(data["type"], data["name"]);
     }
 
-    public static void BroadcastEvent(GameObject gameObject, string type)
+    public static void BroadcastEvent(GameObject gameObject, string type, bool multiplayer = false)
     {
         var broadcasters = gameObject.GetComponents<EventBroadcasterInstance>();
             
         foreach (var broadcaster in broadcasters)
         {
-            if (broadcaster.GetEventType().Equals(type, StringComparison.InvariantCultureIgnoreCase)) broadcaster.Broadcast();
+            if (broadcaster.GetEventType().Equals(type, StringComparison.InvariantCultureIgnoreCase)) broadcaster.Broadcast(multiplayer);
         }
     }
     
-    public static void BroadcastEvent(string name)
+    public static void BroadcastEvent(string name, bool multiplayer = false)
     {
+        if (multiplayer && Architect.UsingMultiplayer) HkmpHook.BroadcastEvent(name);
         if (!Events.TryGetValue(name, out var @event)) return;
         foreach (var receiver in @event.Where(receiver => receiver && receiver.gameObject))
         {

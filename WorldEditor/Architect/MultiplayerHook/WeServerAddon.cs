@@ -16,6 +16,7 @@ public class WeServerAddon : ServerAddon
             PacketId.Edit => new EditPacketData(),
             PacketId.Erase => new ErasePacketData(),
             PacketId.Update => new UpdatePacketData(),
+            PacketId.Relay => new RelayPacketData(),
             _ => null
         };
     }
@@ -72,9 +73,18 @@ public class WeServerAddon : ServerAddon
             Logger.Info("Receiving Win Packet [SERVER]");
             sender.SendSingleData(PacketId.Win, packet, serverApi.ServerManager.Players.Select(player => player.Id).ToArray());
         });
+        
+        netReceiver.RegisterPacketHandler<RelayPacketData>(PacketId.Relay, (id, packet) =>
+        {
+            Logger.Info("Receiving Relay Packet [SERVER]");
+            sender.SendSingleData(PacketId.Relay, packet, serverApi.ServerManager.Players
+                .Where(player => player.Id != id)
+                .Select(player => player.Id)
+                .ToArray());
+        });
     }
 
     protected override string Name => "Architect";
-    protected override string Version => "1.8.8.2";
+    protected override string Version => "1.9.0.0";
     public override bool NeedsNetwork => true;
 }

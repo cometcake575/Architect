@@ -12,7 +12,11 @@ internal class PrefabsCategory : ObjectCategory
     
     public PrefabsCategory() : base("Prefabs")
     {
-        foreach (var obj in SceneSaveLoader.Load("Prefabs")) Prefabs.Add(new PrefabObject(obj));
+        foreach (var obj in SceneSaveLoader.Load("Prefabs"))
+        {
+            Prefabs.Add(new PrefabObject(obj));
+            Objects.Add(obj);
+        }
     }
 
     public static void TryAddPrefab()

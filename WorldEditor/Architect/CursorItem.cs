@@ -151,6 +151,8 @@ public static class CursorItem
             movable = true;
         }
 
+        if (EditorUIManager.ConfigValues.TryGetValue("Stick Player", out cfgVal)) movable = true;
+
         if (!movable)
         {
             _movingComponent.SetSpeed(0);

@@ -77,7 +77,7 @@ public static class ContentPacks
     {
         return new GInternalPackElement(scene, path, name, "Solids", weight)
             .WithRotationGroup(RotationGroup.Four)
-            .WithConfigGroup(ConfigGroup.MovingObjects);
+            .WithConfigGroup(ConfigGroup.MovingPlatforms);
     }
 
     private static AbstractPackElement CreateDecoration(string scene, string path, string name, float offset = 0)
@@ -158,7 +158,9 @@ public static class ContentPacks
             CreateDecoration("Crossroads_07", "_Scenery/brk_barrel_05", "Crossroads Barrel"),
             CreateDecoration("Crossroads_07", "_Scenery/brk_cart_05", "Crossroads Cart"),
             CreateDecoration("Crossroads_47", "_Props/Crossroads Statue Horned", "Horned Statue"),
-            CreateDecoration("Crossroads_47", "_Props/Crossroads Statue Stone", "Stone Statue")
+            CreateDecoration("Crossroads_47", "_Props/Crossroads Statue Stone", "Stone Statue"),
+            new LeverPackElement("Room_Town_Stag_Station", "Gate Switch", "Small Lever", weight:LeverWeight)
+                .FlipHorizontal()
         });
         RegisterInternalPack(new ContentPack("Infected Crossroads", "Assets unique to the Infected Crossroads")
         {
@@ -284,6 +286,7 @@ public static class ContentPacks
             Create("Mines_31", "Mines Platform", "Crystal Peak Rotating Platform", "Interactable", weight:MiscInteractableWeight)
                 .WithRotationGroup(RotationGroup.Four),
             new ConveyorBeltElement(weight:MiscInteractableWeight),
+            new FallingCrystalsElement(),
             Create("Mines_37", "stomper_offset", "Crystal Peak Stomper (Slow)", "Hazards")
                 .WithRotationGroup(RotationGroup.Four)
                 .WithReceiverGroup(ReceiverGroup.Stompers)

@@ -12,6 +12,8 @@ public class MovingObject : MonoBehaviour
     public float pauseTime;
     public float smoothing = 0.5f;
 
+    public bool stickPlayer = true;
+
     private float _speed = 5;
     private float _currentSpeed;
     
@@ -59,7 +61,7 @@ public class MovingObject : MonoBehaviour
     {
         _currentSpeed = _speed;
         
-        if (gameObject.layer == 8)
+        if (gameObject.layer == 8 && stickPlayer)
         {
             if (!transform.parent) transform.SetParent(new GameObject("[Architect] Motion Parent").transform);
             _movingPart = transform.parent;

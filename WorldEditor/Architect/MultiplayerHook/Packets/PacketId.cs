@@ -6,5 +6,6 @@ public enum PacketId
     Edit,
     Erase,
     Update,
-    Win
+    Win,
+    Relay
 }

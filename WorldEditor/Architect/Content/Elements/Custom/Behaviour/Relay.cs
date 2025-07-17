@@ -9,6 +9,7 @@ public class Relay : MonoBehaviour
     public bool semiPersistent;
     public string id;
     public float relayChance = 1;
+    public bool multiplayerBroadcast;
     
     private PersistentBoolItem _item;
     private bool _shouldRelay;

@@ -4,14 +4,12 @@ using System.Linq;
 using System.Reflection;
 using Architect.Attributes.Config;
 using Architect.Content.Elements.Custom.Behaviour;
-using Architect.Content.Elements.Custom.SaL;
 using Architect.Content.Elements.Internal.Fixers;
 using HutongGames.PlayMaker.Actions;
 using Modding;
 using Modding.Utils;
 using Satchel;
 using UnityEngine;
-using FsmUtil = SFCore.Utils.FsmUtil;
 
 namespace Architect.Content.Groups;
 
@@ -53,6 +51,8 @@ public class ConfigGroup
     
     public static ConfigGroup MovingObjects;
     
+    public static ConfigGroup MovingPlatforms;
+    
     public static ConfigGroup Tablets;
     
     public static ConfigGroup Relays;
@@ -70,6 +70,8 @@ public class ConfigGroup
     public static ConfigGroup Bindings;
     
     public static ConfigGroup Conveyors;
+    
+    public static ConfigGroup FallingCrystals;
     
     public static ConfigGroup RoomClearer;
     
@@ -280,13 +282,19 @@ public class ConfigGroup
         );
 
         Breakable = new ConfigGroup(Generic,
-            Attributes.ConfigManager.RegisterConfigType(MakePersistenceConfigType("Stay Broken"), "stays_broken")
+            Attributes.ConfigManager.RegisterConfigType(MakePersistenceConfigType("Stay Broken"), "stays_broken"),
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Breakable", (o, value) =>
+            {
+                if (value.GetValue()) return;
+                o.RemoveComponent<PlayMakerFSM>();
+                o.RemoveComponent<HealthCocoon>();
+            }), "can_be_broken")
         );
 
         Cocoon = new ConfigGroup(Breakable,
             Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Lifeseed Count", (o, value) =>
             {
-                o.GetComponent<HealthCocoon>().SetScuttlerAmount(Mathf.Abs(value.GetValue()));
+                o.GetComponent<HealthCocoon>()?.SetScuttlerAmount(Mathf.Abs(value.GetValue()));
             }), "lifeseed_count")
         );
 
@@ -355,6 +363,14 @@ public class ConfigGroup
             {
                 o.GetOrAddComponent<MovingObject>().SetRotationSpeed(value.GetValue());
             }), "mo_rotation_time")
+        );
+
+        MovingPlatforms = new ConfigGroup(MovingObjects,
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Stick Player", (o, value) =>
+            {
+                if (value.GetValue()) return;
+                o.GetOrAddComponent<MovingObject>().stickPlayer = false;
+            }, true), "mp_stick_player")
         );
         
         ModHooks.LanguageGetHook += (key, _, orig) => CustomTexts.TryGetValue(key, out var customText) ? customText : orig;
@@ -431,6 +447,53 @@ public class ConfigGroup
                     o.transform.GetChild(0).GetComponent<ConveyorBelt>().speed = value.GetValue();
                     o.GetComponent<Animator>().speed = value.GetValue() / 8;
                 }, true), "conveyor_speed"
+            )
+        );
+
+        var damageGradient = new ParticleSystem.MinMaxGradient(new Color(1, 0.4f, 0.5f));
+        var crystalMask = LayerMask.GetMask("Player", "Terrain");
+        FallingCrystals = new ConfigGroup(
+            Generic,
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Contact Damage", (o, value) =>
+                {
+                    if (!value.GetValue()) return;
+                    var ps = o.GetComponent<ParticleSystem>();
+                    var main = ps.main;
+                    main.startColor = damageGradient;
+                    var collision = ps.collision;
+                    collision.sendCollisionMessages = true;
+                    collision.collidesWith = crystalMask;
+                    o.AddComponent<DamagingCrystals>();
+                }), "falling_crystals_damage"
+            ),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Speed", (o, value) =>
+                {
+                    var main = o.GetComponent<ParticleSystem>().main;
+                    main.simulationSpeed = value.GetValue();
+                }), "falling_crystals_speed"
+            ),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Rate", (o, value) =>
+                {
+                    var emission = o.GetComponent<ParticleSystem>().emission;
+                    emission.rateOverTimeMultiplier = value.GetValue();
+                }), "falling_crystals_rate"
+            ),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Lifetime", (o, value) =>
+                {
+                    var main = o.GetComponent<ParticleSystem>().main;
+                    main.startLifetimeMultiplier = value.GetValue();
+                }), "falling_crystals_lifetime"
+            ),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Gravity Multiplier", (o, value) =>
+                {
+                    var main = o.GetComponent<ParticleSystem>().main;
+                    main.gravityModifierMultiplier *= value.GetValue();
+                }), "falling_crystals_gravity"
             )
         );
 
@@ -673,6 +736,11 @@ public class ConfigGroup
                 if (!value.GetValue()) return;
                 o.GetComponent<Relay>().semiPersistent = true;
             }), "relay_reset_at_bench"),
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Multiplayer Relay", (o, value) =>
+            {
+                if (!value.GetValue()) return;
+                o.GetComponent<Relay>().multiplayerBroadcast = true;
+            }), "relay_multiplayer_mode"),
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Relay Chance", (o, value) =>
             {
                 o.GetComponent<Relay>().relayChance = value.GetValue();

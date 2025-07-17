@@ -29,6 +29,11 @@ public static class HkmpHook
         _clientAddon.Update(guid, scene, pos);
     }
 
+    public static void BroadcastEvent(string name)
+    {
+        _clientAddon.BroadcastEvent(name);
+    }
+
     public static void Erase(string guid, string scene)
     {
         _clientAddon.Erase(guid, scene);
