@@ -60,8 +60,7 @@ public static class CustomObjects
                 .WithConfigGroup(ConfigGroup.Invisible),
             new SimplePackElement(CreateEnemyBarrier(), "Enemy Barrier", "Custom",
                     ResourceUtils.Load("enemy_barrier"))
-                .WithReceiverGroup(ReceiverGroup.ObjectMover)
-                .WithConfigGroup(ConfigGroup.ObjectMover),
+                .WithConfigGroup(ConfigGroup.Stretchable),
             new SimplePackElement(CreateObjectMover(), "Object Mover", "Custom",
                     ResourceUtils.Load("object_mover"))
                 .WithReceiverGroup(ReceiverGroup.ObjectMover)

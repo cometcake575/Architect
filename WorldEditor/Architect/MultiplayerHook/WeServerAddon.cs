@@ -75,6 +75,6 @@ public class WeServerAddon : ServerAddon
     }
 
     protected override string Name => "Architect";
-    protected override string Version => "1.8.8.0";
+    protected override string Version => "1.8.8.1";
     public override bool NeedsNetwork => true;
 }
