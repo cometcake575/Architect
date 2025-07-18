@@ -53,6 +53,8 @@ public class ConfigGroup
     
     public static ConfigGroup MovingPlatforms;
     
+    public static ConfigGroup TriggerZones;
+    
     public static ConfigGroup Tablets;
     
     public static ConfigGroup Relays;
@@ -666,6 +668,18 @@ public class ConfigGroup
             {
                 o.transform.SetScaleY(o.transform.GetScaleY() * value.GetValue());
             }), "height")
+        );
+
+        var activeRegion = LayerMask.NameToLayer("ActiveRegion");
+        var softTerrain = LayerMask.NameToLayer("Soft Terrain");
+        TriggerZones = new ConfigGroup(Stretchable,
+            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Detect Mode", (o, value) =>
+            {
+                var val = value.GetValue();
+                o.GetComponent<TriggerZone>().mode = val;
+
+                o.layer = val == 3 ? activeRegion : softTerrain;
+            }, false, "Player", "Nail Swing", "Enemy", "Zote Head"), "trigger_mode")
         );
 
         Colours = new ConfigGroup(Invisible,

@@ -159,6 +159,7 @@ public static class ContentPacks
             CreateDecoration("Crossroads_07", "_Scenery/brk_cart_05", "Crossroads Cart"),
             CreateDecoration("Crossroads_47", "_Props/Crossroads Statue Horned", "Horned Statue"),
             CreateDecoration("Crossroads_47", "_Props/Crossroads Statue Stone", "Stone Statue"),
+            new DiveGroundElement(weight:BreakableWallsWeight),
             new LeverPackElement("Room_Town_Stag_Station", "Gate Switch", "Small Lever", weight:LeverWeight)
                 .FlipHorizontal()
         });
@@ -189,8 +190,7 @@ public static class ContentPacks
                 .WithRotationGroup(RotationGroup.Four),
             CreateEnemy("Fungus1_12", "Plant Turret", "Gulka")
                 .WithRotationGroup(RotationGroup.All),
-            Create("Fungus1_20_v02", "Zote Death/Head", "Zote Head", "Interactable", weight:MiscInteractableWeight)
-                .WithRotationGroup(RotationGroup.All),
+            new ZoteHeadElement(weight:MiscInteractableWeight),
             CreateEnemy("Fungus1_31", "_Enemies/Fat Fly (1)", "Obble").FlipVertical(),
             CreateDecoration("Fungus1_31", "_Scenery/fung_lamp2", "Standing Lantern"),
             

@@ -35,7 +35,7 @@ public static class CustomObjects
             new SimplePackElement(CreateTriggerZone(), "Trigger Zone", "Custom",
                     ResourceUtils.Load("trigger_zone", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.TriggerZones)
-                .WithConfigGroup(ConfigGroup.Stretchable),
+                .WithConfigGroup(ConfigGroup.TriggerZones),
             new SimplePackElement(CreateTimer(), "Timer", "Custom",
                     ResourceUtils.Load("timer", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.Callable)
@@ -187,7 +187,7 @@ public static class CustomObjects
         var collider = point.AddComponent<BoxCollider2D>();
         collider.isTrigger = true;
         collider.size = new Vector2(0.32f, 0.32f);
-
+        
         point.AddComponent<TriggerZone>();
 
         point.SetActive(false);

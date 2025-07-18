@@ -238,3 +238,32 @@ internal sealed class ZoteCurseElement : InternalPackElement
         _gameObject = preloads["GG_Mighty_Zote"]["Battle Control/Zote Salubra"];
     }
 }
+
+internal class ZoteHeadElement : InternalPackElement
+{
+    private GameObject _gameObject;
+
+    public ZoteHeadElement(int weight) : base("Zote Head", "Interactable", weight:weight)
+    {
+        WithRotationGroup(RotationGroup.All);
+    }
+
+    public override GameObject GetPrefab(bool flipped, float rotation)
+    {
+        return _gameObject;
+    }
+
+    internal override void AddPreloads(List<(string, string)> preloadInfo)
+    {
+        preloadInfo.Add(("Fungus1_20_v02", "Zote Death/Head"));
+    }
+
+    internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
+    {
+        _gameObject = preloads["Fungus1_20_v02"]["Zote Death/Head"];
+        _gameObject.AddComponent<ZoteHead>();
+        _gameObject.transform.SetRotation2D(0);
+    }
+}
+
+internal class ZoteHead : MonoBehaviour;
