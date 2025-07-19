@@ -490,8 +490,7 @@ public static class ContentPacks
             CreateSolid("White_Palace_07", "wp_plat_float_07", "White Palace Platform 2"),
             CreateSolid("White_Palace_07", "wp_plat_float_03", "White Palace Platform 3"),
             CreateSolid("White_Palace_07", "wp_plat_float_05 (1)", "White Palace Platform 4"),
-            Create("White_Palace_07", "wp_saw", "White Palace Saw", "Hazards")
-                .WithConfigGroup(ConfigGroup.MovingObjects),
+            new WhitePalaceSawElement(),
             new WhiteThornsElement(),
             Create("White_Palace_07", "wp_trap_spikes", "White Palace Moving Spikes", "Hazards")
                 .WithRotationGroup(RotationGroup.Eight)

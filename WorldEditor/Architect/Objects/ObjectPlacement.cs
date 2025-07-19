@@ -270,7 +270,7 @@ public class ObjectPlacement
             ReceiverGroup.Initialize();
             
             var name = "";
-            var id = "";
+            string id = null;
             var pos = Vector3.zero;
             var flipped = true;
             var rotation = 0f;
@@ -342,6 +342,7 @@ public class ObjectPlacement
             }
 
             name = Updater.UpdateObject(name);
+            id ??= Guid.NewGuid().ToString().Substring(0, 8);
             var placement = new ObjectPlacement(name, pos, flipped, rotation, scale, id, broadcasters, receivers, config);
 
             return placement;
