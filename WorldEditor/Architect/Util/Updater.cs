@@ -18,6 +18,7 @@ public static class Updater
             "sal_door_id" => "sal_door_group",
             "sal_x_move_dist" => "sal_door_x_move",
             "sal_y_move_dist" => "sal_door_y_move",
+            "lore_tabet_content" => "lore_tablet_content",
             _ => id
         };
     }

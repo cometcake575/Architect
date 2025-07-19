@@ -68,7 +68,7 @@ public static class ContentPacks
     private static AbstractPackElement CreateEnemy(string scene, string path, string name, int weight = 0, string category = "Enemies")
     {
         return new GInternalPackElement(scene, path, name, category, weight)
-            .WithConfigGroup(ConfigGroup.Enemies)
+            .WithConfigGroup(ConfigGroup.KillableEnemies)
             .WithReceiverGroup(ReceiverGroup.Enemies)
             .WithBroadcasterGroup(BroadcasterGroup.Enemies);
     }
@@ -267,7 +267,7 @@ public static class ContentPacks
                 .WithConfigGroup(ConfigGroup.MovingObjects)
                 .FlipHorizontal(),
             new ForceActivatedElement("Crossroads_45", "Zombie Myla", "Husk Myla", "Enemies")
-                .WithConfigGroup(ConfigGroup.Enemies)
+                .WithConfigGroup(ConfigGroup.KillableEnemies)
                 .WithBroadcasterGroup(BroadcasterGroup.Enemies)
                 .WithReceiverGroup(ReceiverGroup.Enemies),
             CreateEnemy("Mines_20", "Zombie Miner 1", "Husk Miner")
@@ -290,11 +290,11 @@ public static class ContentPacks
             Create("Mines_37", "stomper_offset", "Crystal Peak Stomper (Slow)", "Hazards")
                 .WithRotationGroup(RotationGroup.Four)
                 .WithReceiverGroup(ReceiverGroup.Stompers)
-                .WithConfigGroup(ConfigGroup.Invisible),
+                .WithConfigGroup(ConfigGroup.Animated),
             Create("Mines_37", "stomper_fast", "Crystal Peak Stomper (Fast)", "Hazards")
                 .WithRotationGroup(RotationGroup.Four)
                 .WithReceiverGroup(ReceiverGroup.Stompers)
-                .WithConfigGroup(ConfigGroup.Invisible),
+                .WithConfigGroup(ConfigGroup.Animated),
             new BreakableWallElement("Mines_25", "Breakable Wall", "Breakable Wall", weight:BreakableWallsWeight),
             CreateDecoration("Mines_20", "brk_Crystal3", "Crystal"),
             CreateDecoration("Mines_20", "crystal_barrel", "Crystal Barrel")
@@ -450,19 +450,19 @@ public static class ContentPacks
             new HatcherPackElement("Deepnest_26b", "Centipede Hatcher (4)", "Centipede Cage", "Carver Hatcher", "Centipede Hatcher"),
             new ForceActivatedElement("Deepnest_Spider_Town", "Spider Mini", "Deephunter", "Enemies")
                 .WithRotationGroup(RotationGroup.Four)
-                .WithConfigGroup(ConfigGroup.Enemies)
+                .WithConfigGroup(ConfigGroup.KillableEnemies)
                 .WithBroadcasterGroup(BroadcasterGroup.Enemies)
                 .WithReceiverGroup(ReceiverGroup.Enemies),
             new ForceActivatedElement("Deepnest_Spider_Town", "Tiny Spider", "Deepling", "Enemies")
-                .WithConfigGroup(ConfigGroup.Enemies)
+                .WithConfigGroup(ConfigGroup.KillableEnemies)
                 .WithBroadcasterGroup(BroadcasterGroup.Enemies)
                 .WithReceiverGroup(ReceiverGroup.Enemies),
             new ForceActivatedElement("Deepnest_41", "Spider Flyer", "Little Weaver", "Enemies")
-                .WithConfigGroup(ConfigGroup.Enemies)
+                .WithConfigGroup(ConfigGroup.KillableEnemies)
                 .WithBroadcasterGroup(BroadcasterGroup.Enemies)
                 .WithReceiverGroup(ReceiverGroup.Enemies),
             new ForceActivatedElement("Deepnest_Spider_Town", "Slash Spider", "Stalking Devout", "Enemies")
-                .WithConfigGroup(ConfigGroup.Enemies)
+                .WithConfigGroup(ConfigGroup.KillableEnemies)
                 .WithBroadcasterGroup(BroadcasterGroup.Enemies)
                 .WithReceiverGroup(ReceiverGroup.Enemies)
                 .FlipVertical(),
@@ -482,7 +482,9 @@ public static class ContentPacks
         });
         RegisterInternalPack(new ContentPack("White Palace", "Assets from the White Palace")
         {
-            Create("White_Palace_18", "White Palace Fly", "Wingsmould", "Enemies").FlipVertical(),
+            Create("White_Palace_18", "White Palace Fly", "Wingsmould", "Enemies")
+                .FlipVertical()
+                .WithConfigGroup(ConfigGroup.Wingsmould),
             CreateEnemy("White_Palace_20", "Battle Scene/Wave 1/Royal Gaurd (1)", "Kingsmould"),
             CreateSolid("White_Palace_07", "wp_plat_float_01_wide (1)", "White Palace Platform 1"),
             CreateSolid("White_Palace_07", "wp_plat_float_07", "White Palace Platform 2"),
@@ -492,7 +494,8 @@ public static class ContentPacks
                 .WithConfigGroup(ConfigGroup.MovingObjects),
             new WhiteThornsElement(),
             Create("White_Palace_07", "wp_trap_spikes", "White Palace Moving Spikes", "Hazards")
-                .WithRotationGroup(RotationGroup.Eight),
+                .WithRotationGroup(RotationGroup.Eight)
+                .WithConfigGroup(ConfigGroup.Animated),
             Create("White_Palace_03_hub", "White_ Spikes", "White Palace Spikes", "Hazards")
                 .WithRotationGroup(RotationGroup.Eight),
             Create("White_Palace_03_hub", "Soul Totem white", "Pale King Soul Totem", "Interactable", weight:SoulSourceWeight)

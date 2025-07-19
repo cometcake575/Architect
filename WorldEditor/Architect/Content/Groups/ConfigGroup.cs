@@ -20,12 +20,18 @@ public class ConfigGroup
     public static ConfigGroup Invisible;
     
     public static ConfigGroup Generic;
+    
+    public static ConfigGroup Animated;
 
     public static ConfigGroup GeoChest;
     
     public static ConfigGroup KeyListeners;
     
     public static ConfigGroup Enemies;
+    
+    public static ConfigGroup Wingsmould;
+
+    public static ConfigGroup KillableEnemies;
     
     public static ConfigGroup FlukeZoteling;
     
@@ -57,6 +63,8 @@ public class ConfigGroup
     
     public static ConfigGroup Tablets;
     
+    public static ConfigGroup Binoculars;
+    
     public static ConfigGroup Relays;
     
     public static ConfigGroup Abyss;
@@ -66,6 +74,8 @@ public class ConfigGroup
     public static ConfigGroup Grub;
     
     public static ConfigGroup BattleGate;
+    
+    public static ConfigGroup ShieldGate;
     
     public static ConfigGroup BrokenVessel;
     
@@ -117,6 +127,17 @@ public class ConfigGroup
             }), "visible")
         );
 
+        Animated = new ConfigGroup(Generic,
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Speed", (o, value) =>
+            {
+                o.GetComponentInChildren<Animator>().speed = value.GetValue();
+            }), "animator_speed"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Offset", (o, value) =>
+            {
+                o.AddComponent<AnimatorDelay>().delay = value.GetValue();
+            }), "animator_offset")
+        );
+
         ObjectMover = new ConfigGroup(Invisible,
             Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Movement Type", (o, value) =>
             {
@@ -157,6 +178,25 @@ public class ConfigGroup
         
         var enemyTypeField = typeof(HealthManager).GetField("enemyType", BindingFlags.NonPublic | BindingFlags.Instance);
         Enemies = new ConfigGroup(Generic,
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Give Soul", (o, value) =>
+            {
+                enemyTypeField?.SetValue(o.GetComponent<HealthManager>(), value.GetValue() ? 1 : 6);
+            }), "enemy_give_soul"),
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Invulnerable", (o, value) =>
+            {
+                o.AddComponent<EnemyInvulnerabilityMarker>().invincible = value.GetValue();
+                o.GetComponent<HealthManager>().IsInvincible = value.GetValue();
+            }), "enemy_invulnerable")
+        );
+        
+        Wingsmould = new ConfigGroup(Enemies,
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Roaming Range", (o, value) =>
+            {
+                o.LocateMyFSM("Control").GetAction<IdleBuzz>("Idle", 1).roamingRange = value.GetValue();
+            }), "wingsmould_range")
+        );
+        
+        KillableEnemies = new ConfigGroup(Enemies,
             Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Health", (o, value) =>
             {
                 o.GetComponent<HealthManager>().hp = Mathf.Abs(value.GetValue());
@@ -189,16 +229,6 @@ public class ConfigGroup
                     b = o.GetComponent<HealthManager>().isDead;
                 };
             }), "enemy_stay_dead"),
-            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Give Soul", (o, value) =>
-            {
-                enemyTypeField?.SetValue(o.GetComponent<HealthManager>(), value.GetValue() ? 1 : 6);
-            }), "enemy_give_soul"),
-            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Invulnerable", (o, value) =>
-            {
-                if (!value.GetValue()) return;
-                o.AddComponent<EnemyInvulnerabilityMarker>();
-                o.GetComponent<HealthManager>().IsInvincible = true;
-            }), "enemy_invulnerable"),
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Disable Enemy AI", (o, value) =>
             {
                 if (!value.GetValue()) return;
@@ -209,7 +239,7 @@ public class ConfigGroup
             }), "enemy_ai_disabled")
         );
 
-        FlukeZoteling = new ConfigGroup(Enemies, 
+        FlukeZoteling = new ConfigGroup(KillableEnemies, 
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Max Flight Distance", (o, value) =>
             {
                 var control = o.LocateMyFSM("Control");
@@ -217,7 +247,7 @@ public class ConfigGroup
             }), "fzote_max_fly")
         );
 
-        Mantis = new ConfigGroup(Enemies,
+        Mantis = new ConfigGroup(KillableEnemies,
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Ignore Respect", (o, value) =>
             {
                 if (!value.GetValue()) return;
@@ -235,7 +265,7 @@ public class ConfigGroup
             }), "ignore_lords_respect")
         );
 
-        Twisters = new ConfigGroup(Enemies,
+        Twisters = new ConfigGroup(KillableEnemies,
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Teleplane Width", (o, value) =>
             {
                 var collider = o.GetComponent<Teleplane>().collider;
@@ -248,7 +278,7 @@ public class ConfigGroup
             }), "tp_height")
         );
 
-        Awakable = new ConfigGroup(Enemies,
+        Awakable = new ConfigGroup(KillableEnemies,
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Start Awake", (o, value) =>
             {
                 if (!value.GetValue()) return;
@@ -386,7 +416,14 @@ public class ConfigGroup
                 fsm.FsmVariables.GetFsmString("Convo Name").Value = id;
                 fsm.FsmVariables.GetFsmString("Sheet Name").Value = "Custom";
                 CustomTexts[id] = value.GetValue();
-            }), "lore_tabet_content")
+            }), "lore_tablet_content")
+        );
+
+        Binoculars = new ConfigGroup(Generic,
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Camera Speed", (o, value) =>
+            {
+                o.GetComponent<Binoculars>().speed = value.GetValue() * 10;
+            }), "freecam_speed")
         );
 
         var ignoreVoidHeart =
@@ -420,6 +457,22 @@ public class ConfigGroup
                     if (fsm) fsm.SetState("Open");
                     else o.LocateMyFSM("FSM").SendEvent("DOWN");
                 }), "gate_start_open"
+            )
+        );
+
+        ShieldGate = new ConfigGroup(
+            BattleGate,
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Close Time", (o, value) =>
+                {
+                    o.LocateMyFSM("FSM").FsmVariables.FindFsmFloat("Up Time").Value = value.GetValue();
+                }), "shield_close_time"
+            ),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Open Time", (o, value) =>
+                {
+                    o.LocateMyFSM("FSM").FsmVariables.FindFsmFloat("Down Time").Value = value.GetValue();
+                }), "shield_open_time"
             )
         );
 
@@ -761,7 +814,7 @@ public class ConfigGroup
             }), "relay_run_chance")
         );
 
-        BrokenVessel = new ConfigGroup(Enemies,
+        BrokenVessel = new ConfigGroup(KillableEnemies,
             Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Jump Zone", (o, value) =>
             {
                 if (value.GetValue() != 1) return;
@@ -841,6 +894,7 @@ public class ConfigGroup
     public class EnemyInvulnerabilityMarker : MonoBehaviour
     {
         private HealthManager _manager;
+        public bool invincible;
         
         private void Awake()
         {
@@ -849,7 +903,7 @@ public class ConfigGroup
 
         private void Update()
         {
-            _manager.IsInvincible = true;
+            _manager.IsInvincible = invincible;
         }
     }
 }

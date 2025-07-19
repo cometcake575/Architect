@@ -12,7 +12,7 @@ internal sealed class MenderbugElement : InternalPackElement
     public MenderbugElement() : base("Menderbug", "Enemies")
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
-        WithConfigGroup(ConfigGroup.Enemies);
+        WithConfigGroup(ConfigGroup.KillableEnemies);
         WithReceiverGroup(ReceiverGroup.Enemies);
     }
 

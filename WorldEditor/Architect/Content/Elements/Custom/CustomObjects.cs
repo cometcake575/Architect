@@ -88,6 +88,7 @@ public static class CustomObjects
             CreateBinding("dive", "Desolate Dive Binding", clip),
             CreateBinding("wraiths", "Howling Wraiths Binding", clip),
             CreateBinding("pogo", "Pogo Binding", clip),
+            CreateBinding("lantern", "Lantern Binding", clip),
             CreateBinding("dash", "Dash Binding", clip),
             CreateBinding("shadow_dash", "Shadow Dash Binding", clip),
             CreateBinding("claw", "Mantis Claw Binding", clip),
@@ -391,14 +392,16 @@ public static class CustomObjects
 
     private static bool BindingCheck(bool orig, string type)
     {
-        if (!Bindings.TryGetValue(type, out var list) || list.Count == 0) return orig;
+        if (!orig) return false;
+        
+        if (!Bindings.TryGetValue(type, out var list) || list.Count == 0) return true;
         foreach (var binding in list.ToList())
         {
             if (!binding) list.Remove(binding);
             else if (binding.active && binding.gameObject.activeInHierarchy) return false;
         }
 
-        return orig;
+        return true;
     }
 
     private static void InitializeHooks()
@@ -433,7 +436,15 @@ public static class CustomObjects
         On.HeroController.CanDoubleJump += (orig, self) => BindingCheck(orig(self), "wings");
         On.HeroController.CanDreamNail += (orig, self) => BindingCheck(orig(self), "dnail");
         
-        ModHooks.GetPlayerBoolHook += (name, orig) => name == "hasShadowDash" ? BindingCheck(orig, "shadow_dash") : orig;
+        ModHooks.GetPlayerBoolHook += (name, orig) =>
+        {
+            return name switch
+            {
+                "hasShadowDash" => BindingCheck(orig, "shadow_dash"),
+                "hasLantern" => BindingCheck(orig, "lantern"),
+                _ => orig
+            };
+        };
 
         On.ShadowGateColliderControl.FixedUpdate += (orig, self) =>
         {
@@ -590,7 +601,6 @@ public static class CustomObjects
 
     public static void RefreshBinding(string binding)
     {
-        if (BossSequenceController.IsInSequence) return;
         switch (binding)
         {
             case "charms":
@@ -608,6 +618,9 @@ public static class CustomObjects
             case "tear":
                 RefreshTearBinding();
                 break;
+            case "lantern":
+                RefreshLanternBinding();
+                break;
         }
     }
 
@@ -616,8 +629,19 @@ public static class CustomObjects
         PlayMakerFSM.BroadcastEvent("REFRESH ACID ARMOUR");
     }
 
+    internal static void RefreshLanternBinding()
+    {
+        PlayMakerFSM.BroadcastEvent("RESET");
+        if (GameManager.instance.sm.GetDarknessLevel() > 0 && 
+            BindingCheck(PlayerData.instance.GetBool("hasLantern"), "lantern"))
+        {
+            HeroController.instance.SetWieldingLantern(true);
+        } else HeroController.instance.SetWieldingLantern(false);
+    }
+
     private static void RefreshNailBinding()
     {
+        if (BossSequenceController.IsInSequence) return;
         if (_nailBound == ShouldBindNail()) return;
         _nailBound = !_nailBound;
         
@@ -627,6 +651,7 @@ public static class CustomObjects
 
     private static void RefreshShellBinding()
     {
+        if (BossSequenceController.IsInSequence) return;
         if (_shellBound == ShouldBindShell()) return;
         _shellBound = !_shellBound;
 
@@ -647,6 +672,7 @@ public static class CustomObjects
 
     private static void RefreshCharmsBinding()
     {
+        if (BossSequenceController.IsInSequence) return;
         if (ShouldBindCharms())
         {
             if (_charmsBound) return;
@@ -681,6 +707,7 @@ public static class CustomObjects
 
     private static void RefreshSoulBinding()
     {
+        if (BossSequenceController.IsInSequence) return;
         if (ShouldBindSoul() == _soulBound) return;
         _soulBound = !_soulBound;
         

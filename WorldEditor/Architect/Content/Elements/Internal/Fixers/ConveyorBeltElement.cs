@@ -56,8 +56,8 @@ internal class ConveyorBeltElement : InternalPackElement
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         var belt = gameObject.transform.GetChild(0).gameObject.GetComponent<ConveyorBelt>();
-        if (flipped == (rotation == 270)) belt.speed = -belt.speed;
-        if (rotation % 180 != 0) belt.vertical = true;
+        if (flipped == rotation is 270) belt.speed = -belt.speed;
+        if (rotation is 90 or 270) belt.vertical = true;
     }
 
     public static void Initialize()

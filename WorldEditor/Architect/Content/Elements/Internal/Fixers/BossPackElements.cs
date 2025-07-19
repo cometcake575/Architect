@@ -177,7 +177,7 @@ internal class OblobbleElement : InternalPackElement
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
         WithReceiverGroup(ReceiverGroup.Enemies);
-        WithConfigGroup(ConfigGroup.Enemies);
+        WithConfigGroup(ConfigGroup.KillableEnemies);
     }
 
     public override GameObject GetPrefab(bool flipped, float rotation)
@@ -211,7 +211,7 @@ internal class TamerBeastElement : InternalPackElement
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
         WithReceiverGroup(ReceiverGroup.Enemies);
-        WithConfigGroup(ConfigGroup.Enemies);
+        WithConfigGroup(ConfigGroup.KillableEnemies);
     }
 
     public override GameObject GetPrefab(bool flipped, float rotation)
@@ -272,7 +272,7 @@ internal class SoulWarriorElement : InternalPackElement
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
         WithReceiverGroup(ReceiverGroup.Enemies);
-        WithConfigGroup(ConfigGroup.Enemies);
+        WithConfigGroup(ConfigGroup.KillableEnemies);
     }
 
     public override GameObject GetPrefab(bool flipped, float rotation)
@@ -433,7 +433,7 @@ internal class PureVesselElement : InternalPackElement
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
         WithReceiverGroup(ReceiverGroup.Enemies);
-        WithConfigGroup(ConfigGroup.Enemies);
+        WithConfigGroup(ConfigGroup.KillableEnemies);
         FlipVertical();
     }
 

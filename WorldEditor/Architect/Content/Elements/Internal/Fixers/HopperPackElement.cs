@@ -10,7 +10,7 @@ internal sealed class HopperPackElement : GInternalPackElement
     public HopperPackElement(string scene, string path, string name, bool flip) : base(scene, path, name, "Enemies", 0)
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
-        WithConfigGroup(ConfigGroup.Enemies);
+        WithConfigGroup(ConfigGroup.KillableEnemies);
         WithReceiverGroup(ReceiverGroup.Enemies);
         _flip = flip;
     }

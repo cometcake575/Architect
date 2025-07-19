@@ -13,7 +13,7 @@ internal class WhitePalaceShieldGateElement : InternalPackElement
     {
         WithRotationGroup(RotationGroup.Four);
         WithReceiverGroup(ReceiverGroup.BattleGate);
-        WithConfigGroup(ConfigGroup.BattleGate);
+        WithConfigGroup(ConfigGroup.ShieldGate);
     }
 
     public override GameObject GetPrefab(bool flipped, float rotation)

@@ -6,6 +6,7 @@ using Architect.Content.Groups;
 using Architect.Util;
 using JetBrains.Annotations;
 using Modding.Utils;
+using Satchel;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -25,6 +26,10 @@ public static class RoomObjects
                     ResourceUtils.Load("teleport_point"))
                 .WithReceiverGroup(ReceiverGroup.TeleportPoint)
                 .WithConfigGroup(ConfigGroup.Invisible),
+            new SimplePackElement(CreateDarkness(), "Darkness", "Room Edits",
+                    ResourceUtils.Load("darkness")),
+            new SimplePackElement(CreateBinoculars(), "Binoculars", "Room Edits")
+                .WithConfigGroup(ConfigGroup.Binoculars),
             CreateRoomEditor("room_remover", "Clear Room", o =>
             {
                 var clearer = o.GetComponent<RoomClearerConfig>();
@@ -140,6 +145,40 @@ public static class RoomObjects
     {
         var point = new GameObject(name);
 
+        point.SetActive(false);
+        Object.DontDestroyOnLoad(point);
+
+        return point;
+    }
+
+    private static GameObject CreateDarkness()
+    {
+        Darkness.Init();
+        
+        var point = new GameObject("Darkness");
+
+        point.AddComponent<Darkness>();
+        point.SetActive(false);
+        Object.DontDestroyOnLoad(point);
+
+        return point;
+    }
+
+    private static GameObject CreateBinoculars()
+    {
+        var point = new GameObject("Binoculars");
+
+        var col = point.AddComponent<BoxCollider2D>();
+        col.isTrigger = true;
+        col.size = new Vector2(1.25f, 1.06f);
+        
+        point.AddComponent<SpriteRenderer>().sprite = ResourceUtils.Load("binoculars");
+        
+        Binoculars.Init();
+        var softTerrain = LayerMask.NameToLayer("Soft Terrain");
+        point.layer = softTerrain;
+        point.AddComponent<Binoculars>();
+        
         point.SetActive(false);
         Object.DontDestroyOnLoad(point);
 

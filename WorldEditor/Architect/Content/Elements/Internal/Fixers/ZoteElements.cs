@@ -15,7 +15,7 @@ internal class ZotelingElement : InternalPackElement
     public ZotelingElement(string path, string name) : base(name, "Enemies")
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
-        WithConfigGroup(ConfigGroup.Enemies);
+        WithConfigGroup(ConfigGroup.KillableEnemies);
         WithReceiverGroup(ReceiverGroup.Enemies);
 
         _path = path;
@@ -54,7 +54,7 @@ internal class BallZotelingElement : InternalPackElement
     public BallZotelingElement(string name, string type) : base(name, "Enemies")
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
-        WithConfigGroup(ConfigGroup.Enemies);
+        WithConfigGroup(ConfigGroup.KillableEnemies);
         WithReceiverGroup(ReceiverGroup.Enemies);
         _type = type;
     }
@@ -135,7 +135,7 @@ internal sealed class VolatileZotelingElement : InternalPackElement
     public VolatileZotelingElement() : base("Volatile Zoteling", "Enemies")
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
-        WithConfigGroup(ConfigGroup.Enemies);
+        WithConfigGroup(ConfigGroup.KillableEnemies);
         WithReceiverGroup(ReceiverGroup.Enemies);
     }
     
@@ -209,7 +209,7 @@ internal sealed class ZoteCurseElement : InternalPackElement
     public ZoteCurseElement() : base("Zote's Curse", "Enemies")
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
-        WithConfigGroup(ConfigGroup.Enemies);
+        WithConfigGroup(ConfigGroup.KillableEnemies);
         WithReceiverGroup(ReceiverGroup.Enemies);
     }
     

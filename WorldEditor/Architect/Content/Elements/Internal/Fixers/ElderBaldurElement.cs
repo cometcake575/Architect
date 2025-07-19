@@ -11,7 +11,7 @@ internal class ElderBaldurElement : InternalPackElement
     public ElderBaldurElement() : base("Elder Baldur", "Enemies")
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
-        WithConfigGroup(ConfigGroup.Enemies);
+        WithConfigGroup(ConfigGroup.KillableEnemies);
         WithReceiverGroup(ReceiverGroup.Enemies);
         FlipHorizontal();
     }

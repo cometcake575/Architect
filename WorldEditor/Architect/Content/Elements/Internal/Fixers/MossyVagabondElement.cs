@@ -11,7 +11,7 @@ internal sealed class MossyVagabondElement : InternalPackElement
     public MossyVagabondElement() : base("Mossy Vagabond", "Enemies")
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
-        WithConfigGroup(ConfigGroup.Enemies);
+        WithConfigGroup(ConfigGroup.KillableEnemies);
         WithReceiverGroup(ReceiverGroup.Enemies);
     }
 
