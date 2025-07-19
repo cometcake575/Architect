@@ -31,11 +31,10 @@ public class Binoculars : MonoBehaviour
         {
             _frozen = true;
             _active = true;
+            HeroController.instance.damageMode = DamageMode.NO_DAMAGE;
+            HeroController.instance.vignette.enabled = false;
+            HeroController.instance.RelinquishControl();
         }
-        
-        HeroController.instance.damageMode = DamageMode.NO_DAMAGE;
-        HeroController.instance.vignette.enabled = false;
-        HeroController.instance.RelinquishControl();
     }
 
     private void Update()
