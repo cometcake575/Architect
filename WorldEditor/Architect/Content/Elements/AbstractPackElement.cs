@@ -1,5 +1,6 @@
 #nullable enable
 using Architect.Content.Groups;
+using Architect.Objects;
 using UnityEngine;
 
 namespace Architect.Content.Elements;
@@ -24,7 +25,7 @@ public abstract class AbstractPackElement
     {
         return null;
     }
-
+    
     internal string[] GetBroadcasterGroup()
     {
         return _broadcasterGroup;
@@ -123,5 +124,9 @@ public abstract class AbstractPackElement
         return false;
     }
 
+    // After the object is spawned in
     public virtual void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale) { }
+    
+    // After the preview is spawned in
+    public virtual void PostPlace(ObjectPlacement placement, GameObject preview) { }
 }

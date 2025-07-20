@@ -203,8 +203,6 @@ public static class ContentPacks
             Create("Fungus1_37", "RestBench", "Stone Sanctuary Bench", "Interactable", weight:BenchWeight),
             Create("Room_Slug_Shrine", "RestBench", "Unn Shrine Bench", "Interactable", weight:BenchWeight),
             Create("Fungus1_15", "RestBench", "Nailmaster Sheo's Bench", "Interactable", weight:NailmasterBenchWeight),
-            
-            //CreateEnemy("GG_Hornet_1", "Boss Holder/Hornet Boss 1", "Hornet Protector")
         });
         RegisterInternalPack(new ContentPack("Fog Canyon", "Assets from Fog Canyon")
         {

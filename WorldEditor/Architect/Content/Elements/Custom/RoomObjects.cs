@@ -6,7 +6,6 @@ using Architect.Content.Groups;
 using Architect.Util;
 using JetBrains.Annotations;
 using Modding.Utils;
-using Satchel;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -26,29 +25,28 @@ public static class RoomObjects
                     ResourceUtils.Load("teleport_point"))
                 .WithReceiverGroup(ReceiverGroup.TeleportPoint)
                 .WithConfigGroup(ConfigGroup.Invisible),
-            new SimplePackElement(CreateDarkness(), "Darkness", "Room Edits",
+            new PreviewablePackElement(CreateDarkness(), "Darkness", "Room Edits",
                     ResourceUtils.Load("darkness")),
             new SimplePackElement(CreateBinoculars(), "Binoculars", "Room Edits")
                 .WithConfigGroup(ConfigGroup.Binoculars),
             CreateRoomEditor("room_remover", "Clear Room", o =>
             {
-                var clearer = o.GetComponent<RoomClearerConfig>();
+                var clearer = o.GetOrAddComponent<RoomClearerConfig>();
 
                 var objects = o.scene.GetRootGameObjects().Where(obj => !obj.name.StartsWith("[Architect]"));
-                
-                if (clearer)
-                {
-                    if (!clearer.removeBenches) objects = objects.Where(obj => !obj.GetComponent<RestBench>());
-                    if (!clearer.removeScenery) objects = objects.Where(obj => !obj.name.StartsWith("_Scenery") && obj.name != "Acid Control v2");
-                    if (!clearer.removeTilemap) objects = objects.Where(obj => !obj.name.Contains("TileMap"));
-                    if (!clearer.removeBlur) objects = objects.Where(obj => !obj.GetComponentInChildren<BlurPlane>());
-                    if (!clearer.removeProps) objects = objects.Where(obj => !obj.name.StartsWith("_Props"));
-                    if (!clearer.removeTransitions) objects = objects.Where(obj => !obj.name.StartsWith("_Transition Gates"));
-                    if (!clearer.removeCameraLocks) objects = objects.Where(obj => !obj.name.StartsWith("_CameraLock"));
-                    if (!clearer.removeMusic) objects = objects.Where(obj => !obj.GetComponent<MusicRegion>());
-                    if (!clearer.removeNpcs) objects = objects.Where(obj => !obj.name.StartsWith("NPC"));
-                }
-                
+
+                if (!clearer.removeBenches) objects = objects.Where(obj => !obj.GetComponent<RestBench>());
+                if (!clearer.removeScenery)
+                    objects = objects.Where(obj => !obj.name.StartsWith("_Scenery") && obj.name != "Acid Control v2");
+                if (!clearer.removeTilemap) objects = objects.Where(obj => !obj.name.Contains("TileMap"));
+                if (!clearer.removeBlur) objects = objects.Where(obj => !obj.GetComponentInChildren<BlurPlane>());
+                if (!clearer.removeProps) objects = objects.Where(obj => !obj.name.StartsWith("_Props"));
+                if (!clearer.removeTransitions)
+                    objects = objects.Where(obj => !obj.name.StartsWith("_Transition Gates"));
+                if (!clearer.removeCameraLocks) objects = objects.Where(obj => !obj.name.StartsWith("_CameraLock"));
+                if (!clearer.removeMusic) objects = objects.Where(obj => !obj.GetComponent<MusicRegion>());
+                if (!clearer.removeNpcs) objects = objects.Where(obj => !obj.name.StartsWith("NPC"));
+
                 return objects.Select(obj => obj.GetOrAddComponent<Disabler>()).ToArray();
             }).WithConfigGroup(ConfigGroup.RoomClearer),
             CreateRoomEditor("hrp_remover", "Remove Hazard Respawn Point", FindObjectsToDisable<HazardRespawnTrigger>)
@@ -114,7 +112,7 @@ public static class RoomObjects
 
         Object.DontDestroyOnLoad(obj);
         obj.SetActive(false);
-        return new SimplePackElement(obj, name, "Room Edits", sprite);
+        return new PreviewablePackElement(obj, name, "Room Edits", sprite);
     }
     
     private static SimplePackElement CreateTransitionPoint()

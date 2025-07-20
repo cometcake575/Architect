@@ -25,6 +25,9 @@ public class TriggerZone : MonoBehaviour
             case 3:
                 if (!other.gameObject.GetComponent<ZoteHead>()) return;
                 break;
+            case 4:
+                if (!other.gameObject.GetComponent<TriggerZone>()) return;
+                break;
         }
         EventManager.BroadcastEvent(gameObject, "ZoneEnter");
     }
@@ -44,6 +47,9 @@ public class TriggerZone : MonoBehaviour
                 break;
             case 3:
                 if (!other.gameObject.GetComponent<ZoteHead>()) return;
+                break;
+            case 4:
+                if (!other.gameObject.GetComponent<TriggerZone>()) return;
                 break;
         }
         EventManager.BroadcastEvent(gameObject, "ZoneExit");

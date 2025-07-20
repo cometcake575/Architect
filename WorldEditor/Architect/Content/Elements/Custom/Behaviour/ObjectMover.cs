@@ -17,11 +17,14 @@ public class ObjectMover : MonoBehaviour
     
     private Quaternion _rotation;
     private Vector3 _movement;
+    private Transform _source;
 
     private void Start()
     {
         _rotation = Quaternion.Euler(0, 0, rotation);
         _movement = new Vector2(xMovement, yMovement);
+
+        _source = movementType == 2 ? HeroController.instance.gameObject.transform : gameObject.transform;
     }
 
     public void DoMove()
@@ -33,18 +36,19 @@ public class ObjectMover : MonoBehaviour
 
         if (!_object) return;
 
-        if (movementType != 0)
+        if (movementType == 0)
         {
-            _object.transform.rotation = _rotation;
-
-            var move = transform.position + _movement;
-            move.z = _object.transform.position.z;
-            _object.transform.position = move;
+            
+            _object.transform.rotation = Quaternion.Euler(_object.transform.rotation.eulerAngles + _rotation.eulerAngles);
+            _object.transform.position += _movement;
         }
         else
         {
-            _object.transform.rotation = Quaternion.Euler(_object.transform.rotation.eulerAngles + _rotation.eulerAngles);
-            _object.transform.position += _movement;
+            _object.transform.rotation = _rotation;
+
+            var move = _source.position + _movement;
+            move.z = _object.transform.position.z;
+            _object.transform.position = move;
         }
     }
 }

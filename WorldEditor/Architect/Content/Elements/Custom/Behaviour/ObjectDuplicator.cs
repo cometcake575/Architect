@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Architect.Objects;
+using Satchel;
 using UnityEngine;
 
 namespace Architect.Content.Elements.Custom.Behaviour;
@@ -20,6 +21,7 @@ public class ObjectDuplicator : MonoBehaviour
 
         var obj = _placement.SpawnObject();
         obj.name += " Copy " + Guid.NewGuid();
+        obj.RemoveComponent<PersistentBoolItem>();
         obj.SetActive(true);
     }
 }

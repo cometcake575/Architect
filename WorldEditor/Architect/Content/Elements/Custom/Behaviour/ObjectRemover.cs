@@ -1,6 +1,5 @@
-using System;
 using System.Collections.Generic;
-using Architect.Util;
+using Architect.Objects;
 using JetBrains.Annotations;
 using UnityEngine;
 
@@ -32,7 +31,7 @@ public class ObjectRemover : MonoBehaviour
 
 public class Disabler : MonoBehaviour
 {
-    public List<string> disablers = new();
+    public List<string> disablers = [];
     
     private bool _enableByDefault;
 

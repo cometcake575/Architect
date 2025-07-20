@@ -195,7 +195,7 @@ public class ConfigGroup
             Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Movement Type", (o, value) =>
             {
                 o.GetComponent<ObjectMover>().movementType = value.GetValue();
-            }, false, "Add", "Set"), "object_mover_type"),
+            }, false, "Add", "Set", "Knight"), "object_mover_type"),
             Attributes.ConfigManager.RegisterConfigType(new StringConfigType("ID/Path", (o, value) =>
             {
                 o.GetComponent<ObjectMover>().id = value.GetValue();
@@ -390,7 +390,38 @@ public class ConfigGroup
             }), "lifeseed_count")
         );
 
-        Levers = new ConfigGroup(Generic,
+        MovingObjects = new ConfigGroup(Gravity,
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Track Distance", (o, value) =>
+            {
+                o.GetOrAddComponent<MovingObject>().trackDistance = value.GetValue();
+            }), "mo_track_dist"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Speed", (o, value) =>
+            {
+                o.GetOrAddComponent<MovingObject>().SetSpeed(value.GetValue());
+            }, true), "mo_speed"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Pause Time", (o, value) =>
+            {
+                o.GetOrAddComponent<MovingObject>().pauseTime = value.GetValue();
+            }), "mo_pause"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Smoothing", (o, value) =>
+            {
+                o.GetOrAddComponent<MovingObject>().smoothing = value.GetValue();
+            }), "mo_smoothing"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Start Offset", (o, value) =>
+            {
+                o.GetOrAddComponent<MovingObject>().offset = value.GetValue();
+            }), "mo_offset"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Track Rotation", (o, value) =>
+            {
+                o.GetOrAddComponent<MovingObject>().rotation = value.GetValue();
+            }), "mo_rotation"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Rotation over Time", (o, value) =>
+            {
+                o.GetOrAddComponent<MovingObject>().SetRotationSpeed(value.GetValue());
+            }), "mo_rotation_time")
+        );
+
+        Levers = new ConfigGroup(MovingObjects,
             Attributes.ConfigManager.RegisterConfigType(MakePersistenceConfigType("Stay Activated"), "levers_stay_active")
         );
 
@@ -424,37 +455,6 @@ public class ConfigGroup
                     stringValue = id
                 }, 2);
             }), "toll_text")
-        );
-
-        MovingObjects = new ConfigGroup(Gravity,
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Track Distance", (o, value) =>
-            {
-                o.GetOrAddComponent<MovingObject>().trackDistance = value.GetValue();
-            }), "mo_track_dist"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Speed", (o, value) =>
-            {
-                o.GetOrAddComponent<MovingObject>().SetSpeed(value.GetValue());
-            }, true), "mo_speed"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Pause Time", (o, value) =>
-            {
-                o.GetOrAddComponent<MovingObject>().pauseTime = value.GetValue();
-            }), "mo_pause"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Smoothing", (o, value) =>
-            {
-                o.GetOrAddComponent<MovingObject>().smoothing = value.GetValue();
-            }), "mo_smoothing"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Start Offset", (o, value) =>
-            {
-                o.GetOrAddComponent<MovingObject>().offset = value.GetValue();
-            }), "mo_offset"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Track Rotation", (o, value) =>
-            {
-                o.GetOrAddComponent<MovingObject>().rotation = value.GetValue();
-            }), "mo_rotation"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Rotation over Time", (o, value) =>
-            {
-                o.GetOrAddComponent<MovingObject>().SetRotationSpeed(value.GetValue());
-            }), "mo_rotation_time")
         );
 
         Thorns = new ConfigGroup(Colours,
@@ -579,7 +579,7 @@ public class ConfigGroup
         );
 
         Conveyors = new ConfigGroup(
-            Generic,
+            MovingObjects,
             Attributes.ConfigManager.RegisterConfigType(
                 new FloatConfigType("Belt Speed", (o, value) =>
                 {
@@ -816,7 +816,7 @@ public class ConfigGroup
                 o.GetComponent<TriggerZone>().mode = val;
 
                 o.layer = val == 3 ? activeRegion : softTerrain;
-            }, false, "Player", "Nail Swing", "Enemy", "Zote Head"), "trigger_mode")
+            }, false, "Player", "Nail Swing", "Enemy", "Zote Head", "Trigger Zone"), "trigger_mode")
         );
 
         var terrain = LayerMask.NameToLayer("Terrain");

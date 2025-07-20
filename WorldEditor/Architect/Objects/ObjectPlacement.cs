@@ -18,14 +18,14 @@ public class ObjectPlacement
 {
     internal bool Touching(Vector2 pos)
     {
-        if (!_obj) return false;
+        if (!_previewObject) return false;
 
-        var size = _obj.GetComponent<SpriteRenderer>().size;
-        var width = size.x / 2 * Mathf.Abs(_obj.transform.GetScaleX());
-        var height = size.y / 2 * Mathf.Abs(_obj.transform.GetScaleY());
+        var size = _previewObject.GetComponent<SpriteRenderer>().size;
+        var width = size.x / 2 * Mathf.Abs(_previewObject.transform.GetScaleX());
+        var height = size.y / 2 * Mathf.Abs(_previewObject.transform.GetScaleY());
 
-        var objPos = _obj.transform.position;
-        var objRotation = _obj.transform.rotation;
+        var objPos = _previewObject.transform.position;
+        var objRotation = _previewObject.transform.rotation;
 
         var localPos = Quaternion.Inverse(objRotation) * (pos - (Vector2) objPos);
 
@@ -34,7 +34,7 @@ public class ObjectPlacement
 
     internal void Destroy()
     {
-        if (_obj) Object.Destroy(_obj);
+        if (_previewObject) Object.Destroy(_previewObject);
         PlacementManager.GetCurrentPlacements().Remove(this);
     }
 
@@ -49,7 +49,7 @@ public class ObjectPlacement
     {
         pos.z = _pos.z;
         _pos = pos;
-        if (_obj) _obj.transform.position = pos + ResourceUtils.FixOffset(GetPlaceableObject().Offset, EditorManager.IsFlipped, EditorManager.Rotation, EditorManager.Scale);
+        if (_previewObject) _previewObject.transform.position = pos + ResourceUtils.FixOffset(GetPlaceableObject().Offset, EditorManager.IsFlipped, EditorManager.Rotation, EditorManager.Scale);
     }
 
     public Vector3 GetPos()
@@ -71,13 +71,13 @@ public class ObjectPlacement
         return _id;
     }
 
-    private GameObject _obj;
+    private GameObject _previewObject;
 
     internal void PlaceGhost()
     {
-        if (PlaceableObject.AllObjects[_name] is not PlaceableObject selected) return;
+        var selected = GetPlaceableObject();
         
-        _obj = new GameObject
+        _previewObject = new GameObject
         {
             transform = { position = _pos + ResourceUtils.FixOffset(selected.Offset, Flipped, Rotation, Scale) },
             name = "[Architect] Object Preview"
@@ -91,7 +91,7 @@ public class ObjectPlacement
         var b = 1f;
         var a = 0.5f;
         
-        var renderer = _obj.AddComponent<SpriteRenderer>();
+        var renderer = _previewObject.AddComponent<SpriteRenderer>();
         
         foreach (var config in Config)
         {
@@ -106,7 +106,9 @@ public class ObjectPlacement
 
         renderer.color = new Color(r, g, b, a);
         
-        GhostPlacementUtils.SetupForPlacement(_obj, renderer, selected, Flipped, Rotation, scaleX, scaleY);
+        selected.PackElement.PostPlace(this, _previewObject);
+        
+        GhostPlacementUtils.SetupForPlacement(_previewObject, renderer, selected, Flipped, Rotation, scaleX, scaleY);
     }
 
     internal GameObject SpawnObject()
