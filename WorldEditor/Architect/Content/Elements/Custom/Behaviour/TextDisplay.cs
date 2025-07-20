@@ -21,6 +21,7 @@ public class TextDisplay : MonoBehaviour
 
     public void Display()
     {
+        if (!isActiveAndEnabled) return;
         _dreamDialogue.FsmVariables.FindFsmString("Convo Title").Value = ID;
         _dreamDialogue.SendEvent("DISPLAY DREAM MSG ALT");
     }
