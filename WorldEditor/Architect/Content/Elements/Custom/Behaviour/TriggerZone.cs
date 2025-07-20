@@ -31,7 +31,21 @@ public class TriggerZone : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (!other.gameObject.GetComponent<HeroController>()) return;
+        switch (mode)
+        {
+            case 0:
+                if (!other.gameObject.GetComponent<HeroController>()) return;
+                break;
+            case 1:
+                if (!other.gameObject.GetComponent<NailSlash>()) return;
+                break;
+            case 2:
+                if (!other.gameObject.GetComponent<HealthManager>()) return;
+                break;
+            case 3:
+                if (!other.gameObject.GetComponent<ZoteHead>()) return;
+                break;
+        }
         EventManager.BroadcastEvent(gameObject, "ZoneExit");
     }
 }
