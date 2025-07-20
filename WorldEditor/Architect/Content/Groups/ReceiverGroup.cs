@@ -31,6 +31,8 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
     
     internal static ReceiverGroup Relays;
     
+    internal static ReceiverGroup JellyEgg;
+    
     internal static ReceiverGroup PlayerHook;
     
     internal static ReceiverGroup TextDisplay;
@@ -50,6 +52,13 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
         ObjectMover = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("move", o =>
         {
             o.GetComponent<ObjectMover>().DoMove();
+        }));
+
+        JellyEgg = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("respawn_egg", o =>
+        {
+            var egg = o.GetComponent<JellyEgg>();
+            egg.meshRenderer.enabled = true;
+            egg.circleCollider.enabled = true;
         }));
         
         Gates = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("open", o =>

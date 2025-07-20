@@ -211,7 +211,8 @@ public static class ContentPacks
             CreateEnemy("Fungus3_26", "Jellyfish Baby", "Uoma"),
             Create("Fungus3_26", "Zap Cloud", "Charged Lumaflies", "Enemies"),
             Create("Fungus3_26", "Jelly Egg Bomb", "Jelly Egg Bomb", "Hazards")
-                .WithRotationGroup(RotationGroup.Eight),
+                .WithRotationGroup(RotationGroup.Eight)
+                .WithReceiverGroup(ReceiverGroup.JellyEgg),
             CreateSolid("Fungus3_26", "fung_plat_float_01", "Fog Canyon Platform 1"),
             CreateSolid("Fungus3_26", "fung_plat_float_04", "Fog Canyon Platform 2"),
             CreateSolid("Fungus3_26", "fung_plat_float_05", "Fog Canyon Platform 3"),
