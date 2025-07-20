@@ -1,8 +1,12 @@
+using System;
 using System.Collections.Generic;
+using Architect.Attributes;
 using Architect.Content.Groups;
 using HutongGames.PlayMaker.Actions;
 using Satchel;
 using UnityEngine;
+using Bounds = UnityEngine.Bounds;
+using Object = UnityEngine.Object;
 
 namespace Architect.Content.Elements.Internal.Fixers;
 
@@ -246,6 +250,8 @@ internal class ZoteHeadElement : InternalPackElement
     public ZoteHeadElement(int weight) : base("Zote Head", "Interactable", weight:weight)
     {
         WithRotationGroup(RotationGroup.All);
+        WithConfigGroup(ConfigGroup.ZoteHead);
+        WithBroadcasterGroup(BroadcasterGroup.ZoteHead);
     }
 
     public override GameObject GetPrefab(bool flipped, float rotation)
@@ -266,4 +272,60 @@ internal class ZoteHeadElement : InternalPackElement
     }
 }
 
-internal class ZoteHead : MonoBehaviour;
+internal class ZoteHead : MonoBehaviour
+{
+    private Collider2D _col2d;
+    private bool _ground;
+
+    private void Start()
+    {
+        _col2d = GetComponent<Collider2D>();
+    }
+
+    private void OnCollisionEnter2D(Collision2D _)
+    {
+        if (CheckTouchingGround())
+        {
+            _ground = true;
+            EventManager.BroadcastEvent(gameObject, "Land");
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D _)
+    {
+        if (_ground && !CheckTouchingGround())
+        {
+            _ground = false;
+            EventManager.BroadcastEvent(gameObject, "InAir");
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.GetComponentInChildren<NailSlash>()) EventManager.BroadcastEvent(gameObject, "OnHit");
+    }
+
+    public bool CheckTouchingGround()
+    {
+        var bounds1 = _col2d.bounds;
+        double x1 = bounds1.min.x;
+        bounds1 = _col2d.bounds;
+        double y1 = bounds1.center.y;
+        var vector21 = new Vector2((float) x1, (float) y1);
+        Vector2 center = _col2d.bounds.center;
+        var bounds2 = _col2d.bounds;
+        double x2 = bounds2.max.x;
+        bounds2 = _col2d.bounds;
+        double y2 = bounds2.center.y;
+        var vector22 = new Vector2((float) x2, (float) y2);
+        bounds2 = _col2d.bounds;
+        var distance = bounds2.extents.y + 0.16f;
+        Debug.DrawRay(vector21, Vector2.down, Color.yellow);
+        Debug.DrawRay(center, Vector2.down, Color.yellow);
+        Debug.DrawRay(vector22, Vector2.down, Color.yellow);
+        var raycastHit2D1 = Physics2D.Raycast(vector21, Vector2.down, distance, 256);
+        var raycastHit2D2 = Physics2D.Raycast(center, Vector2.down, distance, 256);
+        var raycastHit2D3 = Physics2D.Raycast(vector22, Vector2.down, distance, 256);
+        return raycastHit2D1.collider || raycastHit2D2.collider || raycastHit2D3.collider;
+    }
+}

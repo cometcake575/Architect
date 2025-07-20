@@ -79,6 +79,7 @@ public static class RoomObjects
     private static Disabler[] FindObjectsToDisable<T>(GameObject disabler) where T : UnityEngine.Behaviour
     {
         var objects = disabler.scene.GetRootGameObjects()
+            .Where(obj => !obj.name.StartsWith("[Architect] "))
             .SelectMany(root => root.GetComponentsInChildren<T>(true))
             .Select(obj => obj.gameObject);
         

@@ -39,6 +39,8 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
     
     internal static ReceiverGroup ObjectMover;
     
+    internal static ReceiverGroup ObjectDuplicator;
+    
     internal static void Initialize()
     {
         if (_initialized) return;
@@ -52,6 +54,11 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
         ObjectMover = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("move", o =>
         {
             o.GetComponent<ObjectMover>().DoMove();
+        }));
+
+        ObjectDuplicator = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("duplicate", o =>
+        {
+            o.GetComponent<ObjectDuplicator>().Duplicate();
         }));
 
         JellyEgg = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("respawn_egg", o =>
@@ -82,6 +89,7 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
 
         Enemies = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("die", o =>
         {
+            if (!o.activeInHierarchy) return;
             o.GetComponent<HealthManager>().Die(null, AttackTypes.Generic, true);
         }));
         

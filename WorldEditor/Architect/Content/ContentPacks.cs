@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Architect.Content.Elements;
+using Architect.Content.Elements.Custom.Behaviour;
 using Architect.Content.Elements.Internal;
 using Architect.Content.Elements.Internal.Fixers;
 using Architect.Content.Groups;
@@ -40,7 +41,7 @@ public static class ContentPacks
 
     internal static List<(string, string)> GetPreloadValues()
     {
-        List<(string, string)> preloadInfo = new();
+        List<(string, string)> preloadInfo = [];
 
         foreach (var element in InternalPacks.Where(pack => pack.IsEnabled()).SelectMany(pack => pack))
         {
@@ -212,6 +213,7 @@ public static class ContentPacks
             Create("Fungus3_26", "Zap Cloud", "Charged Lumaflies", "Enemies"),
             Create("Fungus3_26", "Jelly Egg Bomb", "Jelly Egg Bomb", "Hazards")
                 .WithRotationGroup(RotationGroup.Eight)
+                .WithConfigGroup(ConfigGroup.MovingObjects)
                 .WithReceiverGroup(ReceiverGroup.JellyEgg),
             CreateSolid("Fungus3_26", "fung_plat_float_01", "Fog Canyon Platform 1"),
             CreateSolid("Fungus3_26", "fung_plat_float_04", "Fog Canyon Platform 2"),
@@ -403,11 +405,6 @@ public static class ContentPacks
             new TallZotelingElement().FlipHorizontal(),
             new VolatileZotelingElement(),
             new FlukeZotelingElement()
-            /*,
-            CreateEnemy("GG_Mighty_Zote", "Battle Control/Zote Balloon Ordeal", "Zote Balloon"),
-            CreateEnemy("GG_Mighty_Zote", "Battle Control/Zote Salubra", "Zote's Curse"),
-            CreateEnemy("GG_Mighty_Zote", "Battle Control/Zote Fluke", "Zotemon"),
-            CreateEnemy("GG_Mighty_Zote", "Battle Control/Zote Thwomp", "Zwomp"),*/
         });
         RegisterInternalPack(new ContentPack("The Hive", "Assets from the Hive")
         {

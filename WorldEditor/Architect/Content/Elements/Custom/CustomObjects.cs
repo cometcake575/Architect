@@ -65,6 +65,10 @@ public static class CustomObjects
                     ResourceUtils.Load("object_mover"))
                 .WithReceiverGroup(ReceiverGroup.ObjectMover)
                 .WithConfigGroup(ConfigGroup.ObjectMover),
+            new SimplePackElement(CreateObjectDuplicator(), "Object Duplicator", "Custom",
+                    ResourceUtils.Load("object_duplicator"))
+                .WithReceiverGroup(ReceiverGroup.ObjectDuplicator)
+                .WithConfigGroup(ConfigGroup.ObjectDuplicator),
             new SimplePackElement(CreateWidePlatform(), "Wide Platform", "Solids")
                 .WithConfigGroup(ConfigGroup.MovingPlatforms),
             CreateSquare(),
@@ -252,6 +256,17 @@ public static class CustomObjects
 
         point.SetActive(false);
         point.AddComponent<ObjectMover>();
+        Object.DontDestroyOnLoad(point);
+
+        return point;
+    }
+
+    private static GameObject CreateObjectDuplicator()
+    {
+        var point = new GameObject("Object Duplicator");
+
+        point.SetActive(false);
+        point.AddComponent<ObjectDuplicator>();
         Object.DontDestroyOnLoad(point);
 
         return point;
@@ -479,7 +494,7 @@ public static class CustomObjects
             switch (self.FsmName)
             {
                 case "Spell Control":
-                    InitSpellBindings(self);
+                    InitSpellHooks(self);
                     break;
                 case "Nail Arts":
                     InitNailArtBindings(self);
@@ -508,7 +523,7 @@ public static class CustomObjects
         };
     }
 
-    private static void InitSpellBindings(PlayMakerFSM fsm)
+    private static void InitSpellHooks(PlayMakerFSM fsm)
     {
         fsm.InsertCustomAction("Has Fireball?", playMakerFsm =>
         {
@@ -522,6 +537,19 @@ public static class CustomObjects
         {
             if (!BindingCheck(true, "wraiths")) playMakerFsm.FsmVariables.FindFsmInt("Spell Level").Value = 0;
         }, 1);
+        
+        fsm.InsertCustomAction("Level Check", () =>
+        {
+            PlayerEvent("Spirit");
+        }, 0);
+        fsm.InsertCustomAction("Level Check 2", () =>
+        {
+            PlayerEvent("Dive");
+        }, 0);
+        fsm.InsertCustomAction("Level Check 3", () =>
+        {
+            PlayerEvent("Wraiths");
+        }, 0);
     }
 
     private static void InitNailArtBindings(PlayMakerFSM fsm)

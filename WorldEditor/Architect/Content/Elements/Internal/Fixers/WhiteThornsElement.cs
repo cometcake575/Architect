@@ -11,7 +11,7 @@ internal class WhiteThornsElement : InternalPackElement
 
     public WhiteThornsElement() : base("White Thorns", "Hazards")
     {
-        WithConfigGroup(ConfigGroup.MovingObjects);
+        WithConfigGroup(ConfigGroup.Thorns);
         WithRotationGroup(RotationGroup.All);
     }
 

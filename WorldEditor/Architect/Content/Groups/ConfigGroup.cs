@@ -5,6 +5,7 @@ using System.Reflection;
 using Architect.Attributes.Config;
 using Architect.Content.Elements.Custom.Behaviour;
 using Architect.Content.Elements.Internal.Fixers;
+using Architect.Util;
 using HutongGames.PlayMaker.Actions;
 using Modding;
 using Modding.Utils;
@@ -55,7 +56,11 @@ public class ConfigGroup
     
     public static ConfigGroup Toll;
     
+    public static ConfigGroup Gravity;
+    
     public static ConfigGroup MovingObjects;
+    
+    public static ConfigGroup Thorns;
     
     public static ConfigGroup MovingPlatforms;
     
@@ -64,6 +69,8 @@ public class ConfigGroup
     public static ConfigGroup Tablets;
     
     public static ConfigGroup Binoculars;
+    
+    public static ConfigGroup ZoteHead;
     
     public static ConfigGroup Relays;
     
@@ -109,6 +116,8 @@ public class ConfigGroup
     
     public static ConfigGroup ObjectMover;
     
+    public static ConfigGroup ObjectDuplicator;
+    
     public static void Initialize()
     {
         if (_initialized) return;
@@ -119,12 +128,56 @@ public class ConfigGroup
                 o.SetActive(value.GetValue());
             }), "active")
         );
+
+        Colours = new ConfigGroup(Invisible,
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("r", (o, value) =>
+            {
+                var sr = o.GetComponent<SpriteRenderer>();
+                var color = sr.color;
+                color.r = value.GetValue();
+                sr.color = color;
+            }), "r"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("g", (o, value) =>
+            {
+                var sr = o.GetComponent<SpriteRenderer>();
+                var color = sr.color;
+                color.g = value.GetValue();
+                sr.color = color;
+            }), "g"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("b", (o, value) =>
+            {
+                var sr = o.GetComponent<SpriteRenderer>();
+                var color = sr.color;
+                color.b = value.GetValue();
+                sr.color = color;
+            }), "b"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("a", (o, value) =>
+            {
+                var sr = o.GetComponent<SpriteRenderer>();
+                var color = sr.color;
+                color.a = value.GetValue();
+                sr.color = color;
+            }), "a"),
+            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("layer", (o, value) =>
+            {
+                o.GetComponent<SpriteRenderer>().sortingOrder = value.GetValue();
+            }), "layer")
+        );
         
         Generic = new ConfigGroup(Invisible,
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Visible", (o, value) =>
             {
                 foreach (var renderer in o.GetComponentsInChildren<Renderer>()) renderer.enabled = value.GetValue();
             }), "visible")
+        );
+
+        Gravity = new ConfigGroup(Generic,
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Gravity Scale", (o, value) =>
+            {
+                var body = o.GetOrAddComponent<Rigidbody2D>();
+                body.gravityScale = value.GetValue();
+                body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+            }), "gravity_scale")
         );
 
         Animated = new ConfigGroup(Generic,
@@ -161,6 +214,13 @@ public class ConfigGroup
             }, true), "object_mover_y_move")
         );
 
+        ObjectDuplicator = new ConfigGroup(Invisible,
+            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Placement ID", (o, value) =>
+            {
+                o.GetComponent<ObjectDuplicator>().id = value.GetValue();
+            }), "object_duplicator_identifier")
+        );
+
         GeoChest = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Large Geo", (o, value) =>
             {
@@ -177,7 +237,7 @@ public class ConfigGroup
         );
         
         var enemyTypeField = typeof(HealthManager).GetField("enemyType", BindingFlags.NonPublic | BindingFlags.Instance);
-        Enemies = new ConfigGroup(Generic,
+        Enemies = new ConfigGroup(Gravity,
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Give Soul", (o, value) =>
             {
                 enemyTypeField?.SetValue(o.GetComponent<HealthManager>(), value.GetValue() ? 1 : 6);
@@ -366,7 +426,7 @@ public class ConfigGroup
             }), "toll_text")
         );
 
-        MovingObjects = new ConfigGroup(Generic,
+        MovingObjects = new ConfigGroup(Gravity,
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Track Distance", (o, value) =>
             {
                 o.GetOrAddComponent<MovingObject>().trackDistance = value.GetValue();
@@ -397,6 +457,13 @@ public class ConfigGroup
             }), "mo_rotation_time")
         );
 
+        Thorns = new ConfigGroup(Colours,
+            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Damage Amount", (o, value) =>
+            {
+                o.GetOrAddComponent<CustomDamager>().damageAmount = value.GetValue();
+            }), "thorns_damage")
+        );
+
         MovingPlatforms = new ConfigGroup(MovingObjects,
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Stick Player", (o, value) =>
             {
@@ -424,6 +491,23 @@ public class ConfigGroup
             {
                 o.GetComponent<Binoculars>().speed = value.GetValue() * 10;
             }), "freecam_speed")
+        );
+
+        List<Sprite> headSprites =
+        [
+            ResourceUtils.Load("knight_head", ppu:64),
+            ResourceUtils.Load("nosk_head", ppu:64),
+            ResourceUtils.Load("hornet_head", ppu:64),
+            ResourceUtils.Load("grub", ppu:192),
+            ResourceUtils.Load("inverted_zote", ppu:64)
+        ];
+        ZoteHead = new ConfigGroup(Gravity,
+            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Mode", (o, value) =>
+            {
+                var val = value.GetValue();
+                if (val == 0) return;
+                o.GetComponent<SpriteRenderer>().sprite = headSprites[val - 1];
+            }, false, "Zote", "Knight", "Nosk", "Hornet", "Grub", "Peak"), "zote_head_mode")
         );
 
         var ignoreVoidHeart =
@@ -733,41 +817,6 @@ public class ConfigGroup
 
                 o.layer = val == 3 ? activeRegion : softTerrain;
             }, false, "Player", "Nail Swing", "Enemy", "Zote Head"), "trigger_mode")
-        );
-
-        Colours = new ConfigGroup(Invisible,
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("r", (o, value) =>
-            {
-                var sr = o.GetComponent<SpriteRenderer>();
-                var color = sr.color;
-                color.r = value.GetValue();
-                sr.color = color;
-            }), "r"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("g", (o, value) =>
-            {
-                var sr = o.GetComponent<SpriteRenderer>();
-                var color = sr.color;
-                color.g = value.GetValue();
-                sr.color = color;
-            }), "g"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("b", (o, value) =>
-            {
-                var sr = o.GetComponent<SpriteRenderer>();
-                var color = sr.color;
-                color.b = value.GetValue();
-                sr.color = color;
-            }), "b"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("a", (o, value) =>
-            {
-                var sr = o.GetComponent<SpriteRenderer>();
-                var color = sr.color;
-                color.a = value.GetValue();
-                sr.color = color;
-            }), "a"),
-            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("layer", (o, value) =>
-            {
-                o.GetComponent<SpriteRenderer>().sortingOrder = value.GetValue();
-            }), "layer")
         );
 
         var terrain = LayerMask.NameToLayer("Terrain");

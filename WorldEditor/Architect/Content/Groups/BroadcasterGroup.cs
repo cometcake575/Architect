@@ -20,6 +20,8 @@ public class BroadcasterGroup
 
     public static readonly string[] KeyListeners = ["KeyPress"];
     
+    public static readonly string[] ZoteHead = ["Land", "InAir", "OnHit"];
+    
     public static readonly string[] PlayerHook = [
         "OnDamage", 
         "OnHeal",
@@ -34,6 +36,9 @@ public class BroadcasterGroup
         "HardLand",
         "Dash",
         "CrystalDash",
-        "Attack"
+        "Attack",
+        "Spirit",
+        "Dive",
+        "Wraiths"
     ];
 }
