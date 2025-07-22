@@ -49,7 +49,7 @@ public class ObjectPlacement
     {
         pos.z = _pos.z;
         _pos = pos;
-        if (_previewObject) _previewObject.transform.position = pos + ResourceUtils.FixOffset(GetPlaceableObject().Offset, EditorManager.IsFlipped, EditorManager.Rotation, EditorManager.Scale);
+        if (_previewObject) _previewObject.transform.position = pos + ResourceUtils.FixOffset(GetPlaceableObject().Offset, Flipped, Rotation, Scale);
     }
 
     public Vector3 GetPos()
