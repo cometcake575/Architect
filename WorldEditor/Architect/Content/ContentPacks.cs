@@ -156,10 +156,14 @@ public static class ContentPacks
                 .WithRotationGroup(RotationGroup.Four),
             Create("Crossroads_31", "Grub Bottle", "Grub Bottle", "Interactable", weight:MiscInteractableWeight)
                 .WithConfigGroup(ConfigGroup.Grub),
-            CreateDecoration("Crossroads_07", "_Scenery/brk_barrel_05", "Crossroads Barrel"),
-            CreateDecoration("Crossroads_07", "_Scenery/brk_cart_05", "Crossroads Cart"),
-            CreateDecoration("Crossroads_47", "_Props/Crossroads Statue Horned", "Horned Statue"),
-            CreateDecoration("Crossroads_47", "_Props/Crossroads Statue Stone", "Stone Statue"),
+            CreateDecoration("Crossroads_07", "_Scenery/brk_barrel_05", "Crossroads Barrel")
+                .WithBroadcasterGroup(BroadcasterGroup.Breakable),
+            CreateDecoration("Crossroads_07", "_Scenery/brk_cart_05", "Crossroads Cart")
+                .WithBroadcasterGroup(BroadcasterGroup.Breakable),
+            CreateDecoration("Crossroads_47", "_Props/Crossroads Statue Horned", "Horned Statue")
+                .WithBroadcasterGroup(BroadcasterGroup.Breakable),
+            CreateDecoration("Crossroads_47", "_Props/Crossroads Statue Stone", "Stone Statue")
+                .WithBroadcasterGroup(BroadcasterGroup.Breakable),
             new DiveGroundElement(weight:BreakableWallsWeight),
             new LeverPackElement("Room_Town_Stag_Station", "Gate Switch", "Small Lever", weight:LeverWeight)
                 .FlipHorizontal()
@@ -193,8 +197,8 @@ public static class ContentPacks
                 .WithRotationGroup(RotationGroup.All),
             new ZoteHeadElement(weight:MiscInteractableWeight),
             CreateEnemy("Fungus1_31", "_Enemies/Fat Fly (1)", "Obble").FlipVertical(),
-            CreateDecoration("Fungus1_31", "_Scenery/fung_lamp2", "Standing Lantern"),
-            
+            CreateDecoration("Fungus1_31", "_Scenery/fung_lamp2", "Standing Lantern")
+                .WithBroadcasterGroup(BroadcasterGroup.Breakable),
             Create("Fungus1_31", "Toll Gate", "Toll Gate", "Interactable", weight:GateWeight)
                 .WithReceiverGroup(ReceiverGroup.Gates)
                 .WithRotationGroup(RotationGroup.Four),
@@ -297,8 +301,10 @@ public static class ContentPacks
                 .WithReceiverGroup(ReceiverGroup.Stompers)
                 .WithConfigGroup(ConfigGroup.Animated),
             new BreakableWallElement("Mines_25", "Breakable Wall", "Breakable Wall", weight:BreakableWallsWeight),
-            CreateDecoration("Mines_20", "brk_Crystal3", "Crystal"),
+            CreateDecoration("Mines_20", "brk_Crystal3", "Crystal")
+                .WithBroadcasterGroup(BroadcasterGroup.Breakable),
             CreateDecoration("Mines_20", "crystal_barrel", "Crystal Barrel")
+                .WithBroadcasterGroup(BroadcasterGroup.Breakable)
         });
         RegisterInternalPack(new ContentPack("Queen's Gardens", "Assets from the Queen's Gardens")
         {
@@ -340,7 +346,8 @@ public static class ContentPacks
             CreateEnemy("Ruins2_01", "Royal Zombie Fat (2)", "Gluttonous Husk"),
             CreateEnemy("Ruins2_01", "Battle Scene/Great Shield Zombie", "Great Husk Sentry"),
             CreateEnemy("Ruins_House_02", "Gorgeous Husk", "Gorgeous Husk"),
-            CreateDecoration("Ruins_House_02", "ruind_dressing_light_03", "Ceiling Lantern"),
+            CreateDecoration("Ruins_House_02", "ruind_dressing_light_03", "Ceiling Lantern")
+                .WithBroadcasterGroup(BroadcasterGroup.Breakable),
             Create("Ruins2_08", "ruind_bridge_roof_01 (1)/ruind_bridge_roof_04_spikes", "Roof Spikes", "Hazards")
                 .WithRotationGroup(RotationGroup.Eight),
             CreateSolid("Ruins1_03", "_Scenery/ruin_plat_float_01", "City Platform 1"),

@@ -124,7 +124,7 @@ public class PlaceableObject : SelectableObject
         
         var animator = sprite.gameObject.GetComponent<tk2dSpriteAnimator>();
         tk2dSpriteDefinition def;
-
+        
         if (animator)
         {
             var frame = animator.DefaultClip.frames[0];

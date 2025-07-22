@@ -8,10 +8,22 @@ using Button = MagicUI.Elements.Button;
 
 namespace Architect.Attributes.Config;
 
-public class IntConfigType : ConfigType<IntConfigValue>
+public class IntConfigType(string name, Action<GameObject, IntConfigValue> action)
+    : ConfigType<IntConfigValue>(name, action)
 {
-    public IntConfigType(string name, Action<GameObject, IntConfigValue> action, bool preAwake = false) : base(name, action, preAwake) { }
+    private int? _defaultValue;
 
+    public IntConfigType WithDefaultValue(int value)
+    {
+        _defaultValue = value;
+        return this;
+    }
+
+    public override ConfigValue GetDefaultValue()
+    {
+        return !_defaultValue.HasValue ? null : new IntConfigValue(this, _defaultValue.Value);
+    }
+    
     public override ConfigValue Deserialize(string data)
     {
         return new IntConfigValue(this, Convert.ToInt32(data));

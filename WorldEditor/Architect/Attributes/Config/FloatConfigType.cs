@@ -9,10 +9,22 @@ using Button = MagicUI.Elements.Button;
 
 namespace Architect.Attributes.Config;
 
-public class FloatConfigType : ConfigType<FloatConfigValue>
+public class FloatConfigType(string name, Action<GameObject, FloatConfigValue> action)
+    : ConfigType<FloatConfigValue>(name, action)
 {
-    public FloatConfigType(string name, Action<GameObject, FloatConfigValue> action, bool preAwake = false) : base(name, action, preAwake) { }
+    private float? _defaultValue;
 
+    public FloatConfigType WithDefaultValue(float value)
+    {
+        _defaultValue = value;
+        return this;
+    }
+
+    public override ConfigValue GetDefaultValue()
+    {
+        return !_defaultValue.HasValue ? null : new FloatConfigValue(this, _defaultValue.Value);
+    }
+    
     public override ConfigValue Deserialize(string data)
     {
         return new FloatConfigValue(this, Convert.ToSingle(data.Replace(",", "."), CultureInfo.InvariantCulture));

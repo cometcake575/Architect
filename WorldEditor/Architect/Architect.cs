@@ -107,4 +107,7 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
     }
 
     public bool ToggleButtonInsideMenu => throw new NotImplementedException();
+    
+    // Blank sprite texture
+    public static readonly Sprite BlankSprite = Sprite.Create(Texture2D.normalTexture, new Rect(0, 0, 0, 0), new Vector2());
 }

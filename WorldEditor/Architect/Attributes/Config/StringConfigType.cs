@@ -6,9 +6,21 @@ using UnityEngine;
 
 namespace Architect.Attributes.Config;
 
-public class StringConfigType : ConfigType<StringConfigValue>
+public class StringConfigType(string name, Action<GameObject, StringConfigValue> action)
+    : ConfigType<StringConfigValue>(name, action)
 {
-    public StringConfigType(string name, Action<GameObject, StringConfigValue> action, bool preAwake = false) : base(name, action, preAwake) { }
+    [CanBeNull] private string _defaultValue;
+
+    public StringConfigType WithDefaultValue(string value)
+    {
+        _defaultValue = value;
+        return this;
+    }
+
+    public override ConfigValue GetDefaultValue()
+    {
+        return _defaultValue == null ? null : new StringConfigValue(this, _defaultValue);
+    }
     
     public override ConfigValue Deserialize(string data)
     {

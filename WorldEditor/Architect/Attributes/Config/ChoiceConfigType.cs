@@ -6,14 +6,20 @@ using UnityEngine;
 
 namespace Architect.Attributes.Config;
 
-public class ChoiceConfigType : ConfigType<ChoiceConfigValue>
+public class ChoiceConfigType(string name, Action<GameObject, ChoiceConfigValue> action, params string[] options)
+    : ConfigType<ChoiceConfigValue>(name, action)
 {
-    private readonly string[] _options;
+    private int? _defaultValue;
 
-    public ChoiceConfigType(string name, Action<GameObject, ChoiceConfigValue> action, bool preAwake = false, params string[] options) :
-        base(name, action, preAwake)
+    public ChoiceConfigType WithDefaultValue(int value)
     {
-        _options = options;
+        _defaultValue = value;
+        return this;
+    }
+
+    public override ConfigValue GetDefaultValue()
+    {
+        return !_defaultValue.HasValue ? null : new ChoiceConfigValue(this, _defaultValue.Value);
     }
 
     public override ConfigValue Deserialize(string data)
@@ -23,7 +29,7 @@ public class ChoiceConfigType : ConfigType<ChoiceConfigValue>
 
     public override ConfigElement CreateInput(LayoutRoot root, Button apply, string oldValue)
     {
-        return new ChoiceConfigElement(Name, root, apply, _options, oldValue);
+        return new ChoiceConfigElement(Name, root, apply, options, oldValue);
     }
 }
 

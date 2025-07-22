@@ -22,6 +22,8 @@ public class BroadcasterGroup
     
     public static readonly string[] ZoteHead = ["Land", "InAir", "OnHit"];
     
+    public static readonly string[] Breakable = ["OnBreak"];
+    
     public static readonly string[] PlayerHook = [
         "OnDamage", 
         "OnHeal",

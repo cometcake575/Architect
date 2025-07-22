@@ -29,11 +29,14 @@ public static class RoomObjects
                     ResourceUtils.Load("darkness")),
             new SimplePackElement(CreateBinoculars(), "Binoculars", "Room Edits")
                 .WithConfigGroup(ConfigGroup.Binoculars),
-            CreateRoomEditor("room_remover", "Clear Room", o =>
+            CreateObjectRemover("room_remover", "Clear Room", o =>
             {
                 var clearer = o.GetOrAddComponent<RoomClearerConfig>();
 
-                var objects = o.scene.GetRootGameObjects().Where(obj => !obj.name.StartsWith("[Architect]"));
+                var objects = o.scene.GetRootGameObjects().Where(obj => 
+                    !obj.name.StartsWith("[Architect]") 
+                    && !obj.name.StartsWith("_SceneManager")
+                );
 
                 if (!clearer.removeBenches) objects = objects.Where(obj => !obj.GetComponent<RestBench>());
                 if (!clearer.removeScenery)
@@ -49,15 +52,15 @@ public static class RoomObjects
 
                 return objects.Select(obj => obj.GetOrAddComponent<Disabler>()).ToArray();
             }).WithConfigGroup(ConfigGroup.RoomClearer),
-            CreateRoomEditor("hrp_remover", "Remove Hazard Respawn Point", FindObjectsToDisable<HazardRespawnTrigger>)
+            CreateObjectRemover("hrp_remover", "Remove Hazard Respawn Point", FindObjectsToDisable<HazardRespawnTrigger>)
                 .WithConfigGroup(ConfigGroup.Invisible),
-            CreateRoomEditor("door_remover", "Remove Transition", FindObjectsToDisable<TransitionPoint>)
+            CreateObjectRemover("door_remover", "Remove Transition", FindObjectsToDisable<TransitionPoint>)
                 .WithConfigGroup(ConfigGroup.Invisible),
-            CreateRoomEditor("enemy_remover", "Remove Enemy", FindObjectsToDisable<HealthManager>)
+            CreateObjectRemover("enemy_remover", "Remove Enemy", FindObjectsToDisable<HealthManager>)
                 .WithConfigGroup(ConfigGroup.Invisible),
-            CreateRoomEditor("collision_remover", "Remove Solid", FindObjectsToDisable<Collider2D>)
+            CreateObjectRemover("collision_remover", "Remove Solid", FindObjectsToDisable<Collider2D>)
                 .WithConfigGroup(ConfigGroup.Invisible),
-            CreateRoomEditor("object_remover", "Remove Object", o =>
+            CreateObjectRemover("object_remover", "Remove Object", o =>
             {
                 var config = o.GetComponent<ObjectRemoverConfig>();
                 GameObject point = null;
@@ -99,9 +102,9 @@ public static class RoomObjects
 
     private static readonly Dictionary<string, Func<GameObject, Disabler[]>> EditActions = new();
 
-    private static SimplePackElement CreateRoomEditor(string id, string name, [CanBeNull] Func<GameObject, Disabler[]> action)
+    private static SimplePackElement CreateObjectRemover(string id, string name, [CanBeNull] Func<GameObject, Disabler[]> action)
     {
-        var obj = new GameObject { name = "Room Editor (" + id + ")" };
+        var obj = new GameObject { name = "Object Remover (" + id + ")" };
         
         EditActions[id] = action;
         obj.AddComponent<ObjectRemover>().triggerName = id;
@@ -115,24 +118,25 @@ public static class RoomObjects
         return new PreviewablePackElement(obj, name, "Room Edits", sprite);
     }
     
-    private static SimplePackElement CreateTransitionPoint()
+    private static AbstractPackElement CreateTransitionPoint()
     {
-        var obj = new GameObject
-        {
-            name = "top Transition Point"
-        };
+        var obj = new GameObject { name = "Transition Point" };
 
         var point = obj.AddComponent<TransitionPoint>();
         point.nonHazardGate = true;
-        point.targetScene = "Town";
+        point.transform.localScale *= 3;
         
-        obj.AddComponent<BoxCollider2D>().size = new Vector2(10, 10);
+        var col = obj.AddComponent<BoxCollider2D>();
+        col.size = new Vector2(1, 1);
+        col.isTrigger = true;
 
-        var sprite = ResourceUtils.Load("square", FilterMode.Point);
+        obj.layer = LayerMask.NameToLayer("TransitionGates");
+
+        var sprite = ResourceUtils.Load("door", FilterMode.Point);
 
         Object.DontDestroyOnLoad(obj);
         obj.SetActive(false);
-        return new SimplePackElement(obj, "top Transition Point", "Room Edits", sprite);
+        return new SimplePackElement(obj, "Transition Point", "Room Edits", sprite);
     }
 
     public static Disabler[] GetObjects(ObjectRemover editor)

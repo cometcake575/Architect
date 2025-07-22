@@ -9,17 +9,18 @@ namespace Architect.Attributes.Config;
 public abstract class ConfigType
 {
     public readonly string Name;
-    public readonly bool PreAwake;
     
+    public bool IsPreAwake;
     public string Id;
     
-    protected ConfigType(string name, bool preAwake)
+    protected ConfigType(string name)
     {
         Name = name;
-        PreAwake = preAwake;
     }
     
     public abstract ConfigValue Deserialize(string data);
+
+    [CanBeNull] public abstract ConfigValue GetDefaultValue();
 
     public abstract ConfigElement CreateInput(LayoutRoot root, Button apply, [CanBeNull] string oldValue);
     
@@ -30,9 +31,15 @@ public abstract class ConfigType<TValue> : ConfigType where TValue : ConfigValue
 {
     private readonly Action<GameObject, TValue> _action;
 
-    protected ConfigType(string name, Action<GameObject, TValue> action, bool preAwake) : base(name, preAwake)
+    protected ConfigType(string name, Action<GameObject, TValue> action) : base(name)
     {
         _action = action;
+    }
+
+    public ConfigType<TValue> PreAwake()
+    {
+        IsPreAwake = true;
+        return this;
     }
 
     internal override void RunAction(GameObject obj, ConfigValue value)
@@ -87,7 +94,7 @@ public abstract class ConfigValue<TType> : ConfigValue where TType : ConfigType
 
     public override bool PreAwake()
     {
-        return _type.PreAwake;
+        return _type.IsPreAwake;
     }
 }
 

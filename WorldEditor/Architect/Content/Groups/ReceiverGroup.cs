@@ -135,9 +135,7 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
             {
                 if (!o.activeInHierarchy) return;
                 var relay = o.GetComponent<Relay>();
-                if (!relay.ShouldRelay()) return;
-                relay.canCall = false;
-                EventManager.BroadcastEvent(o, "OnCall", relay.multiplayerBroadcast);
+                relay.DoRelay();
             }),
             EventManager.RegisterEventReceiverType("enable_relay", o =>
             {

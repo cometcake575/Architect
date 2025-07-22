@@ -10,10 +10,13 @@ using Architect.Content.Groups;
 using Architect.Util;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
+using MagicUI.Core;
+using MagicUI.Elements;
 using Modding;
 using MonoMod.RuntimeDetour;
 using Satchel;
 using UnityEngine;
+using GridLayout = MagicUI.Elements.GridLayout;
 using Object = UnityEngine.Object;
 
 namespace Architect.Content.Elements.Custom;
@@ -23,13 +26,14 @@ public static class CustomObjects
     internal static readonly HashSet<string> TemporaryAbilities = [];
     internal static readonly List<PlayerHook> PlayerListeners = [];
     internal static readonly Dictionary<string, List<CustomBinder>> Bindings = new();
+    internal static readonly List<string> ExtraVisualsBindings = [];
 
+    private static GridLayout _bindingsLayout; 
+        
     private const int ShapeWeight = 1;
 
     public static void Initialize()
     {
-        var clip = ResourceUtils.LoadClip("Bindings.chain_cut");
-
         var customs = new ContentPack("Custom", "Custom assets that don't exist in the base game")
         {
             new SimplePackElement(CreateTriggerZone(), "Trigger Zone", "Custom",
@@ -83,31 +87,48 @@ public static class CustomObjects
                 .WithConfigGroup(ConfigGroup.MovingObjects),
             new SimplePackElement(CreateDamagingOrb("radiant_orb", "Radiant Orb", 999), "Radiant Orb", "Custom")
                 .WithConfigGroup(ConfigGroup.MovingObjects),
-            CreateBinding("nail", "Nail Binding", clip),
-            CreateBinding("shell", "Shell Binding", clip),
-            CreateBinding("charms", "Charm Binding", clip),
-            CreateBinding("soul", "Soul Binding", clip),
-            CreateBinding("focus", "Focus Binding", clip),
-            CreateBinding("spirit", "Vengeful Spirit Binding", clip),
-            CreateBinding("dive", "Desolate Dive Binding", clip),
-            CreateBinding("wraiths", "Howling Wraiths Binding", clip),
-            CreateBinding("pogo", "Pogo Binding", clip),
-            CreateBinding("lantern", "Lantern Binding", clip),
-            CreateBinding("dash", "Dash Binding", clip),
-            CreateBinding("shadow_dash", "Shadow Dash Binding", clip),
-            CreateBinding("claw", "Mantis Claw Binding", clip),
-            CreateBinding("cdash", "Crystal Heart Binding", clip),
-            CreateBinding("tear", "Isma's Tear Binding", clip),
-            CreateBinding("wings", "Monarch Wings Binding", clip),
-            CreateBinding("dnail", "Dream Nail Binding", clip),
-            CreateBinding("gate", "Dreamgate Binding", clip),
-            CreateBinding("gslash", "Great Slash Binding", clip),
-            CreateBinding("cslash", "Cyclone Slash Binding", clip),
-            CreateBinding("dslash", "Dash Slash Binding", clip)
+            CreateBinding("nail", "Nail Binding", false),
+            CreateBinding("shell", "Shell Binding", false),
+            CreateBinding("charms", "Charm Binding", false),
+            CreateBinding("soul", "Soul Binding", false),
+            CreateBinding("focus", "Focus Binding"),
+            CreateBinding("spirit", "Vengeful Spirit Binding"),
+            CreateBinding("dive", "Desolate Dive Binding"),
+            CreateBinding("wraiths", "Howling Wraiths Binding"),
+            CreateBinding("pogo", "Pogo Binding"),
+            CreateBinding("lantern", "Lantern Binding"),
+            CreateBinding("dash", "Dash Binding"),
+            CreateBinding("shadow_dash", "Shadow Dash Binding"),
+            CreateBinding("claw", "Mantis Claw Binding"),
+            CreateBinding("cdash", "Crystal Heart Binding"),
+            CreateBinding("tear", "Isma's Tear Binding"),
+            CreateBinding("wings", "Monarch Wings Binding"),
+            CreateBinding("dnail", "Dream Nail Binding"),
+            CreateBinding("gate", "Dreamgate Binding"),
+            CreateBinding("gslash", "Great Slash Binding"),
+            CreateBinding("cslash", "Cyclone Slash Binding"),
+            CreateBinding("dslash", "Dash Slash Binding")
         };
         ContentPacks.RegisterPack(customs);
 
+        InitializeBindingsUI();
         InitializeHooks();
+    }
+
+    private static void InitializeBindingsUI()
+    {
+        var root = new LayoutRoot(true, "Bindings Layout");
+        _bindingsLayout = new GridLayout(root, "Bindings")
+        {
+            VerticalAlignment = VerticalAlignment.Bottom,
+            HorizontalAlignment = HorizontalAlignment.Left
+        };
+        for (var i = 0; i < 17; i++)
+        {
+            _bindingsLayout.ColumnDefinitions.Add(new GridDimension(1, GridUnit.Proportional));
+            _bindingsLayout.Children.Add(new Image(root, Architect.BlankSprite)
+                .WithProp(GridLayout.Column, i));
+        }
     }
 
     private static AbstractPackElement CreateSquare()
@@ -153,13 +174,13 @@ public static class CustomObjects
         
         var collider = triangle.AddComponent<EdgeCollider2D>();
         collider.isTrigger = true;
-        collider.points = new[]
-        {
+        collider.points =
+        [
             new Vector2(-5, -4.17f),
             new Vector2(0, 4.45f),
             new Vector2(5, -4.17f),
             new Vector2(-5, -4.17f)
-        };
+        ];
         
         return new SimplePackElement(triangle, "Coloured Triangle", "Decorations", weight: ShapeWeight)
             .WithConfigGroup(ConfigGroup.Shapes)
@@ -377,8 +398,10 @@ public static class CustomObjects
         return new SimplePackElement(granterObj, name, "Custom");
     }
 
-    private static AbstractPackElement CreateBinding(string id, string name, AudioClip clip)
+    private static AbstractPackElement CreateBinding(string id, string name, bool extraVisuals = true)
     {
+        if (extraVisuals) ExtraVisualsBindings.Add(id);
+        
         var disabledSprite = ResourceUtils.Load("Bindings." + id + "_disabled");
         var enabledSprite = ResourceUtils.Load("Bindings." + id + "_enabled");
 
@@ -391,7 +414,8 @@ public static class CustomObjects
         binder.bindingType = id;
         binder.disabledSprite = disabledSprite;
         binder.enabledSprite = enabledSprite;
-        binder.clip = clip;
+
+        binder.extraVisuals = extraVisuals;
 
         var collider = bindingObj.AddComponent<CircleCollider2D>();
         collider.isTrigger = true;
@@ -429,6 +453,7 @@ public static class CustomObjects
             orig(self);
         };
 
+        CustomBinder.Init();
         On.HeroController.SceneInit += (orig, self) =>
         {
             orig(self);
@@ -650,6 +675,13 @@ public static class CustomObjects
                 RefreshLanternBinding();
                 break;
         }
+/*
+        var i = 0;
+        foreach (var bind in ExtraVisualsBindings.Where(bind => Bindings[bind].Count > 0))
+        {
+            ((Image) _bindingsLayout.Children[i]).Sprite = Bindings[bind][0].enabledSprite;
+            i++;
+        }*/ // Incomplete
     }
 
     private static void RefreshTearBinding()

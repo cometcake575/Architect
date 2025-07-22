@@ -6,10 +6,22 @@ using UnityEngine;
 
 namespace Architect.Attributes.Config;
 
-public class BoolConfigType : ConfigType<BoolConfigValue>
+public class BoolConfigType(string name, Action<GameObject, BoolConfigValue> action)
+    : ConfigType<BoolConfigValue>(name, action)
 {
-    public BoolConfigType(string name, Action<GameObject, BoolConfigValue> action, bool preAwake = false) : base(name, action, preAwake) { }
+    private bool? _defaultValue;
 
+    public BoolConfigType WithDefaultValue(bool value)
+    {
+        _defaultValue = value;
+        return this;
+    }
+
+    public override ConfigValue GetDefaultValue()
+    {
+        return !_defaultValue.HasValue ? null : new BoolConfigValue(this, _defaultValue.Value);
+    }
+    
     public override ConfigValue Deserialize(string data)
     {
         return new BoolConfigValue(this, Convert.ToBoolean(data));

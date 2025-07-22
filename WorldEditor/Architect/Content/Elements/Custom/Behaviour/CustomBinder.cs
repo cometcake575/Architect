@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using Architect.Attributes;
 using Architect.Attributes.Broadcasters;
+using Architect.Util;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Architect.Content.Elements.Custom.Behaviour;
@@ -12,11 +14,10 @@ public class CustomBinder : MonoBehaviour
     private AudioSource _source;
     public Sprite disabledSprite;
     public Sprite enabledSprite;
+    public bool extraVisuals;
     public bool active = true;
     public bool reversible;
     private bool _used;
-
-    public AudioClip clip;
 
     private void Start()
     {
@@ -24,7 +25,7 @@ public class CustomBinder : MonoBehaviour
         _renderer.sprite = enabledSprite;
         if (!CustomObjects.Bindings.TryGetValue(bindingType, out var binders))
         {
-            binders = new List<CustomBinder>();
+            binders = [];
             CustomObjects.Bindings[bindingType] = binders;
         }
         binders.Add(this);
@@ -55,12 +56,19 @@ public class CustomBinder : MonoBehaviour
         
         EventManager.BroadcastEvent(gameObject, active ? "OnBind" : "OnUnbind");
         
-        if (_source) _source.PlayOneShot(clip, 1f);
+        if (_source) _source.PlayOneShot(_clip, 1f);
         
         CustomObjects.RefreshBinding(bindingType);
 
         if (reversible) return;
         _used = true;
         _renderer.enabled = false;
+    }
+
+    private static AudioClip _clip;
+
+    internal static void Init()
+    {
+        _clip = ResourceUtils.LoadClip("Bindings.chain_cut");
     }
 }

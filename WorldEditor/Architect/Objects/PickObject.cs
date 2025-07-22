@@ -52,7 +52,7 @@ internal class PickObject : SelectableObject
         foreach (var broadcaster in pl.Broadcasters) EditorUIManager.Broadcasters.Add(broadcaster);
         foreach (var receiver in pl.Receivers) EditorUIManager.Receivers.Add(receiver);
         
-        EditorUIManager.RefreshSelectedItem();
+        EditorUIManager.RefreshSelectedItem(false);
         
         EditorManager.Scale = pl.Scale;
         EditorManager.Rotation = pl.Rotation;

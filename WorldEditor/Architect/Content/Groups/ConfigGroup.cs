@@ -195,7 +195,7 @@ public class ConfigGroup
             Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Movement Type", (o, value) =>
             {
                 o.GetComponent<ObjectMover>().movementType = value.GetValue();
-            }, false, "Add", "Set", "Knight"), "object_mover_type"),
+            }, "Add", "Set", "Knight"), "object_mover_type"),
             Attributes.ConfigManager.RegisterConfigType(new StringConfigType("ID/Path", (o, value) =>
             {
                 o.GetComponent<ObjectMover>().id = value.GetValue();
@@ -203,15 +203,15 @@ public class ConfigGroup
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Rotation", (o, value) =>
             {
                 o.GetComponent<ObjectMover>().rotation = value.GetValue();
-            }, true), "object_mover_rotation"),
+            }).PreAwake(), "object_mover_rotation"),
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("X Movement", (o, value) =>
             {
                 o.GetComponent<ObjectMover>().xMovement = value.GetValue();
-            }, true), "object_mover_x_move"),
+            }).PreAwake(), "object_mover_x_move"),
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Y Movement", (o, value) =>
             {
                 o.GetComponent<ObjectMover>().yMovement = value.GetValue();
-            }, true), "object_mover_y_move")
+            }).PreAwake(), "object_mover_y_move")
         );
 
         ObjectDuplicator = new ConfigGroup(Invisible,
@@ -358,19 +358,19 @@ public class ConfigGroup
             {
                 if (value.GetValue()) return;
                 o.GetComponent<GruzMotherElement.GmConfig>().spawnGruzzers = false;
-            }, true), "mother_spawn_gruzzers")
+            }).PreAwake(), "mother_spawn_gruzzers")
         );
 
-        VengeflyKing = new ConfigGroup(Awakable,
+        VengeflyKing = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Dive Height", (o, value) =>
             {
                 if (value.GetValue() == 1) return;
                 o.GetComponent<VengeflyKingElement.VkConfig>().targetPlayer = false;
-            }, true, "Vanilla", "Player"), "vk_dive_mode"),
+            }, "Vanilla", "Player").PreAwake(), "vk_dive_mode"),
             Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Vengeflies", (o, value) =>
             {
                 o.GetComponent<VengeflyKingElement.VkConfig>().vengeflyRule = value.GetValue();
-            }, true, "Off", "Vanilla", "Local"), "vk_summon_mode")
+            }, "Off", "Vanilla", "Local").PreAwake(), "vk_summon_mode")
         );
 
         Breakable = new ConfigGroup(Generic,
@@ -398,7 +398,7 @@ public class ConfigGroup
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Speed", (o, value) =>
             {
                 o.GetOrAddComponent<MovingObject>().SetSpeed(value.GetValue());
-            }, true), "mo_speed"),
+            }).PreAwake(), "mo_speed"),
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Pause Time", (o, value) =>
             {
                 o.GetOrAddComponent<MovingObject>().pauseTime = value.GetValue();
@@ -469,7 +469,7 @@ public class ConfigGroup
             {
                 if (value.GetValue()) return;
                 o.GetOrAddComponent<MovingObject>().stickPlayer = false;
-            }, true), "mp_stick_player")
+            }).PreAwake(), "mp_stick_player")
         );
         
         ModHooks.LanguageGetHook += (key, _, orig) => CustomTexts.TryGetValue(key, out var customText) ? customText : orig;
@@ -507,7 +507,7 @@ public class ConfigGroup
                 var val = value.GetValue();
                 if (val == 0) return;
                 o.GetComponent<SpriteRenderer>().sprite = headSprites[val - 1];
-            }, false, "Zote", "Knight", "Nosk", "Hornet", "Grub", "Peak"), "zote_head_mode")
+            }, "Zote", "Knight", "Nosk", "Hornet", "Grub", "Peak"), "zote_head_mode")
         );
 
         var ignoreVoidHeart =
@@ -585,7 +585,7 @@ public class ConfigGroup
                 {
                     o.transform.GetChild(0).GetComponent<ConveyorBelt>().speed = value.GetValue();
                     o.GetComponent<Animator>().speed = value.GetValue() / 8;
-                }, true), "conveyor_speed"
+                }).PreAwake(), "conveyor_speed"
             )
         );
 
@@ -643,63 +643,63 @@ public class ConfigGroup
                 {
                     if (!value.GetValue()) return;
                     o.GetOrAddComponent<RoomClearerConfig>().removeTransitions = true;
-                }, true), "clearer_remove_transitions"
+                }).PreAwake(), "clearer_remove_transitions"
             ),
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Remove Benches", (o, value) =>
                 {
                     if (value.GetValue()) return;
                     o.GetOrAddComponent<RoomClearerConfig>().removeBenches = false;
-                }, true), "clearer_remove_benches"
+                }).PreAwake(), "clearer_remove_benches"
             ),
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Remove Props", (o, value) =>
                 {
                     if (value.GetValue()) return;
                     o.GetOrAddComponent<RoomClearerConfig>().removeProps = false;
-                }, true), "clearer_remove_props"
+                }).PreAwake(), "clearer_remove_props"
             ),
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Remove Scenery", (o, value) =>
                 {
                     if (value.GetValue()) return;
                     o.GetOrAddComponent<RoomClearerConfig>().removeScenery = false;
-                }, true), "clearer_remove_scenery"
+                }).PreAwake(), "clearer_remove_scenery"
             ),
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Remove Blur", (o, value) =>
                 {
                     if (value.GetValue()) return;
                     o.GetOrAddComponent<RoomClearerConfig>().removeBlur = false;
-                }, true), "clearer_remove_blur"
+                }).PreAwake(), "clearer_remove_blur"
             ),
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Remove Tilemap", (o, value) =>
                 {
                     if (value.GetValue()) return;
                     o.GetOrAddComponent<RoomClearerConfig>().removeTilemap = false;
-                }, true), "clearer_remove_tilemap"
+                }).PreAwake(), "clearer_remove_tilemap"
             ),
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Remove NPCs", (o, value) =>
                 {
                     if (value.GetValue()) return;
                     o.GetOrAddComponent<RoomClearerConfig>().removeNpcs = false;
-                }, true), "clearer_remove_npcs"
+                }).PreAwake(), "clearer_remove_npcs"
             ),
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Remove Camera Lock", (o, value) =>
                 {
                     if (value.GetValue()) return;
                     o.GetOrAddComponent<RoomClearerConfig>().removeCameraLocks = false;
-                }, true), "clearer_remove_cameralock"
+                }).PreAwake(), "clearer_remove_cameralock"
             ),
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Remove Music", (o, value) =>
                 {
                     if (value.GetValue()) return;
                     o.GetOrAddComponent<RoomClearerConfig>().removeMusic = false;
-                }, true), "clearer_remove_music"
+                }).PreAwake(), "clearer_remove_music"
             )
         );
 
@@ -709,7 +709,7 @@ public class ConfigGroup
                 new StringConfigType("Path", (o, value) =>
                 {
                     o.GetOrAddComponent<ObjectRemoverConfig>().objectPath = value.GetValue();
-                }, true), "remover_path"
+                }).PreAwake(), "remover_path"
             )
         );
 
@@ -775,7 +775,7 @@ public class ConfigGroup
                 o.GetComponent<Timer>().maxCalls = value.GetValue();
             }), "timer_max_calls")
         );
-
+        
         KeyListeners = new ConfigGroup(
             Invisible,
             Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Key", (o, value) =>
@@ -786,7 +786,7 @@ public class ConfigGroup
             Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Type", (o, value) =>
             {
                 o.GetComponent<KeyListener>().listenMode = value.GetValue();
-            }, false, "Press", "Release", "Hold"), "keylistener_type")
+            }, "Press", "Release", "Hold"), "keylistener_type")
         );
 
         Decorations = new ConfigGroup(Generic,
@@ -816,7 +816,7 @@ public class ConfigGroup
                 o.GetComponent<TriggerZone>().mode = val;
 
                 o.layer = val == 3 ? activeRegion : softTerrain;
-            }, false, "Player", "Nail Swing", "Enemy", "Zote Head", "Trigger Zone"), "trigger_mode")
+            }, "Player", "Nail Swing", "Enemy", "Zote Head", "Trigger Zone"), "trigger_mode")
         );
 
         var terrain = LayerMask.NameToLayer("Terrain");
@@ -839,7 +839,7 @@ public class ConfigGroup
                         o.GetComponent<Collider2D>().isTrigger = false;
                         break;
                 }
-            }, false, "None", "Hazard", "Terrain", "Solid"), "shape_collision")
+            }, "None", "Hazard", "Terrain", "Solid"), "shape_collision")
         );
 
         Relays = new ConfigGroup(Generic,
@@ -857,6 +857,10 @@ public class ConfigGroup
                 if (!value.GetValue()) return;
                 o.GetComponent<Relay>().multiplayerBroadcast = true;
             }), "relay_multiplayer_mode"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Delay", (o, value) =>
+            {
+                o.GetComponent<Relay>().delay = value.GetValue();
+            }), "relay_delay"),
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Relay Chance", (o, value) =>
             {
                 o.GetComponent<Relay>().relayChance = value.GetValue();
@@ -868,16 +872,16 @@ public class ConfigGroup
             {
                 if (value.GetValue() != 1) return;
                 o.GetComponent<BrokenVesselElement.BrokenVesselConfig>().localJump = false;
-            }, true, "Local", "Arena"), "bv_jump_mode"),
+            }, "Local", "Arena").PreAwake(), "bv_jump_mode"),
             Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Infected Balloons", (o, value) =>
             {
                 o.GetComponent<BrokenVesselElement.BrokenVesselConfig>().balloons = value.GetValue();
-            }, true, "Local", "Arena", "Disabled"), "bv_balloon_type"),
+            }, "Local", "Arena", "Disabled").PreAwake(), "bv_balloon_type"),
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Disable Roar", (o, value) =>
             {
                 if (value.GetValue()) return;
                 o.GetComponent<BrokenVesselElement.BrokenVesselConfig>().disableRoar = false;
-            }, true), "bv_noroar")
+            }).PreAwake(), "bv_noroar")
         );
 
         TextDisplay = new ConfigGroup(Invisible,
@@ -914,7 +918,7 @@ public class ConfigGroup
                 item.semiPersistent = val == 1;
                 item.persistentBoolData.semiPersistent = val == 1;
             }
-        }, true, "False", "Bench", "True");
+        }, "False", "Bench", "True").PreAwake();
     }
 
     private static readonly Dictionary<string, string> CustomTexts = new();

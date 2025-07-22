@@ -35,6 +35,7 @@ public static class EditorUIManager
     
     // Info about current selected item and buttons to change item
     private static TextObject _selectionInfo;
+    private static TextObject _sceneInfo;
     private static TextObject _extraInfo;
     private static List<(Button, Button, Image)> _selectionButtons;
     
@@ -47,11 +48,8 @@ public static class EditorUIManager
     private static GridLayout _receiversGrid;
     private static GridLayout _broadcastersGrid;
     public static readonly Dictionary<string, ConfigValue> ConfigValues = new();
-    public static readonly List<EventBroadcaster> Broadcasters = new();
-    public static readonly List<EventReceiver> Receivers = new();
-
-    // Blank sprite texture, used for buttons with no item
-    private static Sprite _blankSprite;
+    public static readonly List<EventBroadcaster> Broadcasters = [];
+    public static readonly List<EventReceiver> Receivers = [];
     
     // Constants
     private const int ItemsPerGroup = 9;
@@ -119,7 +117,7 @@ public static class EditorUIManager
             else
             {
                 pair.Item1.Content = "Unset";
-                pair.Item3.Sprite = _blankSprite;
+                pair.Item3.Sprite = Architect.BlankSprite;
                 pair.Item2.Content = Nothing;
                 pair.Item2.ContentColor = Color.white;
             }
@@ -175,7 +173,7 @@ public static class EditorUIManager
     }
 
     // Refreshes the currently selected item, resetting configuration applied to the object
-    public static void RefreshSelectedItem()
+    public static void RefreshSelectedItem(bool useDefaultConfigValues)
     {
         RotationChoice.Text = "0";
         ScaleChoice.Text = "1";
@@ -186,13 +184,13 @@ public static class EditorUIManager
         CursorItem.NeedsRefreshing = true;
         _selectionInfo.Text = "Current Item: " + (SelectedItem != null ? SelectedItem.GetName() : "None");
         
-        CreateConfigGrid(_layout);
+        CreateConfigGrid(_layout, useDefaultConfigValues);
         CreateBroadcastersGrid(_layout);
         CreateReceiversGrid(_layout);
         
         RefreshConfigMode();
     }
-
+    
     private static LayoutRoot _layout;
     
     // Initializes the UI
@@ -201,7 +199,6 @@ public static class EditorUIManager
         _layout = layout;
         
         _selectionButtons = [];
-        _blankSprite = Sprite.Create(Texture2D.normalTexture, new Rect(0, 0, 0, 0), new Vector2());
         PauseOptions = [];
 
         layout.VisibilityCondition = () => EditorManager.IsEditing;
@@ -211,6 +208,12 @@ public static class EditorUIManager
         SetupObjectOptions(layout);
         SetupFilter(layout);
         SetupExtraSettings(layout);
+
+        On.HeroController.SceneInit += (orig, self) =>
+        {
+            orig(self);
+            _sceneInfo.Text = "Scene: " + GameManager.instance.sceneName;
+        };
     }
 
     private static void SetupLeftSide(LayoutRoot layout)
@@ -364,14 +367,15 @@ public static class EditorUIManager
 
     private static void SetupTextDisplay(LayoutRoot layout)
     {
-        new TextObject(layout)
+        _ = new TextObject(layout)
         {
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Top,
             MaxWidth = 200,
             MaxHeight = 20,
-            Padding = new Padding(0, 60)
-        }.Text = "Editor Enabled";
+            Padding = new Padding(0, 60),
+            Text = "Editor Enabled"
+        };
 
         _selectionInfo = new TextObject(layout)
         {
@@ -383,11 +387,21 @@ public static class EditorUIManager
             Text = "Current Item: None"
         };
 
-        _extraInfo = new TextObject(layout)
+        _sceneInfo = new TextObject(layout)
         {
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Top,
             Padding = new Padding(0, 120),
+            MaxWidth = 1000,
+            MaxHeight = 20,
+            Text = "Scene: None"
+        };
+
+        _extraInfo = new TextObject(layout)
+        {
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Top,
+            Padding = new Padding(0, 150),
             MaxWidth = 1000,
             MaxHeight = 20,
             Text = "ID: None",
@@ -471,7 +485,7 @@ public static class EditorUIManager
         {
             var j = 2 - i / 3;
 
-            var (button, image) = CreateImagedButton(layout, _blankSprite, i.ToString(), (2 - i % 3) * 100, j * 100, i);
+            var (button, image) = CreateImagedButton(layout, Architect.BlankSprite, i.ToString(), (2 - i % 3) * 100, j * 100, i);
 
             var favourite = new Button(layout, i + " Favourite")
             {
@@ -609,7 +623,7 @@ public static class EditorUIManager
         {
             _index = index;
             UpdateSelectedItem();
-            RefreshSelectedItem();
+            RefreshSelectedItem(true);
             SelectedItem?.AfterSelect();
         };
 
@@ -636,7 +650,7 @@ public static class EditorUIManager
         if (_receiversGrid != null) _receiversGrid.Visibility = _currentMode == ConfigMode.Receivers ? Visibility.Visible : Visibility.Hidden;
     }
 
-    private static void CreateConfigGrid(LayoutRoot layout)
+    private static void CreateConfigGrid(LayoutRoot layout, bool useDefaultValues)
     {
         _configGrid?.Destroy();
         _configGrid = null;
@@ -680,7 +694,18 @@ public static class EditorUIManager
             }.WithProp(GridLayout.Row, i).WithProp(GridLayout.Column, 2);
             _configGrid.Children.Add(apply);
 
-            var oldValue = ConfigValues.TryGetValue(type.Name, out var v1) ? v1.SerializeValue() : null;
+            string oldValue = null;
+            if (useDefaultValues)
+            {
+                var def = type.GetDefaultValue();
+                if (def != null)
+                {
+                    ConfigValues[type.Name] = def;
+                    oldValue = def.SerializeValue();
+                }
+            }
+            else if (ConfigValues.TryGetValue(type.Name, out var v1)) oldValue = v1.SerializeValue();
+            
             var input = type.CreateInput(layout, apply, oldValue);
 
             input.GetElement().VerticalAlignment = VerticalAlignment.Center;

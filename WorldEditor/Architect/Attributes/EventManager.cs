@@ -26,6 +26,12 @@ public static class EventManager
             BroadcastEvent(self.gameObject, "OnDamage");
             orig(self, instance);
         };
+
+        On.Breakable.Break += (orig, self, min, max, multiplier) =>
+        {
+            orig(self, min, max, multiplier);
+            BroadcastEvent(self.gameObject, "OnBreak");
+        };
         
         On.HealthManager.Awake += (orig, self) =>
         {
