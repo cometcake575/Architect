@@ -453,3 +453,45 @@ internal class PureVesselElement : InternalPackElement
         _gameObject.RemoveComponent<ConstrainPosition>();
     }
 }
+
+internal class MassiveMossChargerElement : InternalPackElement
+{
+    private GameObject _gameObject;
+
+    public MassiveMossChargerElement() : base("Massive Moss Charger", "Enemies")
+    {
+        WithBroadcasterGroup(BroadcasterGroup.Enemies);
+        WithReceiverGroup(ReceiverGroup.Awakable);
+        WithConfigGroup(ConfigGroup.MassiveMc);
+        FlipVertical();
+    }
+
+    public override GameObject GetPrefab(bool flipped, float rotation)
+    {
+        return _gameObject;
+    }
+
+    internal override void AddPreloads(List<(string, string)> preloadInfo)
+    {
+        preloadInfo.Add(("GG_Mega_Moss_Charger", "Mega Moss Charger"));
+    }
+
+    internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
+    {
+        _gameObject = preloads["GG_Mega_Moss_Charger"]["Mega Moss Charger"];
+    }
+
+    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
+    {
+        var fsm = gameObject.LocateMyFSM("Mossy Control");
+        fsm.DisableAction("Init", 28);
+
+        fsm.GetAction<SetScale>("Emerge Left", 6).x = scale;
+        fsm.GetAction<SetScale>("Emerge Right", 6).x = -scale;
+    }
+
+    public override bool DisableScaleParent()
+    {
+        return true;
+    }
+}

@@ -38,7 +38,7 @@ internal class ElderBaldurElement : InternalPackElement
 
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
-        gameObject.transform.SetScaleX(-_gameObject.transform.GetScaleX());
+        gameObject.transform.SetScaleX(-_gameObject.transform.GetScaleX() * scale);
         if (flipped) return;
         var fsm = gameObject.LocateMyFSM("Blocker Control");
         fsm.FsmVariables.GetFsmBool("Facing Right").Value = false;

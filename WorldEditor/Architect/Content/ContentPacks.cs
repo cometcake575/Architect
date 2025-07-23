@@ -208,7 +208,9 @@ public static class ContentPacks
             
             new BenchElement("Fungus1_37", "RestBench", "Stone Sanctuary Bench", "Interactable", weight:BenchWeight),
             new BenchElement("Room_Slug_Shrine", "RestBench", "Unn Shrine Bench", "Interactable", weight:BenchWeight),
-            new BenchElement("Fungus1_15", "RestBench", "Nailmaster Sheo's Bench", "Interactable", weight:NailmasterBenchWeight)
+            new BenchElement("Fungus1_15", "RestBench", "Nailmaster Sheo's Bench", "Interactable", weight:NailmasterBenchWeight),
+            
+            new MassiveMossChargerElement()
         });
         RegisterInternalPack(new ContentPack("Fog Canyon", "Assets from Fog Canyon")
         {
@@ -535,7 +537,7 @@ public static class ContentPacks
            CreateEnemy("GG_God_Tamer", "Entry Object/Lancer", "God Tamer"),
            CreateEnemy("GG_God_Tamer", "Entry Object", "God Tamer Full"),
             new OblobbleElement(),
-            CreateEnemy("GG_Mega_Moss_Charger", "Mega Moss Charger", "Massive Moss Charger", category:"Bosses").FlipVertical(),
+
            CreateEnemy("GG_Crystal_Guardian", "Mega Zombie Beam Miner (1)", "Crystal Guardian"),
            CreateEnemy("GG_Crystal_Guardian_2", "Battle Scene/Zombie Beam Miner Rematch", "Enraged Guardian"),
         });*/

@@ -44,6 +44,8 @@ public class ConfigGroup
     
     public static ConfigGroup Awakable;
     
+    public static ConfigGroup MassiveMc;
+    
     public static ConfigGroup GruzMother;
     
     public static ConfigGroup VengeflyKing;
@@ -390,7 +392,15 @@ public class ConfigGroup
                 }
                 
                 o.LocateMyFSM("Black Knight").AddCustomAction("Rest", fsm => fsm.SendEvent("WAKE"));
-            }), "enemy_start_awake")
+            }).WithDefaultValue(true), "enemy_start_awake")
+        );
+
+        MassiveMc = new ConfigGroup(KillableEnemies,
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Start Awake", (o, value) =>
+            {
+                if (!value.GetValue()) return;
+                o.LocateMyFSM("Mossy Control").AddCustomAction("Sleep", fsm => fsm.SendEvent("WAKE"));
+            }).WithDefaultValue(true), "mmc_start_awake")
         );
 
         GruzMother = new ConfigGroup(Awakable,
