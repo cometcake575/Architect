@@ -18,7 +18,7 @@ public class WorldEditorGlobalSettings
     public bool CollaborationMode = false;
     
     [JsonConverter(typeof(PlayerActionSetConverter))]
-    public readonly WorldEditorKeyBinds Keybinds = new();
+    public WorldEditorKeyBinds Keybinds = new();
 
     public Dictionary<string, List<ObjectPlacement>> Edits = new();
 }

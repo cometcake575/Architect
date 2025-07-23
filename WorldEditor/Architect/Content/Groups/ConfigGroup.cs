@@ -132,7 +132,11 @@ public class ConfigGroup
                 o.SetActive(value.GetValue());
             }), "active")
         );
-
+        
+        var layerType = Attributes.ConfigManager.RegisterConfigType(new IntConfigType("layer", (o, value) =>
+        {
+            o.GetComponent<SpriteRenderer>().sortingOrder = value.GetValue();
+        }), "layer");
         Colours = new ConfigGroup(Invisible,
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("r", (o, value) =>
             {
@@ -162,10 +166,7 @@ public class ConfigGroup
                 color.a = value.GetValue();
                 sr.color = color;
             }), "a"),
-            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("layer", (o, value) =>
-            {
-                o.GetComponent<SpriteRenderer>().sortingOrder = value.GetValue();
-            }), "layer")
+            layerType
         );
         
         Generic = new ConfigGroup(Invisible,
@@ -519,7 +520,8 @@ public class ConfigGroup
             {
                 if (value.GetValue()) return;
                 o.GetOrAddComponent<MovingObject>().stickPlayer = false;
-            }).PreAwake(), "mp_stick_player")
+            }).PreAwake(), "mp_stick_player"),
+            layerType
         );
         
         ModHooks.LanguageGetHook += (key, _, orig) => CustomTexts.TryGetValue(key, out var customText) ? customText : orig;
