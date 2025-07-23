@@ -54,7 +54,7 @@ public class ChoiceConfigElement : ConfigElement
         else
         {
             _choice = -1;
-            _input.Content = "Unset";
+            _input.Content = "Default";
         }
 
         _input.Click += button =>

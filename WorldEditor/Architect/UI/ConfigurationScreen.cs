@@ -37,6 +37,14 @@ public static class ConfigurationScreen
                 playerAction: globalSettings.Keybinds.ToggleEditor
             ),
             new KeyBind(
+                name: "Undo",
+                playerAction: globalSettings.Keybinds.Undo
+            ),
+            new KeyBind(
+                name: "Redo",
+                playerAction: globalSettings.Keybinds.Redo
+            ),
+            new KeyBind(
                 name: "Flip",
                 playerAction: globalSettings.Keybinds.FlipItem
             ),

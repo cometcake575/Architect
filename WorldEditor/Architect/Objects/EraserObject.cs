@@ -24,6 +24,8 @@ internal class EraserObject : SelectableObject
         var pl = PlacementManager.GetCurrentPlacements().FirstOrDefault(placement => placement.Touching(pos));
         if (pl == null) return;
         pl.Destroy();
+        
+        UndoManager.PerformAction(new EraseObject(pl));
 
         if (!Architect.UsingMultiplayer || !Architect.GlobalSettings.CollaborationMode) return;
         var id = pl.GetId();

@@ -38,17 +38,35 @@ public static class RoomObjects
                     && !obj.name.StartsWith("_SceneManager")
                 );
 
-                if (!clearer.removeBenches) objects = objects.Where(obj => !obj.GetComponent<RestBench>());
-                if (!clearer.removeScenery)
-                    objects = objects.Where(obj => !obj.name.StartsWith("_Scenery") && obj.name != "Acid Control v2");
-                if (!clearer.removeTilemap) objects = objects.Where(obj => !obj.name.Contains("TileMap"));
-                if (!clearer.removeBlur) objects = objects.Where(obj => !obj.GetComponentInChildren<BlurPlane>());
-                if (!clearer.removeProps) objects = objects.Where(obj => !obj.name.StartsWith("_Props"));
-                if (!clearer.removeTransitions)
-                    objects = objects.Where(obj => !obj.name.StartsWith("_Transition Gates"));
-                if (!clearer.removeCameraLocks) objects = objects.Where(obj => !obj.name.StartsWith("_CameraLock"));
-                if (!clearer.removeMusic) objects = objects.Where(obj => !obj.GetComponent<MusicRegion>());
-                if (!clearer.removeNpcs) objects = objects.Where(obj => !obj.name.StartsWith("NPC"));
+                if (clearer.removeOther)
+                {
+                    if (!clearer.removeBenches) objects = objects.Where(obj => !obj.GetComponent<RestBench>());
+                    if (!clearer.removeScenery)
+                        objects =
+                            objects.Where(obj => !obj.name.StartsWith("_Scenery") && obj.name != "Acid Control v2");
+                    if (!clearer.removeTilemap) objects = objects.Where(obj => !obj.name.Contains("TileMap"));
+                    if (!clearer.removeBlur) objects = objects.Where(obj => !obj.GetComponentInChildren<BlurPlane>());
+                    if (!clearer.removeProps) objects = objects.Where(obj => !obj.name.StartsWith("_Props"));
+                    if (!clearer.removeTransitions)
+                        objects = objects.Where(obj => !obj.name.StartsWith("_Transition Gates"));
+                    if (!clearer.removeCameraLocks) objects = objects.Where(obj => !obj.name.StartsWith("_CameraLock"));
+                    if (!clearer.removeMusic) objects = objects.Where(obj => !obj.GetComponent<MusicRegion>());
+                    if (!clearer.removeNpcs) objects = objects.Where(obj => !obj.name.StartsWith("NPC"));
+                }
+                else
+                {
+                    objects = objects.Where(obj =>
+                        (obj.GetComponent<RestBench>() && clearer.removeBenches) ||
+                        ((obj.name.StartsWith("_Scenery") || obj.name == "Acid Control v2") && clearer.removeScenery) ||
+                        (obj.name.Contains("TileMap") && clearer.removeTilemap) ||
+                        (obj.GetComponentInChildren<BlurPlane>() && clearer.removeBlur) ||
+                        (obj.name.StartsWith("_Props") && clearer.removeProps) ||
+                        (obj.name.StartsWith("_Transition Gates") && clearer.removeTransitions) ||
+                        (obj.name.StartsWith("_CameraLock") && clearer.removeCameraLocks) ||
+                        (obj.GetComponent<MusicRegion>() && clearer.removeMusic) ||
+                        (obj.name.StartsWith("NPC") && clearer.removeNpcs)
+                    );
+                }
 
                 return objects.Select(obj => obj.GetOrAddComponent<Disabler>()).ToArray();
             }).WithConfigGroup(ConfigGroup.RoomClearer),
@@ -97,7 +115,7 @@ public static class RoomObjects
             }
         }
         
-        return point is not null && lowest <= 25 ? [point.gameObject.GetOrAddComponent<Disabler>()] : [];
+        return point is not null && lowest <= 225 ? [point.gameObject.GetOrAddComponent<Disabler>()] : [];
     }
 
     private static readonly Dictionary<string, Func<GameObject, Disabler[]>> EditActions = new();

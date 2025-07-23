@@ -73,8 +73,6 @@ public static class CustomObjects
                     ResourceUtils.Load("object_duplicator"))
                 .WithReceiverGroup(ReceiverGroup.ObjectDuplicator)
                 .WithConfigGroup(ConfigGroup.ObjectDuplicator),
-            new SimplePackElement(CreateWidePlatform(), "Wide Platform", "Solids")
-                .WithConfigGroup(ConfigGroup.MovingPlatforms),
             CreateSquare(),
             CreateCircle(),
             CreateTriangle(),
@@ -288,22 +286,6 @@ public static class CustomObjects
 
         point.SetActive(false);
         point.AddComponent<ObjectDuplicator>();
-        Object.DontDestroyOnLoad(point);
-
-        return point;
-    }
-
-    private static GameObject CreateWidePlatform()
-    {
-        var point = new GameObject("Wide Platform");
-
-        point.AddComponent<SpriteRenderer>().sprite = ResourceUtils.Load("wide_platform");
-        var col = point.AddComponent<BoxCollider2D>();
-        col.size = new Vector2(11.30954f, 0.8839264f);
-        col.offset = new Vector2(0.007995605f, 0.1063919f);
-        point.layer = 8;
-
-        point.SetActive(false);
         Object.DontDestroyOnLoad(point);
 
         return point;

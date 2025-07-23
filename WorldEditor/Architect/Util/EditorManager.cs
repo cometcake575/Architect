@@ -112,7 +112,7 @@ public static class EditorManager
         HeroController.instance.GetComponent<Rigidbody2D>().velocity.Set(0, 0);
 
         // Checks if the selected item is placeable
-        if (EditorUIManager.SelectedItem is PlaceableObject placeable)
+        if (EditorUIManager.SelectedItem is PlaceableObject placeable && !paused)
         {
             // Was the 'flip item' keybind pressed
             if (Architect.GlobalSettings.Keybinds.FlipItem.WasPressed)
@@ -174,6 +174,7 @@ public static class EditorManager
         }
 
         HeroController.instance.AffectedByGravity(false);
+        if (Architect.GlobalSettings.Keybinds.AddPrefab.WasPressed) PrefabsCategory.TryAddPrefab();
 
         var actions = InputHandler.Instance.inputActions;
         
@@ -250,7 +251,8 @@ public static class EditorManager
 
     private static void TryPlace()
     {
-        if (Architect.GlobalSettings.Keybinds.AddPrefab.WasPressed) PrefabsCategory.TryAddPrefab();
+        if (Architect.GlobalSettings.Keybinds.Undo.WasPressed) UndoManager.UndoLast();
+        if (Architect.GlobalSettings.Keybinds.Redo.WasPressed) UndoManager.RedoLast();
         
         var b1 = Input.GetMouseButtonDown(0);
         var b2 = Input.GetMouseButton(0);
@@ -297,19 +299,23 @@ public static class EditorManager
     }
 
     private static ObjectPlacement _dragged;
+    private static Vector3 _oldDraggedPos;
 
     public static void SetDraggedItem(ObjectPlacement placement)
     {
+        _oldDraggedPos = placement.GetPos();
         _dragged = placement;
     }
 
     public static void ReleaseDraggedItem()
     {
+        var id = _dragged.GetId();
         if (Architect.UsingMultiplayer && Architect.GlobalSettings.CollaborationMode)
         {
-            var id = _dragged.GetId();
             HkmpHook.Update(id, GameManager.instance.sceneName, _dragged.GetPos());
         }
+        
+        UndoManager.PerformAction(new MoveObject(id, _oldDraggedPos));
 
         _dragged = null;
     }

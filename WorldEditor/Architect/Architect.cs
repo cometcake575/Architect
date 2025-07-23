@@ -59,6 +59,8 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
         PlacementManager.Initialize();
         EventManager.InitializeBroadcasters();
         
+        UndoManager.Initialize();
+        
         if (ModHooks.GetMod("HKMP") is Mod)
         {
             HkmpHookInitializer.Initialize();

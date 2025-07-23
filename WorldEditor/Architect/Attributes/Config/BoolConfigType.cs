@@ -50,7 +50,7 @@ public class BoolConfigElement : ConfigElement
         {
             _choice = oldValue == bool.TrueString;
             _input.Content = _choice.ToString();
-        } else _input.Content = "Unset";
+        } else _input.Content = "Default";
 
         _input.Click += button =>
         {

@@ -5,6 +5,8 @@ namespace Architect.Configuration;
 public class WorldEditorKeyBinds : PlayerActionSet
 {
     public PlayerAction ToggleEditor;
+    public PlayerAction Undo;
+    public PlayerAction Redo;
     public PlayerAction FlipItem;
     public PlayerAction RotateItem;
     public PlayerAction UnsafeRotation;
@@ -17,6 +19,8 @@ public class WorldEditorKeyBinds : PlayerActionSet
     public WorldEditorKeyBinds()
     {
         ToggleEditor = CreatePlayerAction("EditToggle");
+        Undo = CreatePlayerAction("Undo");
+        Redo = CreatePlayerAction("Redo");
         FlipItem = CreatePlayerAction("FlipItem");
         RotateItem = CreatePlayerAction("RotateItem");
         UnsafeRotation = CreatePlayerAction("UnsafeRotation");
@@ -27,6 +31,8 @@ public class WorldEditorKeyBinds : PlayerActionSet
         AddPrefab = CreatePlayerAction("AddPrefab");
         
         ToggleEditor.AddDefaultBinding(Key.E);
+        Undo.AddDefaultBinding(Key.Z);
+        Redo.AddDefaultBinding(Key.Y);
         FlipItem.AddDefaultBinding(Key.F);
         RotateItem.AddDefaultBinding(Key.R);
         UnsafeRotation.AddDefaultBinding(Key.LeftAlt);

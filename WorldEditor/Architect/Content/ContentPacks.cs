@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Architect.Content.Elements;
-using Architect.Content.Elements.Custom.Behaviour;
 using Architect.Content.Elements.Internal;
 using Architect.Content.Elements.Internal.Fixers;
 using Architect.Content.Groups;
+using Architect.Util;
 using UnityEngine;
 
 namespace Architect.Content;
@@ -21,6 +21,7 @@ public static class ContentPacks
     public const int MiscInteractableWeight = 8;
     public const int LeverWeight = 9;
     public const int GateWeight = 10;
+    //public const int ShinyWeight = 11;
 
     internal static readonly List<ContentPack> Packs = [];
     private static readonly List<ContentPack> InternalPacks = [];
@@ -110,10 +111,11 @@ public static class ContentPacks
                 .WithConfigGroup(ConfigGroup.Tablets),
             Create("Tutorial_01", "_Props/Health Cocoon", "Lifeblood Cocoon", "Interactable", weight:MiscInteractableWeight)
                 .WithConfigGroup(ConfigGroup.Cocoon),
-            Create("Room_nailmaster", "RestBench", "Nailmaster Mato's Bench", "Interactable", weight:NailmasterBenchWeight)
+            new BenchElement("Room_nailmaster", "RestBench", "Nailmaster Mato's Bench", "Interactable", weight:NailmasterBenchWeight)
         });
         RegisterInternalPack(new ContentPack("Forgotten Crossroads", "Assets from the regular Forgotten Crossroads")
         {
+            //new CharmElement(weight:ShinyWeight),
             CreateEnemy("Crossroads_07", "Uninfected Parent/Fly", "Gruzzer"),
             new GruzMotherElement(),
             CreateEnemy("Crossroads_07", "_Enemies/Crawler", "Crawlid"),
@@ -145,10 +147,10 @@ public static class ContentPacks
                 .WithReceiverGroup(ReceiverGroup.Gates)
                 .WithRotationGroup(RotationGroup.Four)
                 .FlipHorizontal(),
-            Create("Crossroads_47", "RestBench", "Common Bench", "Interactable", weight:BenchWeight),
-            Create("Crossroads_ShamanTemple", "BoneBench", "Ancestral Mound Bench", "Interactable", weight:BenchWeight),
-            Create("Crossroads_04", "RestBench", "Salubra's Bench", "Interactable", weight:BenchWeight),
-            Create("Room_Final_Boss_Atrium", "RestBench", "Black Egg Bench", "Interactable", weight:SpecialBenchWeight),
+            new BenchElement("Crossroads_47", "RestBench", "Common Bench", "Interactable", weight:BenchWeight),
+            new BenchElement("Crossroads_ShamanTemple", "BoneBench", "Ancestral Mound Bench", "Interactable", weight:BenchWeight),
+            new BenchElement("Crossroads_04", "RestBench", "Salubra's Bench", "Interactable", weight:BenchWeight),
+            new BenchElement("Room_Final_Boss_Atrium", "RestBench", "Black Egg Bench", "Interactable", weight:SpecialBenchWeight),
             new GrubfatherElement(weight:NpcWeight),
             Create("Crossroads_07", "_Scenery/plat_lift_06", "Lift Platform S", "Solids")
                 .WithRotationGroup(RotationGroup.Four),
@@ -204,9 +206,9 @@ public static class ContentPacks
                 .WithRotationGroup(RotationGroup.Four),
             new TollMachineElement(weight:LeverWeight),
             
-            Create("Fungus1_37", "RestBench", "Stone Sanctuary Bench", "Interactable", weight:BenchWeight),
-            Create("Room_Slug_Shrine", "RestBench", "Unn Shrine Bench", "Interactable", weight:BenchWeight),
-            Create("Fungus1_15", "RestBench", "Nailmaster Sheo's Bench", "Interactable", weight:NailmasterBenchWeight),
+            new BenchElement("Fungus1_37", "RestBench", "Stone Sanctuary Bench", "Interactable", weight:BenchWeight),
+            new BenchElement("Room_Slug_Shrine", "RestBench", "Unn Shrine Bench", "Interactable", weight:BenchWeight),
+            new BenchElement("Fungus1_15", "RestBench", "Nailmaster Sheo's Bench", "Interactable", weight:NailmasterBenchWeight)
         });
         RegisterInternalPack(new ContentPack("Fog Canyon", "Assets from Fog Canyon")
         {
@@ -225,7 +227,7 @@ public static class ContentPacks
             CreateSolid("Fungus3_26", "fung_plat_float_08", "Fog Canyon Platform 6"),
             CreateSolid("Fungus3_archive_02", "fung temple_plat_float_small", "Archives Platform S"),
             CreateSolid("Fungus3_archive_02", "fung_temple_plat_float (1)", "Archives Platform L"),
-            Create("Fungus3_archive", "RestBench", "Archive Bench", "Interactable", weight:BenchWeight)
+            new BenchElement("Fungus3_archive", "RestBench", "Archive Bench", "Interactable", weight:BenchWeight)
         });
         RegisterInternalPack(new ContentPack("Fungal Wastes", "Assets from the Fungal Wastes")
         {
@@ -254,8 +256,8 @@ public static class ContentPacks
             Create("Fungus2_04", "Mantis Gate", "Mantis Gate", "Interactable", weight:GateWeight)
                 .WithReceiverGroup(ReceiverGroup.Gates)
                 .WithRotationGroup(RotationGroup.Four),
-            Create("Fungus2_26", "RestBench", "Leg Eater's Bench", "Interactable", weight:BenchWeight),
-            Create("Fungus2_31", "RestBench", "Mantis Bench", "Interactable", weight:BenchWeight)
+            new BenchElement("Fungus2_26", "RestBench", "Leg Eater's Bench", "Interactable", weight:BenchWeight),
+            new BenchElement("Fungus2_31", "RestBench", "Mantis Bench", "Interactable", weight:BenchWeight)
         });
         RegisterInternalPack(new ContentPack("Crystal Peak", "Assets from the Crystal Peak")
         {
@@ -354,6 +356,7 @@ public static class ContentPacks
             CreateSolid("Ruins1_03", "_Scenery/ruin_plat_float_01_wide", "City Platform 2"),
             CreateSolid("Ruins1_03", "_Scenery/ruin_plat_float_02", "City Platform 3"),
             CreateSolid("Ruins1_03", "_Scenery/ruin_plat_float_05", "City Platform 4"),
+            CreateCustomPlatform("wide_platfrom", "Wide Platform", new Vector2(11.30954f, 0.8839264f), new Vector2(0.007995605f, 0.1063919f), 100),
             Create("Ruins1_25", "Ruins Vial Empty", "Soul Vial", "Interactable", weight:SoulSourceWeight)
                 .WithConfigGroup(ConfigGroup.Breakable),
             Create("Ruins1_24", "Soul Totem 1", "Thin Soul Totem", "Interactable", weight:SoulSourceWeight)
@@ -364,7 +367,7 @@ public static class ContentPacks
                 .WithRotationGroup(RotationGroup.Eight),
             CreateSolid("Ruins2_01", "ruins_mage_building_0011_a_royal_plat", "Pleasure House Platform"),
             CreateSolid("Ruins2_01", "ruins_plat_royal_02", "Royal Platform"),
-            Create("Ruins_Bathhouse", "RestBench", "Pleasure House Bench", "Interactable", weight:BenchWeight),
+            new BenchElement("Ruins_Bathhouse", "RestBench", "Pleasure House Bench", "Interactable", weight:BenchWeight),
             new MillibellePackElement(weight:NpcWeight),
             new ReusableLeverElement(weight:LeverWeight),
             new WatcherKnightElement()
@@ -386,7 +389,7 @@ public static class ContentPacks
             new HopperPackElement("Deepnest_East_06", "Hopper", "Hopper", true),
             new HopperPackElement("Deepnest_East_06", "Giant Hopper (1)", "Great Hopper", false),
             CreateSolid("Ruins2_11_b", "jar_col_plat", "Tower of Love Platform"),
-            Create("Deepnest_East_06", "RestBench", "Nailmaster Oro's Bench", "Interactable", weight:NailmasterBenchWeight),
+            new BenchElement("Deepnest_East_06", "RestBench", "Nailmaster Oro's Bench", "Interactable", weight:NailmasterBenchWeight),
             
             // Colosseum of Fools
             new ColosseumPackElement("Room_Colosseum_Gold", "Colosseum Manager/Waves/Wave 1/Colosseum Cage Large", "Heavy Fool", "Enemies"),
@@ -399,7 +402,7 @@ public static class ContentPacks
             new ColosseumPackElement("Room_Colosseum_Gold", "Colosseum Manager/Waves/Wave 9/Colosseum Cage Small (1)", "Death Loodle", "Enemies"),
             new TwisterPackElement("Room_Colosseum_Gold", "Colosseum Manager/Waves/Wave 25/Electric Mage New", "Volt Twister", "Electric Mage"),
             new TamerBeastElement(),
-            Create("Room_Colosseum_02", "RestBench", "Colosseum Bench", "Interactable", weight:BenchWeight)
+            new BenchElement("Room_Colosseum_02", "RestBench", "Colosseum Bench", "Interactable", weight:BenchWeight)
         });
         RegisterInternalPack(new ContentPack("Zoteboat", "Zotelings from the Eternal Ordeal")
         {
@@ -470,7 +473,7 @@ public static class ContentPacks
                 .WithReceiverGroup(ReceiverGroup.Enemies)
                 .FlipVertical(),
             CreateEnemy("Deepnest_Spider_Town", "Egg Sac", "Bluggsac"),
-            Create("Deepnest_Spider_Town", "RestBench Return", "Beast's Den Bench", "Interactable", weight:BenchWeight),
+            new BenchElement("Deepnest_Spider_Town", "RestBench Return", "Beast's Den Bench", "Interactable", weight:BenchWeight),
             new MidwifeElement(weight:NpcWeight)
         });
         RegisterInternalPack(new ContentPack("The Abyss", "Assets from The Abyss")
@@ -508,15 +511,19 @@ public static class ContentPacks
             Create("White_Palace_03_hub", "White_Servant_01", "Royal Retainer 1", "Interactable", weight:SoulSourceWeight),
             Create("White_Palace_03_hub", "White_Servant_02", "Royal Retainer 2", "Interactable", weight:SoulSourceWeight).FlipHorizontal(),
             Create("White_Palace_03_hub", "White_Servant_03", "Royal Retainer 3", "Interactable", weight:SoulSourceWeight),
-            Create("White_Palace_03_hub", "WhiteBench", "White Palace Bench", "Interactable", weight:BenchWeight)
+            new BenchElement("White_Palace_03_hub", "WhiteBench", "White Palace Bench", "Interactable", weight:BenchWeight)
         });
         RegisterInternalPack(new ContentPack("Godhome", "Assets from Godhome")
         {
+            CreateCustomPlatform("godhome_tiles", "Godhome Tiles", new Vector2(3.95f, 0.75f), new Vector2(0.15f, 0.22f), 64),
             CreateSolid("GG_Atrium_Roof", "gg_plat_float_small", "Godhome Platform S"),
             CreateSolid("GG_Workshop", "gg_plat_float_wide", "Godhome Platform L"),
-            Create("GG_Workshop", "RestBench (1)", "Godhome Bench", "Interactable", weight:SpecialBenchWeight),
-            new MultiPartInternalElement("GG_Atrium_Roof", "RestBench (1)", "GG_bench_metal_0001_1", "Godhome Roof Bench", "Interactable", weight:SpecialBenchWeight),
-            new GodseekerElement(weight:NpcWeight)
+            CreateCustomPlatform("godhome_wide_platform", "Godhome Platform XL", new Vector2(5.6f, 1), new Vector2(0, 0.25f), 64),
+            new BenchElement("GG_Workshop", "RestBench (1)", "Godhome Bench", "Interactable", weight:SpecialBenchWeight),
+            new MultiPartBenchElement("GG_Atrium_Roof", "RestBench (1)", "GG_bench_metal_0001_1", "Godhome Roof Bench", "Interactable", weight:SpecialBenchWeight),
+            new GodseekerElement(weight:NpcWeight),
+            CreateCustomDecoration("godhome_cloud_1", "Godhome Cloud 1"),
+            CreateCustomDecoration("godhome_cloud_2", "Godhome Cloud 2")
         });
         /*RegisterInternalPack(new ContentPack("Experimental", "Experimental Features - These will be moved to a regular pack when confirmed to work")
         {,
@@ -532,5 +539,36 @@ public static class ContentPacks
            CreateEnemy("GG_Crystal_Guardian", "Mega Zombie Beam Miner (1)", "Crystal Guardian"),
            CreateEnemy("GG_Crystal_Guardian_2", "Battle Scene/Zombie Beam Miner Rematch", "Enraged Guardian"),
         });*/
+    }
+
+    private static AbstractPackElement CreateCustomDecoration(string path, string name)
+    {
+        var obj = new GameObject(name);
+
+        obj.AddComponent<SpriteRenderer>().sprite = ResourceUtils.Load(path, ppu: 64);
+
+        obj.SetActive(false);
+        Object.DontDestroyOnLoad(obj);
+        
+        return new SimplePackElement(obj, name, "Decorations")
+            .WithConfigGroup(ConfigGroup.Decorations);
+    }
+
+    private static AbstractPackElement CreateCustomPlatform(string path, string name, Vector2 size, Vector2 offset, int ppu)
+    {
+        var point = new GameObject(name);
+
+        point.AddComponent<SpriteRenderer>().sprite = ResourceUtils.Load(path, ppu:ppu);
+        var col = point.AddComponent<BoxCollider2D>();
+        col.size = size;
+        col.offset = offset;
+        point.layer = 8;
+
+        point.SetActive(false);
+        Object.DontDestroyOnLoad(point);
+
+        return new SimplePackElement(point, name, "Solids")
+            .WithConfigGroup(ConfigGroup.MovingPlatforms)
+            .WithRotationGroup(RotationGroup.Four);
     }
 }

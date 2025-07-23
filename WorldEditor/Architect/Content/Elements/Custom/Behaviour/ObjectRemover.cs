@@ -88,6 +88,8 @@ public class RoomClearerConfig : MonoBehaviour
     public bool removeCameraLocks = true;
     
     public bool removeMusic = true;
+    
+    public bool removeOther = true;
 }
 
 public class ObjectRemoverConfig : MonoBehaviour

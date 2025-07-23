@@ -1,35 +1,18 @@
-using System.Collections.Generic;
 using Architect.Content.Groups;
 using UnityEngine;
 
 namespace Architect.Content.Elements.Internal.Fixers;
 
-internal class TollBenchElement : InternalPackElement
+internal class TollBenchElement : BenchElement
 {
-    private GameObject _gameObject;
-
-    public TollBenchElement(int weight) : base("Toll Bench", "Interactable", weight)
+    public TollBenchElement(int weight) : base("Fungus3_50", "Toll Machine Bench", "Toll Bench", "Interactable", weight)
     {
         WithConfigGroup(ConfigGroup.TollBench);
     }
 
-    public override GameObject GetPrefab(bool flipped, float rotation)
-    {
-        return _gameObject;
-    }
-
-    internal override void AddPreloads(List<(string, string)> preloadInfo)
-    {
-        preloadInfo.Add(("Fungus3_50", "Toll Machine Bench"));
-    }
-
-    internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
-    {
-        _gameObject = preloads["Fungus3_50"]["Toll Machine Bench"];
-    }
-
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
+        base.PostSpawn(gameObject, flipped, rotation, scale);
         gameObject.transform.GetChild(2).name = gameObject.name + " Bench";
     }
 }

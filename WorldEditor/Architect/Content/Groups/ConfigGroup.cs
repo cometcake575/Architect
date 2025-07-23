@@ -22,6 +22,8 @@ public class ConfigGroup
     
     public static ConfigGroup Generic;
     
+    public static ConfigGroup Charm;
+    
     public static ConfigGroup Animated;
 
     public static ConfigGroup GeoChest;
@@ -169,6 +171,44 @@ public class ConfigGroup
             {
                 foreach (var renderer in o.GetComponentsInChildren<Renderer>()) renderer.enabled = value.GetValue();
             }), "visible")
+        );
+        
+        Charm = new ConfigGroup(Invisible,
+            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Charm ID", (o, value) =>
+            {
+                var val = value.GetValue();
+                var control = o.LocateMyFSM("Shiny Control");
+                control.FsmVariables.FindFsmString("PD Bool Name").Value = "gotCharm_" + val;
+                control.FsmVariables.FindFsmInt("Charm ID").Value = val;
+
+                control.InsertCustomAction("Get Charm", () =>
+                {
+                    switch (val)
+                    {
+                        case 36:
+                            PlayerData.instance.royalCharmState = Mathf.Min(PlayerData.instance.royalCharmState, 4);
+                            break;
+                        case 40:
+                            PlayerData.instance.grimmChildLevel = PlayerData.instance.gotCharm_40 ? Mathf.Min(PlayerData.instance.grimmChildLevel, 5) : 0;
+                            break;
+                        case 23:
+                            PlayerData.instance.fragileHealth_unbreakable = PlayerData.instance.gotCharm_23;
+                            break;
+                        case 24:
+                            PlayerData.instance.fragileGreed_unbreakable = PlayerData.instance.gotCharm_24;
+                            break;
+                        case 25:
+                            PlayerData.instance.fragileStrength_unbreakable = PlayerData.instance.gotCharm_25;
+                            break;
+                    }
+                }, 0);
+            }), "charm_type"),
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Disable If Collected", (o, value) =>
+            {
+                if (value.GetValue()) return;
+                var control = o.LocateMyFSM("Shiny Control");
+                control.DisableAction("PD Bool?", 1);
+            }).WithDefaultValue(false), "disable_if_collected")
         );
 
         Gravity = new ConfigGroup(Generic,
@@ -421,7 +461,7 @@ public class ConfigGroup
             }), "mo_rotation_time")
         );
 
-        Levers = new ConfigGroup(MovingObjects,
+        Levers = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(MakePersistenceConfigType("Stay Activated"), "levers_stay_active")
         );
 
@@ -643,63 +683,70 @@ public class ConfigGroup
                 {
                     if (!value.GetValue()) return;
                     o.GetOrAddComponent<RoomClearerConfig>().removeTransitions = true;
-                }).PreAwake(), "clearer_remove_transitions"
+                }).WithDefaultValue(false).PreAwake(), "clearer_remove_transitions"
             ),
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Remove Benches", (o, value) =>
                 {
                     if (value.GetValue()) return;
                     o.GetOrAddComponent<RoomClearerConfig>().removeBenches = false;
-                }).PreAwake(), "clearer_remove_benches"
+                }).WithDefaultValue(true).PreAwake(), "clearer_remove_benches"
             ),
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Remove Props", (o, value) =>
                 {
                     if (value.GetValue()) return;
                     o.GetOrAddComponent<RoomClearerConfig>().removeProps = false;
-                }).PreAwake(), "clearer_remove_props"
+                }).WithDefaultValue(true).PreAwake(), "clearer_remove_props"
             ),
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Remove Scenery", (o, value) =>
                 {
                     if (value.GetValue()) return;
                     o.GetOrAddComponent<RoomClearerConfig>().removeScenery = false;
-                }).PreAwake(), "clearer_remove_scenery"
+                }).WithDefaultValue(true).PreAwake(), "clearer_remove_scenery"
             ),
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Remove Blur", (o, value) =>
                 {
                     if (value.GetValue()) return;
                     o.GetOrAddComponent<RoomClearerConfig>().removeBlur = false;
-                }).PreAwake(), "clearer_remove_blur"
+                }).WithDefaultValue(true).PreAwake(), "clearer_remove_blur"
             ),
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Remove Tilemap", (o, value) =>
                 {
                     if (value.GetValue()) return;
                     o.GetOrAddComponent<RoomClearerConfig>().removeTilemap = false;
-                }).PreAwake(), "clearer_remove_tilemap"
+                }).WithDefaultValue(true).PreAwake(), "clearer_remove_tilemap"
             ),
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Remove NPCs", (o, value) =>
                 {
                     if (value.GetValue()) return;
                     o.GetOrAddComponent<RoomClearerConfig>().removeNpcs = false;
-                }).PreAwake(), "clearer_remove_npcs"
+                }).WithDefaultValue(true).PreAwake(), "clearer_remove_npcs"
             ),
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Remove Camera Lock", (o, value) =>
                 {
                     if (value.GetValue()) return;
                     o.GetOrAddComponent<RoomClearerConfig>().removeCameraLocks = false;
-                }).PreAwake(), "clearer_remove_cameralock"
+                }).WithDefaultValue(true).PreAwake(), "clearer_remove_cameralock"
             ),
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Remove Music", (o, value) =>
                 {
                     if (value.GetValue()) return;
                     o.GetOrAddComponent<RoomClearerConfig>().removeMusic = false;
-                }).PreAwake(), "clearer_remove_music"
+                }).WithDefaultValue(true).PreAwake(), "clearer_remove_music"
+            ),
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Remove Other", (o, value) =>
+                {
+                    if (value.GetValue()) return;
+                    o.GetOrAddComponent<RoomClearerConfig>().removeOther = false;
+                }).WithDefaultValue(true).PreAwake(), "clearer_remove_other"
             )
         );
 
