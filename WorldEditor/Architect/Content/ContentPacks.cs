@@ -358,7 +358,7 @@ public static class ContentPacks
             CreateSolid("Ruins1_03", "_Scenery/ruin_plat_float_01_wide", "City Platform 2"),
             CreateSolid("Ruins1_03", "_Scenery/ruin_plat_float_02", "City Platform 3"),
             CreateSolid("Ruins1_03", "_Scenery/ruin_plat_float_05", "City Platform 4"),
-            CreateCustomPlatform("wide_platfrom", "Wide Platform", new Vector2(11.30954f, 0.8839264f), new Vector2(0.007995605f, 0.1063919f), 100),
+            CreateCustomPlatform("wide_platform", "Wide Platform", new Vector2(11.30954f, 0.8839264f), new Vector2(0.007995605f, 0.1063919f), 100),
             Create("Ruins1_25", "Ruins Vial Empty", "Soul Vial", "Interactable", weight:SoulSourceWeight)
                 .WithConfigGroup(ConfigGroup.Breakable),
             Create("Ruins1_24", "Soul Totem 1", "Thin Soul Totem", "Interactable", weight:SoulSourceWeight)
