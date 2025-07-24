@@ -23,8 +23,8 @@ internal class CursorObject : SelectableObject
     public override void OnClickInWorld(Vector3 pos, bool first)
     {
         if (!first) return;
-        
-        var pl = PlacementManager.GetCurrentPlacements().FirstOrDefault(placement => placement.Touching(pos));
+
+        var pl = PlacementManager.FindClickedObject(pos);
         if (pl == null) return;
 
         Task.Run(() => EditorUIManager.DisplayExtraInfo("Placement ID: " + pl.GetId()));

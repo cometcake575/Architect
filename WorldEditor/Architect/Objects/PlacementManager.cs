@@ -4,6 +4,7 @@ using Architect.Attributes;
 using Architect.Configuration;
 using Architect.Content.Elements.Custom;
 using Architect.Util;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Architect.Objects;
@@ -59,5 +60,11 @@ public static class PlacementManager
             EventManager.ClearEventReceivers();
             orig(self);
         };
+    }
+
+    [CanBeNull]
+    public static ObjectPlacement FindClickedObject(Vector3 mousePos)
+    {
+        return GetCurrentPlacements().FirstOrDefault(placement => placement.Touching(mousePos));        
     }
 }

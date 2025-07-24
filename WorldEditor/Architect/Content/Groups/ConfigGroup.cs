@@ -137,6 +137,10 @@ public class ConfigGroup
         {
             o.GetComponent<SpriteRenderer>().sortingOrder = value.GetValue();
         }), "layer");
+        var zOffset = Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Z Offset", (o, value) =>
+        {
+            o.transform.SetPositionZ(o.transform.GetPositionZ() + value.GetValue());
+        }), "decoration_z_offset");
         Colours = new ConfigGroup(Invisible,
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("r", (o, value) =>
             {
@@ -166,7 +170,8 @@ public class ConfigGroup
                 color.a = value.GetValue();
                 sr.color = color;
             }), "a"),
-            layerType
+            layerType,
+            zOffset
         );
         
         Generic = new ConfigGroup(Invisible,
@@ -174,6 +179,9 @@ public class ConfigGroup
             {
                 foreach (var renderer in o.GetComponentsInChildren<Renderer>()) renderer.enabled = value.GetValue();
             }), "visible")
+        );
+        Decorations = new ConfigGroup(Generic,
+            zOffset
         );
         
         Charm = new ConfigGroup(Invisible,
@@ -508,11 +516,18 @@ public class ConfigGroup
             }), "toll_text")
         );
 
+        var disableCollision = Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Disable Collision",
+            (o, value) =>
+            {
+                if (!value.GetValue()) return;
+                o.RemoveComponent<Collider2D>();
+            }), "disable_collision");
         Thorns = new ConfigGroup(Colours,
             Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Damage Amount", (o, value) =>
             {
                 o.GetOrAddComponent<CustomDamager>().damageAmount = value.GetValue();
-            }), "thorns_damage")
+            }), "thorns_damage"),
+            disableCollision
         );
 
         MovingPlatforms = new ConfigGroup(MovingObjects,
@@ -521,7 +536,9 @@ public class ConfigGroup
                 if (value.GetValue()) return;
                 o.GetOrAddComponent<MovingObject>().stickPlayer = false;
             }).PreAwake(), "mp_stick_player"),
-            layerType
+            layerType,
+            zOffset,
+            disableCollision
         );
         
         ModHooks.LanguageGetHook += (key, _, orig) => CustomTexts.TryGetValue(key, out var customText) ? customText : orig;
@@ -846,13 +863,6 @@ public class ConfigGroup
             {
                 o.GetComponent<KeyListener>().listenMode = value.GetValue();
             }, "Press", "Release", "Hold"), "keylistener_type")
-        );
-
-        Decorations = new ConfigGroup(Generic,
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Z Offset", (o, value) =>
-            {
-                o.transform.SetPositionZ(o.transform.GetPositionZ() + value.GetValue());
-            }), "decoration_z_offset")
         );
 
         Stretchable = new ConfigGroup(Invisible,

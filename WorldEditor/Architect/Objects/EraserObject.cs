@@ -21,7 +21,7 @@ internal class EraserObject : SelectableObject
 
     public override void OnClickInWorld(Vector3 pos, bool first)
     {
-        var pl = PlacementManager.GetCurrentPlacements().FirstOrDefault(placement => placement.Touching(pos));
+        var pl = PlacementManager.FindClickedObject(pos);
         if (pl == null) return;
         pl.Destroy();
         

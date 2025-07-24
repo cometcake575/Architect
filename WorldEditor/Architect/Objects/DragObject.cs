@@ -22,7 +22,7 @@ internal class DragObject : SelectableObject
     {
         if (!first) return;
         
-        var pl = PlacementManager.GetCurrentPlacements().FirstOrDefault(placement => placement.Touching(pos));
+        var pl = PlacementManager.FindClickedObject(pos);
         if (pl == null) return;
         EditorManager.SetDraggedItem(pl);
     }

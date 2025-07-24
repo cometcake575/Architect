@@ -102,6 +102,13 @@ public class ObjectPlacement
             else if (config.GetTypeId() == "b" && config is FloatConfigValue blue) b = blue.GetValue();
             else if (config.GetTypeId() == "a" && config is FloatConfigValue alpha) a *= Mathf.Max(0.15f, alpha.GetValue());
             else if (config.GetTypeId() == "layer" && config is IntConfigValue layer) renderer.sortingOrder = layer.GetValue(); 
+            
+            else if (config.GetTypeId() == "decoration_z_offset" && config is FloatConfigValue zOffset)
+            {
+                var pos = _previewObject.transform.position;
+                pos.z += zOffset.GetValue();
+                _previewObject.transform.position = pos;
+            }
         }
 
         renderer.color = new Color(r, g, b, a);

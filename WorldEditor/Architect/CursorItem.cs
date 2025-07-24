@@ -71,6 +71,9 @@ public static class CursorItem
         UpdateMovingComponent();
         
         _offset = ResourceUtils.FixOffset(selected.Offset, EditorManager.IsFlipped, EditorManager.Rotation, EditorManager.Scale);
+        if (EditorUIManager.ConfigValues.TryGetValue("Z Offset", out cfgVal) && cfgVal is FloatConfigValue zOffset)
+            _offset.z += zOffset.GetValue();
+        
         GhostPlacementUtils.SetupForPlacement(_display, renderer, selected, EditorManager.IsFlipped, EditorManager.Rotation, scaleX, scaleY);
     }
 
