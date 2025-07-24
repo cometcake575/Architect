@@ -225,15 +225,15 @@ public static class EditorUIManager
             HorizontalAlignment = HorizontalAlignment.Left,
             RowDefinitions =
             {
-                new GridDimension(1, GridUnit.Proportional),
-                new GridDimension(1, GridUnit.Proportional),
-                new GridDimension(0.2f, GridUnit.Proportional)
+                new GridDimension(120, GridUnit.AbsoluteMin),
+                new GridDimension(320, GridUnit.AbsoluteMin),
+                new GridDimension(24, GridUnit.AbsoluteMin)
             },
             ColumnDefinitions =
             {
-                new GridDimension(1, GridUnit.Proportional),
-                new GridDimension(1, GridUnit.Proportional),
-                new GridDimension(1, GridUnit.Proportional)
+                new GridDimension(160, GridUnit.AbsoluteMin),
+                new GridDimension(160, GridUnit.AbsoluteMin),
+                new GridDimension(160, GridUnit.AbsoluteMin)
             }
         };
 
@@ -324,7 +324,7 @@ public static class EditorUIManager
             Content = "Config",
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Bottom,
-            MinWidth = 120
+            MinWidth = 160
         }.WithProp(GridLayout.Row, 2);
         configButton.Click += _ =>
         {
@@ -337,8 +337,8 @@ public static class EditorUIManager
             Content = "Events",
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Bottom,
-            MinWidth = 120,
-            Padding = new Padding(10, 0)
+            MinWidth = 160,
+            Padding = new Padding(20, 0)
         }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 2);
         broadcasterButton.Click += _ =>
         {
@@ -351,8 +351,7 @@ public static class EditorUIManager
             Content = "Listeners",
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Bottom,
-            MinWidth = 120,
-            Padding = new Padding(10, 0)
+            MinWidth = 160
         }.WithProp(GridLayout.Column, 2).WithProp(GridLayout.Row, 2);
         receiverButton.Click += _ =>
         {
@@ -661,18 +660,19 @@ public static class EditorUIManager
         {
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
+            Padding = new Padding(0, 10),
             ColumnDefinitions =
             {
-                new GridDimension(2, GridUnit.Proportional),
-                new GridDimension(2, GridUnit.Proportional),
-                new GridDimension(2, GridUnit.Proportional)
+                new GridDimension(160, GridUnit.AbsoluteMin),
+                new GridDimension(160, GridUnit.AbsoluteMin),
+                new GridDimension(160, GridUnit.AbsoluteMin)
             }
         }.WithProp(GridLayout.Row, 1).WithProp(GridLayout.ColumnSpan, 3);
 
         var i = 0;
         foreach (var type in placeable.PackElement.GetConfigGroup().Types)
         {
-            _configGrid.RowDefinitions.Add(new GridDimension(4, GridUnit.Proportional));
+            _configGrid.RowDefinitions.Add(new GridDimension(10, GridUnit.AbsoluteMin));
             _configGrid.Children.Add(
                 new TextObject(layout, type.Name + " Description")
                 {
@@ -710,7 +710,7 @@ public static class EditorUIManager
 
             input.GetElement().VerticalAlignment = VerticalAlignment.Center;
             input.GetElement().HorizontalAlignment = HorizontalAlignment.Center;
-            input.GetElement().Padding = new Padding(0, 2);
+            input.GetElement().Padding = new Padding(10, 2);
             input.GetElement().WithProp(GridLayout.Row, i).WithProp(GridLayout.Column, 1);
 
             _configGrid.Children.Add(input.GetElement());
@@ -739,6 +739,8 @@ public static class EditorUIManager
     {
         _receiversGrid?.Destroy();
         _receiversGrid = null;
+        
+        ReceiversInUI.Clear();
 
         if (SelectedItem is not PlaceableObject placeable) return;
 
@@ -793,14 +795,14 @@ public static class EditorUIManager
             VerticalAlignment = VerticalAlignment.Top,
             HorizontalAlignment = HorizontalAlignment.Center,
             ContentType = InputField.ContentType.Alphanumeric,
-            MinWidth = 80
+            MinWidth = 100
         }.WithProp(GridLayout.Row, 1);
         
         var eventTypeInput = new TextInput(layout, "Trigger Type")
         {
             VerticalAlignment = VerticalAlignment.Top,
             HorizontalAlignment = HorizontalAlignment.Center,
-            MinWidth = 80
+            MinWidth = 100
         }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 1);
         
         var times = new TextInput(layout, "Times")
@@ -853,11 +855,13 @@ public static class EditorUIManager
         _leftSideGrid.Children.Add(_receiversGrid);
     }
 
+    private static readonly List<(ArrangableElement, ArrangableElement)> ReceiversInUI = [];
+
     private static void AddReceiver(EventReceiver receiver)
     {
         var info = new TextObject(_layout)
         {
-            Text = "On: " + receiver.Name + " | Trigger: " + receiver.TypeName,
+            Text = "On: " + receiver.Name + " | Trigger: " + receiver.TypeName + " | Times: " + receiver.RequiredCalls,
             VerticalAlignment = VerticalAlignment.Bottom,
             HorizontalAlignment = HorizontalAlignment.Center
         }.WithProp(GridLayout.ColumnSpan, 2).WithProp(GridLayout.Row, _receiversGrid.RowDefinitions.Count);
@@ -871,14 +875,28 @@ public static class EditorUIManager
             Enabled = true
         }.WithProp(GridLayout.Column, 3).WithProp(GridLayout.Row, _receiversGrid.RowDefinitions.Count);
 
-        var def = new GridDimension(1, GridUnit.Proportional);
+        var pair = (info, remove);
+        ReceiversInUI.Add(pair);
+
+        var def = new GridDimension(30, GridUnit.AbsoluteMin);
         _receiversGrid.RowDefinitions.Add(def);
-            
+        
         remove.Click += _ =>
         {
             Receivers.Remove(receiver);
+            var listSize = ReceiversInUI.IndexOf(pair);
+            ReceiversInUI.Remove(pair);
             info.Destroy();
             remove.Destroy();
+
+            for (var i = listSize; i < ReceiversInUI.Count; i++)
+            {
+                var aPair = ReceiversInUI[i];
+                aPair.Item1.WithProp(GridLayout.Row, i + 2);
+                aPair.Item2.WithProp(GridLayout.Row, i + 2);
+            }
+
+            _receiversGrid.RowDefinitions.Remove(def);
         };
 
         _receiversGrid.Children.Add(info);
@@ -985,6 +1003,8 @@ public static class EditorUIManager
         _leftSideGrid.Children.Add(_broadcastersGrid);
     }
 
+    private static readonly List<(ArrangableElement, ArrangableElement)> BroadcastersInUI = [];
+
     private static void AddBroadcaster(EventBroadcaster broadcaster)
     {
         var info = new TextObject(_layout)
@@ -1003,14 +1023,28 @@ public static class EditorUIManager
             Enabled = true
         }.WithProp(GridLayout.Column, 3).WithProp(GridLayout.Row, _broadcastersGrid.RowDefinitions.Count);
 
-        var def = new GridDimension(1, GridUnit.Proportional);
+        var pair = (info, remove);
+        BroadcastersInUI.Add(pair);
+        
+        var def = new GridDimension(30, GridUnit.AbsoluteMin);
         _broadcastersGrid.RowDefinitions.Add(def);
             
         remove.Click += _ =>
         {
             Broadcasters.Remove(broadcaster);
+            var listSize = BroadcastersInUI.IndexOf(pair);
+            BroadcastersInUI.Remove(pair);
             info.Destroy();
             remove.Destroy();
+
+            for (var i = listSize; i < BroadcastersInUI.Count; i++)
+            {
+                var aPair = BroadcastersInUI[i];
+                aPair.Item1.WithProp(GridLayout.Row, i + 2);
+                aPair.Item2.WithProp(GridLayout.Row, i + 2);
+            }
+
+            _broadcastersGrid.RowDefinitions.Remove(def);
         };
 
         _broadcastersGrid.Children.Add(info);
