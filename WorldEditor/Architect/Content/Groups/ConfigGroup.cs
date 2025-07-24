@@ -74,6 +74,8 @@ public class ConfigGroup
     
     public static ConfigGroup Binoculars;
     
+    public static ConfigGroup CameraBorder;
+    
     public static ConfigGroup ZoteHead;
     
     public static ConfigGroup Relays;
@@ -560,6 +562,13 @@ public class ConfigGroup
             {
                 o.GetComponent<Binoculars>().speed = value.GetValue() * 10;
             }), "freecam_speed")
+        );
+
+        CameraBorder = new ConfigGroup(Invisible,
+            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Border Type", (o, value) =>
+            {
+                o.GetComponent<CameraBorder>().type = value.GetValue();
+            }, "Left", "Right", "Top", "Bottom"), "camera_border_type")
         );
 
         List<Sprite> headSprites =

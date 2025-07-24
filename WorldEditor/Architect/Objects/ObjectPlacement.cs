@@ -118,7 +118,7 @@ public class ObjectPlacement
         GhostPlacementUtils.SetupForPlacement(_previewObject, renderer, selected, Flipped, Rotation, scaleX, scaleY);
     }
 
-    internal GameObject SpawnObject()
+    public GameObject SpawnObject()
     {
         var packElement = GetPlaceableObject().PackElement;
         var prefab = packElement.GetPrefab(Flipped, Rotation);

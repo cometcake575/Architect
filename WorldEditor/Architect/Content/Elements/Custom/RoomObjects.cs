@@ -29,6 +29,7 @@ public static class RoomObjects
                     ResourceUtils.Load("darkness")),
             new SimplePackElement(CreateBinoculars(), "Binoculars", "Room Edits")
                 .WithConfigGroup(ConfigGroup.Binoculars),
+            CreateCameraBorder(),
             CreateObjectRemover("room_remover", "Clear Room", o =>
             {
                 var clearer = o.GetOrAddComponent<RoomClearerConfig>();
@@ -119,6 +120,23 @@ public static class RoomObjects
     }
 
     private static readonly Dictionary<string, Func<GameObject, Disabler[]>> EditActions = new();
+
+    private static AbstractPackElement CreateCameraBorder()
+    {
+        CameraBorder.Init();
+        
+        var obj = new GameObject("Camera Border");
+        obj.AddComponent<CameraBorder>();
+        
+        var sprite = ResourceUtils.Load("camera");
+        obj.layer = 10;
+        obj.transform.position += new Vector3(0, 0, 0.1f);
+        
+        Object.DontDestroyOnLoad(obj);
+        obj.SetActive(false);
+        return new PreviewablePackElement(obj, "Camera Border", "Room Edits", sprite)
+            .WithConfigGroup(ConfigGroup.CameraBorder);
+    }
 
     private static SimplePackElement CreateObjectRemover(string id, string name, [CanBeNull] Func<GameObject, Disabler[]> action)
     {

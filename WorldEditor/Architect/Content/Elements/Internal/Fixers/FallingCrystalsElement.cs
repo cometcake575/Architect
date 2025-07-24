@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Architect.Content.Groups;
 using Architect.Util;
