@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,7 +7,7 @@ namespace Architect.Content.Elements.Custom.Behaviour;
 public class CameraBorder : MonoBehaviour
 {
     private static readonly List<CameraBorder> Borders = [];
-    
+
     internal static void Init()
     {
         On.CameraController.LateUpdate += (orig, self) =>

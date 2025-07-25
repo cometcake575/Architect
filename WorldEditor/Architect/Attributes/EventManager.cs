@@ -73,13 +73,8 @@ public static class EventManager
 
     public static EventReceiver DeserializeReceiver(Dictionary<string, string> data)
     {
-        return new EventReceiver(data["type"].ToLower(), data["name"],
+        return new EventReceiver(data["type"], data["name"],
             data.TryGetValue("times", out var value) ? Convert.ToInt32(value) : 1);
-    }
-
-    public static EventReceiver CreateReceiver(string type, string name, int times)
-    {
-        return new EventReceiver(type, name, times);
     }
 
     public static EventBroadcaster DeserializeBroadcaster(Dictionary<string, string> data)

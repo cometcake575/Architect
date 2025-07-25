@@ -72,13 +72,17 @@ public static class RoomObjects
                 return objects.Select(obj => obj.GetOrAddComponent<Disabler>()).ToArray();
             }).WithConfigGroup(ConfigGroup.RoomClearer),
             CreateObjectRemover("hrp_remover", "Remove Hazard Respawn Point", FindObjectsToDisable<HazardRespawnTrigger>)
-                .WithConfigGroup(ConfigGroup.Invisible),
+                .WithConfigGroup(ConfigGroup.Invisible)
+                .WithReceiverGroup(ReceiverGroup.Invisible),
             CreateObjectRemover("door_remover", "Remove Transition", FindObjectsToDisable<TransitionPoint>)
-                .WithConfigGroup(ConfigGroup.Invisible),
+                .WithConfigGroup(ConfigGroup.Invisible)
+                .WithReceiverGroup(ReceiverGroup.Invisible),
             CreateObjectRemover("enemy_remover", "Remove Enemy", FindObjectsToDisable<HealthManager>)
-                .WithConfigGroup(ConfigGroup.Invisible),
+                .WithConfigGroup(ConfigGroup.Invisible)
+                .WithReceiverGroup(ReceiverGroup.Invisible),
             CreateObjectRemover("collision_remover", "Remove Solid", FindObjectsToDisable<Collider2D>)
-                .WithConfigGroup(ConfigGroup.Invisible),
+                .WithConfigGroup(ConfigGroup.Invisible)
+                .WithReceiverGroup(ReceiverGroup.Invisible),
             CreateObjectRemover("object_remover", "Remove Object", o =>
             {
                 var config = o.GetComponent<ObjectRemoverConfig>();
@@ -91,7 +95,9 @@ public static class RoomObjects
                 }
 
                 return point is not null ? [point.GetOrAddComponent<Disabler>()] : [];
-            }).WithConfigGroup(ConfigGroup.ObjectRemover)
+            })
+                .WithConfigGroup(ConfigGroup.ObjectRemover)
+                .WithReceiverGroup(ReceiverGroup.Invisible)
         };
         ContentPacks.RegisterPack(edits);
     }

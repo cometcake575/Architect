@@ -2,16 +2,10 @@ using System.Collections.Generic;
 
 namespace Architect.Attributes.Broadcasters;
 
-public class EventBroadcaster
+public class EventBroadcaster(string type, string name)
 {
-    public readonly string EventBroadcasterType;
-    public readonly string EventName;
-
-    public EventBroadcaster(string type, string name)
-    {
-        EventBroadcasterType = type;
-        EventName = name;
-    }
+    public readonly string EventBroadcasterType = type;
+    public readonly string EventName = name.ToLower();
 
     public Dictionary<string, string> Serialize()
     {

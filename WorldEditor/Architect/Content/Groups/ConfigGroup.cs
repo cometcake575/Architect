@@ -182,6 +182,7 @@ public class ConfigGroup
                 foreach (var renderer in o.GetComponentsInChildren<Renderer>()) renderer.enabled = value.GetValue();
             }), "visible")
         );
+        
         Decorations = new ConfigGroup(Generic,
             zOffset
         );
@@ -290,7 +291,7 @@ public class ConfigGroup
         );
         
         var enemyTypeField = typeof(HealthManager).GetField("enemyType", BindingFlags.NonPublic | BindingFlags.Instance);
-        Enemies = new ConfigGroup(Gravity,
+        Enemies = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Give Soul", (o, value) =>
             {
                 enemyTypeField?.SetValue(o.GetComponent<HealthManager>(), value.GetValue() ? 1 : 6);

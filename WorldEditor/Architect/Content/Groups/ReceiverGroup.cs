@@ -13,7 +13,9 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
 {
     private static bool _initialized;
     
-    internal static ReceiverGroup All;
+    internal static ReceiverGroup Invisible;
+    
+    internal static ReceiverGroup Generic;
     
     internal static ReceiverGroup Gates;
     
@@ -46,29 +48,40 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
         if (_initialized) return;
         _initialized = true;
 
-        All = new ReceiverGroup(null, 
+        Invisible = new ReceiverGroup(Invisible, 
             EventManager.RegisterEventReceiverType("disable", o => o.SetActive(false)),
             EventManager.RegisterEventReceiverType("enable", o => o.SetActive(true))
         );
 
-        ObjectMover = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("move", o =>
+        Generic = new ReceiverGroup(Invisible, 
+            EventManager.RegisterEventReceiverType("hide", o =>
+            {
+                foreach (var renderer in o.GetComponentsInChildren<Renderer>()) renderer.enabled = false;
+            }),
+            EventManager.RegisterEventReceiverType("show", o =>
+            {
+                foreach (var renderer in o.GetComponentsInChildren<Renderer>()) renderer.enabled = true;
+            })
+        );
+
+        ObjectMover = new ReceiverGroup(Invisible, EventManager.RegisterEventReceiverType("move", o =>
         {
             o.GetComponent<ObjectMover>().DoMove();
         }));
 
-        ObjectDuplicator = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("duplicate", o =>
+        ObjectDuplicator = new ReceiverGroup(Invisible, EventManager.RegisterEventReceiverType("duplicate", o =>
         {
             o.GetComponent<ObjectDuplicator>().Duplicate();
         }));
 
-        JellyEgg = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("respawn_egg", o =>
+        JellyEgg = new ReceiverGroup(Generic, EventManager.RegisterEventReceiverType("respawn_egg", o =>
         {
             var egg = o.GetComponent<JellyEgg>();
             egg.meshRenderer.enabled = true;
             egg.circleCollider.enabled = true;
         }));
         
-        Gates = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("open", o =>
+        Gates = new ReceiverGroup(Generic, EventManager.RegisterEventReceiverType("open", o =>
         {
             foreach (var fsm in o.GetComponents<PlayMakerFSM>())
             {
@@ -87,23 +100,23 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
             else o.LocateMyFSM("FSM").SendEvent("UP"); 
         }));
 
-        Enemies = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("die", o =>
+        Enemies = new ReceiverGroup(Generic, EventManager.RegisterEventReceiverType("die", o =>
         {
             if (!o.activeInHierarchy) return;
             o.GetComponent<HealthManager>().Die(null, AttackTypes.Generic, true);
         }));
         
-        TeleportPoint = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("teleport", o =>
+        TeleportPoint = new ReceiverGroup(Invisible, EventManager.RegisterEventReceiverType("teleport", o =>
         {
             HeroController.instance.transform.position = o.transform.position;
         }));
         
-        HazardRespawnPoint = new ReceiverGroup(All, EventManager.RegisterEventReceiverType("setspawn", o =>
+        HazardRespawnPoint = new ReceiverGroup(Invisible, EventManager.RegisterEventReceiverType("setspawn", o =>
         {
             PlayerData.instance.SetHazardRespawn(o.GetComponent<HazardRespawnMarker>());
         }));
 
-        Stompers = new ReceiverGroup(All,
+        Stompers = new ReceiverGroup(Invisible,
             EventManager.RegisterEventReceiverType("start", o =>
             {
                 ReflectionHelper.SetFieldSafe(o.GetComponentInChildren<StopAnimatorsAtPoint>(), "shouldStop", false);
@@ -130,7 +143,7 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
             })
         );
 
-        Relays = new ReceiverGroup(Enemies,
+        Relays = new ReceiverGroup(Invisible,
             EventManager.RegisterEventReceiverType("call", o =>
             {
                 if (!o.activeInHierarchy) return;
@@ -149,7 +162,7 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
             })
         );
 
-        PlayerHook = new ReceiverGroup(All,
+        PlayerHook = new ReceiverGroup(Invisible,
             EventManager.RegisterEventReceiverType("kill_player", o =>
             {
                 HeroController.instance.TakeDamage(o, CollisionSide.other, 999, 2);
@@ -172,7 +185,7 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
             })
         );
 
-        TextDisplay = new ReceiverGroup(All,
+        TextDisplay = new ReceiverGroup(Invisible,
             EventManager.RegisterEventReceiverType("display", o =>
             {
                 o.GetComponent<TextDisplay>().Display();

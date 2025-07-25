@@ -39,15 +39,18 @@ public static class CustomObjects
             new SimplePackElement(CreateTriggerZone(), "Trigger Zone", "Custom",
                     ResourceUtils.Load("trigger_zone", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.TriggerZones)
-                .WithConfigGroup(ConfigGroup.TriggerZones),
+                .WithConfigGroup(ConfigGroup.TriggerZones)
+                .WithReceiverGroup(ReceiverGroup.Invisible),
             new SimplePackElement(CreateTimer(), "Timer", "Custom",
                     ResourceUtils.Load("timer", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.Callable)
-                .WithConfigGroup(ConfigGroup.Timers),
+                .WithConfigGroup(ConfigGroup.Timers)
+                .WithReceiverGroup(ReceiverGroup.Invisible),
             new SimplePackElement(CreateKeyListener(), "Key Listener", "Custom",
                     ResourceUtils.Load("key_listener", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.KeyListeners)
-                .WithConfigGroup(ConfigGroup.KeyListeners),
+                .WithConfigGroup(ConfigGroup.KeyListeners)
+                .WithReceiverGroup(ReceiverGroup.Invisible),
             new SimplePackElement(CreateRelay(), "Relay", "Custom",
                     ResourceUtils.Load("event_relay", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.Callable)
@@ -64,7 +67,8 @@ public static class CustomObjects
                 .WithConfigGroup(ConfigGroup.Invisible),
             new SimplePackElement(CreateEnemyBarrier(), "Enemy Barrier", "Custom",
                     ResourceUtils.Load("enemy_barrier"))
-                .WithConfigGroup(ConfigGroup.Stretchable),
+                .WithConfigGroup(ConfigGroup.Stretchable)
+                .WithReceiverGroup(ReceiverGroup.Invisible),
             new SimplePackElement(CreateObjectMover(), "Object Mover", "Custom",
                     ResourceUtils.Load("object_mover"))
                 .WithReceiverGroup(ReceiverGroup.ObjectMover)

@@ -2,8 +2,12 @@ using System.Collections.Generic;
 
 namespace Architect.Attributes.Receivers;
 
-public record EventReceiver(string TypeName, string Name, int RequiredCalls)
+public class EventReceiver(string typeName, string name, int requiredCalls)
 {
+    public readonly string TypeName = typeName.ToLower();
+    public readonly string Name = name.ToLower();
+    public readonly int RequiredCalls = requiredCalls;
+    
     public Dictionary<string, string> Serialize()
     {
         Dictionary<string, string> data = new()
