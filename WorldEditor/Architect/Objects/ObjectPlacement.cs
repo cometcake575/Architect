@@ -33,12 +33,12 @@ public class ObjectPlacement
         SetPreviewColor(DefaultColor);
     }
     
-    public bool StartDragging()
+    public bool StartDragging(bool canInvert)
     {
-        if (_dragging) return false;
-        _dragging = true;
-        SetPreviewColor(DraggedColor);
-        return true;
+        if (_dragging && !canInvert) return false;
+        _dragging = !_dragging;
+        SetPreviewColor(_dragging ? DraggedColor : DefaultColor);
+        return _dragging;
     }
     
     public bool Touching(Vector2 pos)
@@ -61,13 +61,6 @@ public class ObjectPlacement
     {
         var withinX = (_pos.x > pos1.x && _pos.x < pos2.x) || (_pos.x < pos1.x && _pos.x > pos2.x);
         var withinY = (_pos.y > pos1.y && _pos.y < pos2.y) || (_pos.y < pos1.y && _pos.y > pos2.y);
-        
-        Architect.Instance.Log(pos1);
-        Architect.Instance.Log(pos2);
-        Architect.Instance.Log(_pos);
-        Architect.Instance.Log(withinX);
-        Architect.Instance.Log(withinY);
-
         return withinX && withinY;
     }
 

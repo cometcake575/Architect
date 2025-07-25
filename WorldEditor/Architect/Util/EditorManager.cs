@@ -308,11 +308,11 @@ public static class EditorManager
 
     public static void AddDraggedItem(ObjectPlacement placement, Vector3 clickPos, bool startDragging)
     {
-        if (placement.StartDragging())
+        if (placement.StartDragging(!startDragging))
         {
             placement.StoreOldPos();
             Dragged.Add(new DraggedObject(placement, placement.GetPos() - clickPos));
-        }
+        } else if (!startDragging) Dragged.RemoveAll(obj => obj.Placement == placement);
         
         if (startDragging) BeginDragging(clickPos);
     }

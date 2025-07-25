@@ -101,7 +101,6 @@ public class MoveObjects(List<(string, Vector3)> data) : IUndoable
     public IUndoable Undo()
     {
         List<(string, Vector3)> reversed = [];
-        Architect.Instance.Log(data.Count());
         foreach (var pair in data)
         {
             var obj = PlacementManager.GetCurrentPlacements().FirstOrDefault(pl => pl.GetId() == pair.Item1);
