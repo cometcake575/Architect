@@ -3,6 +3,7 @@ using System.Linq;
 using Architect.MultiplayerHook;
 using Architect.Objects;
 using Modding;
+using Mono.Collections.Generic;
 using UnityEngine;
 
 namespace Architect.Util;
@@ -95,21 +96,27 @@ public class EraseObject(ObjectPlacement placement) : IUndoable
     }
 }
 
-public class MoveObject(string placementId, Vector3 oldPos) : IUndoable
+public class MoveObjects(List<(string, Vector3)> data) : IUndoable
 {
     public IUndoable Undo()
     {
-        var obj = PlacementManager.GetCurrentPlacements().FirstOrDefault(pl => pl.GetId() == placementId);
-        if (obj == null) return null;
-        
-        var newPos = obj.GetPos();
-        obj.Move(oldPos);
-        
-        if (Architect.UsingMultiplayer && Architect.GlobalSettings.CollaborationMode)
+        List<(string, Vector3)> reversed = [];
+        Architect.Instance.Log(data.Count());
+        foreach (var pair in data)
         {
-            HkmpHook.Update(placementId, GameManager.instance.sceneName, oldPos);
+            var obj = PlacementManager.GetCurrentPlacements().FirstOrDefault(pl => pl.GetId() == pair.Item1);
+            if (obj == null) return null;
+
+            reversed.Add((pair.Item1, obj.GetPos()));
+            
+            obj.Move(pair.Item2);
+            obj.StoreOldPos();
+
+            if (Architect.UsingMultiplayer && Architect.GlobalSettings.CollaborationMode)
+            {
+                HkmpHook.Update(pair.Item1, GameManager.instance.sceneName, pair.Item2);
+            }
         }
-        
-        return new MoveObject(placementId, newPos);
+        return new MoveObjects(reversed);
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Architect.Category;
@@ -10,6 +11,7 @@ using Architect.UI;
 using MagicUI.Core;
 using Modding;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Architect.Util;
 
@@ -63,6 +65,8 @@ public static class EditorManager
             Cursor.visible = GameManager.instance.isPaused ||
                              (IsEditing && EditorUIManager.SelectedItem is not PlaceableObject);
         };
+
+        SetupGroupSelectionBox();
     }
 
     private static void LoadStoredPosition(On.GameManager.orig_EnterHero orig, GameManager self, bool search)
@@ -89,15 +93,16 @@ public static class EditorManager
 
         if (!Architect.GlobalSettings.CanEnableEditing) return;
 
-        if (_dragged != null)
+        RefreshGroupSelectionBox();
+        if (Dragged.Count > 0)
         {
-            if (paused || Input.GetMouseButtonUp(0))
+            if ((paused || !Input.GetMouseButton(0)) && _dragging) ReleaseDraggedItems();
+            else if (Input.GetMouseButton(0) &&
+                     (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0))
             {
-                ReleaseDraggedItem();
-            }
-            else
-            {
-                _dragged.Move(GetWorldPos(Input.mousePosition));
+                var wp = GetWorldPos(Input.mousePosition);
+                if (!_dragging) BeginDragging(wp);
+                foreach (var dragged in Dragged) dragged.Placement.Move(wp + dragged.Offset);
             }
         }
 
@@ -298,25 +303,115 @@ public static class EditorManager
         return pos;
     }
 
-    private static ObjectPlacement _dragged;
-    private static Vector3 _oldDraggedPos;
+    private static readonly List<DraggedObject> Dragged = [];
+    private static bool _dragging;
 
-    public static void SetDraggedItem(ObjectPlacement placement)
+    public static void AddDraggedItem(ObjectPlacement placement, Vector3 clickPos, bool startDragging)
     {
-        _oldDraggedPos = placement.GetPos();
-        _dragged = placement;
-    }
-
-    public static void ReleaseDraggedItem()
-    {
-        var id = _dragged.GetId();
-        if (Architect.UsingMultiplayer && Architect.GlobalSettings.CollaborationMode)
+        if (placement.StartDragging())
         {
-            HkmpHook.Update(id, GameManager.instance.sceneName, _dragged.GetPos());
+            placement.StoreOldPos();
+            Dragged.Add(new DraggedObject(placement, placement.GetPos() - clickPos));
         }
         
-        UndoManager.PerformAction(new MoveObject(id, _oldDraggedPos));
+        if (startDragging) BeginDragging(clickPos);
+    }
 
-        _dragged = null;
+    public static void BeginDragging(Vector3 clickPos)
+    {
+        foreach (var dragged in Dragged) dragged.Offset = dragged.Placement.GetPos() - clickPos;
+        _dragging = true;
+    }
+
+    public static void ReleaseDraggedItems()
+    {
+        var deselect = !Input.GetKey(KeyCode.LeftControl);
+        
+        UndoManager.PerformAction(new MoveObjects(
+            Dragged.Select(obj => (obj.Placement.GetId(), obj.Placement.GetOldPos())).ToList()
+        ));
+        
+        foreach (var dragged in Dragged)
+        {
+            if (deselect) dragged.Placement.StopDragging();
+            var id = dragged.Placement.GetId();
+            if (Architect.UsingMultiplayer && Architect.GlobalSettings.CollaborationMode)
+            {
+                HkmpHook.Update(id, GameManager.instance.sceneName, dragged.Placement.GetPos());
+            }
+
+            dragged.Placement.StoreOldPos();
+        }
+        
+        _dragging = false;
+        if (deselect) Dragged.Clear();
+    }
+
+    private static bool _groupSelecting;
+    private static Vector3 _groupSelectionCorner;
+    private static GroupSelectionBox _groupSelectionBox;
+
+    public static void StartGroupSelect(Vector3 pos)
+    {
+        if (Dragged.Count > 0) return;
+        
+        _groupSelectionCorner = pos;
+        _groupSelecting = true;
+        
+        _groupSelectionBox.gameObject.SetActive(true);
+        _groupSelectionBox.transform.position = pos;
+        _groupSelectionBox.width = 0;
+        _groupSelectionBox.height = 0;
+        _groupSelectionBox.UpdateOutline();
+    }
+
+    public static void StopGroupSelect(Vector3 pos)
+    {
+        _groupSelectionBox.gameObject.SetActive(false);
+
+        foreach (var obj in PlacementManager.GetCurrentPlacements()
+                     .Where(obj => obj.IsWithinZone(_groupSelectionCorner, pos)))
+        {
+            AddDraggedItem(obj, pos, false);
+        }
+
+        _groupSelecting = false;
+    }
+    
+    private static void RefreshGroupSelectionBox()
+    {
+        if (!_groupSelecting) return;
+
+        var wp = GetWorldPos(Input.mousePosition);
+        if (Input.GetMouseButtonUp(0))
+        {
+            StopGroupSelect(wp);
+            return;
+        }
+        
+        _groupSelectionBox.width = wp.x - _groupSelectionCorner.x;
+        _groupSelectionBox.height = wp.y - _groupSelectionCorner.y;
+        _groupSelectionBox.UpdateOutline();
+    }
+
+    private static readonly int Color1 = Shader.PropertyToID("_Color");
+    
+    private static void SetupGroupSelectionBox()
+    {
+        var box = new GameObject("[Architect] Group Selection Box");
+        Object.DontDestroyOnLoad(box);
+        box.SetActive(false);
+
+        var particleMaterial = new Material(Shader.Find("Sprites/Default"));
+        particleMaterial.SetColor(Color1, new Color(0, 1, 0, 0.3f));
+        box.AddComponent<LineRenderer>().material = particleMaterial;
+        
+        _groupSelectionBox = box.AddComponent<GroupSelectionBox>();
+    }
+
+    private class DraggedObject(ObjectPlacement placement, Vector3 offset)
+    {
+        public readonly ObjectPlacement Placement = placement;
+        public Vector3 Offset = offset;
     }
 }

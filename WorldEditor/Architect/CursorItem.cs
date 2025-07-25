@@ -94,7 +94,6 @@ public static class CursorItem
         line.startWidth = 0.1f;
         line.startColor = Color.red;
 
-
         var particleMaterial = new Material(Shader.Find("Sprites/Default"));
         particleMaterial.SetColor(Color1, new Color(1, 0, 0, 0.2f));
         line.material = particleMaterial;

@@ -23,8 +23,12 @@ internal class DragObject : SelectableObject
         if (!first) return;
         
         var pl = PlacementManager.FindClickedObject(pos);
-        if (pl == null) return;
-        EditorManager.SetDraggedItem(pl);
+        if (pl == null)
+        {
+            EditorManager.StartGroupSelect(pos);
+            return;
+        }
+        EditorManager.AddDraggedItem(pl, pos, !Input.GetKey(KeyCode.LeftControl));
     }
 
     public override bool IsFavourite()

@@ -16,7 +16,32 @@ namespace Architect.Objects;
 [JsonConverter(typeof(ObjectPlacementConverter))]
 public class ObjectPlacement
 {
-    internal bool Touching(Vector2 pos)
+    private static readonly Color DefaultColor = new Color(1, 1, 1, 0.5f);
+    private static readonly Color DraggedColor = new Color(0.2f, 1, 0.2f, 0.5f);
+
+    private bool _dragging;
+    
+    public void SetPreviewColor(Color color)
+    {
+        if (!_previewObject) return;
+        _previewObject.GetComponent<SpriteRenderer>().color = color;
+    }
+    
+    public void StopDragging()
+    {
+        _dragging = false;
+        SetPreviewColor(DefaultColor);
+    }
+    
+    public bool StartDragging()
+    {
+        if (_dragging) return false;
+        _dragging = true;
+        SetPreviewColor(DraggedColor);
+        return true;
+    }
+    
+    public bool Touching(Vector2 pos)
     {
         if (!_previewObject) return false;
 
@@ -30,6 +55,20 @@ public class ObjectPlacement
         var localPos = Quaternion.Inverse(objRotation) * (pos - (Vector2) objPos);
 
         return Mathf.Abs(localPos.x) <= width && Mathf.Abs(localPos.y) <= height;
+    }
+
+    public bool IsWithinZone(Vector2 pos1, Vector2 pos2)
+    {
+        var withinX = (_pos.x > pos1.x && _pos.x < pos2.x) || (_pos.x < pos1.x && _pos.x > pos2.x);
+        var withinY = (_pos.y > pos1.y && _pos.y < pos2.y) || (_pos.y < pos1.y && _pos.y > pos2.y);
+        
+        Architect.Instance.Log(pos1);
+        Architect.Instance.Log(pos2);
+        Architect.Instance.Log(_pos);
+        Architect.Instance.Log(withinX);
+        Architect.Instance.Log(withinY);
+
+        return withinX && withinY;
     }
 
     internal void Destroy()
@@ -57,6 +96,17 @@ public class ObjectPlacement
         return _pos;
     }
 
+    public void StoreOldPos()
+    {
+        _oldPos = _pos;
+    }
+
+    public Vector3 GetOldPos()
+    {
+        return _oldPos;
+    }
+
+    private Vector3 _oldPos;
     private Vector3 _pos;
     private PlaceableObject _placeableObject;
     private readonly string _name;
