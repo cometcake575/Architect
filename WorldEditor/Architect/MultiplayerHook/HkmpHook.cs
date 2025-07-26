@@ -39,6 +39,11 @@ public static class HkmpHook
         _clientAddon.Erase(guid, scene);
     }
 
+    public static void ClearRoom(string scene)
+    {
+        _clientAddon.ClearRoom(scene);
+    }
+
     public static void Place(ObjectPlacement placement, string scene)
     {
         _clientAddon.Place(placement, scene);

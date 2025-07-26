@@ -37,7 +37,7 @@ internal class EraserObject : SelectableObject
         {
             pl.Destroy();
             
-            if (!Architect.UsingMultiplayer || !Architect.GlobalSettings.CollaborationMode) return;
+            if (!Architect.UsingMultiplayer || !Architect.GlobalSettings.CollaborationMode) continue;
             var id = pl.GetId();
             HkmpHook.Erase(id, GameManager.instance.sceneName);
         }

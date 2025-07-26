@@ -296,6 +296,8 @@ public static class EditorManager
         
         var b1 = Input.GetMouseButtonDown(0);
         var b2 = Input.GetMouseButton(0);
+        
+        if (!b2) ResetObject.RestartDelay();
 
         if (!b1 && !b2) return;
 

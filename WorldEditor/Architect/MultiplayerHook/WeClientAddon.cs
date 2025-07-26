@@ -177,6 +177,19 @@ public class WeClientAddon : ClientAddon
             });
     }
 
+    public void ClearRoom(string scene)
+    {
+        if (!_api.NetClient.IsConnected) return;
+        
+        Logger.Info("Sending Clear Packet");
+        /*
+        _api.NetClient.GetNetworkSender<PacketId>(this)
+            .SendSingleData(PacketId.Clear, new ClearPacketData
+            {
+                SceneName = scene
+            });*/
+    }
+
     public void Update(string guid, string scene, Vector3 pos)
     {
         if (!_api.NetClient.IsConnected) return;

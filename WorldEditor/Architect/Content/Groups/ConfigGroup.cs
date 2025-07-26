@@ -432,7 +432,7 @@ public class ConfigGroup
             }).PreAwake(), "mother_spawn_gruzzers")
         );
 
-        VengeflyKing = new ConfigGroup(Generic,
+        VengeflyKing = new ConfigGroup(KillableEnemies,
             Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Dive Height", (o, value) =>
             {
                 if (value.GetValue() == 1) return;
