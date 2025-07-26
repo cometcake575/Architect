@@ -437,7 +437,18 @@ public class ConfigGroup
                 var vars = o.LocateMyFSM("Mossy Control").FsmVariables;
                 vars.FindFsmFloat("X Max").Value = o.transform.position.x + value.GetValue()/2;
                 vars.FindFsmFloat("X Min").Value = o.transform.position.x - value.GetValue()/2;
-            }), "mmc_arena_width")
+            }), "mmc_arena_width"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Emerge Offset", (o, value) =>
+            {
+                var fsm = o.LocateMyFSM("Mossy Control");
+                var act = fsm.GetAction<RandomFloat>("Emerge Left", 3);
+                act.min = value.GetValue();
+                act.max = value.GetValue();
+                
+                var act2 = fsm.GetAction<RandomFloat>("Emerge Right", 3);
+                act2.min = value.GetValue();
+                act2.max = value.GetValue();
+            }), "mmc_search_width")
         );
 
         GruzMother = new ConfigGroup(Awakable,
