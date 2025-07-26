@@ -124,7 +124,8 @@ public static class ContentPacks
             CreateEnemy("Crossroads_16", "Uninfected Parent/Buzzer", "Vengefly"),
             new VengeflyKingElement(),
             Create("Crossroads_12", "_Enemies/Worm", "Goam", "Enemies")
-                .WithRotationGroup(RotationGroup.Eight),
+                .WithRotationGroup(RotationGroup.Eight)
+                .WithConfigGroup(ConfigGroup.Goams),
             CreateEnemy("Crossroads_21", "non_infected_event/Zombie Runner", "Wandering Husk"),
             CreateEnemy("Crossroads_21", "Zombie Barger", "Husk Bully"),
             CreateEnemy("Crossroads_16", "_Enemies/Zombie Hornhead", "Husk Hornhead"),
@@ -283,7 +284,7 @@ public static class ContentPacks
                 .FlipVertical(),
             CreateEnemy("Mines_25", "Zombie Beam Miner", "Crystallised Husk"),
             CreateEnemy("Mines_20", "Crystal Crawler", "Blimback"),
-            CreateEnemy("Mines_20", "Mines Crawler", "Shardmite"),
+            new ShardmiteElement(),
             CreateEnemy("Mines_25", "Crystal Flyer", "Crystal Hunter"),
             Create("Mines_20", "Metal Gate v2", "Mines Gate", "Interactable", weight:GateWeight)
                 .WithReceiverGroup(ReceiverGroup.Gates)

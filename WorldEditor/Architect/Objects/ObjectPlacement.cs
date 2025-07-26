@@ -157,9 +157,9 @@ public class ObjectPlacement
         _defaultColor = new Color(r, g, b, a);
         renderer.color = _defaultColor; 
         
-        selected.PackElement.PostPlace(this, _previewObject);
-        
         GhostPlacementUtils.SetupForPlacement(_previewObject, renderer, selected, Flipped, Rotation, scaleX, scaleY);
+        
+        selected.PackElement.PostPlace(this, _previewObject);
     }
 
     public GameObject SpawnObject()

@@ -16,5 +16,12 @@ public class PreviewablePackElement(
     {
         var obj = placement.SpawnObject();
         obj.transform.parent = preview.transform;
+        var ls = obj.transform.lossyScale;
+        
+        ls.x /= Mathf.Max(0.01f, preview.transform.localScale.x);
+        ls.y /= Mathf.Max(0.01f, preview.transform.localScale.y);
+        ls.z /= Mathf.Max(0.01f, preview.transform.localScale.z);
+
+        obj.transform.localScale = ls;
     }
 }

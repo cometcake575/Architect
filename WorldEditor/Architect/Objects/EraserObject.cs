@@ -35,6 +35,7 @@ internal class EraserObject : SelectableObject
         
         foreach (var pl in placements)
         {
+            pl.StopDragging();
             pl.Destroy();
             
             if (!Architect.UsingMultiplayer || !Architect.GlobalSettings.CollaborationMode) continue;

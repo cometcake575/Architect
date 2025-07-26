@@ -34,6 +34,8 @@ public class ConfigGroup
     
     public static ConfigGroup Enemies;
     
+    public static ConfigGroup Goams;
+    
     public static ConfigGroup Wingsmould;
 
     public static ConfigGroup KillableEnemies;
@@ -312,6 +314,14 @@ public class ConfigGroup
             }), "enemy_invulnerable")
         );
         
+        Goams = new ConfigGroup(Generic,
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Start Down", (o, value) =>
+            {
+                if (!value.GetValue()) return;
+                o.LocateMyFSM("Worm Control").FsmVariables.FindFsmBool("Start Down").Value = true;
+            }), "goam_start_down")
+        );
+        
         Wingsmould = new ConfigGroup(Enemies,
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Roaming Range", (o, value) =>
             {
@@ -421,7 +431,13 @@ public class ConfigGroup
             {
                 if (!value.GetValue()) return;
                 o.LocateMyFSM("Mossy Control").AddCustomAction("Sleep", fsm => fsm.SendEvent("WAKE"));
-            }).WithDefaultValue(true), "mmc_start_awake")
+            }).WithDefaultValue(true), "mmc_start_awake"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Arena Width", (o, value) =>
+            {
+                var vars = o.LocateMyFSM("Mossy Control").FsmVariables;
+                vars.FindFsmFloat("X Max").Value = o.transform.position.x + value.GetValue()/2;
+                vars.FindFsmFloat("X Min").Value = o.transform.position.x - value.GetValue()/2;
+            }), "mmc_arena_width")
         );
 
         GruzMother = new ConfigGroup(Awakable,

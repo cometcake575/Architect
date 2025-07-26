@@ -479,6 +479,7 @@ internal class MassiveMossChargerElement : InternalPackElement
     internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
     {
         _gameObject = preloads["GG_Mega_Moss_Charger"]["Mega Moss Charger"];
+        _gameObject.RemoveComponent<BoxCollider2D>();
     }
 
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
