@@ -340,6 +340,8 @@ public static class CustomObjects
 
     private static GameObject CreateZoteTrophy()
     {
+        ZoteTrophy.Init();
+        
         var sprite = ResourceUtils.Load("zote_trophy");
         var obj = new GameObject("Winner's Trophy");
 

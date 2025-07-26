@@ -68,10 +68,12 @@ public class WeServerAddon : ServerAddon
                 );
         });
         
-        netReceiver.RegisterPacketHandler<WinPacketData>(PacketId.Win, (_, packet) =>
+        netReceiver.RegisterPacketHandler<WinPacketData>(PacketId.Win, (id, packet) =>
         {
             Logger.Info("Receiving Win Packet [SERVER]");
-            sender.SendSingleData(PacketId.Win, packet, serverApi.ServerManager.Players.Select(player => player.Id).ToArray());
+            sender.SendSingleData(PacketId.Win, packet, serverApi.ServerManager.Players
+                .Where(player => player.Id != id)
+                .Select(player => player.Id).ToArray());
         });
         
         netReceiver.RegisterPacketHandler<RelayPacketData>(PacketId.Relay, (id, packet) =>
@@ -85,6 +87,6 @@ public class WeServerAddon : ServerAddon
     }
 
     protected override string Name => "Architect";
-    protected override string Version => "1.10.8.1";
+    protected override string Version => "1.10.9.0";
     public override bool NeedsNetwork => true;
 }

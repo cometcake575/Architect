@@ -22,6 +22,8 @@ public class ConfigGroup
     
     public static ConfigGroup Generic;
     
+    public static ConfigGroup Benches;
+    
     public static ConfigGroup Charm;
     
     public static ConfigGroup Animated;
@@ -181,6 +183,13 @@ public class ConfigGroup
             {
                 foreach (var renderer in o.GetComponentsInChildren<Renderer>()) renderer.enabled = value.GetValue();
             }), "visible")
+        );
+        
+        Benches = new ConfigGroup(Generic,
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Set Spawn", (o, value) =>
+            {
+                o.GetComponent<BenchConfig>().setSpawn = value.GetValue();
+            }).PreAwake(), "bench_set_spawn")
         );
         
         Decorations = new ConfigGroup(Generic,
@@ -543,7 +552,7 @@ public class ConfigGroup
             zOffset,
             disableCollision
         );
-        
+
         ModHooks.LanguageGetHook += (key, _, orig) => CustomTexts.TryGetValue(key, out var customText) ? customText : orig;
 
         Tablets = new ConfigGroup(Generic,

@@ -69,8 +69,8 @@ public class WeClientAddon : ClientAddon
         netReceiver.RegisterPacketHandler<WinPacketData>(PacketId.Win,
             packet =>
             {
-                Logger.Info("Receiving Edit Packet [CLIENT]");
-                ZoteTrophy.WinScreen(packet.WinnerName);
+                Logger.Info("Receiving Win Packet [CLIENT]");
+                ZoteTrophy.WinScreen(packet.WinnerName + " Wins!");
             });
 
         netReceiver.RegisterPacketHandler<RelayPacketData>(PacketId.Relay,
@@ -282,6 +282,6 @@ public class WeClientAddon : ClientAddon
     }
 
     protected override string Name => "Architect";
-    protected override string Version => "1.10.8.1";
+    protected override string Version => "1.10.9.0";
     public override bool NeedsNetwork => true;
 }

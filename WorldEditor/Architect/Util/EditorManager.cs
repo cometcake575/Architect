@@ -58,7 +58,39 @@ public static class EditorManager
 
         On.HeroController.CanNailArt += (orig, self) => !IsEditing && orig(self);
 
-        On.HeroController.CanTakeDamage += (orig, self) => orig(self) && !IsEditing;
+        On.HeroController.TakeDamage += (orig, self, go, side, amount, type) =>
+        {
+            if (IsEditing) return;
+            orig(self, go, side, amount, type);
+        };
+
+        On.GameManager.FindEntryPoint += (orig, self, name, scene) =>
+        {
+            var point = orig(self, name, scene);
+            if (!point.HasValue)
+            {
+                var hrm = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects()
+                    .SelectMany(obj => obj.GetComponentsInChildren<HazardRespawnMarker>(true))
+                    .First();
+                point = hrm.transform.position;
+            }
+
+            return point;
+        };
+
+        On.HeroController.LocateSpawnPoint += (orig, self) =>
+        {
+            var point = orig(self);
+            if (!point)
+            {
+                var hrm = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects()
+                    .SelectMany(obj => obj.GetComponentsInChildren<HazardRespawnMarker>(true))
+                    .First();
+                point = hrm.transform;
+            }
+
+            return point;
+        };
 
         ModHooks.CursorHook += () =>
         {
@@ -93,20 +125,23 @@ public static class EditorManager
 
         if (!Architect.GlobalSettings.CanEnableEditing) return;
 
-        RefreshGroupSelectionBox();
-        if (Dragged.Count > 0)
+        if (EditorUIManager.SelectedItem is DragObject)
         {
-            if ((paused || !Input.GetMouseButton(0)) && _dragging) ReleaseDraggedItems();
-            else if (Input.GetMouseButton(0) &&
-                     (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0))
+            RefreshGroupSelectionBox();
+            if (Dragged.Count > 0)
             {
-                var wp = GetWorldPos(Input.mousePosition);
-                if (!_dragging) BeginDragging(wp);
-                foreach (var dragged in Dragged) dragged.Placement.Move(wp + dragged.Offset);
+                if ((!Input.GetMouseButton(0) || paused) && _dragging) ReleaseDraggedItems(true);
+                else if (!paused && Input.GetMouseButton(0) &&
+                         (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0))
+                {
+                    var wp = GetWorldPos(Input.mousePosition);
+                    if (!_dragging) BeginDragging(wp);
+                    foreach (var dragged in Dragged) dragged.Placement.Move(wp + dragged.Offset);
+                }
             }
-        }
+        } else if (EditorUIManager.SelectedItem is not EraserObject) ReleaseDraggedItems(false);
 
-        if (!GameCamera) GameCamera = Camera.allCameras.FirstOrDefault(cam => cam.gameObject.name.Equals("tk2dCamera"));
+        if (!GameCamera) GameCamera = GameCameras.instance.mainCamera;
 
         CheckToggle(paused);
 
@@ -303,7 +338,7 @@ public static class EditorManager
         return pos;
     }
 
-    private static readonly List<DraggedObject> Dragged = [];
+    public static readonly List<DraggedObject> Dragged = [];
     private static bool _dragging;
 
     public static void AddDraggedItem(ObjectPlacement placement, Vector3 clickPos, bool startDragging)
@@ -323,11 +358,11 @@ public static class EditorManager
         _dragging = true;
     }
 
-    public static void ReleaseDraggedItems()
+    public static void ReleaseDraggedItems(bool storeUndo)
     {
         var deselect = !Input.GetKey(KeyCode.LeftControl);
         
-        UndoManager.PerformAction(new MoveObjects(
+        if (storeUndo) UndoManager.PerformAction(new MoveObjects(
             Dragged.Select(obj => (obj.Placement.GetId(), obj.Placement.GetOldPos())).ToList()
         ));
         
@@ -409,7 +444,7 @@ public static class EditorManager
         _groupSelectionBox = box.AddComponent<GroupSelectionBox>();
     }
 
-    private class DraggedObject(ObjectPlacement placement, Vector3 offset)
+    public class DraggedObject(ObjectPlacement placement, Vector3 offset)
     {
         public readonly ObjectPlacement Placement = placement;
         public Vector3 Offset = offset;

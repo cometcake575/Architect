@@ -63,36 +63,45 @@ public interface IUndoable
     IUndoable Undo();
 }
 
-public class PlaceObject(string placementId) : IUndoable
+public class PlaceObject(List<string> placementIds) : IUndoable
 {
     public IUndoable Undo()
     {
-        var obj = PlacementManager.GetCurrentPlacements().FirstOrDefault(pl => pl.GetId() == placementId);
-        if (obj == null) return null;
-
-        if (Architect.UsingMultiplayer && Architect.GlobalSettings.CollaborationMode)
+        List<ObjectPlacement> placements = [];
+        foreach (var placementId in placementIds)
         {
-            HkmpHook.Erase(placementId, GameManager.instance.sceneName);
+            var obj = PlacementManager.GetCurrentPlacements().FirstOrDefault(pl => pl.GetId() == placementId);
+            if (obj == null) return null;
+
+            if (Architect.UsingMultiplayer && Architect.GlobalSettings.CollaborationMode)
+            {
+                HkmpHook.Erase(placementId, GameManager.instance.sceneName);
+            }
+
+            obj.Destroy();
+            placements.Add(obj);
         }
-        
-        obj.Destroy();
-        return new EraseObject(obj);
+
+        return new EraseObject(placements);
     }
 }
 
-public class EraseObject(ObjectPlacement placement) : IUndoable
+public class EraseObject(List<ObjectPlacement> placements) : IUndoable
 {
     public IUndoable Undo()
     {
-        PlacementManager.GetCurrentPlacements().Add(placement);
-        placement.PlaceGhost();
-
-        if (Architect.UsingMultiplayer && Architect.GlobalSettings.CollaborationMode)
+        foreach (var placement in placements)
         {
-            HkmpHook.Place(placement, GameManager.instance.sceneName);
+            PlacementManager.GetCurrentPlacements().Add(placement);
+            placement.PlaceGhost();
+
+            if (Architect.UsingMultiplayer && Architect.GlobalSettings.CollaborationMode)
+            {
+                HkmpHook.Place(placement, GameManager.instance.sceneName);
+            }
         }
-        
-        return new PlaceObject(placement.GetId());
+
+        return new PlaceObject(placements.Select(pl => pl.GetId()).ToList());
     }
 }
 

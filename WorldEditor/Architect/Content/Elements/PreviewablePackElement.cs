@@ -14,6 +14,7 @@ public class PreviewablePackElement(
 {
     public override void PostPlace(ObjectPlacement placement, GameObject preview)
     {
-        placement.SpawnObject().transform.parent = preview.transform;
+        var obj = placement.SpawnObject();
+        obj.transform.parent = preview.transform;
     }
 }

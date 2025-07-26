@@ -22,7 +22,7 @@ public class PlaceableObject : SelectableObject
         PlacementManager.GetCurrentPlacements().Add(placement);
         placement.PlaceGhost();
         
-        UndoManager.PerformAction(new PlaceObject(placement.GetId()));
+        UndoManager.PerformAction(new PlaceObject([placement.GetId()]));
 
         if (!Architect.UsingMultiplayer || !Architect.GlobalSettings.CollaborationMode) return;
         HkmpHook.Place(placement, GameManager.instance.sceneName);

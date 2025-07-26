@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Architect.MultiplayerHook;
 using Architect.Util;
@@ -21,15 +22,25 @@ internal class EraserObject : SelectableObject
 
     public override void OnClickInWorld(Vector3 pos, bool first)
     {
-        var pl = PlacementManager.FindClickedObject(pos);
-        if (pl == null) return;
-        pl.Destroy();
-        
-        UndoManager.PerformAction(new EraseObject(pl));
+        List<ObjectPlacement> placements = [];
+        placements.AddRange(EditorManager.Dragged.Select(obj => obj.Placement));
+        EditorManager.Dragged.Clear();
 
-        if (!Architect.UsingMultiplayer || !Architect.GlobalSettings.CollaborationMode) return;
-        var id = pl.GetId();
-        HkmpHook.Erase(id, GameManager.instance.sceneName);
+        var placement = PlacementManager.FindClickedObject(pos);
+        if (placement != null && !placements.Contains(placement)) placements.Add(placement);
+        
+        if (placements.Count == 0) return;
+
+        UndoManager.PerformAction(new EraseObject(placements));
+        
+        foreach (var pl in placements)
+        {
+            pl.Destroy();
+            
+            if (!Architect.UsingMultiplayer || !Architect.GlobalSettings.CollaborationMode) return;
+            var id = pl.GetId();
+            HkmpHook.Erase(id, GameManager.instance.sceneName);
+        }
     }
 
     public override bool IsFavourite()

@@ -1,4 +1,6 @@
 using Architect.MultiplayerHook;
+using HutongGames.PlayMaker;
+using Modding;
 using UnityEngine;
 
 namespace Architect.Content.Elements.Custom.Behaviour;
@@ -50,6 +52,7 @@ public class ZoteTrophy : MonoBehaviour
         
         if (Architect.UsingMultiplayer)
         {
+            WinScreen("You Win!");
             HkmpHook.BroadcastWin();
         }
 
@@ -70,8 +73,24 @@ public class ZoteTrophy : MonoBehaviour
         _system.Stop();
     }
 
+    private static GameObject _titleCard;
+    private static FsmString _titleCardData;
+
+    public static void Init()
+    {
+        _titleCard = GameCameras.instance.hudCamera.transform.GetChild(10).GetChild(0).gameObject;
+        _titleCardData = _titleCard.LocateMyFSM("Area Title Control").FsmVariables.FindFsmString("Area Event");
+        
+        ModHooks.LanguageGetHook += (key, _, orig) =>
+        {
+            if (key.EndsWith("_RawText_SUPER") || key.EndsWith("_RawText_SUB")) return "";
+            return key.EndsWith("_RawText_MAIN") ? key.Replace("_RawText_MAIN", "") : orig;
+        };
+    }
+
     public static void WinScreen(string name)
     {
-        Architect.Instance.Log(name + " Wins");
+        _titleCardData.Value = name + "_RawText";
+        _titleCard.SetActive(true);
     }
 }

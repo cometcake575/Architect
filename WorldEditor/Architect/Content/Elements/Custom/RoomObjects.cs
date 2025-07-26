@@ -17,7 +17,7 @@ public static class RoomObjects
     {
         var edits = new ContentPack("Room Edits", "Tools used to edit rooms")
         {
-            new SimplePackElement(CreateHazardRespawnPoint(), "Hazard Respawn Point", "Room Edits",
+            new PreviewablePackElement(CreateHazardRespawnPoint(), "Hazard Respawn Point", "Room Edits",
                 ResourceUtils.Load("hazard_respawn_point"))
                 .WithConfigGroup(ConfigGroup.HazardRespawnPoint)
                 .WithReceiverGroup(ReceiverGroup.HazardRespawnPoint),
