@@ -16,8 +16,8 @@ namespace Architect.Objects;
 [JsonConverter(typeof(ObjectPlacementConverter))]
 public class ObjectPlacement
 {
-    private static readonly Color DefaultColor = new Color(1, 1, 1, 0.5f);
-    private static readonly Color DraggedColor = new Color(0.2f, 1, 0.2f, 0.5f);
+    private Color _defaultColor;
+    private static readonly Color DraggedColor = new(0.2f, 1, 0.2f, 0.5f);
 
     private bool _dragging;
     
@@ -30,14 +30,14 @@ public class ObjectPlacement
     public void StopDragging()
     {
         _dragging = false;
-        SetPreviewColor(DefaultColor);
+        SetPreviewColor(_defaultColor);
     }
     
     public bool StartDragging(bool canInvert)
     {
         if (_dragging && !canInvert) return false;
         _dragging = !_dragging;
-        SetPreviewColor(_dragging ? DraggedColor : DefaultColor);
+        SetPreviewColor(_dragging ? DraggedColor : _defaultColor);
         return _dragging;
     }
     
@@ -154,7 +154,8 @@ public class ObjectPlacement
             }
         }
 
-        renderer.color = new Color(r, g, b, a);
+        _defaultColor = new Color(r, g, b, a);
+        renderer.color = _defaultColor; 
         
         selected.PackElement.PostPlace(this, _previewObject);
         
