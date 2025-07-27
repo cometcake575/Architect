@@ -6,7 +6,7 @@ using Modding.Converters;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace Architect.Configuration;
+namespace Architect.Storage;
 
 public static class SceneSaveLoader
 {

@@ -5,6 +5,7 @@ using System.Reflection;
 using Architect.Attributes.Config;
 using Architect.Content.Elements.Custom.Behaviour;
 using Architect.Content.Elements.Internal.Fixers;
+using Architect.Storage;
 using Architect.Util;
 using HutongGames.PlayMaker.Actions;
 using Modding;
@@ -123,6 +124,8 @@ public class ConfigGroup
     public static ConfigGroup Colours;
     
     public static ConfigGroup Shapes;
+    
+    public static ConfigGroup Png;
     
     public static ConfigGroup TextDisplay;
     
@@ -639,11 +642,11 @@ public class ConfigGroup
 
         List<Sprite> headSprites =
         [
-            ResourceUtils.Load("knight_head", ppu:64),
-            ResourceUtils.Load("nosk_head", ppu:64),
-            ResourceUtils.Load("hornet_head", ppu:64),
-            ResourceUtils.Load("grub", ppu:192),
-            ResourceUtils.Load("inverted_zote", ppu:64)
+            ResourceUtils.LoadInternal("knight_head", ppu:64),
+            ResourceUtils.LoadInternal("nosk_head", ppu:64),
+            ResourceUtils.LoadInternal("hornet_head", ppu:64),
+            ResourceUtils.LoadInternal("grub", ppu:192),
+            ResourceUtils.LoadInternal("inverted_zote", ppu:64)
         ];
         ZoteHead = new ConfigGroup(Gravity,
             Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Mode", (o, value) =>
@@ -985,6 +988,13 @@ public class ConfigGroup
                 }
             }, "None", "Hazard", "Terrain", "Solid"), "shape_collision")
         );
+        
+        Png = new ConfigGroup(Colours,
+            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("PNG Name", (o, value) =>
+            {
+                o.GetComponent<SpriteRenderer>().sprite = PngLoader.TryGetSprite(value.GetValue());
+            }), "png_name")
+        );
 
         Relays = new ConfigGroup(
             Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Relay ID", (o, value) =>
@@ -1012,7 +1022,11 @@ public class ConfigGroup
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Relay Chance", (o, value) =>
             {
                 o.GetComponent<Relay>().relayChance = value.GetValue();
-            }), "relay_run_chance")
+            }), "relay_run_chance"),
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Trigger on Load", (o, value) =>
+            {
+                o.GetComponent<Relay>().broadcastImmediately = value.GetValue();
+            }), "relay_trigger_load")
         );
 
         BrokenVessel = new ConfigGroup(KillableEnemies,

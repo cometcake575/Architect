@@ -17,7 +17,7 @@ internal class PickObject : SelectableObject
 
     private static Sprite PrepareSprite()
     {
-        return ResourceUtils.Load("pick");
+        return ResourceUtils.LoadInternal("pick");
     }
 
     public override void OnClickInWorld(Vector3 pos, bool first)

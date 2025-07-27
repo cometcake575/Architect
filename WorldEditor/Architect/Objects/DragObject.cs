@@ -15,7 +15,7 @@ internal class DragObject : SelectableObject
 
     private static Sprite PrepareSprite()
     {
-        return ResourceUtils.Load("drag");
+        return ResourceUtils.LoadInternal("drag");
     }
 
     public override void OnClickInWorld(Vector3 pos, bool first)

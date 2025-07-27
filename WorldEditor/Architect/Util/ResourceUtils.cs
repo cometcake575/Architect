@@ -1,5 +1,6 @@
-using System;
+using System.IO;
 using System.Reflection;
+using JetBrains.Annotations;
 using SFCore.Utils;
 using UnityEngine;
 
@@ -7,25 +8,16 @@ namespace Architect.Util;
 
 public static class ResourceUtils
 {
-    internal static Sprite Load(string spritePath, FilterMode filterMode = FilterMode.Bilinear, Type modType = null, float ppu = 100)
+    internal static Sprite LoadInternal(string spritePath, FilterMode filterMode = FilterMode.Bilinear, float ppu = 100)
     {
-        return Load(spritePath, new Vector2(0.5f, 0.5f), filterMode, modType, ppu);
+        return LoadInternal(spritePath, new Vector2(0.5f, 0.5f), filterMode, ppu);
     }
 
-    internal static Sprite Load(string spritePath, Vector2 pivot, FilterMode filterMode = FilterMode.Bilinear, Type modType = null, float ppu = 100)
+    internal static Sprite LoadInternal(string spritePath, Vector2 pivot, FilterMode filterMode = FilterMode.Bilinear, float ppu = 100)
     {
-        Assembly asm;
-        string path;
-
-        if (modType != null)
-        {
-            asm = modType.Assembly;
-            path = spritePath;
-        } else
-        {
-            asm = Assembly.GetExecutingAssembly();
-            path = $"Architect.Resources.{spritePath}.png";
-        }
+        var path = $"Architect.Resources.{spritePath}.png";
+        
+        var asm = Assembly.GetExecutingAssembly();
         
         using var s = asm.GetManifestResourceStream(path);
         if (s == null) return null;
@@ -37,6 +29,20 @@ public static class ResourceUtils
         var sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), pivot, ppu);
         sprite.texture.filterMode = filterMode;
         return sprite;
+    }
+
+    [CanBeNull]
+    internal static Sprite Load(string spritePath, Vector2 pivot)
+    {
+        try
+        {
+            var tex = new Texture2D(2, 2);
+            tex.LoadImage(File.ReadAllBytes(spritePath), true);
+
+            var sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), pivot, 100);
+            return sprite;
+        }
+        catch (FileNotFoundException) { return null; }
     }
 
     internal static AudioClip LoadClip(string clipName)

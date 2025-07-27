@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Architect.Attributes;
-using Architect.Configuration;
 using Architect.Content.Elements.Custom.Behaviour;
 using Architect.MultiplayerHook.Packets;
 using Architect.Objects;
+using Architect.Storage;
 using Architect.Util;
 using Hkmp.Api.Client;
 using Hkmp.Networking.Packet;
@@ -123,7 +123,7 @@ public class WeClientAddon : ClientAddon
             }
         });
 
-        netReceiver.RegisterPacketHandler<ClearPacketData>(PacketId.Erase, packet =>
+        netReceiver.RegisterPacketHandler<ClearPacketData>(PacketId.Clear, packet =>
         {
             if (!Architect.GlobalSettings.CollaborationMode) return;
             Logger.Info("Receiving Clear Packet [CLIENT]");
@@ -304,6 +304,6 @@ public class WeClientAddon : ClientAddon
     }
 
     protected override string Name => "Architect";
-    protected override string Version => "1.11.0.0";
+    protected override string Version => "1.11.0.1";
     public override bool NeedsNetwork => true;
 }

@@ -17,7 +17,7 @@ internal class CursorObject : SelectableObject
 
     private static Sprite PrepareSprite()
     {
-        return ResourceUtils.Load("cursor");
+        return ResourceUtils.LoadInternal("cursor");
     }
 
     public override void OnClickInWorld(Vector3 pos, bool first)

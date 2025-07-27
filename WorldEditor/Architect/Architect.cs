@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using Modding;
 using System.Reflection;
 using Architect.Attributes;
-using Architect.Configuration;
 using UnityEngine;
 using Architect.Content;
 using Architect.Content.Elements.Custom;
 using Architect.Content.Elements.Custom.SaL;
 using Architect.MultiplayerHook;
 using Architect.Objects;
+using Architect.Storage;
 using Architect.UI;
 using Architect.Util;
 using GlobalEnums;
@@ -61,6 +61,8 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
         EventManager.InitializeBroadcasters();
         
         UndoManager.Initialize();
+        
+        PngLoader.RefreshSprites();
         
         if (ModHooks.GetMod("HKMP") is Mod)
         {

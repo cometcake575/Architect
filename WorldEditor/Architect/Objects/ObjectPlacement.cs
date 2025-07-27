@@ -6,6 +6,8 @@ using Architect.Attributes.Broadcasters;
 using Architect.Attributes.Config;
 using Architect.Attributes.Receivers;
 using Architect.Content.Groups;
+using Architect.Storage;
+using Architect.UI;
 using Architect.Util;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -136,6 +138,8 @@ public class ObjectPlacement
         
         var renderer = _previewObject.AddComponent<SpriteRenderer>();
         
+        Sprite sprite = null;
+
         foreach (var config in Config)
         {
             if (config.GetTypeId() == "width" && config is FloatConfigValue width) scaleX *= width.GetValue();
@@ -143,21 +147,26 @@ public class ObjectPlacement
             else if (config.GetTypeId() == "r" && config is FloatConfigValue red) r = red.GetValue();
             else if (config.GetTypeId() == "g" && config is FloatConfigValue green) g = green.GetValue();
             else if (config.GetTypeId() == "b" && config is FloatConfigValue blue) b = blue.GetValue();
-            else if (config.GetTypeId() == "a" && config is FloatConfigValue alpha) a *= Mathf.Max(0.15f, alpha.GetValue());
-            else if (config.GetTypeId() == "layer" && config is IntConfigValue layer) renderer.sortingOrder = layer.GetValue(); 
-            
+            else if (config.GetTypeId() == "a" && config is FloatConfigValue alpha)
+                a *= Mathf.Max(0.15f, alpha.GetValue());
+            else if (config.GetTypeId() == "layer" && config is IntConfigValue layer)
+                renderer.sortingOrder = layer.GetValue();
+
             else if (config.GetTypeId() == "decoration_z_offset" && config is FloatConfigValue zOffset)
             {
                 var pos = _previewObject.transform.position;
                 pos.z += zOffset.GetValue();
                 _previewObject.transform.position = pos;
             }
+
+            if (config.GetTypeId() == "png_name" && config is StringConfigValue pngName)
+                sprite = PngLoader.TryGetSprite(pngName.GetValue());
         }
 
         _defaultColor = new Color(r, g, b, a);
-        renderer.color = _defaultColor; 
+        renderer.color = _defaultColor;
         
-        GhostPlacementUtils.SetupForPlacement(_previewObject, renderer, selected, Flipped, Rotation, scaleX, scaleY);
+        GhostPlacementUtils.SetupForPlacement(_previewObject, renderer, selected, sprite, Flipped, Rotation, scaleX, scaleY);
         
         selected.PackElement.PostPlace(this, _previewObject);
     }

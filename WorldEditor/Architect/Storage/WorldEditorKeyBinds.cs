@@ -1,6 +1,6 @@
 using InControl;
 
-namespace Architect.Configuration;
+namespace Architect.Storage;
 
 public class WorldEditorKeyBinds : PlayerActionSet
 {

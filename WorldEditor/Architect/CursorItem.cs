@@ -2,6 +2,7 @@ using Architect.Attributes.Config;
 using Architect.Content.Elements.Custom.Behaviour;
 using UnityEngine;
 using Architect.Objects;
+using Architect.Storage;
 using Architect.UI;
 using Architect.Util;
 
@@ -67,14 +68,19 @@ public static class CursorItem
         
         if (EditorUIManager.ConfigValues.TryGetValue("layer", out cfgVal) && cfgVal is IntConfigValue layer) renderer.sortingOrder = layer.GetValue();
         else renderer.sortingOrder = 0;
+        
+        Sprite sprite = null;
+        if (EditorUIManager.ConfigValues.TryGetValue("PNG Name", out cfgVal) && cfgVal is StringConfigValue pngName)
+            sprite = PngLoader.TryGetSprite(pngName.GetValue());
 
+        
         UpdateMovingComponent();
         
         _offset = ResourceUtils.FixOffset(selected.Offset, EditorManager.IsFlipped, EditorManager.Rotation, EditorManager.Scale);
         if (EditorUIManager.ConfigValues.TryGetValue("Z Offset", out cfgVal) && cfgVal is FloatConfigValue zOffset)
             _offset.z += zOffset.GetValue();
         
-        GhostPlacementUtils.SetupForPlacement(_display, renderer, selected, EditorManager.IsFlipped, EditorManager.Rotation, scaleX, scaleY);
+        GhostPlacementUtils.SetupForPlacement(_display, renderer, selected, sprite, EditorManager.IsFlipped, EditorManager.Rotation, scaleX, scaleY);
     }
 
     private static void SetupObject()

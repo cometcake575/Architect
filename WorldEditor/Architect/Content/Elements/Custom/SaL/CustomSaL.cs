@@ -21,7 +21,7 @@ public static class CustomSaL
     {
         var obj = new GameObject { name = name };
 
-        obj.AddComponent<SpriteRenderer>().sprite = ResourceUtils.Load(sprite, FilterMode.Point, ppu:10);
+        obj.AddComponent<SpriteRenderer>().sprite = ResourceUtils.LoadInternal(sprite, FilterMode.Point, ppu:10);
         obj.SetActive(false);
 
         Object.DontDestroyOnLoad(obj);

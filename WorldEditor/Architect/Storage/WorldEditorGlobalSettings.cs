@@ -3,7 +3,7 @@ using Architect.Objects;
 using Modding.Converters;
 using Newtonsoft.Json;
 
-namespace Architect.Configuration;
+namespace Architect.Storage;
 
 public class WorldEditorGlobalSettings
 {

@@ -548,7 +548,7 @@ public static class ContentPacks
     {
         var obj = new GameObject(name);
 
-        obj.AddComponent<SpriteRenderer>().sprite = ResourceUtils.Load(path, ppu: 64);
+        obj.AddComponent<SpriteRenderer>().sprite = ResourceUtils.LoadInternal(path, ppu: 64);
 
         obj.SetActive(false);
         Object.DontDestroyOnLoad(obj);
@@ -561,7 +561,7 @@ public static class ContentPacks
     {
         var point = new GameObject(name);
 
-        point.AddComponent<SpriteRenderer>().sprite = ResourceUtils.Load(path, ppu:ppu);
+        point.AddComponent<SpriteRenderer>().sprite = ResourceUtils.LoadInternal(path, ppu:ppu);
         var col = point.AddComponent<BoxCollider2D>();
         col.size = size;
         col.offset = offset;

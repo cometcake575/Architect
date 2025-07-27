@@ -1,6 +1,6 @@
 using System.Globalization;
-using Architect.Configuration;
 using Architect.MultiplayerHook;
+using Architect.Storage;
 using Architect.UI;
 using Architect.Util;
 using UnityEngine;
@@ -18,7 +18,7 @@ internal class ResetObject : SelectableObject
 
     private static Sprite PrepareSprite()
     {
-        return ResourceUtils.Load("reset_rocket");
+        return ResourceUtils.LoadInternal("reset_rocket");
     }
 
     private static float _resetTime;

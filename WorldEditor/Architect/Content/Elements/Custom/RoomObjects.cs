@@ -18,15 +18,15 @@ public static class RoomObjects
         var edits = new ContentPack("Room Edits", "Tools used to edit rooms")
         {
             new PreviewablePackElement(CreateHazardRespawnPoint(), "Hazard Respawn Point", "Room Edits",
-                ResourceUtils.Load("hazard_respawn_point"))
+                ResourceUtils.LoadInternal("hazard_respawn_point"))
                 .WithConfigGroup(ConfigGroup.HazardRespawnPoint)
                 .WithReceiverGroup(ReceiverGroup.HazardRespawnPoint),
             new SimplePackElement(CreateObject("Teleport Point"), "Teleport Point", "Room Edits",
-                    ResourceUtils.Load("teleport_point"))
+                    ResourceUtils.LoadInternal("teleport_point"))
                 .WithReceiverGroup(ReceiverGroup.TeleportPoint)
                 .WithConfigGroup(ConfigGroup.Invisible),
             new PreviewablePackElement(CreateDarkness(), "Darkness", "Room Edits",
-                    ResourceUtils.Load("darkness")),
+                    ResourceUtils.LoadInternal("darkness")),
             new SimplePackElement(CreateBinoculars(), "Binoculars", "Room Edits")
                 .WithConfigGroup(ConfigGroup.Binoculars),
             CreateCameraBorder(),
@@ -134,7 +134,7 @@ public static class RoomObjects
         var obj = new GameObject("Camera Border");
         obj.AddComponent<CameraBorder>();
         
-        var sprite = ResourceUtils.Load("camera");
+        var sprite = ResourceUtils.LoadInternal("camera");
         obj.layer = 10;
         obj.transform.position += new Vector3(0, 0, 0.1f);
         
@@ -151,7 +151,7 @@ public static class RoomObjects
         EditActions[id] = action;
         obj.AddComponent<ObjectRemover>().triggerName = id;
         
-        var sprite = ResourceUtils.Load(id, FilterMode.Point);
+        var sprite = ResourceUtils.LoadInternal(id, FilterMode.Point);
         obj.layer = 10;
         obj.transform.position += new Vector3(0, 0, 0.1f);
 
@@ -174,7 +174,7 @@ public static class RoomObjects
 
         obj.layer = LayerMask.NameToLayer("TransitionGates");
 
-        var sprite = ResourceUtils.Load("door", FilterMode.Point);
+        var sprite = ResourceUtils.LoadInternal("door", FilterMode.Point);
 
         Object.DontDestroyOnLoad(obj);
         obj.SetActive(false);
@@ -217,7 +217,7 @@ public static class RoomObjects
         col.isTrigger = true;
         col.size = new Vector2(1.25f, 1.06f);
         
-        point.AddComponent<SpriteRenderer>().sprite = ResourceUtils.Load("binoculars");
+        point.AddComponent<SpriteRenderer>().sprite = ResourceUtils.LoadInternal("binoculars");
         
         Binoculars.Init();
         var softTerrain = LayerMask.NameToLayer("Soft Terrain");

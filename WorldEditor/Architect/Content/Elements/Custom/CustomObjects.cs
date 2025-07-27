@@ -37,49 +37,50 @@ public static class CustomObjects
         var customs = new ContentPack("Custom", "Custom assets that don't exist in the base game")
         {
             new SimplePackElement(CreateTriggerZone(), "Trigger Zone", "Custom",
-                    ResourceUtils.Load("trigger_zone", FilterMode.Point))
+                    ResourceUtils.LoadInternal("trigger_zone", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.TriggerZones)
                 .WithConfigGroup(ConfigGroup.TriggerZones)
                 .WithReceiverGroup(ReceiverGroup.Invisible),
             new SimplePackElement(CreateTimer(), "Timer", "Custom",
-                    ResourceUtils.Load("timer", FilterMode.Point))
+                    ResourceUtils.LoadInternal("timer", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.Callable)
                 .WithConfigGroup(ConfigGroup.Timers)
                 .WithReceiverGroup(ReceiverGroup.Invisible),
             new SimplePackElement(CreateKeyListener(), "Key Listener", "Custom",
-                    ResourceUtils.Load("key_listener", FilterMode.Point))
+                    ResourceUtils.LoadInternal("key_listener", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.KeyListeners)
                 .WithConfigGroup(ConfigGroup.KeyListeners)
                 .WithReceiverGroup(ReceiverGroup.Invisible),
             new SimplePackElement(CreateRelay(), "Relay", "Custom",
-                    ResourceUtils.Load("event_relay", FilterMode.Point))
+                    ResourceUtils.LoadInternal("event_relay", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.Callable)
                 .WithReceiverGroup(ReceiverGroup.Relays)
                 .WithConfigGroup(ConfigGroup.Relays),
             new SimplePackElement(CreateTextDisplay(), "Text Display", "Custom",
-                    ResourceUtils.Load("text_display", FilterMode.Point))
+                    ResourceUtils.LoadInternal("text_display", FilterMode.Point))
                 .WithReceiverGroup(ReceiverGroup.TextDisplay)
                 .WithConfigGroup(ConfigGroup.TextDisplay),
             new SimplePackElement(CreatePlayerListener(), "Player Hook", "Custom",
-                    ResourceUtils.Load("player_listener"))
+                    ResourceUtils.LoadInternal("player_listener"))
                 .WithBroadcasterGroup(BroadcasterGroup.PlayerHook)
                 .WithReceiverGroup(ReceiverGroup.PlayerHook)
                 .WithConfigGroup(ConfigGroup.Invisible),
             new SimplePackElement(CreateEnemyBarrier(), "Enemy Barrier", "Custom",
-                    ResourceUtils.Load("enemy_barrier"))
+                    ResourceUtils.LoadInternal("enemy_barrier"))
                 .WithConfigGroup(ConfigGroup.Stretchable)
                 .WithReceiverGroup(ReceiverGroup.Invisible),
             new SimplePackElement(CreateObjectMover(), "Object Mover", "Custom",
-                    ResourceUtils.Load("object_mover"))
+                    ResourceUtils.LoadInternal("object_mover"))
                 .WithReceiverGroup(ReceiverGroup.ObjectMover)
                 .WithConfigGroup(ConfigGroup.ObjectMover),
             new SimplePackElement(CreateObjectDuplicator(), "Object Duplicator", "Custom",
-                    ResourceUtils.Load("object_duplicator"))
+                    ResourceUtils.LoadInternal("object_duplicator"))
                 .WithReceiverGroup(ReceiverGroup.ObjectDuplicator)
                 .WithConfigGroup(ConfigGroup.ObjectDuplicator),
             CreateSquare(),
             CreateCircle(),
             CreateTriangle(),
+            //CreatePng(),
             new SimplePackElement(CreateZoteTrophy(), "Winner's Trophy", "Custom"),
             CreateTemporaryAbilityGranter("dash_crystal", "Dash", false, "Dash Crystal"),
             CreateTemporaryAbilityGranter("single_dash_crystal", "Dash", true, "Single Use Dash Crystal"),
@@ -189,9 +190,22 @@ public static class CustomObjects
             .WithRotationGroup(RotationGroup.All);
     }
 
+    private static AbstractPackElement CreatePng()
+    {
+        var png = new GameObject("Custom PNG");
+
+        png.AddComponent<SpriteRenderer>();
+        Object.DontDestroyOnLoad(png);
+        png.SetActive(false);
+        
+        return new SimplePackElement(png, "Custom PNG", "Decorations", ResourceUtils.LoadInternal("png", ppu:300), weight: ShapeWeight)
+            .WithConfigGroup(ConfigGroup.Png)
+            .WithRotationGroup(RotationGroup.All);
+    }
+
     private static GameObject CreateDamagingOrb(string path, string name, int damage)
     {
-        var sprite = ResourceUtils.Load(path);
+        var sprite = ResourceUtils.LoadInternal(path);
         var point = new GameObject(name);
 
         point.AddComponent<SpriteRenderer>().sprite = sprite;
@@ -325,7 +339,7 @@ public static class CustomObjects
 
     private static GameObject CreateShape(string name)
     {
-        var sprite = ResourceUtils.Load(name);
+        var sprite = ResourceUtils.LoadInternal(name);
         
         var point = new GameObject("Shape (" + name + ")");
         point.transform.localScale /= 3;
@@ -342,7 +356,7 @@ public static class CustomObjects
     {
         ZoteTrophy.Init();
         
-        var sprite = ResourceUtils.Load("zote_trophy");
+        var sprite = ResourceUtils.LoadInternal("zote_trophy");
         var obj = new GameObject("Winner's Trophy");
 
         var renderer = obj.AddComponent<SpriteRenderer>();
@@ -364,7 +378,7 @@ public static class CustomObjects
     private static SimplePackElement CreateTemporaryAbilityGranter(string path, string ability, bool singleUse,
         string name)
     {
-        var sprite = ResourceUtils.Load(path, FilterMode.Point);
+        var sprite = ResourceUtils.LoadInternal(path, FilterMode.Point);
 
         var granterObj = new GameObject(ability + " Granter");
 
@@ -390,8 +404,8 @@ public static class CustomObjects
     {
         if (extraVisuals) ExtraVisualsBindings.Add(id);
         
-        var disabledSprite = ResourceUtils.Load("Bindings." + id + "_disabled");
-        var enabledSprite = ResourceUtils.Load("Bindings." + id + "_enabled");
+        var disabledSprite = ResourceUtils.LoadInternal("Bindings." + id + "_disabled");
+        var enabledSprite = ResourceUtils.LoadInternal("Bindings." + id + "_enabled");
 
         var bindingObj = new GameObject("Binding (" + id + ")");
 

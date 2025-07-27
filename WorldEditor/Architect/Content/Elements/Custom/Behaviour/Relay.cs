@@ -1,3 +1,4 @@
+using System;
 using Architect.Attributes;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -15,6 +16,7 @@ public class Relay : MonoBehaviour
     public float relayChance = 1;
     public bool multiplayerBroadcast;
     public float delay;
+    public bool broadcastImmediately;
     
     private PersistentRelayItem _item;
     private bool _shouldRelay;
@@ -52,6 +54,7 @@ public class Relay : MonoBehaviour
         {
             if (value == -1) return;
             _shouldRelay = value == 1;
+            if (broadcastImmediately) DoRelay();
         };
 
         _item.OnGetSaveState += (ref int value) =>

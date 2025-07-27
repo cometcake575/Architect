@@ -28,7 +28,7 @@ internal class FallingCrystalsElement : InternalPackElement
     internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
     {
         _gameObject = preloads["Mines_31"]["Pt Crystal Dropping (13)"];
-        _sprite = ResourceUtils.Load("falling_crystal");
+        _sprite = ResourceUtils.LoadInternal("falling_crystal");
     }
 
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)

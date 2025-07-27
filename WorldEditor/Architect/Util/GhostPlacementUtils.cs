@@ -1,13 +1,14 @@
 using Architect.Objects;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Architect.Util;
 
 public static class GhostPlacementUtils
 {
-    public static void SetupForPlacement(GameObject obj, SpriteRenderer renderer, PlaceableObject selected, bool flipped, float rotation, float scaleX, float scaleY)
+    public static void SetupForPlacement(GameObject obj, SpriteRenderer renderer, PlaceableObject selected, [CanBeNull] Sprite overrideSprite, bool flipped, float rotation, float scaleX, float scaleY)
     {
-        renderer.sprite = selected.GetSprite();
+        renderer.sprite = overrideSprite ? overrideSprite : selected.GetSprite();
 
         obj.transform.localScale = new Vector2(scaleX, scaleY) * selected.Scale;
         

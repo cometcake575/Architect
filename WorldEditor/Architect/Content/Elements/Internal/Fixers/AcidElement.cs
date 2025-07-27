@@ -46,7 +46,7 @@ internal class AcidElement() : InternalPackElement("Acid", "Hazards")
         p0.transform.Translate(-12, -5, 0);
     }
 
-    private readonly Sprite _sprite = ResourceUtils.Load("acid");
+    private readonly Sprite _sprite = ResourceUtils.LoadInternal("acid");
 
     public override Sprite GetSprite()
     {

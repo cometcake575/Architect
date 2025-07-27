@@ -8,7 +8,7 @@ namespace Architect.Content.Elements.Internal.Fixers;
 internal class CharmElement : InternalPackElement
 {
     private GameObject _gameObject;
-    private readonly Sprite _sprite = ResourceUtils.Load("shiny", new Vector2(0.5f, 0.5f), ppu:64);
+    private readonly Sprite _sprite = ResourceUtils.LoadInternal("shiny", new Vector2(0.5f, 0.5f), ppu:64);
 
     public CharmElement(int weight) : base("Charm", "Interactable", weight:weight)
     {

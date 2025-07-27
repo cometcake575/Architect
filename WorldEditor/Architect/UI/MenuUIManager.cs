@@ -5,8 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Architect.Configuration;
 using Architect.Objects;
+using Architect.Storage;
 using Architect.Util;
 using MagicUI.Core;
 using MagicUI.Elements;
@@ -100,8 +100,8 @@ public static class MenuUIManager
 
     private static void SetupSwitchArea(LayoutRoot layout)
     {
-        var architectKnight = ResourceUtils.Load("architect_knight");
-        var sleepingKnight = ResourceUtils.Load("sleeping_knight");
+        var architectKnight = ResourceUtils.LoadInternal("architect_knight");
+        var sleepingKnight = ResourceUtils.LoadInternal("sleeping_knight");
 
         var img = new Image(layout, architectKnight)
         {
@@ -214,6 +214,7 @@ public static class MenuUIManager
         }
         
         PlacementManager.InvalidateCache();
+        PngLoader.RefreshSprites();
 
         _success.Visibility = Visibility.Visible;
         _success.Text = "Downloaded";
@@ -247,31 +248,36 @@ public static class MenuUIManager
         yield return null;
     }
     
-    [System.Serializable]
+    [Serializable]
     public class SearchRequestData
     {
         public string desc;
         public string creator;
     }
     
-    [System.Serializable]
+    [Serializable]
     public class DownloadRequestData
     {
         // ReSharper disable once InconsistentNaming
+        // ReSharper disable once NotAccessedField.Global
         public string level_id;
     }
     
-    [System.Serializable]
+    [Serializable]
     public class AuthRequestData
     {
+        // ReSharper disable once NotAccessedField.Global
         public string username;
+        // ReSharper disable once NotAccessedField.Global
         public string password;
     }
     
-    [System.Serializable]
+    [Serializable]
     public class DeleteRequestData
     {
+        // ReSharper disable once NotAccessedField.Global
         public string key;
+        // ReSharper disable once NotAccessedField.Global
         public string name;
     }
 
