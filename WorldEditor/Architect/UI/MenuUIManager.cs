@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,9 +30,11 @@ public static class MenuUIManager
     private static Button _leftButton;
     private static Button _rightButton;
 
-    private static readonly List<(TextObject, TextObject, Button)> DownloadChoices = [];
+    private static readonly List<(TextObject, TextObject, TextObject, Button)> DownloadChoices = [];
     private static int _index;
     private static List<Dictionary<string, string>> _currentLevels;
+    private static TextInput _descriptionInput;
+    private static TextInput _creatorInput;
     
     private static TextObject _success;
 
@@ -119,7 +122,7 @@ public static class MenuUIManager
             Padding = new Padding(20, 20)
         };
 
-        find.Click += _ =>
+        find.Click += async _ =>
         {
             var uiManager = UIManager.instance;
             _viewing = !_viewing;
@@ -128,6 +131,8 @@ public static class MenuUIManager
                 img.Sprite = sleepingKnight;
                 uiManager.StartCoroutine(FadeGameTitle());
                 uiManager.StartCoroutine(uiManager.FadeOutCanvasGroup(uiManager.mainMenuScreen));
+
+                await PerformSearch();
             }
             else
             {
@@ -141,6 +146,15 @@ public static class MenuUIManager
                 uiManager.UIGoToMainMenu();
             }
         };
+    }
+
+    private static async Task PerformSearch()
+    {
+        var jsonResponse = await SendSearchRequest(_descriptionInput.Text, _creatorInput.Text);
+        _currentLevels = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(jsonResponse)
+            .OrderByDescending(c => Convert.ToInt32(c["downloads"])).ToList();
+        _index = 0;
+        RefreshCurrentLevels();
     }
 
     private static async Task<string> SendSearchRequest(string description, string creator)
@@ -198,7 +212,6 @@ public static class MenuUIManager
             var legacyData = JsonConvert.DeserializeObject<Dictionary<string, List<ObjectPlacement>>>(json);
             SceneSaveLoader.LoadAllScenes(legacyData);
         }
-
         
         PlacementManager.InvalidateCache();
 
@@ -266,7 +279,7 @@ public static class MenuUIManager
     {
         var padding = new Padding(20, 20);
 
-        var descriptionInput = new TextInput(layout)
+        _descriptionInput = new TextInput(layout)
         {
             MinWidth = 400,
             FontSize = 30,
@@ -275,7 +288,7 @@ public static class MenuUIManager
             Padding = padding
         }.WithProp(GridLayout.Row, 1);
 
-        var creatorInput = new TextInput(layout)
+        _creatorInput = new TextInput(layout)
         {
             MinWidth = 400,
             FontSize = 30,
@@ -324,20 +337,14 @@ public static class MenuUIManager
                     HorizontalAlignment = HorizontalAlignment.Center,
                     Padding = padding
                 }.WithProp(GridLayout.Column, 1),
-                descriptionInput,
-                creatorInput,
+                _descriptionInput,
+                _creatorInput,
                 searchButton
             },
             Visibility = Visibility.Hidden
         };
 
-        searchButton.Click += async _ =>
-        {
-            var jsonResponse = await SendSearchRequest(descriptionInput.Text, creatorInput.Text);
-            _currentLevels = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(jsonResponse);
-            _index = 0;
-            RefreshCurrentLevels();
-        };
+        searchButton.Click += async _ => await PerformSearch();
 
         _downloadArea = new GridLayout(layout, "Level Grid")
         {
@@ -345,8 +352,9 @@ public static class MenuUIManager
             VerticalAlignment = VerticalAlignment.Top,
             ColumnDefinitions =
             {
-                new GridDimension(1, GridUnit.Proportional),
-                new GridDimension(0.2f, GridUnit.Proportional)
+                new GridDimension(60, GridUnit.AbsoluteMin),
+                new GridDimension(800, GridUnit.AbsoluteMin),
+                new GridDimension(60, GridUnit.AbsoluteMin)
             },
             RowDefinitions =
             {
@@ -363,10 +371,21 @@ public static class MenuUIManager
             Visibility = Visibility.Hidden
         };
 
+        var dcPadding = new Padding(0, 20, 30, 0);
         var downloadPadding = new Padding(0, 5);
         
         for (var i = 0; i < 4; i++)
         {
+            var downloadCount = new TextObject(layout, "Download Count " + i)
+            {
+                Text = "",
+                FontSize = 20,
+                Padding = dcPadding,
+                TextAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Top,
+                HorizontalAlignment = HorizontalAlignment.Center
+            }.WithProp(GridLayout.Row, i * 2).WithProp(GridLayout.RowSpan, 2);
+            
             var infoName = new TextObject(layout, "Info 1A")
             {
                 Padding = downloadPadding,
@@ -374,7 +393,7 @@ public static class MenuUIManager
                 FontSize = 24,
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center
-            }.WithProp(GridLayout.Row, i * 2);
+            }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, i * 2);
 
             var infoDesc = new TextObject(layout, "Info 1B")
             {
@@ -382,23 +401,21 @@ public static class MenuUIManager
                 FontSize = 16,
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center
-            }.WithProp(GridLayout.Row, i * 2 + 1);
+            }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, i * 2 + 1);
 
             var download = new Button(layout, "Download " + i)
             {
                 Content = "Download",
-                VerticalAlignment = VerticalAlignment.Bottom,
+                VerticalAlignment = VerticalAlignment.Center,
                 Visibility = Visibility.Hidden
-            }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, i * 2);
+            }.WithProp(GridLayout.Column, 2).WithProp(GridLayout.Row, i * 2);
             
-            DownloadChoices.Add((infoName, infoDesc, download));
+            DownloadChoices.Add((downloadCount, infoName, infoDesc, download));
 
             var k = i;
-            download.Click += async _ =>
-            {
-                await DownloadLevel(_index * 4 + k);
-            };
+            download.Click += async _ => await DownloadLevel(_index * 4 + k);
 
+            _downloadArea.Children.Add(downloadCount);
             _downloadArea.Children.Add(infoName);
             _downloadArea.Children.Add(infoDesc);
             _downloadArea.Children.Add(download);
@@ -412,16 +429,18 @@ public static class MenuUIManager
             var index = _index * 4 + i;
             if (_currentLevels.Count > index)
             {
-                var name = _currentLevels[index]["level_name"];
-                DownloadChoices[i].Item1.Text = name + new string(' ', Mathf.Max(0, 50 - name.Length));
-                DownloadChoices[i].Item2.Text = SplitText(_currentLevels[index]["level_desc"]);
-                DownloadChoices[i].Item3.Visibility = Visibility.Visible;
+                var name = _currentLevels[index]["level_name"] + " – " + _currentLevels[index]["username"];
+                DownloadChoices[i].Item1.Text = "Downloads:\n" + _currentLevels[index]["downloads"];
+                DownloadChoices[i].Item2.Text = name + new string(' ', Mathf.Max(0, 50 - name.Length));
+                DownloadChoices[i].Item3.Text = SplitText(_currentLevels[index]["level_desc"]);
+                DownloadChoices[i].Item4.Visibility = Visibility.Visible;
             }
             else
             {
                 DownloadChoices[i].Item1.Text = "";
                 DownloadChoices[i].Item2.Text = "";
-                DownloadChoices[i].Item3.Visibility = Visibility.Hidden;
+                DownloadChoices[i].Item3.Text = "";
+                DownloadChoices[i].Item4.Visibility = Visibility.Hidden;
             }
         }
     }
@@ -774,6 +793,7 @@ public static class MenuUIManager
         while (!operation.isDone) await Task.Yield();
         if (request.responseCode != 201) return;
 
+        RefreshCurrentLevels();
         _success.Visibility = Visibility.Visible;
         _success.Text = "Uploaded";
         await Task.Delay(4000);
@@ -800,6 +820,7 @@ public static class MenuUIManager
         while (!operation.isDone) await Task.Yield();
         if (request.responseCode != 201) return;
 
+        RefreshCurrentLevels();
         _success.Visibility = Visibility.Visible;
         _success.Text = "Deleted";
         await Task.Delay(4000);

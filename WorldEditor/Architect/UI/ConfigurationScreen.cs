@@ -31,6 +31,16 @@ public static class ConfigurationScreen
                 },
                 loadSetting: () => globalSettings.CanEnableEditing ? 0 : 1
             ),
+            new HorizontalOption(
+                name: "Test Mode",
+                description: "Stops the game from storing persistent data such as walls being broken and enemies being killed",
+                values: values,
+                applySetting: i =>
+                {
+                    globalSettings.TestMode = i == 0;
+                },
+                loadSetting: () => globalSettings.TestMode ? 0 : 1
+            ),
             new TextPanel("Keybinds"),
             new KeyBind(
                 name: "Toggle Editor",
@@ -83,7 +93,7 @@ public static class ConfigurationScreen
                 Anchor = TextAnchor.UpperCenter
             }
         };
-        if (Architect.UsingMultiplayer) elements.Insert(2, new HorizontalOption(
+        if (Architect.UsingMultiplayer) elements.Insert(3, new HorizontalOption(
             name: "Collaboration Mode",
             description: "Shares edits as soon as they're made to allow working together online using HKMP",
             values: values,

@@ -98,6 +98,16 @@ public static class EditorManager
                              (IsEditing && EditorUIManager.SelectedItem is not PlaceableObject);
         };
 
+        
+        On.PersistentBoolItem.Awake += (orig, self) =>
+        {
+            if (Architect.GlobalSettings.TestMode && self.gameObject.name.StartsWith("[Architect] "))
+            {
+                self.OnGetSaveState += (ref bool value) => value = false;
+            }
+            orig(self);
+        };
+
         SetupGroupSelectionBox();
     }
 

@@ -17,6 +17,7 @@ public class WeServerAddon : ServerAddon
             PacketId.Erase => new ErasePacketData(),
             PacketId.Update => new UpdatePacketData(),
             PacketId.Relay => new RelayPacketData(),
+            PacketId.Clear => new ClearPacketData(),
             _ => null
         };
     }
@@ -42,6 +43,16 @@ public class WeServerAddon : ServerAddon
         {
             Logger.Info("Receiving Erase Packet [SERVER]");
             sender.SendSingleData(PacketId.Erase, packet, serverApi.ServerManager.Players
+                    .Where(player => player.Id != id)
+                    .Select(player => player.Id)
+                    .ToArray()
+                );
+        });
+        
+        netReceiver.RegisterPacketHandler<ClearPacketData>(PacketId.Clear, (id, packet) =>
+        {
+            Logger.Info("Receiving Clear Packet [SERVER]");
+            sender.SendSingleData(PacketId.Clear, packet, serverApi.ServerManager.Players
                     .Where(player => player.Id != id)
                     .Select(player => player.Id)
                     .ToArray()
@@ -87,6 +98,6 @@ public class WeServerAddon : ServerAddon
     }
 
     protected override string Name => "Architect";
-    protected override string Version => "1.10.9.3";
+    protected override string Version => "1.10.10.0";
     public override bool NeedsNetwork => true;
 }

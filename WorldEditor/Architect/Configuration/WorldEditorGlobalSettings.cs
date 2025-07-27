@@ -14,6 +14,8 @@ public class WorldEditorGlobalSettings
     public Dictionary<string, bool> ContentPackSettings = new();
 
     public bool CanEnableEditing = false;
+
+    public bool TestMode = false;
     
     public bool CollaborationMode = false;
     

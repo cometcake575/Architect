@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Linq;
 using Architect.Configuration;
 using Architect.MultiplayerHook;
 using Architect.UI;
@@ -26,21 +25,36 @@ internal class ResetObject : SelectableObject
 
     public static void RestartDelay()
     {
-        _resetTime = 0;
+        if (_resetting)
+        {
+            _resetting = false;
+            _resetTime = 0;
+            EditorUIManager.SetText("");
+        }
     }
+
+    private static bool _resetting;
 
     public override void OnClickInWorld(Vector3 pos, bool first)
     {
+        if (first) _resetting = true;
+        if (!_resetting) return;
+        
         _resetTime += Time.deltaTime;
-
+        
         if (_resetTime >= 3)
         {
+            RestartDelay();
+            
             var id = GameManager.instance.sceneName;
             ResetRoom(id);
             
             if (!Architect.UsingMultiplayer || !Architect.GlobalSettings.CollaborationMode) return;
             HkmpHook.ClearRoom(id);
+            return;
         }
+        
+        EditorUIManager.SetText(Mathf.Ceil(3 - _resetTime).ToString(CultureInfo.InvariantCulture));
     }
 
     public override bool IsFavourite()
@@ -66,6 +80,7 @@ internal class ResetObject : SelectableObject
         {
             var placements = PlacementManager.GetCurrentPlacements();
             while (placements.Count > 0) placements[0].Destroy();
+            UndoManager.ClearHistory();
         }
         else SceneSaveLoader.SaveScene(sceneName, []);
     }

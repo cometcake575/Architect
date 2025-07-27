@@ -51,6 +51,11 @@ public static class UndoManager
         
         After.RemoveAt(After.Count - 1);
     }
+
+    public static void ClearHistory()
+    {
+        After.Clear();
+    }
     
     public static void PerformAction(IUndoable undoable) {
         After.Clear();

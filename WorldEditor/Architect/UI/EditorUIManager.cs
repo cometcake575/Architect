@@ -162,6 +162,9 @@ public static class EditorUIManager
             case -4:
                 SelectedItem = PickObject.Instance;
                 break;
+            case -5:
+                SelectedItem = ResetObject.Instance;
+                break;
             default:
             {
                 var index = _groupIndex * ItemsPerGroup + _index;
@@ -207,8 +210,8 @@ public static class EditorUIManager
         SetupLeftSide(layout);
         SetupObjectOptions(layout);
         SetupFilter(layout);
-        SetupExtraSettings(layout);
-
+        SetupTools(layout);
+        
         On.HeroController.SceneInit += (orig, self) =>
         {
             orig(self);
@@ -406,6 +409,14 @@ public static class EditorUIManager
             Text = "ID: None",
             Visibility = Visibility.Hidden
         };
+
+        _bigText = new TextObject(layout)
+        {
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            FontSize = 128,
+            Text = ""
+        };
     }
 
     private static int _lastInfoIndex;
@@ -505,6 +516,9 @@ public static class EditorUIManager
             
             _selectionButtons.Add((button, favourite, image));
         }
+        
+        CreateImagedButton(layout, ResetObject.Instance.GetSprite(), "Reset", 0, 360, -5);
+        
         RefreshObjects();
         RefreshButtons();
     }
@@ -530,7 +544,7 @@ public static class EditorUIManager
         PauseOptions.Add(filter);
     }
 
-    private static void SetupExtraSettings(LayoutRoot layout)
+    private static void SetupTools(LayoutRoot layout)
     {
         var extraSettings = new GridLayout(layout, "Extra Settings")
         {
@@ -974,8 +988,8 @@ public static class EditorUIManager
             Enabled = false
         }.WithProp(GridLayout.Column, 2).WithProp(GridLayout.Row, 1);
 
-        eventTypeInput.TextChanged += (_, s) => { ValidateBroadcaster(s, eventNameInput.Text, add, placeable); };
-        eventNameInput.TextChanged += (_, s) => { ValidateBroadcaster(eventTypeInput.Text, s, add, placeable); };
+        eventTypeInput.TextChanged += (_, s) => ValidateBroadcaster(s, eventNameInput.Text, add, placeable);
+        eventNameInput.TextChanged += (_, s) => ValidateBroadcaster(eventTypeInput.Text, s, add, placeable);
 
         add.Click += button =>
         {
@@ -1075,5 +1089,12 @@ public static class EditorUIManager
             }
             
         add.Enabled = valid;
+    }
+
+    private static TextObject _bigText;
+
+    public static void SetText(string text)
+    {
+        _bigText.Text = text;
     }
 }

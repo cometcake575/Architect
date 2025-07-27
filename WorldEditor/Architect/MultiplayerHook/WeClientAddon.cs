@@ -123,6 +123,14 @@ public class WeClientAddon : ClientAddon
             }
         });
 
+        netReceiver.RegisterPacketHandler<ClearPacketData>(PacketId.Erase, packet =>
+        {
+            if (!Architect.GlobalSettings.CollaborationMode) return;
+            Logger.Info("Receiving Clear Packet [CLIENT]");
+
+            ResetObject.ResetRoom(packet.SceneName);
+        });
+
         netReceiver.RegisterPacketHandler<UpdatePacketData>(PacketId.Update, packet =>
         {
             if (!Architect.GlobalSettings.CollaborationMode) return;
@@ -182,12 +190,12 @@ public class WeClientAddon : ClientAddon
         if (!_api.NetClient.IsConnected) return;
         
         Logger.Info("Sending Clear Packet");
-        /*
+        
         _api.NetClient.GetNetworkSender<PacketId>(this)
             .SendSingleData(PacketId.Clear, new ClearPacketData
             {
                 SceneName = scene
-            });*/
+            });
     }
 
     public void Update(string guid, string scene, Vector3 pos)
@@ -290,11 +298,12 @@ public class WeClientAddon : ClientAddon
             PacketId.Erase => new ErasePacketData(),
             PacketId.Update => new UpdatePacketData(),
             PacketId.Relay => new RelayPacketData(),
+            PacketId.Clear => new ClearPacketData(),
             _ => null
         };
     }
 
     protected override string Name => "Architect";
-    protected override string Version => "1.10.9.3";
+    protected override string Version => "1.10.10.0";
     public override bool NeedsNetwork => true;
 }
