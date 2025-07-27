@@ -433,6 +433,16 @@ public class ConfigGroup
         );
 
         MassiveMc = new ConfigGroup(KillableEnemies,
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Disable Roar", (o, value) =>
+            {
+                if (!value.GetValue()) return;
+                var mossy = o.LocateMyFSM("Mossy Control");
+                for (var i = 3; i < 6; i++) mossy.DisableAction("Roar", 3);
+                mossy.InsertCustomAction("Roar", fsm =>
+                {
+                    fsm.SendEvent("FINISHED");
+                }, 8);
+            }), "mcc_no_roar"),
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Start Awake", (o, value) =>
             {
                 if (!value.GetValue()) return;
