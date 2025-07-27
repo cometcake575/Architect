@@ -24,6 +24,8 @@ public class ConfigGroup
     
     public static ConfigGroup Benches;
     
+    public static ConfigGroup LaserCrystal;
+    
     public static ConfigGroup Charm;
     
     public static ConfigGroup Animated;
@@ -127,26 +129,24 @@ public class ConfigGroup
     public static ConfigGroup ObjectMover;
     
     public static ConfigGroup ObjectDuplicator;
-    
+
     public static void Initialize()
     {
         if (_initialized) return;
         _initialized = true;
-        
-        Invisible = new ConfigGroup(Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Active", (o, value) =>
-            {
-                o.SetActive(value.GetValue());
-            }), "active")
+
+        Invisible = new ConfigGroup(
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Active", (o, value) => { o.SetActive(value.GetValue()); }), "active")
         );
-        
-        var layerType = Attributes.ConfigManager.RegisterConfigType(new IntConfigType("layer", (o, value) =>
-        {
-            o.GetComponent<SpriteRenderer>().sortingOrder = value.GetValue();
-        }), "layer");
-        var zOffset = Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Z Offset", (o, value) =>
-        {
-            o.transform.SetPositionZ(o.transform.GetPositionZ() + value.GetValue());
-        }), "decoration_z_offset");
+
+        var layerType = Attributes.ConfigManager.RegisterConfigType(
+            new IntConfigType("layer",
+                (o, value) => { o.GetComponent<SpriteRenderer>().sortingOrder = value.GetValue(); }), "layer");
+        var zOffset = Attributes.ConfigManager.RegisterConfigType(
+            new FloatConfigType("Z Offset",
+                (o, value) => { o.transform.SetPositionZ(o.transform.GetPositionZ() + value.GetValue()); }),
+            "decoration_z_offset");
         Colours = new ConfigGroup(Invisible,
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("r", (o, value) =>
             {
@@ -179,25 +179,25 @@ public class ConfigGroup
             layerType,
             zOffset
         );
-        
+
         Generic = new ConfigGroup(Invisible,
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Visible", (o, value) =>
             {
                 foreach (var renderer in o.GetComponentsInChildren<Renderer>()) renderer.enabled = value.GetValue();
             }), "visible")
         );
-        
+
         Benches = new ConfigGroup(Generic,
-            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Set Spawn", (o, value) =>
-            {
-                o.GetComponent<BenchConfig>().setSpawn = value.GetValue();
-            }).PreAwake(), "bench_set_spawn")
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Set Spawn",
+                    (o, value) => { o.GetComponent<BenchConfig>().setSpawn = value.GetValue(); }).PreAwake(),
+                "bench_set_spawn")
         );
-        
+
         Decorations = new ConfigGroup(Generic,
             zOffset
         );
-        
+
         Charm = new ConfigGroup(Invisible,
             Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Charm ID", (o, value) =>
             {
@@ -214,7 +214,9 @@ public class ConfigGroup
                             PlayerData.instance.royalCharmState = Mathf.Min(PlayerData.instance.royalCharmState, 4);
                             break;
                         case 40:
-                            PlayerData.instance.grimmChildLevel = PlayerData.instance.gotCharm_40 ? Mathf.Min(PlayerData.instance.grimmChildLevel, 5) : 0;
+                            PlayerData.instance.grimmChildLevel = PlayerData.instance.gotCharm_40
+                                ? Mathf.Min(PlayerData.instance.grimmChildLevel, 5)
+                                : 0;
                             break;
                         case 23:
                             PlayerData.instance.fragileHealth_unbreakable = PlayerData.instance.gotCharm_23;
@@ -246,74 +248,81 @@ public class ConfigGroup
         );
 
         Animated = new ConfigGroup(Generic,
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Speed", (o, value) =>
-            {
-                o.GetComponentInChildren<Animator>().speed = value.GetValue();
-            }), "animator_speed"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Offset", (o, value) =>
-            {
-                o.AddComponent<AnimatorDelay>().delay = value.GetValue();
-            }), "animator_offset")
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Speed",
+                    (o, value) => { o.GetComponentInChildren<Animator>().speed = value.GetValue(); }),
+                "animator_speed"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Offset",
+                    (o, value) => { o.AddComponent<AnimatorDelay>().delay = value.GetValue(); }), "animator_offset")
         );
 
         ObjectMover = new ConfigGroup(Invisible,
-            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Movement Type", (o, value) =>
-            {
-                o.GetComponent<ObjectMover>().movementType = value.GetValue();
-            }, "Add", "Set", "Knight"), "object_mover_type"),
-            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("ID/Path", (o, value) =>
-            {
-                o.GetComponent<ObjectMover>().id = value.GetValue();
-            }), "object_mover_identifier"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Rotation", (o, value) =>
-            {
-                o.GetComponent<ObjectMover>().rotation = value.GetValue();
-            }).PreAwake(), "object_mover_rotation"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("X Movement", (o, value) =>
-            {
-                o.GetComponent<ObjectMover>().xMovement = value.GetValue();
-            }).PreAwake(), "object_mover_x_move"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Y Movement", (o, value) =>
-            {
-                o.GetComponent<ObjectMover>().yMovement = value.GetValue();
-            }).PreAwake(), "object_mover_y_move")
+            Attributes.ConfigManager.RegisterConfigType(
+                new ChoiceConfigType("Movement Type",
+                    (o, value) => { o.GetComponent<ObjectMover>().movementType = value.GetValue(); }, "Add", "Set",
+                    "Knight"), "object_mover_type"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new StringConfigType("ID/Path", (o, value) => { o.GetComponent<ObjectMover>().id = value.GetValue(); }),
+                "object_mover_identifier"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Rotation",
+                    (o, value) => { o.GetComponent<ObjectMover>().rotation = value.GetValue(); }).PreAwake(),
+                "object_mover_rotation"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("X Movement",
+                    (o, value) => { o.GetComponent<ObjectMover>().xMovement = value.GetValue(); }).PreAwake(),
+                "object_mover_x_move"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Y Movement",
+                    (o, value) => { o.GetComponent<ObjectMover>().yMovement = value.GetValue(); }).PreAwake(),
+                "object_mover_y_move")
         );
 
         ObjectDuplicator = new ConfigGroup(Invisible,
-            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Placement ID", (o, value) =>
-            {
-                o.GetComponent<ObjectDuplicator>().id = value.GetValue();
-            }), "object_duplicator_identifier")
+            Attributes.ConfigManager.RegisterConfigType(
+                new StringConfigType("Placement ID",
+                    (o, value) => { o.GetComponent<ObjectDuplicator>().id = value.GetValue(); }),
+                "object_duplicator_identifier")
         );
 
         GeoChest = new ConfigGroup(Generic,
-            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Large Geo", (o, value) =>
-            {
-                o.LocateMyFSM("Chest Control").FsmVariables.FindFsmInt("Geo Large").Value = value.GetValue();
-            }), "chest_large_geo"),
-            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Medium Geo", (o, value) =>
-            {
-                o.LocateMyFSM("Chest Control").FsmVariables.FindFsmInt("Geo Med").Value = value.GetValue();
-            }), "chest_med_geo"),
-            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Small Geo", (o, value) =>
-            {
-                o.LocateMyFSM("Chest Control").FsmVariables.FindFsmInt("Geo Small").Value = value.GetValue();
-            }), "chest_small_geo")
+            Attributes.ConfigManager.RegisterConfigType(
+                new IntConfigType("Large Geo",
+                    (o, value) =>
+                    {
+                        o.LocateMyFSM("Chest Control").FsmVariables.FindFsmInt("Geo Large").Value = value.GetValue();
+                    }), "chest_large_geo"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new IntConfigType("Medium Geo",
+                    (o, value) =>
+                    {
+                        o.LocateMyFSM("Chest Control").FsmVariables.FindFsmInt("Geo Med").Value = value.GetValue();
+                    }), "chest_med_geo"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new IntConfigType("Small Geo",
+                    (o, value) =>
+                    {
+                        o.LocateMyFSM("Chest Control").FsmVariables.FindFsmInt("Geo Small").Value = value.GetValue();
+                    }), "chest_small_geo")
         );
-        
-        var enemyTypeField = typeof(HealthManager).GetField("enemyType", BindingFlags.NonPublic | BindingFlags.Instance);
+
+        var enemyTypeField =
+            typeof(HealthManager).GetField("enemyType", BindingFlags.NonPublic | BindingFlags.Instance);
         Enemies = new ConfigGroup(Generic,
-            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Give Soul", (o, value) =>
-            {
-                enemyTypeField?.SetValue(o.GetComponent<HealthManager>(), value.GetValue() ? 1 : 6);
-            }), "enemy_give_soul"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Give Soul",
+                    (o, value) =>
+                    {
+                        enemyTypeField?.SetValue(o.GetComponent<HealthManager>(), value.GetValue() ? 1 : 6);
+                    }), "enemy_give_soul"),
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Invulnerable", (o, value) =>
             {
                 o.AddComponent<EnemyInvulnerabilityMarker>().invincible = value.GetValue();
                 o.GetComponent<HealthManager>().IsInvincible = value.GetValue();
             }), "enemy_invulnerable")
         );
-        
+
         Goams = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Start Down", (o, value) =>
             {
@@ -321,58 +330,54 @@ public class ConfigGroup
                 o.LocateMyFSM("Worm Control").FsmVariables.FindFsmBool("Start Down").Value = true;
             }), "goam_start_down")
         );
-        
+
         Wingsmould = new ConfigGroup(Enemies,
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Roaming Range", (o, value) =>
-            {
-                o.LocateMyFSM("Control").GetAction<IdleBuzz>("Idle", 1).roamingRange = value.GetValue();
-            }), "wingsmould_range")
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Roaming Range",
+                    (o, value) =>
+                    {
+                        o.LocateMyFSM("Control").GetAction<IdleBuzz>("Idle", 1).roamingRange = value.GetValue();
+                    }), "wingsmould_range")
         );
-        
+
         KillableEnemies = new ConfigGroup(Enemies,
-            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Health", (o, value) =>
-            {
-                o.GetComponent<HealthManager>().hp = Mathf.Abs(value.GetValue());
-            }), "enemy_health"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new IntConfigType("Health",
+                    (o, value) => { o.GetComponent<HealthManager>().hp = Mathf.Abs(value.GetValue()); }),
+                "enemy_health"),
 
-            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Large Geo Drops", (o, value) =>
-            {
-                o.GetComponent<HealthManager>().SetGeoLarge(Mathf.Abs(value.GetValue()));
-            }), "enemy_large_geo"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new IntConfigType("Large Geo Drops",
+                    (o, value) => { o.GetComponent<HealthManager>().SetGeoLarge(Mathf.Abs(value.GetValue())); }),
+                "enemy_large_geo"),
 
-            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Medium Geo Drops", (o, value) =>
-            {
-                o.GetComponent<HealthManager>().SetGeoMedium(Mathf.Abs(value.GetValue()));
-            }), "enemy_med_geo"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new IntConfigType("Medium Geo Drops",
+                    (o, value) => { o.GetComponent<HealthManager>().SetGeoMedium(Mathf.Abs(value.GetValue())); }),
+                "enemy_med_geo"),
 
-            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Small Geo Drops", (o, value) =>
-            {
-                o.GetComponent<HealthManager>().SetGeoSmall(Mathf.Abs(value.GetValue()));
-            }), "enemy_small_geo"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new IntConfigType("Small Geo Drops",
+                    (o, value) => { o.GetComponent<HealthManager>().SetGeoSmall(Mathf.Abs(value.GetValue())); }),
+                "enemy_small_geo"),
 
             Attributes.ConfigManager.RegisterConfigType(MakePersistenceConfigType("Stay Dead", (o) =>
             {
                 var item = o.GetComponent<PersistentBoolItem>();
-                item.OnSetSaveState += b =>
-                {
-                    o.GetComponent<HealthManager>().isDead = b;
-                };
-                item.OnGetSaveState += (ref bool b) =>
-                {
-                    b = o.GetComponent<HealthManager>().isDead;
-                };
+                item.OnSetSaveState += b => { o.GetComponent<HealthManager>().isDead = b; };
+                item.OnGetSaveState += (ref bool b) => { b = o.GetComponent<HealthManager>().isDead; };
             }), "enemy_stay_dead"),
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Disable Enemy AI", (o, value) =>
             {
                 if (!value.GetValue()) return;
-                while (o.RemoveComponent<PlayMakerFSM>());
-                while (o.RemoveComponent<Climber>());
-                while (o.RemoveComponent<Walker>());
+                while (o.RemoveComponent<PlayMakerFSM>()) ;
+                while (o.RemoveComponent<Climber>()) ;
+                while (o.RemoveComponent<Walker>()) ;
                 if (!o.GetComponent<EnemyInvulnerabilityMarker>()) o.GetComponent<HealthManager>().IsInvincible = false;
             }), "enemy_ai_disabled")
         );
 
-        FlukeZoteling = new ConfigGroup(KillableEnemies, 
+        FlukeZoteling = new ConfigGroup(KillableEnemies,
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Max Flight Distance", (o, value) =>
             {
                 var control = o.LocateMyFSM("Control");
@@ -390,6 +395,7 @@ public class ConfigGroup
                     var defeated = mantis.GetAction<PlayerDataBoolTest>("Lords Defeated?", 0);
                     defeated.isTrue = defeated.isFalse;
                 }
+
                 var child = o.LocateMyFSM("Mantis Flyer");
                 if (child)
                 {
@@ -421,7 +427,7 @@ public class ConfigGroup
                     bigFly.AddCustomAction("Init", _ => { bigFly.SendEvent("GG BOSS"); });
                     return;
                 }
-                
+
                 o.LocateMyFSM("Black Knight").AddCustomAction("Rest", fsm => fsm.SendEvent("WAKE"));
             }).WithDefaultValue(true), "enemy_start_awake")
         );
@@ -435,8 +441,8 @@ public class ConfigGroup
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Arena Width", (o, value) =>
             {
                 var vars = o.LocateMyFSM("Mossy Control").FsmVariables;
-                vars.FindFsmFloat("X Max").Value = o.transform.position.x + value.GetValue()/2;
-                vars.FindFsmFloat("X Min").Value = o.transform.position.x - value.GetValue()/2;
+                vars.FindFsmFloat("X Max").Value = o.transform.position.x + value.GetValue() / 2;
+                vars.FindFsmFloat("X Min").Value = o.transform.position.x - value.GetValue() / 2;
             }), "mmc_arena_width"),
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Emerge Offset", (o, value) =>
             {
@@ -444,7 +450,7 @@ public class ConfigGroup
                 var act = fsm.GetAction<RandomFloat>("Emerge Left", 3);
                 act.min = value.GetValue();
                 act.max = value.GetValue();
-                
+
                 var act2 = fsm.GetAction<RandomFloat>("Emerge Right", 3);
                 act2.min = value.GetValue();
                 act2.max = value.GetValue();
@@ -465,10 +471,10 @@ public class ConfigGroup
                 if (value.GetValue() == 1) return;
                 o.GetComponent<VengeflyKingElement.VkConfig>().targetPlayer = false;
             }, "Vanilla", "Player").PreAwake(), "vk_dive_mode"),
-            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Vengeflies", (o, value) =>
-            {
-                o.GetComponent<VengeflyKingElement.VkConfig>().vengeflyRule = value.GetValue();
-            }, "Off", "Vanilla", "Local").PreAwake(), "vk_summon_mode")
+            Attributes.ConfigManager.RegisterConfigType(
+                new ChoiceConfigType("Vengeflies",
+                    (o, value) => { o.GetComponent<VengeflyKingElement.VkConfig>().vengeflyRule = value.GetValue(); },
+                    "Off", "Vanilla", "Local").PreAwake(), "vk_summon_mode")
         );
 
         Breakable = new ConfigGroup(Generic,
@@ -482,41 +488,54 @@ public class ConfigGroup
         );
 
         Cocoon = new ConfigGroup(Breakable,
-            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Lifeseed Count", (o, value) =>
-            {
-                o.GetComponent<HealthCocoon>()?.SetScuttlerAmount(Mathf.Abs(value.GetValue()));
-            }), "lifeseed_count")
+            Attributes.ConfigManager.RegisterConfigType(
+                new IntConfigType("Lifeseed Count",
+                    (o, value) => { o.GetComponent<HealthCocoon>()?.SetScuttlerAmount(Mathf.Abs(value.GetValue())); }),
+                "lifeseed_count")
         );
 
         MovingObjects = new ConfigGroup(Gravity,
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Track Distance", (o, value) =>
-            {
-                o.GetOrAddComponent<MovingObject>().trackDistance = value.GetValue();
-            }), "mo_track_dist"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Speed", (o, value) =>
-            {
-                o.GetOrAddComponent<MovingObject>().SetSpeed(value.GetValue());
-            }).PreAwake(), "mo_speed"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Pause Time", (o, value) =>
-            {
-                o.GetOrAddComponent<MovingObject>().pauseTime = value.GetValue();
-            }), "mo_pause"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Smoothing", (o, value) =>
-            {
-                o.GetOrAddComponent<MovingObject>().smoothing = value.GetValue();
-            }), "mo_smoothing"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Start Offset", (o, value) =>
-            {
-                o.GetOrAddComponent<MovingObject>().offset = value.GetValue();
-            }), "mo_offset"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Track Rotation", (o, value) =>
-            {
-                o.GetOrAddComponent<MovingObject>().rotation = value.GetValue();
-            }), "mo_rotation"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Rotation over Time", (o, value) =>
-            {
-                o.GetOrAddComponent<MovingObject>().SetRotationSpeed(value.GetValue());
-            }), "mo_rotation_time")
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Track Distance",
+                    (o, value) => { o.GetOrAddComponent<MovingObject>().trackDistance = value.GetValue(); }),
+                "mo_track_dist"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Speed",
+                    (o, value) => { o.GetOrAddComponent<MovingObject>().SetSpeed(value.GetValue()); }).PreAwake(),
+                "mo_speed"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Pause Time",
+                    (o, value) => { o.GetOrAddComponent<MovingObject>().pauseTime = value.GetValue(); }), "mo_pause"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Smoothing",
+                    (o, value) => { o.GetOrAddComponent<MovingObject>().smoothing = value.GetValue(); }),
+                "mo_smoothing"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Start Offset",
+                    (o, value) => { o.GetOrAddComponent<MovingObject>().offset = value.GetValue(); }), "mo_offset"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Track Rotation",
+                    (o, value) => { o.GetOrAddComponent<MovingObject>().rotation = value.GetValue(); }), "mo_rotation"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Rotation over Time",
+                    (o, value) => { o.GetOrAddComponent<MovingObject>().SetRotationSpeed(value.GetValue()); }),
+                "mo_rotation_time")
+        );
+
+        LaserCrystal = new ConfigGroup(MovingObjects,
+            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Idle Time", (o, value) =>
+                {
+                    o.LocateMyFSM("Laser Bug").FsmVariables.FindFsmFloat("Idle Time").Value = value.GetValue();
+                }
+            ), "beam_idle_time"),
+            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Charge Time", (o, value) => {
+                    o.LocateMyFSM("Laser Bug").FsmVariables.FindFsmFloat("Antic Time").Value = value.GetValue();
+                }
+            ), "beam_charge_time"),
+            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Beam Time", (o, value) => {
+                    o.LocateMyFSM("Laser Bug").FsmVariables.FindFsmFloat("Beam Time").Value = value.GetValue();
+                }
+            ), "beam_beam_time")
         );
 
         Levers = new ConfigGroup(Generic,
@@ -957,16 +976,20 @@ public class ConfigGroup
             }, "None", "Hazard", "Terrain", "Solid"), "shape_collision")
         );
 
-        Relays = new ConfigGroup(Generic,
+        Relays = new ConfigGroup(
             Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Relay ID", (o, value) =>
             {
                 o.GetComponent<Relay>().id = value.GetValue();
-            }), "relay_id"),
+            }).PreAwake(), "relay_id"),
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Start Enabled", (o, value) =>
+            {
+                o.GetComponent<Relay>().startActivated = value.GetValue();
+            }).PreAwake(), "relay_start_active"),
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Reset on Bench", (o, value) =>
             {
                 if (!value.GetValue()) return;
                 o.GetComponent<Relay>().semiPersistent = true;
-            }), "relay_reset_at_bench"),
+            }).PreAwake(), "relay_reset_at_bench"),
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Multiplayer Relay", (o, value) =>
             {
                 if (!value.GetValue()) return;

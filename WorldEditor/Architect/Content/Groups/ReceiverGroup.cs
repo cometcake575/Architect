@@ -48,7 +48,7 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
         if (_initialized) return;
         _initialized = true;
 
-        Invisible = new ReceiverGroup(Invisible, 
+        Invisible = new ReceiverGroup(null, 
             EventManager.RegisterEventReceiverType("disable", o => o.SetActive(false)),
             EventManager.RegisterEventReceiverType("enable", o => o.SetActive(true))
         );
@@ -143,7 +143,7 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
             })
         );
 
-        Relays = new ReceiverGroup(Invisible,
+        Relays = new ReceiverGroup(null,
             EventManager.RegisterEventReceiverType("call", o =>
             {
                 if (!o.activeInHierarchy) return;

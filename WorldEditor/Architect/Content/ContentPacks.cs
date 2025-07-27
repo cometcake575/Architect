@@ -274,7 +274,7 @@ public static class ContentPacks
                 .WithRotationGroup(RotationGroup.Eight),
             Create("Mines_31", "Laser Turret", "Laser Crystal", "Hazards")
                 .WithRotationGroup(RotationGroup.All)
-                .WithConfigGroup(ConfigGroup.MovingObjects)
+                .WithConfigGroup(ConfigGroup.LaserCrystal)
                 .FlipHorizontal(),
             new ForceActivatedElement("Crossroads_45", "Zombie Myla", "Husk Myla", "Enemies")
                 .WithConfigGroup(ConfigGroup.KillableEnemies)
