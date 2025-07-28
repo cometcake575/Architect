@@ -513,18 +513,18 @@ public class ConfigGroup
                     (o, value) => { o.GetOrAddComponent<MovingObject>().trackDistance = value.GetValue(); }),
                 "mo_track_dist"),
             Attributes.ConfigManager.RegisterConfigType(
-                new FloatConfigType("Speed",
+                new FloatConfigType("Track Movement Speed",
                     (o, value) => { o.GetOrAddComponent<MovingObject>().SetSpeed(value.GetValue()); }).PreAwake(),
                 "mo_speed"),
             Attributes.ConfigManager.RegisterConfigType(
-                new FloatConfigType("Pause Time",
+                new FloatConfigType("Track Pause Time",
                     (o, value) => { o.GetOrAddComponent<MovingObject>().pauseTime = value.GetValue(); }), "mo_pause"),
             Attributes.ConfigManager.RegisterConfigType(
-                new FloatConfigType("Smoothing",
+                new FloatConfigType("Track Smoothing",
                     (o, value) => { o.GetOrAddComponent<MovingObject>().smoothing = value.GetValue(); }),
                 "mo_smoothing"),
             Attributes.ConfigManager.RegisterConfigType(
-                new FloatConfigType("Start Offset",
+                new FloatConfigType("Start Offset on Track",
                     (o, value) => { o.GetOrAddComponent<MovingObject>().offset = value.GetValue(); }), "mo_offset"),
             Attributes.ConfigManager.RegisterConfigType(
                 new FloatConfigType("Track Rotation",

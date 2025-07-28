@@ -239,6 +239,8 @@ public static class EditorManager
         DoFreeMovement(actions);
     }
 
+    private static Vector3 _freeMovePos;
+
     private static void DoFreeMovement(HeroActions actions)
     {
         var up = actions.up.IsPressed;
@@ -246,17 +248,22 @@ public static class EditorManager
         var left = actions.left.IsPressed;
         var right = actions.right.IsPressed;
 
-        HeroController.instance.current_velocity = Vector2.zero;
         if (up != down)
         {
-            HeroController.instance.transform.position += (up ? Vector3.up : Vector3.down) * Time.deltaTime * 20;
+            _freeMovePos += (up ? Vector3.up : Vector3.down) * Time.deltaTime * 20;
         }
 
         if (left != right)
         {
-            HeroController.instance.transform.position +=
+            _freeMovePos +=
                 (left ? Vector3.left : Vector3.right) * Time.deltaTime * 20;
         }
+        
+        if (HeroController.instance.transitionState == GlobalEnums.HeroTransitionState.WAITING_TO_TRANSITION)
+        {
+            HeroController.instance.transform.position = _freeMovePos;
+        }   
+        else _freeMovePos = HeroController.instance.transform.position;
     }
 
     private static void CheckToggle(bool paused)
@@ -270,8 +277,10 @@ public static class EditorManager
         if (HeroController.instance.controlReqlinquished) return;
 
         HeroController.instance.AffectedByGravity(IsEditing);
-        if (IsEditing) SceneSaveLoader.SaveScene(GameManager.instance.sceneName, PlacementManager.GetCurrentPlacements()); 
-            
+        if (IsEditing)
+            SceneSaveLoader.SaveScene(GameManager.instance.sceneName, PlacementManager.GetCurrentPlacements());
+        else _freeMovePos = HeroController.instance.transform.position;
+
         IsEditing = !IsEditing;
 
         ReloadScene();
