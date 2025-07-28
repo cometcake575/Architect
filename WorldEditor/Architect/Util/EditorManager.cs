@@ -223,7 +223,6 @@ public static class EditorManager
             }
         }
 
-        HeroController.instance.AffectedByGravity(false);
         if (Architect.GlobalSettings.Keybinds.AddPrefab.WasPressed) PrefabsCategory.TryAddPrefab();
 
         var actions = InputHandler.Instance.inputActions;
@@ -255,12 +254,10 @@ public static class EditorManager
 
         if (left != right)
         {
-            _freeMovePos +=
-                (left ? Vector3.left : Vector3.right) * Time.deltaTime * 20;
+            _freeMovePos += (left ? Vector3.left : Vector3.right) * Time.deltaTime * 20;
         }
-        
-        if (HeroController.instance.transitionState == GlobalEnums.HeroTransitionState.WAITING_TO_TRANSITION 
-            || HeroController.instance.transitionState == GlobalEnums.HeroTransitionState.DROPPING_DOWN)
+
+        if (HeroController.instance.transitionState == GlobalEnums.HeroTransitionState.WAITING_TO_TRANSITION)
         {
             HeroController.instance.transform.position = _freeMovePos;
         }   
@@ -277,9 +274,7 @@ public static class EditorManager
 
         if (HeroController.instance.controlReqlinquished) return;
 
-        HeroController.instance.AffectedByGravity(IsEditing);
-        if (IsEditing)
-            SceneSaveLoader.SaveScene(GameManager.instance.sceneName, PlacementManager.GetCurrentPlacements());
+        if (IsEditing) SceneSaveLoader.SaveScene(GameManager.instance.sceneName, PlacementManager.GetCurrentPlacements());
         else _freeMovePos = HeroController.instance.transform.position;
 
         IsEditing = !IsEditing;
@@ -303,10 +298,7 @@ public static class EditorManager
     {
         var leftMenu = actions.left.WasPressed;
         var rightMenu = actions.right.WasPressed;
-        if (leftMenu != rightMenu)
-        {
-            EditorUIManager.ShiftGroup(rightMenu ? 1 : -1);
-        }
+        if (leftMenu != rightMenu) EditorUIManager.ShiftGroup(rightMenu ? 1 : -1);
     }
 
     private static void TryPlace()
