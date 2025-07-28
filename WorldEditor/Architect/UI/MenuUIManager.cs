@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Architect.Objects;
 using Architect.Storage;
@@ -22,6 +21,8 @@ namespace Architect.UI;
 
 public static class MenuUIManager
 {
+    private const int LevelsPerPage = 5;
+    
     private static bool _viewing;
     private static GridLayout _searchArea;
     private static GridLayout _downloadArea;
@@ -78,7 +79,7 @@ public static class MenuUIManager
         _leftButton.Click += _ =>
         {
             _index -= 1;
-            if (_index < 0) _index = _currentLevels.Count / 4;
+            if (_index < 0) _index = _currentLevels.Count / LevelsPerPage;
             RefreshCurrentLevels();
         };
         
@@ -93,7 +94,7 @@ public static class MenuUIManager
         };
         _rightButton.Click += _ =>
         {
-            _index = (_index + 1) % (_currentLevels.Count / 4 + 1);
+            _index = (_index + 1) % (_currentLevels.Count / LevelsPerPage + 1);
             RefreshCurrentLevels();
         };
     }
@@ -359,33 +360,29 @@ public static class MenuUIManager
             ColumnDefinitions =
             {
                 new GridDimension(60, GridUnit.AbsoluteMin),
-                new GridDimension(800, GridUnit.AbsoluteMin),
+                new GridDimension(1200, GridUnit.AbsoluteMin),
                 new GridDimension(60, GridUnit.AbsoluteMin)
-            },
-            RowDefinitions =
-            {
-                new GridDimension(0.25f, GridUnit.Proportional),
-                new GridDimension(1, GridUnit.Proportional),
-                new GridDimension(0.25f, GridUnit.Proportional),
-                new GridDimension(1, GridUnit.Proportional),
-                new GridDimension(0.25f, GridUnit.Proportional),
-                new GridDimension(1, GridUnit.Proportional),
-                new GridDimension(0.25f, GridUnit.Proportional),
-                new GridDimension(1, GridUnit.Proportional)
             },
             Padding = new Padding(0, 240),
             Visibility = Visibility.Hidden
         };
 
+        for (var _ = 0; _ < LevelsPerPage; _++)
+        {
+            _downloadArea.RowDefinitions.Add(new GridDimension(0.5f, GridUnit.Proportional));
+            _downloadArea.RowDefinitions.Add(new GridDimension(1, GridUnit.Proportional));
+        }
+
         var dcPadding = new Padding(0, 20, 30, 0);
-        var downloadPadding = new Padding(0, 5);
+        var descPadding = new Padding(0, 0, 0, 15);
         
-        for (var i = 0; i < 4; i++)
+        for (var i = 0; i < LevelsPerPage; i++)
         {
             var downloadCount = new TextObject(layout, "Download Count " + i)
             {
                 Text = "",
                 FontSize = 20,
+                Font = MagicUI.Core.UI.Perpetua,
                 Padding = dcPadding,
                 TextAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Top,
@@ -394,17 +391,19 @@ public static class MenuUIManager
             
             var infoName = new TextObject(layout, "Info 1A")
             {
-                Padding = downloadPadding,
                 Text = "",
                 FontSize = 24,
+                Font = MagicUI.Core.UI.Perpetua,
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center
             }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, i * 2);
 
             var infoDesc = new TextObject(layout, "Info 1B")
             {
+                Padding = descPadding,
                 Text = "",
                 FontSize = 16,
+                Font = MagicUI.Core.UI.Perpetua,
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center
             }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, i * 2 + 1);
@@ -419,7 +418,7 @@ public static class MenuUIManager
             DownloadChoices.Add((downloadCount, infoName, infoDesc, download));
 
             var k = i;
-            download.Click += async _ => await DownloadLevel(_index * 4 + k);
+            download.Click += async _ => await DownloadLevel(_index * LevelsPerPage + k);
 
             _downloadArea.Children.Add(downloadCount);
             _downloadArea.Children.Add(infoName);
@@ -430,9 +429,9 @@ public static class MenuUIManager
 
     private static void RefreshCurrentLevels()
     {
-        for (var i = 0; i < 4; i++)
+        for (var i = 0; i < LevelsPerPage; i++)
         {
-            var index = _index * 4 + i;
+            var index = _index * LevelsPerPage + i;
             if (_currentLevels.Count > index)
             {
                 var name = _currentLevels[index]["level_name"] + " – " + _currentLevels[index]["username"];
@@ -461,7 +460,7 @@ public static class MenuUIManager
 
         foreach (var word in words)
         {
-            if (currentSegment.Length + word.Length - sub <= 100)
+            if (currentSegment.Length + word.Length - sub <= 120)
             {
                 if (currentSegment.Length > 1) currentSegment += " ";
                 
@@ -469,7 +468,7 @@ public static class MenuUIManager
             }
             else
             {
-                currentSegment += new string(' ', Mathf.Max(0, 100 - currentSegment.Length + sub));
+                currentSegment += new string(' ', Mathf.Max(0, 120 - currentSegment.Length + sub));
                 segments.Add(currentSegment);
                 sub = 1;
                 if (segments.Count >= 4) break;
@@ -479,10 +478,10 @@ public static class MenuUIManager
 
         if (segments.Count < 4 && currentSegment.Length > 0)
         {
-            currentSegment += new string(' ', Mathf.Max(0, 100 - currentSegment.Length + sub));
+            currentSegment += new string(' ', Mathf.Max(0, 120 - currentSegment.Length + sub));
             segments.Add(currentSegment);
         }
-        while (segments.Count < 4) segments.Add("\n                                                                                                    ");
+        while (segments.Count < 4) segments.Add("\n");
 
         return segments.Aggregate("", (current, seg) => current + seg);
     }

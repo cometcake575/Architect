@@ -123,6 +123,8 @@ public static class EditorManager
         orig(self, search);
     }
 
+    private static bool _prevPaused;
+
     private static void EditorUpdate()
     {
         var paused = GameManager.instance.isPaused;
@@ -230,9 +232,13 @@ public static class EditorManager
         if (paused) ShiftSelection(actions);
         else TryPlace();
 
-        foreach (var element in EditorUIManager.PauseOptions)
+        if (_prevPaused != paused)
         {
-            element.Visibility = paused ? Visibility.Visible : Visibility.Hidden;
+            _prevPaused = paused;
+            foreach (var element in EditorUIManager.PauseOptions)
+            {
+                element.Visibility = paused ? Visibility.Visible : Visibility.Hidden;
+            }
         }
 
         DoFreeMovement(actions);
