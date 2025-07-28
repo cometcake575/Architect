@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Architect.Attributes;
 using Architect.Content.Groups;
@@ -29,8 +30,13 @@ internal sealed class LeverPackElement : GInternalPackElement
         
         var str = fsm.FsmVariables.FindFsmString("Player Data");
         if (str != null) str.Value = "";
-        
-        fsm.RemoveTransition("Activated", "FINISHED");
+
+        try
+        {
+            fsm.RemoveTransition("Activated", "FINISHED");
+        }
+        catch (OverflowException) { }
+
         fsm.AddCustomAction("Activated", makerFsm =>
         {
             EventManager.BroadcastEvent(makerFsm.gameObject, "LoadedPulled");

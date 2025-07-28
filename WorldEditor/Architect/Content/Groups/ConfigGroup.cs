@@ -730,8 +730,16 @@ public class ConfigGroup
             Attributes.ConfigManager.RegisterConfigType(
                 new FloatConfigType("Belt Speed", (o, value) =>
                 {
-                    o.transform.GetChild(0).GetComponent<ConveyorBelt>().speed = value.GetValue();
-                    o.GetComponent<Animator>().speed = value.GetValue() / 8;
+                    var val = value.GetValue();
+                    if (val < 0)
+                    {
+                        var scale = o.transform.localScale;
+                        scale.x = -scale.x;
+                        o.transform.localScale = scale;
+                    }
+
+                    o.transform.GetChild(0).GetComponent<ConveyorBelt>().speed = val;
+                    o.GetComponent<Animator>().speed = Math.Abs(val) / 8;
                 }).PreAwake(), "conveyor_speed"
             )
         );

@@ -31,11 +31,18 @@ internal class BenchElement : GInternalPackElement
             .FindFsmBool("Tilter").Value = true;
         bench.AddComponent<RestBenchTilt>().tilt = rotation;
     }
-    
+
     public override void PostPlace(ObjectPlacement placement, GameObject preview)
     {
         var obj = placement.SpawnObject();
         obj.transform.parent = preview.transform;
+        var ls = obj.transform.lossyScale;
+        
+        ls.x /= Mathf.Max(0.01f, preview.transform.localScale.x);
+        ls.y /= Mathf.Max(0.01f, preview.transform.localScale.y);
+        ls.z /= Mathf.Max(0.01f, preview.transform.localScale.z);
+
+        obj.transform.localScale = ls;
         foreach (var comp in obj.GetComponentsInChildren<Renderer>()) comp.enabled = false;
     }
 }

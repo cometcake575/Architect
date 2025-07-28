@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Architect.Content.Groups;
+using Architect.Objects;
 using UnityEngine;
 
 namespace Architect.Content.Elements.Internal.Fixers;
@@ -68,6 +69,8 @@ internal class ConveyorBeltElement : InternalPackElement
             CurrentVerticalBelts.Clear();
             CurrentBelts.Clear();
             self.GetComponent<ConveyorMovementHero>().StopConveyorMove();
+            HeroController.instance.cState.onConveyor = false;
+            HeroController.instance.cState.onConveyorV = false;
         };
         
         On.ConveyorBelt.OnCollisionExit2D += (orig, self, collision) =>
@@ -87,6 +90,7 @@ internal class ConveyorBeltElement : InternalPackElement
             }
             orig(self, collision);
         };
+        
         On.ConveyorBelt.OnCollisionEnter2D += (orig, self, collision) =>
         {
             orig(self, collision);
@@ -98,6 +102,6 @@ internal class ConveyorBeltElement : InternalPackElement
         };
     }
 
-    private static readonly List<ConveyorBelt> CurrentVerticalBelts = new();
-    private static readonly List<ConveyorBelt> CurrentBelts = new();
+    private static readonly List<ConveyorBelt> CurrentVerticalBelts = [];
+    private static readonly List<ConveyorBelt> CurrentBelts = [];
 }
