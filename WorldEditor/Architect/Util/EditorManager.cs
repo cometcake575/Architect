@@ -259,7 +259,8 @@ public static class EditorManager
                 (left ? Vector3.left : Vector3.right) * Time.deltaTime * 20;
         }
         
-        if (HeroController.instance.transitionState == GlobalEnums.HeroTransitionState.WAITING_TO_TRANSITION)
+        if (HeroController.instance.transitionState == GlobalEnums.HeroTransitionState.WAITING_TO_TRANSITION 
+            || HeroController.instance.transitionState == GlobalEnums.HeroTransitionState.DROPPING_DOWN)
         {
             HeroController.instance.transform.position = _freeMovePos;
         }   
