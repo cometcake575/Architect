@@ -798,7 +798,7 @@ public static class MenuUIManager
         while (!operation.isDone) await Task.Yield();
         if (request.responseCode != 201) return;
 
-        RefreshCurrentLevels();
+        await PerformSearch();
         _success.Visibility = Visibility.Visible;
         _success.Text = "Uploaded";
         await Task.Delay(4000);
@@ -825,7 +825,7 @@ public static class MenuUIManager
         while (!operation.isDone) await Task.Yield();
         if (request.responseCode != 201) return;
 
-        RefreshCurrentLevels();
+        await PerformSearch();
         _success.Visibility = Visibility.Visible;
         _success.Text = "Deleted";
         await Task.Delay(4000);
