@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Architect.Content.Elements.Custom.Behaviour;
@@ -6,7 +7,12 @@ public class SceneBorderRemover : MonoBehaviour
 {
     private static int _count;
     private static CameraController _camera;
-    
+
+    private void Start()
+    {
+        Refresh();
+    }
+
     private void OnEnable()
     {
         _count++;
