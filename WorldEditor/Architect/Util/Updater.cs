@@ -29,6 +29,7 @@ public static class Updater
         {
             "Coin Switch" => "Switch",
             "Coin Switch Door" => "Switch Door",
+            "Spell Twister" => "Soul Twister",
             _ => name
         };
     }

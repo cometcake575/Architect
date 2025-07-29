@@ -1,3 +1,5 @@
+using System;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Architect.Content.Elements.Custom.Behaviour;
@@ -26,6 +28,8 @@ public class TemporaryAbilityGranter : MonoBehaviour
             _renderer.enabled = false;
             _disabled = 2.5f;
         }
+        
+        CustomObjects.CollectAbilityGranter(abilityType);
     }
 
     private void Update()

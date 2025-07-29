@@ -273,6 +273,7 @@ public static class EditorManager
     private static void CheckToggle(bool paused)
     {
         if (paused) return;
+        _prevPaused = true;
 
         if (!Architect.GlobalSettings.Keybinds.ToggleEditor.WasPressed) return;
         var fsm = HeroController.instance.gameObject.LocateMyFSM("Surface Water");
@@ -284,7 +285,7 @@ public static class EditorManager
         else _freeMovePos = HeroController.instance.transform.position;
 
         IsEditing = !IsEditing;
-
+        
         ReloadScene();
     }
 

@@ -28,7 +28,7 @@ public static class CustomObjects
     internal static readonly Dictionary<string, List<CustomBinder>> Bindings = new();
     internal static readonly List<string> ExtraVisualsBindings = [];
 
-    private static GridLayout _bindingsLayout; 
+    private static GridLayout _bindingsLayout;
         
     private const int ShapeWeight = 1;
 
@@ -84,10 +84,12 @@ public static class CustomObjects
             new SimplePackElement(CreateZoteTrophy(), "Winner's Trophy", "Custom"),
             CreateTemporaryAbilityGranter("dash_crystal", "Dash", false, "Dash Crystal"),
             CreateTemporaryAbilityGranter("single_dash_crystal", "Dash", true, "Single Use Dash Crystal"),
+            CreateTemporaryAbilityGranter("shadow_dash_crystal", "Shadow Dash", false, "Shadow Dash Crystal"),
+            CreateTemporaryAbilityGranter("single_shadow_dash_crystal", "Shadow Dash", true, "Single Use Shadow Dash Crystal"),
             CreateTemporaryAbilityGranter("wings_crystal", "Wings", false, "Wings Crystal"),
             CreateTemporaryAbilityGranter("single_wings_crystal", "Wings", true, "Single Use Wings Crystal"),
             new SimplePackElement(CreateDamagingOrb("energy_orb", "Energy Orb", 1), "Energy Orb", "Custom")
-                .WithConfigGroup(ConfigGroup.MovingObjects),
+                .WithConfigGroup(ConfigGroup.EnergyOrb),
             new SimplePackElement(CreateDamagingOrb("radiant_orb", "Radiant Orb", 999), "Radiant Orb", "Custom")
                 .WithConfigGroup(ConfigGroup.MovingObjects),
             CreateBinding("nail", "Nail Binding", false),
@@ -116,6 +118,24 @@ public static class CustomObjects
 
         InitializeBindingsUI();
         InitializeHooks();
+    }
+
+    private static readonly FieldInfo ShadowDashTimer = typeof(HeroController).GetField("shadowDashTimer", 
+        BindingFlags.NonPublic | BindingFlags.Instance);
+    private static readonly FieldInfo SpriteFlash = typeof(HeroController).GetField("spriteFlash", 
+        BindingFlags.NonPublic | BindingFlags.Instance);
+
+    private static void RefreshShadowDash()
+    {
+        if ((float) ShadowDashTimer.GetValue(HeroController.instance) <= 0) return;
+        ShadowDashTimer.SetValue(HeroController.instance, 0.0f);
+        FSMUtility.LocateFSM(HeroController.instance.shadowRechargePrefab, "Recharge Effect").SetState("Burst");
+        ((SpriteFlash) SpriteFlash.GetValue(HeroController.instance)).FlashShadowRecharge();
+    }
+
+    public static void CollectAbilityGranter(string type)
+    {
+        if (type == "Shadow Dash") RefreshShadowDash();
     }
 
     private static void InitializeBindingsUI()
@@ -482,7 +502,9 @@ public static class CustomObjects
         {
             return name switch
             {
-                "hasShadowDash" => BindingCheck(orig, "shadow_dash"),
+                "hasShadowDash" => BindingCheck(orig, "shadow_dash") 
+                                   || TemporaryAbilities.Contains("Shadow Dash") 
+                                   || TemporaryAbilities.Contains("Shadow Dash Check"),
                 "hasLantern" => BindingCheck(orig, "lantern"),
                 _ => orig
             };
@@ -536,11 +558,24 @@ public static class CustomObjects
         };
 
         // Crystals
-        On.HeroController.CanDash += (orig, self) => TemporaryAbilities.Contains("Dash") || orig(self);
+        On.HeroController.CanDash += (orig, self) => TemporaryAbilities.Contains("Dash") 
+                                                     || TemporaryAbilities.Contains("Shadow Dash") 
+                                                     || orig(self);
         On.HeroController.HeroDash += (orig, self) =>
         {
             orig(self);
             TemporaryAbilities.Remove("Dash");
+
+            if (TemporaryAbilities.Contains("Shadow Dash"))
+            {
+                TemporaryAbilities.Remove("Shadow Dash");
+                TemporaryAbilities.Add("Shadow Dash Check");
+            }
+        };
+        On.HeroController.FinishedDashing += (orig, self) =>
+        {
+            orig(self);
+            TemporaryAbilities.Remove("Shadow Dash Check");
         };
         On.HeroController.CanDoubleJump += (orig, self) => TemporaryAbilities.Contains("Wings") || orig(self);
         On.HeroController.DoDoubleJump += (orig, self) =>
@@ -958,7 +993,7 @@ public static class CustomObjects
             orig(self);
             PlayerEvent(self.cState.facingRight ? "FaceRight" : "FaceLeft");
         };
-
+        
         On.HeroController.DoAttack += (orig, self) =>
         {
             PlayerEvent("Attack");

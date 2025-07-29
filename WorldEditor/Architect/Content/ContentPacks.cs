@@ -340,9 +340,10 @@ public static class ContentPacks
                 .WithReceiverGroup(ReceiverGroup.Gates),
             CreateEnemy("Ruins2_01", "Ruins Sentry 1", "Husk Sentry"),
             CreateEnemy("Ruins2_01", "Ruins Flying Sentry", "Winged Sentry"),
-            CreateEnemy("Ruins2_01", "Ruins Flying Sentry Javelin", "Lance Sentry"),
+            CreateEnemy("Ruins2_01", "Ruins Flying Sentry Javelin", "Lance Sentry")
+                .FlipHorizontal(),
             CreateEnemy("Ruins2_01", "Ruins Sentry Fat", "Heavy Sentry"),
-            new TwisterPackElement("Ruins1_30", "Mage", "Spell Twister", "Mage"),
+            new TwisterPackElement("Ruins1_30", "Mage", "Soul Twister", "Mage"),
             CreateEnemy("Ruins1_30", "Mage Blob 1", "Mistake"),
             CreateEnemy("Ruins1_30", "Mage Balloon", "Folly"),
             new SoulWarriorElement(),
@@ -382,7 +383,7 @@ public static class ContentPacks
             CreateEnemy("GG_Pipeway", "Fluke Fly", "Flukefey"),
             CreateEnemy("GG_Pipeway", "Flukeman", "Flukemon"),
             CreateEnemy("GG_Pipeway", "Fat Fluke", "Flukemunga"),
-            new HatcherPackElement("GG_Flukemarm", "Fluke Mother", "Hatcher Cage (2)", "Flukemarm", "Fluke Mother")
+            new HatcherPackElement("GG_Flukemarm", "Fluke Mother", "Hatcher Cage (2)", "Flukemarm", "Fluke Mother", "Enemies")
         });
         RegisterInternalPack(new ContentPack("Kingdom's Edge", "Assets from Kingdom's Edge")
         {

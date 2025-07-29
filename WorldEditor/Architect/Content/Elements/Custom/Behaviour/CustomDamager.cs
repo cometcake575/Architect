@@ -6,6 +6,7 @@ namespace Architect.Content.Elements.Custom.Behaviour;
 public class CustomDamager : MonoBehaviour
 {
     public int damageAmount;
+    public int damageType = 2;
     
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -15,7 +16,7 @@ public class CustomDamager : MonoBehaviour
             gameObject,
             CollisionSide.other,
             damageAmount,
-            2
+            damageType
         );
     }
 }

@@ -73,6 +73,8 @@ public class ConfigGroup
     
     public static ConfigGroup Thorns;
     
+    public static ConfigGroup EnergyOrb;
+    
     public static ConfigGroup MovingPlatforms;
     
     public static ConfigGroup TriggerZones;
@@ -536,16 +538,21 @@ public class ConfigGroup
         );
 
         LaserCrystal = new ConfigGroup(MovingObjects,
-            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Idle Time", (o, value) =>
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Start Pause", (o, value) =>
+                {
+                    o.LocateMyFSM("Laser Bug").FsmVariables.FindFsmFloat("Start Pause").Value = value.GetValue();
+                }
+            ), "beam_idle_time"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Idle Time", (o, value) =>
                 {
                     o.LocateMyFSM("Laser Bug").FsmVariables.FindFsmFloat("Idle Time").Value = value.GetValue();
                 }
             ), "beam_idle_time"),
-            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Charge Time", (o, value) => {
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Charge Time", (o, value) => {
                     o.LocateMyFSM("Laser Bug").FsmVariables.FindFsmFloat("Antic Time").Value = value.GetValue();
                 }
             ), "beam_charge_time"),
-            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Beam Time", (o, value) => {
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Beam Time", (o, value) => {
                     o.LocateMyFSM("Laser Bug").FsmVariables.FindFsmFloat("Beam Time").Value = value.GetValue();
                 }
             ), "beam_beam_time")
@@ -599,6 +606,13 @@ public class ConfigGroup
                 o.GetOrAddComponent<CustomDamager>().damageAmount = value.GetValue();
             }), "thorns_damage"),
             disableCollision
+        );
+        
+        EnergyOrb = new ConfigGroup(MovingObjects,
+            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Damage Type", (o, value) =>
+            {
+                o.GetOrAddComponent<CustomDamager>().damageType = value.GetValue() * 2;
+            }, "Enemy", "Hazard"), "energy_orb_type")
         );
 
         MovingPlatforms = new ConfigGroup(MovingObjects,

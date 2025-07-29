@@ -30,6 +30,7 @@ public static class RoomObjects
             new SimplePackElement(CreateBinoculars(), "Binoculars", "Room Edits")
                 .WithConfigGroup(ConfigGroup.Binoculars),
             CreateCameraBorder(),
+            CreateSceneBorderRemover(),
             CreateObjectRemover("room_remover", "Clear Room", o =>
             {
                 var clearer = o.GetOrAddComponent<RoomClearerConfig>();
@@ -113,7 +114,9 @@ public static class RoomObjects
         GameObject point = null;
         foreach (var obj in objects)
         {
-            var dist = (obj.transform.position - disabler.transform.position).sqrMagnitude;
+            var pos = obj.transform.position - disabler.transform.position;
+            pos.z = 0;
+            var dist = pos.sqrMagnitude;
 
             if (dist < lowest)
             {
@@ -122,7 +125,7 @@ public static class RoomObjects
             }
         }
         
-        return point is not null && lowest <= 225 ? [point.gameObject.GetOrAddComponent<Disabler>()] : [];
+        return point is not null && lowest <= 500 ? [point.gameObject.GetOrAddComponent<Disabler>()] : [];
     }
 
     private static readonly Dictionary<string, Func<GameObject, Disabler[]>> EditActions = new();
@@ -142,6 +145,20 @@ public static class RoomObjects
         obj.SetActive(false);
         return new PreviewablePackElement(obj, "Camera Border", "Room Edits", sprite)
             .WithConfigGroup(ConfigGroup.CameraBorder);
+    }
+
+    private static AbstractPackElement CreateSceneBorderRemover()
+    {
+        var obj = new GameObject("Scene Border Remover");
+        obj.AddComponent<SceneBorderRemover>();
+        
+        var sprite = ResourceUtils.LoadInternal("scene_border_remover");
+        obj.layer = 10;
+        obj.transform.position += new Vector3(0, 0, 0.1f);
+        
+        Object.DontDestroyOnLoad(obj);
+        obj.SetActive(false);
+        return new PreviewablePackElement(obj, "Remove Top Right Border", "Room Edits", sprite);
     }
 
     private static SimplePackElement CreateObjectRemover(string id, string name, [CanBeNull] Func<GameObject, Disabler[]> action)

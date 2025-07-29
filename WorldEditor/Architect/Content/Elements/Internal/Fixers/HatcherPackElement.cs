@@ -15,7 +15,7 @@ internal sealed class HatcherPackElement : GInternalPackElement
     private readonly string _cagePath;
     private readonly string _fsmName;
 
-    public HatcherPackElement(string scene, string path, string cagePath, string name, string fsmName) : base(scene, path, name, "Enemies", 0)
+    public HatcherPackElement(string scene, string path, string cagePath, string name, string fsmName, string category = "Enemies") : base(scene, path, name, category, 0)
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
         WithConfigGroup(ConfigGroup.KillableEnemies);

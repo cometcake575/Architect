@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using Architect.Content.Groups;
-using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using Satchel;
 using UnityEngine;
@@ -147,22 +145,35 @@ internal class GruzMotherElement : InternalPackElement
     internal class GmConfig : MonoBehaviour
     {
         public bool spawnGruzzers = true;
+        private bool _madeChanges;
 
         private void Update()
         {
-            if (!spawnGruzzers) return;
+            if (_madeChanges) return;
             var child = gameObject.transform.GetChild(3);
             if (child)
             {
-                spawnGruzzers = false;
-                var flySpawn = Instantiate(_child);
-                flySpawn.name = gameObject.name + " Fly Spawn";
-                flySpawn.SetActive(true);
-                
-                child.gameObject.LocateMyFSM("corpse").AddCustomAction("Blow", fsm =>
+                var corpse = child.gameObject.LocateMyFSM("corpse");
+                if (spawnGruzzers) corpse.AddCustomAction("Blow", fsm =>
                 {
-                    fsm.FsmVariables.FindFsmGameObject("Burster").Value.LocateMyFSM("burster").GetAction<FindGameObject>("Initiate", 4)
+                    _madeChanges = true;
+                    var flySpawn = Instantiate(_child);
+                    flySpawn.name = gameObject.name + " Fly Spawn";
+                    flySpawn.SetActive(true);
+
+                    var makerFsm = fsm.FsmVariables.FindFsmGameObject("Burster").Value.LocateMyFSM("burster");
+                    makerFsm
+                        .GetAction<FindGameObject>("Initiate", 4)
                         .objectName = flySpawn.name;
+                    makerFsm.RemoveAction("Geo", 0);
+                });
+                else corpse.AddCustomAction("Blow", fsm =>
+                {
+                    var makerFsm = fsm.FsmVariables.FindFsmGameObject("Burster").Value.LocateMyFSM("burster");
+                    var check = makerFsm
+                        .GetAction<GGCheckIfBossScene>("Stop", 1);
+                    check.regularSceneEvent = check.bossSceneEvent;
+                    makerFsm.RemoveAction("Geo", 0);
                 });
             }
         }
@@ -232,6 +243,38 @@ internal class TamerBeastElement : InternalPackElement
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         gameObject.LocateMyFSM("Control").SendEvent("WAKE");
+    }
+}
+
+internal class BroodingMawlekElement : InternalPackElement
+{
+    private GameObject _gameObject;
+
+    public BroodingMawlekElement() : base("Brooding Mawlek", "Enemies")
+    {
+        WithBroadcasterGroup(BroadcasterGroup.Enemies);
+        WithReceiverGroup(ReceiverGroup.Enemies);
+        WithConfigGroup(ConfigGroup.KillableEnemies);
+    }
+
+    public override GameObject GetPrefab(bool flipped, float rotation)
+    {
+        return _gameObject;
+    }
+
+    internal override void AddPreloads(List<(string, string)> preloadInfo)
+    {
+        preloadInfo.Add(("GG_Brooding_Mawlek", "Battle Scene/Mawlek Body"));
+    }
+
+    internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
+    {
+        _gameObject = preloads["GG_Brooding_Mawlek"]["Battle Scene/Mawlek Body"];
+    }
+
+    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
+    {
+        gameObject.LocateMyFSM("Mawlek Control").SendEvent("GG BOSS");
     }
 }
 
@@ -418,7 +461,7 @@ internal class BrokenVesselElement : GInternalPackElement
     {
         public bool localJump = true;
         
-        public int balloons = 0;
+        public int balloons;
         
         public bool disableRoar = true;
     }
@@ -459,6 +502,50 @@ internal class MassiveMossChargerElement : InternalPackElement
     private GameObject _gameObject;
 
     public MassiveMossChargerElement() : base("Massive Moss Charger", "Enemies")
+    {
+        WithBroadcasterGroup(BroadcasterGroup.Enemies);
+        WithReceiverGroup(ReceiverGroup.Awakable);
+        WithConfigGroup(ConfigGroup.MassiveMc);
+        FlipVertical();
+    }
+
+    public override GameObject GetPrefab(bool flipped, float rotation)
+    {
+        return _gameObject;
+    }
+
+    internal override void AddPreloads(List<(string, string)> preloadInfo)
+    {
+        preloadInfo.Add(("GG_Mega_Moss_Charger", "Mega Moss Charger"));
+    }
+
+    internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
+    {
+        _gameObject = preloads["GG_Mega_Moss_Charger"]["Mega Moss Charger"];
+        _gameObject.RemoveComponent<BoxCollider2D>();
+    }
+
+    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
+    {
+        var fsm = gameObject.LocateMyFSM("Mossy Control");
+        fsm.DisableAction("Init", 28);
+
+        fsm.GetAction<SetScale>("Emerge Left", 6).x = scale;
+        fsm.GetAction<SetScale>("Emerge Right", 6).x = -scale;
+    }
+
+    public override bool DisableScaleParent()
+    {
+        return true;
+    }
+}
+
+
+internal class HornetProtectorElement : InternalPackElement
+{
+    private GameObject _gameObject;
+
+    public HornetProtectorElement() : base("Hornet Protector", "Enemies")
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
         WithReceiverGroup(ReceiverGroup.Awakable);
