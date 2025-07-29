@@ -8,7 +8,7 @@ public class SceneBorderRemover : MonoBehaviour
     private static int _count;
     private static CameraController _camera;
 
-    private void Start()
+    private void Update()
     {
         Refresh();
     }
@@ -16,7 +16,6 @@ public class SceneBorderRemover : MonoBehaviour
     private void OnEnable()
     {
         _count++;
-        Refresh();
     }
     
     public static void Refresh()
@@ -37,6 +36,5 @@ public class SceneBorderRemover : MonoBehaviour
     private void OnDisable()
     {
         _count--;
-        Refresh();
     }
 }
