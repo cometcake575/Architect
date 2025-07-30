@@ -17,6 +17,7 @@ using MonoMod.RuntimeDetour;
 using Satchel;
 using UnityEngine;
 using GridLayout = MagicUI.Elements.GridLayout;
+using Image = MagicUI.Elements.Image;
 using Object = UnityEngine.Object;
 
 namespace Architect.Content.Elements.Custom;
@@ -26,9 +27,10 @@ public static class CustomObjects
     internal static readonly HashSet<string> TemporaryAbilities = [];
     internal static readonly List<PlayerHook> PlayerListeners = [];
     internal static readonly Dictionary<string, List<CustomBinder>> Bindings = new();
-    internal static readonly List<string> ExtraVisualsBindings = [];
+    internal static readonly List<(string, Sprite)> ExtraVisualsBindings = [];
 
     private static GridLayout _bindingsLayout;
+    private static Image[] _bindingIcons;
         
     private const int ShapeWeight = 1;
 
@@ -136,22 +138,6 @@ public static class CustomObjects
     public static void CollectAbilityGranter(string type)
     {
         if (type == "Shadow Dash") RefreshShadowDash();
-    }
-
-    private static void InitializeBindingsUI()
-    {
-        var root = new LayoutRoot(true, "Bindings Layout");
-        _bindingsLayout = new GridLayout(root, "Bindings")
-        {
-            VerticalAlignment = VerticalAlignment.Bottom,
-            HorizontalAlignment = HorizontalAlignment.Left
-        };
-        for (var i = 0; i < 17; i++)
-        {
-            _bindingsLayout.ColumnDefinitions.Add(new GridDimension(1, GridUnit.Proportional));
-            _bindingsLayout.Children.Add(new Image(root, Architect.BlankSprite)
-                .WithProp(GridLayout.Column, i));
-        }
     }
 
     private static AbstractPackElement CreateSquare()
@@ -422,10 +408,9 @@ public static class CustomObjects
 
     private static AbstractPackElement CreateBinding(string id, string name, bool extraVisuals = true)
     {
-        if (extraVisuals) ExtraVisualsBindings.Add(id);
-        
         var disabledSprite = ResourceUtils.LoadInternal("Bindings." + id + "_disabled");
         var enabledSprite = ResourceUtils.LoadInternal("Bindings." + id + "_enabled");
+        if (extraVisuals) ExtraVisualsBindings.Add((id, enabledSprite));
 
         var bindingObj = new GameObject("Binding (" + id + ")");
 
@@ -436,8 +421,6 @@ public static class CustomObjects
         binder.bindingType = id;
         binder.disabledSprite = disabledSprite;
         binder.enabledSprite = enabledSprite;
-
-        binder.extraVisuals = extraVisuals;
 
         var collider = bindingObj.AddComponent<CircleCollider2D>();
         collider.isTrigger = true;
@@ -712,13 +695,46 @@ public static class CustomObjects
                 RefreshLanternBinding();
                 break;
         }
-/*
+
         var i = 0;
-        foreach (var bind in ExtraVisualsBindings.Where(bind => Bindings[bind].Count > 0))
+        foreach (var bind in ExtraVisualsBindings
+                     .Where(bind => !BindingCheck(true, bind.Item1)))
         {
-            ((Image) _bindingsLayout.Children[i]).Sprite = Bindings[bind][0].enabledSprite;
+            _bindingIcons[i].Sprite = bind.Item2;
             i++;
-        }*/ // Incomplete
+        }
+
+        for (var k = i; k < ExtraVisualsBindings.Count; k++)
+        {
+            _bindingIcons[k].Sprite = Architect.BlankSprite;
+        }
+    }
+
+    private static void InitializeBindingsUI()
+    {
+        var root = new LayoutRoot(true, "Bindings Layout");
+        _bindingsLayout = new GridLayout(root, "Bindings")
+        {
+            VerticalAlignment = VerticalAlignment.Bottom,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            Padding = new Padding(40, 40)
+        };
+
+        var count = ExtraVisualsBindings.Count;
+        _bindingIcons = new Image[count];
+        for (var i = 0; i < count; i++)
+        {
+            _bindingIcons[i] = new Image(root, Architect.BlankSprite, "Binding Sprite " + i)
+                {
+                    Width = 40,
+                    Height = 40,
+                    Padding = new Padding(5, 0, 0, 0)
+                }
+                .WithProp(GridLayout.Column, i);
+            
+            _bindingsLayout.ColumnDefinitions.Add(new GridDimension(1, GridUnit.Proportional));
+            _bindingsLayout.Children.Add(_bindingIcons[i]);
+        }
     }
 
     private static void RefreshTearBinding()

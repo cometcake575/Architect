@@ -214,6 +214,72 @@ internal class OblobbleElement : InternalPackElement
     }
 }
 
+internal class TmgElement : InternalPackElement
+{
+    private GameObject _gameObject;
+    private GameObject _spikes;
+
+    public TmgElement() : base("Troupe Master Grimm", "Enemies")
+    {
+        WithBroadcasterGroup(BroadcasterGroup.Enemies);
+        WithReceiverGroup(ReceiverGroup.Enemies);
+        WithConfigGroup(ConfigGroup.KillableEnemies);
+    }
+
+    public override GameObject GetPrefab(bool flipped, float rotation)
+    {
+        return _gameObject;
+    }
+
+    internal override void AddPreloads(List<(string, string)> preloadInfo)
+    {
+        preloadInfo.Add(("GG_Grimm", "Grimm Scene/Grimm Boss"));
+        preloadInfo.Add(("GG_Grimm", "Grimm Spike Holder"));
+        preloadInfo.Add(("GG_Grimm", "Grimm Bats"));
+    }
+
+    internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
+    {
+        _gameObject = preloads["GG_Grimm"]["Grimm Scene/Grimm Boss"];
+        _gameObject.transform.Translate(0, 0, 8.2969f);
+        _spikes = preloads["GG_Grimm"]["Grimm Spike Holder"];
+        var bats = preloads["GG_Grimm"]["Grimm Bats"];
+        bats.transform.parent = _gameObject.transform;
+        bats.SetActive(true);
+    }
+
+    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
+    {
+        gameObject.LocateMyFSM("Constrain Y").enabled = false;
+        gameObject.LocateMyFSM("constrain_x").enabled = false;
+        
+        var fsm = gameObject.LocateMyFSM("Control");
+
+        var ground = gameObject.transform.position.y;
+        fsm.FsmVariables.FindFsmFloat("Ground Y").Value = ground;
+        
+        fsm.GetAction<FloatCompare>("Uppercut Up", 7).float2 = ground + 9;
+        fsm.GetAction<SetPosition>("UP Explode", 0).y = ground + 9;
+        
+        fsm.GetAction<SetPosition>("AD Tele In", 3).y = ground + 6.7f;
+        
+        fsm.GetAction<SetPosition>("Balloon Pos", 0).y = ground + 5.2f;
+        fsm.GetAction<SetPosition>("Balloon Pos", 0).x = gameObject.transform.position.x;
+        
+        var spikes = Object.Instantiate(_spikes, gameObject.transform, true);
+        spikes.SetActive(true);
+        spikes.transform.SetPositionY(ground - 4.96f);
+
+        var spikeFsm = spikes.LocateMyFSM("Spike Control");
+        spikeFsm.DisableAction("Ready", 0);
+        var xPos = spikeFsm.FsmVariables.FindFsmFloat("X Pos");
+        spikeFsm.InsertCustomAction("Ready", () =>
+        {
+            xPos.Value = 1 + Random.value > 0.5f ? 0 : 1.125f;
+        }, 0);
+    }
+}
+
 internal class TamerBeastElement : InternalPackElement
 {
     private GameObject _gameObject;

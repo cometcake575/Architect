@@ -33,7 +33,7 @@ public static class ConfigurationScreen
             ),
             new HorizontalOption(
                 name: "Test Mode",
-                description: "Stops the game from storing persistent data such as walls being broken and enemies being killed",
+                description: "Stops the game from storing persistent data such as enemies being killed",
                 values: values,
                 applySetting: i =>
                 {
@@ -95,7 +95,7 @@ public static class ConfigurationScreen
         };
         if (Architect.UsingMultiplayer) elements.Insert(3, new HorizontalOption(
             name: "Collaboration Mode",
-            description: "Shares edits as soon as they're made to allow working together online using HKMP",
+            description: "Shares edits across of an HKMP server as soon as they're made, to allow working together online",
             values: values,
             applySetting: i =>
             {

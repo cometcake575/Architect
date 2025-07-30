@@ -14,7 +14,6 @@ public class CustomBinder : MonoBehaviour
     private AudioSource _source;
     public Sprite disabledSprite;
     public Sprite enabledSprite;
-    public bool extraVisuals;
     public bool active = true;
     public bool reversible;
     private bool _used;
