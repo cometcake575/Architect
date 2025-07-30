@@ -250,6 +250,7 @@ public static class ContentPacks
                 .WithRotationGroup(RotationGroup.Four),
             Create("Fungus2_18", "_Props/Bounce Shrooms 1/Bounce Shroom B (1)", "Bouncy Mushroom", "Interactable", weight:MiscInteractableWeight, offset:15.5f)
                 .FlipVertical()
+                .WithConfigGroup(ConfigGroup.BouncyMushrooms)
                 .WithRotationGroup(RotationGroup.All),
             CreateSolid("Fungus2_04", "mush_plat_float_01", "Fungal Wastes Platform 1"),
             CreateSolid("Fungus2_18", "_Scenery/mush_plat_float_03", "Fungal Wastes Platform 2"),

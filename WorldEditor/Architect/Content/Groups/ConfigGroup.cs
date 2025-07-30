@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -12,6 +13,7 @@ using Modding;
 using Modding.Utils;
 using Satchel;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Architect.Content.Groups;
 
@@ -80,6 +82,8 @@ public class ConfigGroup
     public static ConfigGroup TriggerZones;
     
     public static ConfigGroup Tablets;
+    
+    public static ConfigGroup BouncyMushrooms;
     
     public static ConfigGroup Binoculars;
     
@@ -640,6 +644,47 @@ public class ConfigGroup
             }), "lore_tablet_content")
         );
 
+        var idleRoutine = typeof(BounceShroom)
+            .GetField("idleRoutine", BindingFlags.NonPublic | BindingFlags.Instance);
+        var idle = typeof(BounceShroom)
+            .GetMethod("Idle", BindingFlags.NonPublic | BindingFlags.Instance);
+        var bounceSmall = typeof(BounceShroom)
+            .GetMethod("BounceSmall", BindingFlags.NonPublic | BindingFlags.Instance);
+        On.BounceShroom.Start += (orig, self) =>
+        {
+            if (!self.GetComponent<BounceRandomnessDisabler>())
+            {
+                orig(self);
+                return;
+            }
+
+            if (!self.active) return;
+            var gameObject = Object.Instantiate(self.idleParticlePrefab);
+            if (gameObject)
+            {
+                gameObject.transform.SetPositionX(self.transform.position.x);
+                gameObject.transform.SetPositionY(self.transform.position.y);
+            }
+
+            idleRoutine?.SetValue(self, self.StartCoroutine((IEnumerator)idle?.Invoke(self, [])));
+
+            foreach (var ced in self.GetComponentsInChildren<CollisionEnterEvent>())
+            {
+                ced.OnCollisionEnteredDirectional += (_, _) =>
+                {
+                    HeroController.instance.SendMessage("Bounce");
+                    bounceSmall?.Invoke(self, []);
+                };
+            }
+        };
+        BouncyMushrooms = new ConfigGroup(Generic,
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Side Bounces", (o, value) =>
+            {
+                if (value.GetValue()) return;
+                o.AddComponent<BounceRandomnessDisabler>();
+            }).PreAwake(), "bounceshroom_side_bounce")
+        );
+
         Binoculars = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Camera Speed", (o, value) =>
             {
@@ -1128,7 +1173,7 @@ public class ConfigGroup
         Types = types;
     }
 
-    public class EnemyInvulnerabilityMarker : MonoBehaviour
+    private class EnemyInvulnerabilityMarker : MonoBehaviour
     {
         private HealthManager _manager;
         public bool invincible;
@@ -1143,4 +1188,6 @@ public class ConfigGroup
             _manager.IsInvincible = invincible;
         }
     }
+
+    private class BounceRandomnessDisabler : MonoBehaviour;
 }
