@@ -98,6 +98,6 @@ public class WeServerAddon : ServerAddon
     }
 
     protected override string Name => "Architect";
-    protected override string Version => "1.11.2.0";
+    protected override string Version => "1.11.2.1";
     public override bool NeedsNetwork => true;
 }

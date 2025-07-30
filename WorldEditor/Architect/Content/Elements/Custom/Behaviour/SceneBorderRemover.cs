@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace Architect.Content.Elements.Custom.Behaviour;
@@ -16,6 +15,7 @@ public class SceneBorderRemover : MonoBehaviour
     private void OnEnable()
     {
         _count++;
+        Refresh();
     }
     
     public static void Refresh()
@@ -36,5 +36,6 @@ public class SceneBorderRemover : MonoBehaviour
     private void OnDisable()
     {
         _count--;
+        Refresh();
     }
 }

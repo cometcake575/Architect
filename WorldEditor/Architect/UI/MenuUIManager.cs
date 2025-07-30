@@ -43,12 +43,12 @@ public static class MenuUIManager
 
     public static void Initialize(LayoutRoot layout)
     {
+        SetupSuccessText(layout);
         SetupSwitchArea(layout);
         SetupSearchArea(layout);
-        SetupLoginArea(layout);
         SetupUploadArea(layout);
         SetupIndexButtons(layout);
-        SetupSuccessText(layout);
+        SetupLoginArea(layout);
     }
 
     private static void SetupSuccessText(LayoutRoot layout)
@@ -416,7 +416,7 @@ public static class MenuUIManager
             }.WithProp(GridLayout.Column, 2).WithProp(GridLayout.Row, i * 2);
             
             DownloadChoices.Add((downloadCount, infoName, infoDesc, download));
-
+            
             var k = i;
             download.Click += async _ => await DownloadLevel(_index * LevelsPerPage + k);
 
@@ -488,7 +488,7 @@ public static class MenuUIManager
 
     private static void SetupLoginArea(LayoutRoot layout)
     {
-        var padding = new Padding(20, 5);
+        var padding = new Padding(20, 0);
         
         var errorMessage = new TextObject(layout)
         {
@@ -584,7 +584,7 @@ public static class MenuUIManager
                 passwordInput,
                 new GridLayout(layout, "Login Buttons")
                 {
-                    Padding = padding,
+                    Padding = new Padding(20, 15),
                     VerticalAlignment = VerticalAlignment.Center,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     ColumnDefinitions =
