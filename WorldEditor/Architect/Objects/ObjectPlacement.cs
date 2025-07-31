@@ -7,7 +7,6 @@ using Architect.Attributes.Config;
 using Architect.Attributes.Receivers;
 using Architect.Content.Groups;
 using Architect.Storage;
-using Architect.UI;
 using Architect.Util;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -47,7 +46,7 @@ public class ObjectPlacement
     {
         if (!_previewObject) return false;
 
-        var size = _previewObject.GetComponent<SpriteRenderer>().size;
+        var size = _previewObject.GetComponent<SpriteRenderer>().sprite.bounds.size;
         var width = size.x / 2 * Mathf.Abs(_previewObject.transform.GetScaleX());
         var height = size.y / 2 * Mathf.Abs(_previewObject.transform.GetScaleY());
 
