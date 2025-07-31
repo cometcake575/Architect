@@ -34,15 +34,13 @@ public static class ResourceUtils
     [CanBeNull]
     internal static Sprite Load(string spritePath, Vector2 pivot)
     {
-        try
-        {
-            var tex = new Texture2D(2, 2);
-            tex.LoadImage(File.ReadAllBytes(spritePath), true);
+        if (!File.Exists(spritePath)) return null;
+        
+        var tex = new Texture2D(2, 2);
+        tex.LoadImage(File.ReadAllBytes(spritePath), true);
 
-            var sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), pivot, 100);
-            return sprite;
-        }
-        catch (FileNotFoundException) { return null; }
+        var sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), pivot, 100);
+        return sprite;
     }
 
     internal static AudioClip LoadClip(string clipName)

@@ -48,9 +48,11 @@ public abstract class ConfigType<TValue> : ConfigType where TValue : ConfigValue
         {
             _action.Invoke(obj, value as TValue);
         }
-        catch
+        catch (Exception e)
         {
             Architect.Instance.LogError("Error attempting to apply config \"" + value.GetTypeId() + "\"");
+            Architect.Instance.LogError(e.Message);
+            Architect.Instance.LogError(e.StackTrace);
         }
     }
 }

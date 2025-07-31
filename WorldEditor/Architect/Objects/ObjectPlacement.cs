@@ -137,36 +137,38 @@ public class ObjectPlacement
         var a = 0.5f;
         
         var renderer = _previewObject.AddComponent<SpriteRenderer>();
-        
-        Sprite sprite = null;
+
+        string newSprite = null;
 
         foreach (var config in Config)
         {
-            if (config.GetTypeId() == "width" && config is FloatConfigValue width) scaleX *= width.GetValue();
-            else if (config.GetTypeId() == "height" && config is FloatConfigValue height) scaleY *= height.GetValue();
-            else if (config.GetTypeId() == "r" && config is FloatConfigValue red) r = red.GetValue();
-            else if (config.GetTypeId() == "g" && config is FloatConfigValue green) g = green.GetValue();
-            else if (config.GetTypeId() == "b" && config is FloatConfigValue blue) b = blue.GetValue();
-            else if (config.GetTypeId() == "a" && config is FloatConfigValue alpha)
+            if (config.GetName() == "width" && config is FloatConfigValue width) scaleX *= width.GetValue();
+            else if (config.GetName() == "height" && config is FloatConfigValue height) scaleY *= height.GetValue();
+            else if (config.GetName() == "r" && config is FloatConfigValue red) r = red.GetValue();
+            else if (config.GetName() == "g" && config is FloatConfigValue green) g = green.GetValue();
+            else if (config.GetName() == "b" && config is FloatConfigValue blue) b = blue.GetValue();
+            else if (config.GetName() == "a" && config is FloatConfigValue alpha)
                 a *= Mathf.Max(0.15f, alpha.GetValue());
-            else if (config.GetTypeId() == "layer" && config is IntConfigValue layer)
+            else if (config.GetName() == "layer" && config is IntConfigValue layer)
                 renderer.sortingOrder = layer.GetValue();
 
-            else if (config.GetTypeId() == "decoration_z_offset" && config is FloatConfigValue zOffset)
+            else if (config.GetName() == "Z Offset" && config is FloatConfigValue zOffset)
             {
                 var pos = _previewObject.transform.position;
                 pos.z += zOffset.GetValue();
                 _previewObject.transform.position = pos;
             }
 
-            if (config.GetTypeId() == "png_name" && config is StringConfigValue pngName)
-                sprite = PngLoader.TryGetSprite(pngName.GetValue());
+            else if (config.GetName() == "Source URL" && config is StringConfigValue source)
+                newSprite = source.GetValue();
         }
 
         _defaultColor = new Color(r, g, b, a);
         renderer.color = _defaultColor;
         
-        GhostPlacementUtils.SetupForPlacement(_previewObject, renderer, selected, sprite, Flipped, Rotation, scaleX, scaleY);
+        GhostPlacementUtils.SetupForPlacement(_previewObject, renderer, selected, Flipped, Rotation, scaleX, scaleY);
+        
+        if (newSprite != null) PngLoader.DoLoadSprite(_previewObject, newSprite);
         
         selected.PackElement.PostPlace(this, _previewObject);
     }

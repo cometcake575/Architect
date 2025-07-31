@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Architect.Attributes.Config;
 using Architect.Objects;
 using Modding.Converters;
 using Newtonsoft.Json;
@@ -127,6 +128,7 @@ public static class SceneSaveLoader
 
     public static void WipeAllScenes()
     {
+        PngLoader.WipeAllImages();
         foreach (var file in Directory.GetFiles(DataPath + "Architect/")) File.Delete(file);
     }
 
@@ -162,6 +164,13 @@ public static class SceneSaveLoader
         WipeAllScenes();
         foreach (var pair in placements)
         {
+            foreach (var source in DeserializeSceneData(pair.Value).Select(placement =>
+                         placement.Config.FirstOrDefault(config => config.GetName() == "Source URL")))
+            {
+                if (source is not StringConfigValue value) continue;
+                PngLoader.PrepareImage(value.GetValue());
+            }
+
             Save("Architect/" + pair.Key, pair.Value);
         }
     }

@@ -82,7 +82,7 @@ public static class CustomObjects
             CreateSquare(),
             CreateCircle(),
             CreateTriangle(),
-            //CreatePng(),
+            CreatePng(),
             new SimplePackElement(CreateZoteTrophy(), "Winner's Trophy", "Custom"),
             CreateTemporaryAbilityGranter("dash_crystal", "Dash", false, "Dash Crystal"),
             CreateTemporaryAbilityGranter("single_dash_crystal", "Dash", true, "Single Use Dash Crystal"),

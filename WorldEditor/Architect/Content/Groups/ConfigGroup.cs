@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Architect.Attributes.Config;
 using Architect.Content.Elements.Custom.Behaviour;
 using Architect.Content.Elements.Internal.Fixers;
@@ -670,9 +671,9 @@ public class ConfigGroup
 
             foreach (var ced in self.GetComponentsInChildren<CollisionEnterEvent>())
             {
-                ced.OnCollisionEnteredDirectional += (_, _) =>
+                ced.OnCollisionEnteredDirectional += (direction, _) =>
                 {
-                    HeroController.instance.SendMessage("Bounce");
+                    if (direction == CollisionEnterEvent.Direction.Top) HeroController.instance.SendMessage("Bounce");
                     bounceSmall?.Invoke(self, []);
                 };
             }
@@ -1057,9 +1058,9 @@ public class ConfigGroup
         );
         
         Png = new ConfigGroup(Colours,
-            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("PNG Name", (o, value) =>
+            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Source URL", (o, value) =>
             {
-                o.GetComponent<SpriteRenderer>().sprite = PngLoader.TryGetSprite(value.GetValue());
+                PngLoader.DoLoadSprite(o, value.GetValue());
             }), "png_name")
         );
 

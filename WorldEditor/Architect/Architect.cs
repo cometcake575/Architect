@@ -91,7 +91,7 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
         {
             VisibilityCondition = () => UIManager.instance && UIManager.instance.menuState == MainMenuState.MAIN_MENU
         };
-        MenuUIManager.Initialize(_menuLayout);
+        LevelSharingManager.Initialize(_menuLayout);
     }
 
     internal static WorldEditorGlobalSettings GlobalSettings { get; private set; } = new();

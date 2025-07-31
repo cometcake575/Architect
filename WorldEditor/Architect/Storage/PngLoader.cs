@@ -1,5 +1,10 @@
+using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using Architect.Util;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -24,14 +29,51 @@ public static class PngLoader
         }
     }
 
-    [CanBeNull]
-    public static Sprite TryGetSprite(string name)
+    public static void WipeAllImages()
     {
-        if (!Sprites.ContainsKey(name))
+        Sprites.Clear();
+    }
+
+    public static void DoLoadSprite(GameObject obj, string url)
+    {
+        GameManager.instance.StartCoroutine(LoadSprite(url, obj));
+    }
+
+    private static IEnumerator LoadSprite(string url, [CanBeNull] GameObject obj = null)
+    {
+        if (!Sprites.ContainsKey(url))
         {
-            Sprites[name] = ResourceUtils.Load(SceneSaveLoader.DataPath + "Architect/" + name + ".png", Pivot);
+            var path = GetPath(url);
+            
+            var tmp = ResourceUtils.Load(path, Pivot);
+            if (!tmp)
+            {
+                var task = Task.Run(() => SaveImage(url, path));
+                while (!task.IsCompleted) yield return null;
+                tmp = ResourceUtils.Load(path, Pivot);
+            }
+            Sprites[url] = tmp;
         }
 
-        return Sprites[name];
+        if (obj) obj.GetComponent<SpriteRenderer>().sprite = Sprites[url];
+        yield return null;
+    }
+    
+    public static void PrepareImage(string url)
+    {
+        GameManager.instance.StartCoroutine(LoadSprite(url));
+    }
+
+    private static async Task SaveImage(string url, string path)
+    {
+        var webClient = new WebClient();
+        await webClient.DownloadFileTaskAsync(url, path);
+    }
+
+    private static string GetPath(string url)
+    {
+        var pathUrl = Path.GetInvalidFileNameChars()
+            .Aggregate(url, (current, c) => current.Replace(c, '_'));
+        return SceneSaveLoader.DataPath + "Architect/" + pathUrl + ".png";
     }
 }

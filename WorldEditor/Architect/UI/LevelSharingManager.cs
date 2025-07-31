@@ -19,7 +19,7 @@ using Image = MagicUI.Elements.Image;
 
 namespace Architect.UI;
 
-public static class MenuUIManager
+public static class LevelSharingManager
 {
     private const int LevelsPerPage = 5;
     

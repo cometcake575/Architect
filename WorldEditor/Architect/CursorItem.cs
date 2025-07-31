@@ -65,14 +65,12 @@ public static class CursorItem
         ConfigValue cfgVal;
         if (EditorUIManager.ConfigValues.TryGetValue("width", out cfgVal) && cfgVal is FloatConfigValue width) scaleX *= width.GetValue();
         if (EditorUIManager.ConfigValues.TryGetValue("height", out cfgVal) && cfgVal is FloatConfigValue height) scaleY *= height.GetValue();
+
+        string newSprite = null;
+        if (EditorUIManager.ConfigValues.TryGetValue("Source URL", out cfgVal) && cfgVal is StringConfigValue source) newSprite = source.GetValue();
         
         if (EditorUIManager.ConfigValues.TryGetValue("layer", out cfgVal) && cfgVal is IntConfigValue layer) renderer.sortingOrder = layer.GetValue();
         else renderer.sortingOrder = 0;
-        
-        Sprite sprite = null;
-        if (EditorUIManager.ConfigValues.TryGetValue("PNG Name", out cfgVal) && cfgVal is StringConfigValue pngName)
-            sprite = PngLoader.TryGetSprite(pngName.GetValue());
-
         
         UpdateMovingComponent();
         
@@ -80,7 +78,9 @@ public static class CursorItem
         if (EditorUIManager.ConfigValues.TryGetValue("Z Offset", out cfgVal) && cfgVal is FloatConfigValue zOffset)
             _offset.z += zOffset.GetValue();
         
-        GhostPlacementUtils.SetupForPlacement(_display, renderer, selected, sprite, EditorManager.IsFlipped, EditorManager.Rotation, scaleX, scaleY);
+        GhostPlacementUtils.SetupForPlacement(_display, renderer, selected, EditorManager.IsFlipped, EditorManager.Rotation, scaleX, scaleY);
+        
+        if (newSprite != null) PngLoader.DoLoadSprite(_display, newSprite);
     }
 
     private static void SetupObject()
