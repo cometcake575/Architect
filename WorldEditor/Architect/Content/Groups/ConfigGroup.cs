@@ -153,7 +153,11 @@ public class ConfigGroup
                 (o, value) => { o.GetComponent<SpriteRenderer>().sortingOrder = value.GetValue(); }), "layer");
         var zOffset = Attributes.ConfigManager.RegisterConfigType(
             new FloatConfigType("Z Offset",
-                (o, value) => { o.transform.SetPositionZ(o.transform.GetPositionZ() + value.GetValue()); }),
+                (o, value) =>
+                {
+                    o.RemoveComponent<SetZ>();
+                    o.transform.SetPositionZ(o.transform.GetPositionZ() + value.GetValue());
+                }),
             "decoration_z_offset");
         Colours = new ConfigGroup(Invisible,
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("r", (o, value) =>
@@ -537,7 +541,8 @@ public class ConfigGroup
             Attributes.ConfigManager.RegisterConfigType(
                 new FloatConfigType("Rotation over Time",
                     (o, value) => { o.GetOrAddComponent<MovingObject>().SetRotationSpeed(value.GetValue()); }),
-                "mo_rotation_time")
+                "mo_rotation_time"),
+            zOffset
         );
 
         LaserCrystal = new ConfigGroup(MovingObjects,
@@ -625,7 +630,6 @@ public class ConfigGroup
                 o.GetOrAddComponent<MovingObject>().stickPlayer = false;
             }).PreAwake(), "mp_stick_player"),
             layerType,
-            zOffset,
             disableCollision
         );
 
