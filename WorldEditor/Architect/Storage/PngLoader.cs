@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -16,52 +15,41 @@ public static class PngLoader
     public static readonly Dictionary<string, Sprite> Sprites = new();
 
     private static readonly Vector2 Pivot = new(0.5f, 0.5f);
-    
-    public static void RefreshSprites()
-    {
-        foreach (var sp in Sprites.Values) Object.Destroy(sp);
-        
-        foreach (var file in Directory.GetFiles(SceneSaveLoader.DataPath + "Architect/"))
-        {
-            if (!file.EndsWith(".png")) continue;
-            var sprite = ResourceUtils.Load(file, Pivot);
-            Sprites[Path.GetFileNameWithoutExtension(file)] = sprite;
-        }
-    }
 
     public static void WipeAllImages()
     {
+        foreach (var sp in Sprites.Values) Object.Destroy(sp);
         Sprites.Clear();
     }
 
-    public static void DoLoadSprite(GameObject obj, string url)
+    public static void DoLoadSprite(GameObject obj, string url, bool point, float ppu)
     {
-        GameManager.instance.StartCoroutine(LoadSprite(url, obj));
+        GameManager.instance.StartCoroutine(LoadSprite(url, point, ppu, obj));
     }
 
-    private static IEnumerator LoadSprite(string url, [CanBeNull] GameObject obj = null)
+    private static IEnumerator LoadSprite(string url, bool point, float ppu, [CanBeNull] GameObject obj = null)
     {
-        if (!Sprites.ContainsKey(url))
+        var id = url + (point ? "_point_" : "_bilinear_") + ppu;
+        if (!Sprites.ContainsKey(id))
         {
-            var path = GetPath(url);
-            
-            var tmp = ResourceUtils.Load(path, Pivot);
+            var path = GetPath(url, point);
+            var tmp = ResourceUtils.Load(path, Pivot, point, ppu);
             if (!tmp)
             {
                 var task = Task.Run(() => SaveImage(url, path));
                 while (!task.IsCompleted) yield return null;
-                tmp = ResourceUtils.Load(path, Pivot);
+                tmp = ResourceUtils.Load(path, Pivot, point, ppu);
             }
-            Sprites[url] = tmp;
+            Sprites[id] = tmp;
         }
 
-        if (obj) obj.GetComponent<SpriteRenderer>().sprite = Sprites[url];
+        if (obj) obj.GetComponent<SpriteRenderer>().sprite = Sprites[id];
         yield return null;
     }
     
-    public static void PrepareImage(string url)
+    public static void PrepareImage(string url, bool point, float ppu)
     {
-        GameManager.instance.StartCoroutine(LoadSprite(url));
+        GameManager.instance.StartCoroutine(LoadSprite(url, point, ppu));
     }
 
     private static async Task SaveImage(string url, string path)
@@ -70,7 +58,7 @@ public static class PngLoader
         await webClient.DownloadFileTaskAsync(url, path);
     }
 
-    private static string GetPath(string url)
+    private static string GetPath(string url, bool point)
     {
         var pathUrl = Path.GetInvalidFileNameChars()
             .Aggregate(url, (current, c) => current.Replace(c, '_'));

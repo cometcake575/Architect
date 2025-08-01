@@ -3,11 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Architect.Attributes.Config;
 using Architect.Content.Elements.Custom.Behaviour;
 using Architect.Content.Elements.Internal.Fixers;
-using Architect.Storage;
 using Architect.Util;
 using HutongGames.PlayMaker.Actions;
 using Modding;
@@ -700,6 +698,24 @@ public class ConfigGroup
             }, "Left", "Right", "Top", "Bottom"), "camera_border_type")
         );
 
+        var pngName = Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Source URL", (o, value) =>
+        {
+            o.GetComponent<PngObject>().url = value.GetValue();
+        }).PreAwake(), "png_name");
+        var filter = Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Filter", (o, value) =>
+        {
+            o.GetComponent<PngObject>().point = value.GetValue() == 0;
+        }, "Point", "Bilinear").WithDefaultValue(1).PreAwake(), "png_filter");
+        var ppu = Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Pixels Per Unit", (o, value) =>
+        {
+            o.GetComponent<PngObject>().ppu = value.GetValue();
+        }).PreAwake(), "png_ppu");
+        Png = new ConfigGroup(Colours,
+            pngName,
+            filter,
+            ppu
+        );
+
         List<Sprite> headSprites =
         [
             ResourceUtils.LoadInternal("knight_head", ppu:64),
@@ -714,7 +730,10 @@ public class ConfigGroup
                 var val = value.GetValue();
                 if (val == 0) return;
                 o.GetComponent<SpriteRenderer>().sprite = headSprites[val - 1];
-            }, "Zote", "Knight", "Nosk", "Hornet", "Grub", "Peak"), "zote_head_mode")
+            }, "Zote", "Knight", "Nosk", "Hornet", "Grub", "Peak"), "zote_head_mode"),
+            pngName,
+            filter,
+            ppu
         );
 
         var ignoreVoidHeart =
@@ -1031,7 +1050,11 @@ public class ConfigGroup
                 o.GetComponent<TriggerZone>().mode = val;
 
                 o.layer = val == 3 ? activeRegion : softTerrain;
-            }, "Player", "Nail Swing", "Enemy", "Zote Head", "Trigger Zone"), "trigger_mode")
+            }, "Player", "Nail Swing", "Enemy", "Zote Head", "Trigger Zone"), "trigger_mode"),
+            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Trigger Layer", (o, value) =>
+            {
+                o.GetComponent<TriggerZone>().layer = value.GetValue();
+            }), "trigger_layer")
         );
 
         var terrain = LayerMask.NameToLayer("Terrain");
@@ -1055,13 +1078,6 @@ public class ConfigGroup
                         break;
                 }
             }, "None", "Hazard", "Terrain", "Solid"), "shape_collision")
-        );
-        
-        Png = new ConfigGroup(Colours,
-            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Source URL", (o, value) =>
-            {
-                PngLoader.DoLoadSprite(o, value.GetValue());
-            }), "png_name")
         );
 
         Relays = new ConfigGroup(

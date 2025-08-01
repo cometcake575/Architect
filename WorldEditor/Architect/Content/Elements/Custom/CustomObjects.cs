@@ -201,6 +201,7 @@ public static class CustomObjects
         var png = new GameObject("Custom PNG");
 
         png.AddComponent<SpriteRenderer>();
+        png.AddComponent<PngObject>();
         Object.DontDestroyOnLoad(png);
         png.SetActive(false);
         
@@ -712,7 +713,7 @@ public static class CustomObjects
 
     private static void InitializeBindingsUI()
     {
-        var root = new LayoutRoot(true, "Bindings Layout");
+        var root = new LayoutRoot(true, "Architect Bindings");
         _bindingsLayout = new GridLayout(root, "Bindings")
         {
             VerticalAlignment = VerticalAlignment.Bottom,

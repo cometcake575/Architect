@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Architect.Attributes;
+using Architect.Content.Elements.Custom.Behaviour;
 using Architect.Content.Groups;
 using HutongGames.PlayMaker.Actions;
 using Satchel;
@@ -268,6 +269,7 @@ internal class ZoteHeadElement : InternalPackElement
     {
         _gameObject = preloads["Fungus1_20_v02"]["Zote Death/Head"];
         _gameObject.AddComponent<ZoteHead>();
+        _gameObject.AddComponent<PngObject>();
         _gameObject.transform.SetRotation2D(0);
     }
 }

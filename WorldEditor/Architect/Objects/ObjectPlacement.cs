@@ -138,6 +138,8 @@ public class ObjectPlacement
         var renderer = _previewObject.AddComponent<SpriteRenderer>();
 
         string newSprite = null;
+        var point = false;
+        var ppu = 100f;
 
         foreach (var config in Config)
         {
@@ -160,6 +162,10 @@ public class ObjectPlacement
 
             else if (config.GetName() == "Source URL" && config is StringConfigValue source)
                 newSprite = source.GetValue();
+            else if (config.GetName() == "Filter" && config is ChoiceConfigValue filter) 
+                point = filter.GetValue() == 0;
+            else if (config.GetName() == "Pixels Per Unit" && config is FloatConfigValue ppuVal)
+                ppu = ppuVal.GetValue();
         }
 
         _defaultColor = new Color(r, g, b, a);
@@ -167,7 +173,7 @@ public class ObjectPlacement
         
         GhostPlacementUtils.SetupForPlacement(_previewObject, renderer, selected, Flipped, Rotation, scaleX, scaleY);
         
-        if (newSprite != null) PngLoader.DoLoadSprite(_previewObject, newSprite);
+        if (newSprite != null) PngLoader.DoLoadSprite(_previewObject, newSprite, point, ppu);
         
         selected.PackElement.PostPlace(this, _previewObject);
     }

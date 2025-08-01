@@ -818,6 +818,9 @@ public static class EditorUIManager
             HorizontalAlignment = HorizontalAlignment.Center,
             MinWidth = 100
         }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 1);
+
+        /*var dropdown = new DropdownObject(layout, "Trigger Dropdown")
+            .WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 1);*/ 
         
         var times = new TextInput(layout, "Times")
         {

@@ -25,6 +25,7 @@ public static class ResourceUtils
         _ = s.Read(buffer, 0, buffer.Length);
         var tex = new Texture2D(2, 2);
         tex.LoadImage(buffer, true);
+        tex.wrapMode = TextureWrapMode.Clamp;
         
         var sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), pivot, ppu);
         sprite.texture.filterMode = filterMode;
@@ -32,14 +33,16 @@ public static class ResourceUtils
     }
 
     [CanBeNull]
-    internal static Sprite Load(string spritePath, Vector2 pivot)
+    internal static Sprite Load(string spritePath, Vector2 pivot, bool point, float ppu)
     {
         if (!File.Exists(spritePath)) return null;
         
         var tex = new Texture2D(2, 2);
         tex.LoadImage(File.ReadAllBytes(spritePath), true);
+        tex.wrapMode = TextureWrapMode.Clamp;
+        tex.filterMode = point ? FilterMode.Point : FilterMode.Bilinear;
 
-        var sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), pivot, 100);
+        var sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), pivot, ppu);
         return sprite;
     }
 

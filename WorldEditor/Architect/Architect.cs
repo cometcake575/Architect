@@ -62,8 +62,6 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
         
         UndoManager.Initialize();
         
-        PngLoader.RefreshSprites();
-        
         if (ModHooks.GetMod("HKMP") is Mod)
         {
             HkmpHookInitializer.Initialize();

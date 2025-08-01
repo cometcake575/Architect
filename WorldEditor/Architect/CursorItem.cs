@@ -67,7 +67,14 @@ public static class CursorItem
         if (EditorUIManager.ConfigValues.TryGetValue("height", out cfgVal) && cfgVal is FloatConfigValue height) scaleY *= height.GetValue();
 
         string newSprite = null;
-        if (EditorUIManager.ConfigValues.TryGetValue("Source URL", out cfgVal) && cfgVal is StringConfigValue source) newSprite = source.GetValue();
+        var point = false;
+        var ppu = 100f;
+        if (EditorUIManager.ConfigValues.TryGetValue("Source URL", out cfgVal) && cfgVal is StringConfigValue source) 
+            newSprite = source.GetValue();
+        if (EditorUIManager.ConfigValues.TryGetValue("Filter", out cfgVal) && cfgVal is ChoiceConfigValue filter)
+            point = filter.GetValue() == 0;
+        if (EditorUIManager.ConfigValues.TryGetValue("Pixels Per Unit", out cfgVal) &&
+            cfgVal is FloatConfigValue ppuVal) ppu = ppuVal.GetValue();
         
         if (EditorUIManager.ConfigValues.TryGetValue("layer", out cfgVal) && cfgVal is IntConfigValue layer) renderer.sortingOrder = layer.GetValue();
         else renderer.sortingOrder = 0;
@@ -80,7 +87,7 @@ public static class CursorItem
         
         GhostPlacementUtils.SetupForPlacement(_display, renderer, selected, EditorManager.IsFlipped, EditorManager.Rotation, scaleX, scaleY);
         
-        if (newSprite != null) PngLoader.DoLoadSprite(_display, newSprite);
+        if (newSprite != null) PngLoader.DoLoadSprite(_display, newSprite, point, ppu);
     }
 
     private static void SetupObject()

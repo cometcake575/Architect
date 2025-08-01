@@ -8,6 +8,7 @@ namespace Architect.Content.Elements.Custom.Behaviour;
 public class TriggerZone : MonoBehaviour
 {
     public int mode;
+    public int layer;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -26,7 +27,8 @@ public class TriggerZone : MonoBehaviour
                 if (!other.gameObject.GetComponent<ZoteHead>()) return;
                 break;
             case 4:
-                if (!other.gameObject.GetComponent<TriggerZone>()) return;
+                var tz = other.gameObject.GetComponent<TriggerZone>();
+                if (!tz || tz.layer != layer) return;
                 break;
         }
         EventManager.BroadcastEvent(gameObject, "ZoneEnter");

@@ -21,6 +21,4 @@ public class WorldEditorGlobalSettings
     
     [JsonConverter(typeof(PlayerActionSetConverter))]
     public WorldEditorKeyBinds Keybinds = new();
-
-    public Dictionary<string, List<ObjectPlacement>> Edits = new();
 }

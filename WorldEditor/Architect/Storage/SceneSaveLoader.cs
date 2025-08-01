@@ -21,8 +21,6 @@ public static class SceneSaveLoader
         DataPath = Path.GetFullPath(Application.persistentDataPath + "/");
         Directory.CreateDirectory(DataPath + "Architect/");
 
-        UpdateLegacyData();
-
         On.GameManager.SaveGame += (orig, self) =>
         {
             List<string> scenes = [];
@@ -46,16 +44,6 @@ public static class SceneSaveLoader
             
             orig(self);
         };
-    }
-
-    private static void UpdateLegacyData()
-    {
-        foreach (var pair in Architect.GlobalSettings.Edits)
-        {
-            SaveScene(pair.Key, pair.Value);
-        }
-        
-        Architect.GlobalSettings.Edits.Clear();
     }
 
     public static List<ObjectPlacement> LoadScene(string name)
@@ -164,11 +152,19 @@ public static class SceneSaveLoader
         WipeAllScenes();
         foreach (var pair in placements)
         {
-            foreach (var source in DeserializeSceneData(pair.Value).Select(placement =>
-                         placement.Config.FirstOrDefault(config => config.GetName() == "Source URL")))
+            foreach (var placement in DeserializeSceneData(pair.Value))
             {
+                var source = placement.Config.FirstOrDefault(config => config.GetName() == "Source URL");
                 if (source is not StringConfigValue value) continue;
-                PngLoader.PrepareImage(value.GetValue());
+                
+                var filter = placement.Config.FirstOrDefault(config => config.GetName() == "Filter");
+                var ppu = placement.Config.FirstOrDefault(config => config.GetName() == "Pixels Per Unit");
+                
+                PngLoader.PrepareImage(
+                    value.GetValue(), 
+                    filter is ChoiceConfigValue filterValue && filterValue.GetValue() == 0,
+                    ppu is FloatConfigValue ppuValue ? ppuValue.GetValue() : 100
+                    );
             }
 
             Save("Architect/" + pair.Key, pair.Value);
