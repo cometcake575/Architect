@@ -39,11 +39,13 @@ internal sealed class LeverPackElement : GInternalPackElement
 
         fsm.AddCustomAction("Activated", makerFsm =>
         {
+            EventManager.BroadcastEvent(makerFsm.gameObject, "OnPull");
             EventManager.BroadcastEvent(makerFsm.gameObject, "LoadedPulled");
         });
         fsm.AddCustomAction("Open", makerFsm =>
         {
             EventManager.BroadcastEvent(makerFsm.gameObject, "OnPull");
+            EventManager.BroadcastEvent(makerFsm.gameObject, "FirstPull");
         });
     }
 }

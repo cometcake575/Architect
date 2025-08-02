@@ -19,6 +19,7 @@ public static class EventManager
         {
             if (received) return;
             BroadcastEvent(effects.gameObject, "OnDeath");
+            BroadcastEvent(effects.gameObject, "FirstDeath");
         };
 
         On.HealthManager.TakeDamage += (orig, self, instance) =>
@@ -41,6 +42,7 @@ public static class EventManager
             if (!component) return;
             component.OnSetSaveState += value =>
             {
+                if (value) BroadcastEvent(self.gameObject, "OnDeath");
                 if (value) BroadcastEvent(self.gameObject, "LoadedDead");
             };
         };

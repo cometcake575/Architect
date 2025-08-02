@@ -190,7 +190,8 @@ public static class EditorUIManager
         CreateConfigGrid(_layout, useDefaultConfigValues);
         CreateBroadcastersGrid(_layout);
         CreateReceiversGrid(_layout);
-        
+
+        _currentMode = ConfigMode.Config;
         RefreshConfigMode();
     }
     
@@ -319,52 +320,59 @@ public static class EditorUIManager
 
         return grid;
     }
+
+    private static Button _configButton;
+    private static Button _broadcasterButton;
+    private static Button _receiverButton;
     
     private static void SetupConfigArea(LayoutRoot layout)
     {
-        var configButton = new Button(layout, "Config Choice")
+        _configButton = new Button(layout, "Config Choice")
         {
             Content = "Config",
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Bottom,
-            MinWidth = 160
+            MinWidth = 160,
+            Enabled = false
         }.WithProp(GridLayout.Row, 2);
-        configButton.Click += _ =>
+        _configButton.Click += _ =>
         {
             _currentMode = ConfigMode.Config;
             RefreshConfigMode();
         };
 
-        var broadcasterButton = new Button(layout, "Broadcaster Choice")
+        _broadcasterButton = new Button(layout, "Broadcaster Choice")
         {
             Content = "Events",
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Bottom,
             MinWidth = 160,
-            Padding = new Padding(20, 0)
+            Padding = new Padding(20, 0),
+            Enabled = false
         }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 2);
-        broadcasterButton.Click += _ =>
+        _broadcasterButton.Click += _ =>
         {
             _currentMode = ConfigMode.Broadcasters;
             RefreshConfigMode();
         };
 
-        var receiverButton = new Button(layout, "Receiver Choice")
+        _receiverButton = new Button(layout, "Receiver Choice")
         {
             Content = "Listeners",
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Bottom,
-            MinWidth = 160
+            MinWidth = 160,
+            Enabled = false
         }.WithProp(GridLayout.Column, 2).WithProp(GridLayout.Row, 2);
-        receiverButton.Click += _ =>
+        _receiverButton.Click += _ =>
         {
             _currentMode = ConfigMode.Receivers;
             RefreshConfigMode();
         };
         
-        _leftSideGrid.Children.Add(configButton);
-        _leftSideGrid.Children.Add(broadcasterButton);
-        _leftSideGrid.Children.Add(receiverButton);
+        _leftSideGrid.Children.Add(_configButton);
+        _leftSideGrid.Children.Add(_broadcasterButton);
+        _leftSideGrid.Children.Add(_receiverButton);
     }
 
     private static void SetupTextDisplay(LayoutRoot layout)
@@ -668,7 +676,9 @@ public static class EditorUIManager
         _configGrid?.Destroy();
         _configGrid = null;
         
+        _configButton.Enabled = false;
         if (SelectedItem is not PlaceableObject placeable) return;
+        _configButton.Enabled = true;
 
         _configGrid = new GridLayout(layout, "Config Grid")
         {
@@ -756,7 +766,11 @@ public static class EditorUIManager
         
         ReceiversInUI.Clear();
 
+        _receiverButton.Enabled = false;
         if (SelectedItem is not PlaceableObject placeable) return;
+        var count = placeable.PackElement.GetReceiverGroup().Types.Length;
+        if (count == 0) return;
+        _receiverButton.Enabled = true;
 
         _receiversGrid = new GridLayout(layout, "Config Grid")
         {
@@ -811,16 +825,15 @@ public static class EditorUIManager
             ContentType = InputField.ContentType.Alphanumeric,
             MinWidth = 100
         }.WithProp(GridLayout.Row, 1);
-        
-        var eventTypeInput = new TextInput(layout, "Trigger Type")
-        {
-            VerticalAlignment = VerticalAlignment.Top,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            MinWidth = 100
-        }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 1);
 
-        /*var dropdown = new DropdownObject(layout, "Trigger Dropdown")
-            .WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 1);*/ 
+        var triggerButton = new Button(layout, "Trigger Button")
+        {
+            Content = "Unset",
+            VerticalAlignment = VerticalAlignment.Top,
+            HorizontalAlignment = HorizontalAlignment.Right,
+            MinWidth = 120
+        }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 1);
+        var buttonIndex = -1;
         
         var times = new TextInput(layout, "Times")
         {
@@ -840,20 +853,25 @@ public static class EditorUIManager
             Enabled = false
         }.WithProp(GridLayout.Column, 3).WithProp(GridLayout.Row, 1);
 
-        eventTypeInput.TextChanged += (_, s) => { ValidateReceiver(s, eventNameInput.Text, add, placeable); };
-        eventNameInput.TextChanged += (_, s) => { ValidateReceiver(eventTypeInput.Text, s, add, placeable); };
+        triggerButton.Click += button =>
+        {
+            buttonIndex = (buttonIndex + 1) % count;
+            button.Content = placeable.PackElement.GetReceiverGroup().Types[buttonIndex];
+            ValidateReceiver(button.Content, eventNameInput.Text, add, placeable);
+        };
+
+        eventNameInput.TextChanged += (_, s) => { ValidateReceiver(triggerButton.Content, s, add, placeable); };
 
         add.Click += button =>
         {
             button.Enabled = false;
             if (!int.TryParse(times.Text, out var time)) time = 1;
 
-            var receiver = new EventReceiver(eventTypeInput.Text, eventNameInput.Text, time);
+            var receiver = new EventReceiver(triggerButton.Content, eventNameInput.Text, time);
             Receivers.Add(receiver);
             
             AddReceiver(receiver);
 
-            eventTypeInput.Text = "";
             eventNameInput.Text = "";
         };
 
@@ -864,7 +882,7 @@ public static class EditorUIManager
         _receiversGrid.Children.Add(info3);
         _receiversGrid.Children.Add(info4);
         
-        _receiversGrid.Children.Add(eventTypeInput);
+        _receiversGrid.Children.Add(triggerButton);
         _receiversGrid.Children.Add(eventNameInput);
         _receiversGrid.Children.Add(times);
         _receiversGrid.Children.Add(add);
@@ -925,7 +943,11 @@ public static class EditorUIManager
         _broadcastersGrid?.Destroy();
         _broadcastersGrid = null;
 
+        _broadcasterButton.Enabled = false;
         if (SelectedItem is not PlaceableObject placeable) return;
+        var count = placeable.PackElement.GetBroadcasterGroup().Length;
+        if (count == 0) return;
+        _broadcasterButton.Enabled = true;
 
         _broadcastersGrid = new GridLayout(layout, "Config Grid")
         {
@@ -965,14 +987,15 @@ public static class EditorUIManager
             HorizontalAlignment = HorizontalAlignment.Center
         }.WithProp(GridLayout.Column, 2);
         
-        var eventTypeInput = new TextInput(layout, "Event Type")
+        var eventButton = new Button(layout, "Event Button")
         {
             Padding = new Padding(10, 0),
+            Content = "Unset",
             VerticalAlignment = VerticalAlignment.Top,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            ContentType = InputField.ContentType.Alphanumeric,
+            HorizontalAlignment = HorizontalAlignment.Right,
             MinWidth = 120
         }.WithProp(GridLayout.Row, 1);
+        var buttonIndex = -1;
         
         var eventNameInput = new TextInput(layout, "Name")
         {
@@ -991,19 +1014,24 @@ public static class EditorUIManager
             Enabled = false
         }.WithProp(GridLayout.Column, 2).WithProp(GridLayout.Row, 1);
 
-        eventTypeInput.TextChanged += (_, s) => ValidateBroadcaster(s, eventNameInput.Text, add, placeable);
-        eventNameInput.TextChanged += (_, s) => ValidateBroadcaster(eventTypeInput.Text, s, add, placeable);
+        eventButton.Click += button =>
+        {
+            buttonIndex = (buttonIndex + 1) % count;
+            button.Content = placeable.PackElement.GetBroadcasterGroup()[buttonIndex];
+            ValidateBroadcaster(button.Content, eventNameInput.Text, add, placeable);
+        };
+
+        eventNameInput.TextChanged += (_, s) => ValidateBroadcaster(eventButton.Content, s, add, placeable);
 
         add.Click += button =>
         {
             button.Enabled = false;
 
-            var broadcaster = new EventBroadcaster(eventTypeInput.Text, eventNameInput.Text);
+            var broadcaster = new EventBroadcaster(eventButton.Content, eventNameInput.Text);
             Broadcasters.Add(broadcaster);
 
             AddBroadcaster(broadcaster);
 
-            eventTypeInput.Text = "";
             eventNameInput.Text = "";
         };
         
@@ -1013,7 +1041,7 @@ public static class EditorUIManager
         _broadcastersGrid.Children.Add(info2);
         _broadcastersGrid.Children.Add(info3);
         
-        _broadcastersGrid.Children.Add(eventTypeInput);
+        _broadcastersGrid.Children.Add(eventButton);
         _broadcastersGrid.Children.Add(eventNameInput);
         _broadcastersGrid.Children.Add(add);
         
@@ -1083,15 +1111,7 @@ public static class EditorUIManager
     
     private static void ValidateReceiver(string eText, string nameText, Button add, PlaceableObject placeable)
     {
-        var valid = false;
-
-        if (nameText.Length > 0)
-            foreach (var receiverType in placeable.PackElement.GetReceiverGroup().Types)
-            {
-                if (eText.ToLower().Equals(receiverType.ToLower())) valid = true;
-            }
-            
-        add.Enabled = valid;
+        add.Enabled = nameText.Length > 0 && placeable.PackElement.GetReceiverGroup().Types.Contains(eText.ToLower());
     }
 
     private static TextObject _bigText;
