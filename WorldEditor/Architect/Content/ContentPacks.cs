@@ -528,7 +528,16 @@ public static class ContentPacks
             new MultiPartBenchElement("GG_Atrium_Roof", "RestBench (1)", "GG_bench_metal_0001_1", "Godhome Roof Bench", "Interactable", weight:SpecialBenchWeight),
             new GodseekerElement(weight:NpcWeight),
             CreateCustomDecoration("godhome_cloud_1", "Godhome Cloud 1"),
-            CreateCustomDecoration("godhome_cloud_2", "Godhome Cloud 2")
+            CreateCustomDecoration("godhome_cloud_2", "Godhome Cloud 2"),
+            new CustomSpriteElement("GG_Radiance", "Boss Control/Plat Sets/P2 SetA/Radiant Plat Small (2)", "Small Radiance Platform", "radiance_small", "Solids")
+                .WithConfigGroup(ConfigGroup.RadiancePlatforms)
+                .WithReceiverGroup(ReceiverGroup.RadiancePlatforms),
+            new CustomSpriteElement("GG_Radiance", "Boss Control/Plat Sets/P2 SetA/Radiant Plat Wide (2)", "Wide Radiance Platform", "radiance_wide", "Solids")
+                .WithConfigGroup(ConfigGroup.RadiancePlatforms)
+                .WithReceiverGroup(ReceiverGroup.RadiancePlatforms),
+            new CustomSpriteElement("GG_Radiance", "Boss Control/Plat Sets/P2 SetA/Radiant Plat Thick (2)", "Thick Radiance Platform", "radiance_thick", "Solids")
+                .WithConfigGroup(ConfigGroup.RadiancePlatforms)
+                .WithReceiverGroup(ReceiverGroup.RadiancePlatforms)
         });
         /*RegisterInternalPack(new ContentPack("Experimental", "Experimental Features - These will be moved to a regular pack when confirmed to work")
         {,

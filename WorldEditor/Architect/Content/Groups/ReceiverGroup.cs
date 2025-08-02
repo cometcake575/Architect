@@ -31,6 +31,8 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
     
     internal static ReceiverGroup Awakable;
     
+    internal static ReceiverGroup RadiancePlatforms;
+    
     internal static ReceiverGroup Relays;
     
     internal static ReceiverGroup JellyEgg;
@@ -140,6 +142,17 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
                     fsm.SendEvent("TAKE DAMAGE");
                     fsm.SendEvent("WAKE");
                 }
+            })
+        );
+
+        RadiancePlatforms = new ReceiverGroup(Generic,
+            EventManager.RegisterEventReceiverType("up", o =>
+            { 
+                o.LocateMyFSM("radiant_plat").SendEvent("APPEAR");
+            }),
+            EventManager.RegisterEventReceiverType("down", o =>
+            { 
+                o.LocateMyFSM("radiant_plat").SendEvent("DISAPPEAR");
             })
         );
 

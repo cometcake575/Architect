@@ -52,6 +52,8 @@ public class ConfigGroup
     
     public static ConfigGroup Awakable;
     
+    public static ConfigGroup RadiancePlatforms;
+    
     public static ConfigGroup MassiveMc;
     
     public static ConfigGroup GruzMother;
@@ -635,6 +637,14 @@ public class ConfigGroup
             disableCollision
         );
 
+        RadiancePlatforms = new ConfigGroup(Generic,
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Start Up", (o, value) =>
+            {
+                if (!value.GetValue()) return;
+                o.LocateMyFSM("radiant_plat").SendEvent("APPEAR");
+            }).WithDefaultValue(true), "radplat_start_up")
+        );
+
         ModHooks.LanguageGetHook += (key, _, orig) => CustomTexts.TryGetValue(key, out var customText) ? customText : orig;
 
         Tablets = new ConfigGroup(Generic,
@@ -772,7 +782,7 @@ public class ConfigGroup
                     var fsm = o.LocateMyFSM("BG Control");
                     if (fsm) fsm.SetState("Open");
                     else o.LocateMyFSM("FSM").SendEvent("DOWN");
-                }), "gate_start_open"
+                }).WithDefaultValue(true), "gate_start_open"
             )
         );
 
