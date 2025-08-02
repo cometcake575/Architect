@@ -135,22 +135,22 @@ public static class CursorItem
             _movingComponent.trackDistance = dist.GetValue();
             movable = true;
         }
-        if (EditorUIManager.ConfigValues.TryGetValue("Speed", out cfgVal) && cfgVal is FloatConfigValue speed)
+        if (EditorUIManager.ConfigValues.TryGetValue("Track Speed", out cfgVal) && cfgVal is FloatConfigValue speed)
         {
             _movingComponent.SetSpeed(speed.GetValue());
             movable = true;
         }
-        if (EditorUIManager.ConfigValues.TryGetValue("Pause Time", out cfgVal) && cfgVal is FloatConfigValue pt)
+        if (EditorUIManager.ConfigValues.TryGetValue("Track Pause Time", out cfgVal) && cfgVal is FloatConfigValue pt)
         {
             _movingComponent.pauseTime = pt.GetValue();
             movable = true;
         }
-        if (EditorUIManager.ConfigValues.TryGetValue("Smoothing", out cfgVal) && cfgVal is FloatConfigValue smooth)
+        if (EditorUIManager.ConfigValues.TryGetValue("Track Smoothing", out cfgVal) && cfgVal is FloatConfigValue smooth)
         {
             _movingComponent.smoothing = smooth.GetValue();
             movable = true;
         }
-        if (EditorUIManager.ConfigValues.TryGetValue("Start Offset", out cfgVal) && cfgVal is FloatConfigValue so)
+        if (EditorUIManager.ConfigValues.TryGetValue("Start Offset on Track", out cfgVal) && cfgVal is FloatConfigValue so)
         {
             _movingComponent.offset = so.GetValue();
             movable = true;

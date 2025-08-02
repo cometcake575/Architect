@@ -29,7 +29,7 @@ public class MovingObject : MonoBehaviour
     public void SetSpeed(float value)
     {
         _speed = value;
-        _currentSpeed = 0;
+        _currentSpeed = value;
     }
 
     public void SetRotationSpeed(float value)
