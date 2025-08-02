@@ -32,7 +32,7 @@ public static class PngLoader
         var id = url + (point ? "_point_" : "_bilinear_") + ppu;
         if (!Sprites.ContainsKey(id))
         {
-            var path = GetPath(url, point);
+            var path = GetPath(url);
             var tmp = ResourceUtils.Load(path, Pivot, point, ppu);
             if (!tmp)
             {
@@ -58,7 +58,7 @@ public static class PngLoader
         await webClient.DownloadFileTaskAsync(url, path);
     }
 
-    private static string GetPath(string url, bool point)
+    private static string GetPath(string url)
     {
         var pathUrl = Path.GetInvalidFileNameChars()
             .Aggregate(url, (current, c) => current.Replace(c, '_'));

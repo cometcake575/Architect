@@ -140,7 +140,7 @@ internal sealed class VolatileZotelingElement : InternalPackElement
     public VolatileZotelingElement() : base("Volatile Zoteling", "Enemies")
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
-        WithConfigGroup(ConfigGroup.KillableEnemies);
+        WithConfigGroup(ConfigGroup.VolatileZoteling);
         WithReceiverGroup(ReceiverGroup.Enemies);
     }
     

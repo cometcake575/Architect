@@ -80,6 +80,8 @@ public class ConfigGroup
     
     public static ConfigGroup TriggerZones;
     
+    public static ConfigGroup VolatileZoteling;
+    
     public static ConfigGroup Tablets;
     
     public static ConfigGroup BouncyMushrooms;
@@ -1061,6 +1063,14 @@ public class ConfigGroup
             }), "trigger_layer")
         );
 
+        VolatileZoteling = new ConfigGroup(KillableEnemies,
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Respawn", (o, value) =>
+            {
+                if (value.GetValue()) return;
+                o.LocateMyFSM("Control").RemoveTransition("Reset", "FINISHED");
+            }).WithDefaultValue(false), "volatile_respawn")
+        );
+
         var terrain = LayerMask.NameToLayer("Terrain");
         Shapes = new ConfigGroup([Colours, Stretchable],
             Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("collision", (o, value) =>
@@ -1177,11 +1187,18 @@ public class ConfigGroup
 
     public ConfigGroup(ConfigGroup[] parents, params ConfigType[] types)
     {
-        Types = types;
+        var list = types.ToList();
+        
         foreach (var parent in parents)
         {
-            Types = Types.Concat(parent.Types).ToArray();
+            foreach (var type in parent.Types)
+            {
+                if (list.Contains(type)) continue;
+                list.Add(type);
+            }
         }
+
+        Types = list.ToArray();
     }
 
     public ConfigGroup(ConfigGroup parent, params ConfigType[] types)

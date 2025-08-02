@@ -713,7 +713,11 @@ public static class CustomObjects
 
     private static void InitializeBindingsUI()
     {
-        var root = new LayoutRoot(true, "Architect Bindings");
+        var root = new LayoutRoot(true, "Architect Bindings")
+        {
+            VisibilityCondition = () => !GameManager.instance.isPaused && GameManager.instance.IsGameplayScene()
+        };
+
         _bindingsLayout = new GridLayout(root, "Bindings")
         {
             VerticalAlignment = VerticalAlignment.Bottom,
