@@ -554,7 +554,7 @@ public class ConfigGroup
                 {
                     o.LocateMyFSM("Laser Bug").FsmVariables.FindFsmFloat("Start Pause").Value = value.GetValue();
                 }
-            ), "beam_idle_time"),
+            ), "beam_start_time"),
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Idle Time", (o, value) =>
                 {
                     o.LocateMyFSM("Laser Bug").FsmVariables.FindFsmFloat("Idle Time").Value = value.GetValue();

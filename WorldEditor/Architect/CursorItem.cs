@@ -135,7 +135,7 @@ public static class CursorItem
             _movingComponent.trackDistance = dist.GetValue();
             movable = true;
         }
-        if (EditorUIManager.ConfigValues.TryGetValue("Track Speed", out cfgVal) && cfgVal is FloatConfigValue speed)
+        if (EditorUIManager.ConfigValues.TryGetValue("Track Movement Speed", out cfgVal) && cfgVal is FloatConfigValue speed)
         {
             _movingComponent.SetSpeed(speed.GetValue());
             movable = true;
