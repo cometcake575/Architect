@@ -12,6 +12,7 @@ using Modding;
 using Modding.Utils;
 using Satchel;
 using UnityEngine;
+using UnityEngine.Video;
 using Object = UnityEngine.Object;
 
 namespace Architect.Content.Groups;
@@ -137,6 +138,8 @@ public class ConfigGroup
     public static ConfigGroup Png;
     
     public static ConfigGroup Wav;
+    
+    public static ConfigGroup Mov;
     
     public static ConfigGroup TextDisplay;
     
@@ -746,6 +749,26 @@ public class ConfigGroup
             {
                 o.GetComponent<WavObject>().volume = value.GetValue();
             }), "wav_volume")
+        );
+
+        Mov = new ConfigGroup(Invisible,
+            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Video URL", (o, value) =>
+            {
+                o.GetComponent<MovObject>().url = value.GetValue();
+            }).PreAwake(), "mov_url"),
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Play on Start", (o, value) =>
+            {
+                o.GetComponent<MovObject>().playOnStart = value.GetValue();
+            }).PreAwake(), "mov_start_playing"),
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Loop Video", (o, value) =>
+            {
+                o.GetComponent<VideoPlayer>().isLooping = value.GetValue();
+            }).PreAwake(), "mov_looping"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Playback Speed", (o, value) =>
+            {
+                o.GetComponent<VideoPlayer>().playbackSpeed = value.GetValue();
+            }).PreAwake(), "mov_speed"),
+            layerType
         );
 
         List<Sprite> headSprites =

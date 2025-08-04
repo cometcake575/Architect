@@ -8,6 +8,7 @@ using Architect.Content.Elements.Custom.Behaviour;
 using Architect.Util;
 using JetBrains.Annotations;
 using UnityEngine;
+using UnityEngine.Video;
 
 namespace Architect.Storage;
 
@@ -20,12 +21,52 @@ public static class CustomAssetLoader
 
     private static readonly Vector2 Pivot = new(0.5f, 0.5f);
 
+    private static async Task SaveFile(string url, string path)
+    {
+        var webClient = new WebClient();
+        await webClient.DownloadFileTaskAsync(url, path);
+    }
+
     public static void WipeAssets()
     {
         foreach (var sp in Sprites.Values) Object.Destroy(sp);
         foreach (var sp in Sounds.Values) Object.Destroy(sp);
         Sprites.Clear();
         Sounds.Clear();
+    }
+
+    public static void DoLoadVideo(GameObject obj, string url)
+    {
+        GameManager.instance.StartCoroutine(LoadVideo(url, obj));
+    }
+
+    private static IEnumerator LoadVideo(string url, [CanBeNull] GameObject obj = null)
+    {
+        var path = GetVideoPath(url);
+        if (!File.Exists(path))
+        {
+            var task = Task.Run(() => SaveFile(url, path));
+            while (!task.IsCompleted) yield return null;
+        }
+
+        if (obj)
+        {
+            var player = obj.GetComponent<VideoPlayer>();
+            player.url = path;
+        }
+        yield return null;
+    }
+    
+    public static void PrepareVideo(string url)
+    {
+        GameManager.instance.StartCoroutine(LoadVideo(url));
+    }
+
+    private static string GetVideoPath(string url)
+    {
+        var pathUrl = Path.GetInvalidFileNameChars()
+            .Aggregate(url, (current, c) => current.Replace(c, '_'));
+        return SceneSaveLoader.DataPath + "Architect/" + pathUrl + ".mov";
     }
 
     public static void DoLoadSprite(GameObject obj, string url, bool point, float ppu)
@@ -42,7 +83,7 @@ public static class CustomAssetLoader
             var tmp = ResourceUtils.Load(path, Pivot, point, ppu);
             if (!tmp)
             {
-                var task = Task.Run(() => Save(url, path));
+                var task = Task.Run(() => SaveFile(url, path));
                 while (!task.IsCompleted) yield return null;
                 tmp = ResourceUtils.Load(path, Pivot, point, ppu);
             }
@@ -56,12 +97,6 @@ public static class CustomAssetLoader
     public static void PrepareImage(string url, bool point, float ppu)
     {
         GameManager.instance.StartCoroutine(LoadSprite(url, point, ppu));
-    }
-
-    private static async Task Save(string url, string path)
-    {
-        var webClient = new WebClient();
-        await webClient.DownloadFileTaskAsync(url, path);
     }
 
     private static string GetSpritePath(string url)
@@ -86,7 +121,7 @@ public static class CustomAssetLoader
             var tmp = ResourceUtils.LoadClip(path);
             if (!tmp)
             {
-                var task = Task.Run(() => Save(url, path));
+                var task = Task.Run(() => SaveFile(url, path));
                 while (!task.IsCompleted) yield return null;
                 tmp = ResourceUtils.LoadClip(path);
             }

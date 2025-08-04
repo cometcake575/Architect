@@ -16,6 +16,7 @@ using Modding;
 using MonoMod.RuntimeDetour;
 using Satchel;
 using UnityEngine;
+using UnityEngine.Video;
 using GridLayout = MagicUI.Elements.GridLayout;
 using Image = MagicUI.Elements.Image;
 using Object = UnityEngine.Object;
@@ -83,6 +84,7 @@ public static class CustomObjects
             CreateCircle(),
             CreateTriangle(),
             CreatePng(),
+            CreateMov(),
             CreateWav(),
             new SimplePackElement(CreateZoteTrophy(), "Winner's Trophy", "Custom"),
             CreateTemporaryAbilityGranter("dash_crystal", "Dash", false, "Dash Crystal"),
@@ -211,6 +213,25 @@ public static class CustomObjects
             .WithRotationGroup(RotationGroup.All);
     }
 
+    private static AbstractPackElement CreateMov()
+    {
+        var png = new GameObject("Custom MP4");
+
+        var renderer = png.AddComponent<SpriteRenderer>();
+        renderer.sprite = ResourceUtils.LoadInternal("mp4", ppu: 300);
+        
+        png.AddComponent<VideoPlayer>();
+        
+        png.AddComponent<MovObject>();
+        Object.DontDestroyOnLoad(png);
+        png.SetActive(false);
+        
+        return new SimplePackElement(png, "Custom MP4", "Decorations", weight: ShapeWeight)
+            .WithConfigGroup(ConfigGroup.Mov)
+            .WithReceiverGroup(ReceiverGroup.Mov)
+            .WithRotationGroup(RotationGroup.All);
+    }
+
     private static AbstractPackElement CreateWav()
     {
         var wav = new GameObject("Custom WAV");
@@ -222,7 +243,7 @@ public static class CustomObjects
         return new SimplePackElement(wav, "Custom WAV", "Decorations", ResourceUtils.LoadInternal("wav", ppu: 300),
                 weight: ShapeWeight)
             .WithConfigGroup(ConfigGroup.Wav)
-            .WithReceiverGroup(ReceiverGroup.Wav);
+            .WithReceiverGroup(ReceiverGroup.Playable);
     }
 
     private static GameObject CreateDamagingOrb(string path, string name, int damage)

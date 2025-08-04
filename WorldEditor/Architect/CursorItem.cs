@@ -5,11 +5,13 @@ using Architect.Objects;
 using Architect.Storage;
 using Architect.UI;
 using Architect.Util;
+using UnityEngine.Video;
 
 namespace Architect;
 
 public static class CursorItem
 {
+    private static VideoPlayer _player;
     public static bool NeedsRefreshing;
 
     private static GameObject _obj;
@@ -73,6 +75,9 @@ public static class CursorItem
             newSprite = source.GetValue();
         if (EditorUIManager.ConfigValues.TryGetValue("Clip URL", out cfgVal) && cfgVal is StringConfigValue clip) 
             CustomAssetLoader.PrepareClip(clip.GetValue());
+        if (EditorUIManager.ConfigValues.TryGetValue("Video URL", out cfgVal) && cfgVal is StringConfigValue video)
+            CustomAssetLoader.DoLoadVideo(_display, video.GetValue());
+        else _player.url = null;
         if (EditorUIManager.ConfigValues.TryGetValue("Filter", out cfgVal) && cfgVal is ChoiceConfigValue filter)
             point = filter.GetValue() == 0;
         if (EditorUIManager.ConfigValues.TryGetValue("Pixels Per Unit", out cfgVal) &&
@@ -95,12 +100,15 @@ public static class CursorItem
     private static void SetupObject()
     {
         NeedsRefreshing = true;
-        _obj = new GameObject { name = "[Architect] Cursor Preview" };
+        _obj = new GameObject("[Architect] Cursor Preview");
         _display = new GameObject("Cursor Display") { transform = { parent = _obj.transform } };
         
         _display.AddComponent<SpriteRenderer>().color = new Color(1, 0.2f, 0.2f, 0.5f);
         _movingComponent = _display.AddComponent<MovingObject>();
         _movingComponent.SetSpeed(0);
+
+        _player = _display.AddComponent<VideoPlayer>();
+        _player.playbackSpeed = 0;
         
         _trail = _display.AddComponent<LocalTrailRenderer>();
         var line = _obj.AddComponent<LineRenderer>();

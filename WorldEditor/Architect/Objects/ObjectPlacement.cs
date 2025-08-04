@@ -10,6 +10,7 @@ using Architect.Storage;
 using Architect.Util;
 using Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.Video;
 using Object = UnityEngine.Object;
 
 namespace Architect.Objects;
@@ -168,6 +169,11 @@ public class ObjectPlacement
                 ppu = ppuVal.GetValue();
             else if (config.GetName() == "Clip URL" && config is StringConfigValue clip)
                 CustomAssetLoader.PrepareClip(clip.GetValue());
+            else if (config.GetName() == "Video URL" && config is StringConfigValue video)
+            {
+                _previewObject.AddComponent<VideoPlayer>().playbackSpeed = 0;
+                CustomAssetLoader.DoLoadVideo(_previewObject, video.GetValue());
+            }
         }
 
         _defaultColor = new Color(r, g, b, a);

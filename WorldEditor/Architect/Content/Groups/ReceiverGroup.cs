@@ -29,7 +29,9 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
     
     internal static ReceiverGroup Stompers;
     
-    internal static ReceiverGroup Wav;
+    internal static ReceiverGroup Playable;
+    
+    internal static ReceiverGroup Mov;
     
     internal static ReceiverGroup Awakable;
     
@@ -135,11 +137,19 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
                 o.GetComponentInChildren<StopAnimatorsAtPoint>().stopEvent.ReceiveEvent();
             }));
 
-        Wav = new ReceiverGroup(Invisible,
+        Playable = new ReceiverGroup(Invisible, 
             EventManager.RegisterEventReceiverType("play", o =>
             {
-                o.GetComponent<WavObject>().PlaySound();
-            }));
+                o.GetComponent<Playable>().Play();
+            })
+        );
+
+        Mov = new ReceiverGroup(Playable, 
+            EventManager.RegisterEventReceiverType("pause", o =>
+            {
+                o.GetComponent<MovObject>().Pause();
+            })
+        );
 
         Awakable = new ReceiverGroup(Enemies,
             EventManager.RegisterEventReceiverType("wake", o =>
