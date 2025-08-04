@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -9,6 +10,7 @@ using Architect.Util;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Video;
+using Object = UnityEngine.Object;
 
 namespace Architect.Storage;
 

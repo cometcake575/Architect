@@ -218,7 +218,7 @@ public static class CustomObjects
         var png = new GameObject("Custom MP4");
 
         var renderer = png.AddComponent<SpriteRenderer>();
-        renderer.sprite = ResourceUtils.LoadInternal("mp4", ppu: 300);
+        renderer.sprite = ResourceUtils.LoadInternal("blank", ppu: 300);
         
         png.AddComponent<VideoPlayer>();
         
@@ -226,7 +226,7 @@ public static class CustomObjects
         Object.DontDestroyOnLoad(png);
         png.SetActive(false);
         
-        return new SimplePackElement(png, "Custom MP4", "Decorations", weight: ShapeWeight)
+        return new SimplePackElement(png, "Custom MP4", "Decorations", ResourceUtils.LoadInternal("mp4", ppu: 300), weight: ShapeWeight)
             .WithConfigGroup(ConfigGroup.Mov)
             .WithReceiverGroup(ReceiverGroup.Mov)
             .WithRotationGroup(RotationGroup.All);
