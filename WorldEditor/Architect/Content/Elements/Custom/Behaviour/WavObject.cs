@@ -8,6 +8,8 @@ public class WavObject : MonoBehaviour
     public string url;
     public AudioClip sound;
     private AudioSource _source;
+    
+    public float volume = 1;
 
     private void Awake()
     {
@@ -19,6 +21,6 @@ public class WavObject : MonoBehaviour
     public void PlaySound()
     {
         if (!sound) return;
-        _source.PlayOneShot(sound);
+        _source.PlayOneShot(sound, volume);
     }
 }

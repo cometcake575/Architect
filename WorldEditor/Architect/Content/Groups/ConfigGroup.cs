@@ -741,7 +741,11 @@ public class ConfigGroup
             Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Clip URL", (o, value) =>
             {
                 o.GetComponent<WavObject>().url = value.GetValue();
-            }).PreAwake(), "wav_url")
+            }).PreAwake(), "wav_url"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Clip Volume", (o, value) =>
+            {
+                o.GetComponent<WavObject>().volume = value.GetValue();
+            }), "wav_volume")
         );
 
         List<Sprite> headSprites =
