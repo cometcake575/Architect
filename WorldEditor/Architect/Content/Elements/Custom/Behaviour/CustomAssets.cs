@@ -29,7 +29,7 @@ public class MovObject : Playable
     private VideoPlayer _player;
 
     private bool _started;
-    public bool playOnStart;
+    public bool playOnStart = true;
 
     private void Awake()
     {

@@ -169,6 +169,9 @@ public static class SceneSaveLoader
                 
                 var clip = placement.Config.FirstOrDefault(config => config.GetName() == "Clip URL");
                 if (clip is StringConfigValue clipValue) CustomAssetLoader.PrepareClip(clipValue.GetValue());
+                
+                var video = placement.Config.FirstOrDefault(config => config.GetName() == "Video URL");
+                if (video is StringConfigValue videoValue) CustomAssetLoader.PrepareVideo(videoValue.GetValue());
             }
 
             Save("Architect/" + pair.Key, pair.Value);

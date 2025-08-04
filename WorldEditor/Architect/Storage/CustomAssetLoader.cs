@@ -53,8 +53,10 @@ public static class CustomAssetLoader
         {
             var player = obj.GetComponent<VideoPlayer>();
             player.url = path;
+            while (player.width == 0) yield return null;
+            obj.transform.SetScaleX(obj.transform.GetScaleX() * player.width / 100);
+            obj.transform.SetScaleY(obj.transform.GetScaleY() * player.height / 100);
         }
-        yield return null;
     }
     
     public static void PrepareVideo(string url)
