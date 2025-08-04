@@ -68,6 +68,6 @@ public class CustomBinder : MonoBehaviour
 
     internal static void Init()
     {
-        _clip = ResourceUtils.LoadClip("Bindings.chain_cut");
+        _clip = ResourceUtils.LoadInternalClip("Bindings.chain_cut");
     }
 }

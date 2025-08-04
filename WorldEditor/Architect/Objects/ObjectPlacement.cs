@@ -166,6 +166,8 @@ public class ObjectPlacement
                 point = filter.GetValue() == 0;
             else if (config.GetName() == "Pixels Per Unit" && config is FloatConfigValue ppuVal)
                 ppu = ppuVal.GetValue();
+            else if (config.GetName() == "Clip URL" && config is StringConfigValue clip)
+                CustomAssetLoader.PrepareClip(clip.GetValue());
         }
 
         _defaultColor = new Color(r, g, b, a);
@@ -173,7 +175,7 @@ public class ObjectPlacement
         
         GhostPlacementUtils.SetupForPlacement(_previewObject, renderer, selected, Flipped, Rotation, scaleX, scaleY);
         
-        if (newSprite != null) PngLoader.DoLoadSprite(_previewObject, newSprite, point, ppu);
+        if (newSprite != null) CustomAssetLoader.DoLoadSprite(_previewObject, newSprite, point, ppu);
         
         selected.PackElement.PostPlace(this, _previewObject);
     }

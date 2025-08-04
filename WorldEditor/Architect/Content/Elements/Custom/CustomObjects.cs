@@ -83,6 +83,7 @@ public static class CustomObjects
             CreateCircle(),
             CreateTriangle(),
             CreatePng(),
+            CreateWav(),
             new SimplePackElement(CreateZoteTrophy(), "Winner's Trophy", "Custom"),
             CreateTemporaryAbilityGranter("dash_crystal", "Dash", false, "Dash Crystal"),
             CreateTemporaryAbilityGranter("single_dash_crystal", "Dash", true, "Single Use Dash Crystal"),
@@ -208,6 +209,20 @@ public static class CustomObjects
         return new SimplePackElement(png, "Custom PNG", "Decorations", ResourceUtils.LoadInternal("png", ppu:300), weight: ShapeWeight)
             .WithConfigGroup(ConfigGroup.Png)
             .WithRotationGroup(RotationGroup.All);
+    }
+
+    private static AbstractPackElement CreateWav()
+    {
+        var wav = new GameObject("Custom WAV");
+
+        wav.AddComponent<WavObject>();
+        Object.DontDestroyOnLoad(wav);
+        wav.SetActive(false);
+
+        return new SimplePackElement(wav, "Custom WAV", "Decorations", ResourceUtils.LoadInternal("wav", ppu: 300),
+                weight: ShapeWeight)
+            .WithConfigGroup(ConfigGroup.Wav)
+            .WithReceiverGroup(ReceiverGroup.Wav);
     }
 
     private static GameObject CreateDamagingOrb(string path, string name, int damage)

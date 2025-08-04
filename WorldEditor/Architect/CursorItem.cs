@@ -71,6 +71,8 @@ public static class CursorItem
         var ppu = 100f;
         if (EditorUIManager.ConfigValues.TryGetValue("Source URL", out cfgVal) && cfgVal is StringConfigValue source) 
             newSprite = source.GetValue();
+        if (EditorUIManager.ConfigValues.TryGetValue("Clip URL", out cfgVal) && cfgVal is StringConfigValue clip) 
+            CustomAssetLoader.PrepareClip(clip.GetValue());
         if (EditorUIManager.ConfigValues.TryGetValue("Filter", out cfgVal) && cfgVal is ChoiceConfigValue filter)
             point = filter.GetValue() == 0;
         if (EditorUIManager.ConfigValues.TryGetValue("Pixels Per Unit", out cfgVal) &&
@@ -87,7 +89,7 @@ public static class CursorItem
         
         GhostPlacementUtils.SetupForPlacement(_display, renderer, selected, EditorManager.IsFlipped, EditorManager.Rotation, scaleX, scaleY);
         
-        if (newSprite != null) PngLoader.DoLoadSprite(_display, newSprite, point, ppu);
+        if (newSprite != null) CustomAssetLoader.DoLoadSprite(_display, newSprite, point, ppu);
     }
 
     private static void SetupObject()

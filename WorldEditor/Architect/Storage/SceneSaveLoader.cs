@@ -116,7 +116,7 @@ public static class SceneSaveLoader
 
     public static void WipeAllScenes()
     {
-        PngLoader.WipeAllImages();
+        CustomAssetLoader.WipeAssets();
         foreach (var file in Directory.GetFiles(DataPath + "Architect/")) File.Delete(file);
     }
 
@@ -155,16 +155,20 @@ public static class SceneSaveLoader
             foreach (var placement in DeserializeSceneData(pair.Value))
             {
                 var source = placement.Config.FirstOrDefault(config => config.GetName() == "Source URL");
-                if (source is not StringConfigValue value) continue;
-                
-                var filter = placement.Config.FirstOrDefault(config => config.GetName() == "Filter");
-                var ppu = placement.Config.FirstOrDefault(config => config.GetName() == "Pixels Per Unit");
-                
-                PngLoader.PrepareImage(
-                    value.GetValue(), 
-                    filter is ChoiceConfigValue filterValue && filterValue.GetValue() == 0,
-                    ppu is FloatConfigValue ppuValue ? ppuValue.GetValue() : 100
+                if (source is StringConfigValue value)
+                {
+                    var filter = placement.Config.FirstOrDefault(config => config.GetName() == "Filter");
+                    var ppu = placement.Config.FirstOrDefault(config => config.GetName() == "Pixels Per Unit");
+
+                    CustomAssetLoader.PrepareImage(
+                        value.GetValue(),
+                        filter is ChoiceConfigValue filterValue && filterValue.GetValue() == 0,
+                        ppu is FloatConfigValue ppuValue ? ppuValue.GetValue() : 100
                     );
+                }
+                
+                var clip = placement.Config.FirstOrDefault(config => config.GetName() == "Clip URL");
+                if (clip is StringConfigValue clipValue) CustomAssetLoader.PrepareClip(clipValue.GetValue());
             }
 
             Save("Architect/" + pair.Key, pair.Value);

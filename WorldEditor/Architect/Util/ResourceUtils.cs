@@ -48,6 +48,11 @@ public static class ResourceUtils
 
     internal static AudioClip LoadClip(string clipName)
     {
+        return File.Exists(clipName) ? WavUtils.ToAudioClip(File.ReadAllBytes(clipName)) : null;
+    }
+
+    internal static AudioClip LoadInternalClip(string clipName)
+    {
         var asm = Assembly.GetExecutingAssembly();
         using var s = asm.GetManifestResourceStream($"Architect.Resources.{clipName}.wav");
 

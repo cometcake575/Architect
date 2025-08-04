@@ -13,6 +13,6 @@ public class PngObject : MonoBehaviour
     private void Awake()
     {
         if (string.IsNullOrEmpty(url)) return;
-        PngLoader.DoLoadSprite(gameObject, url, point, ppu);
+        CustomAssetLoader.DoLoadSprite(gameObject, url, point, ppu);
     }
 }

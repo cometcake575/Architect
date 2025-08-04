@@ -136,6 +136,8 @@ public class ConfigGroup
     
     public static ConfigGroup Png;
     
+    public static ConfigGroup Wav;
+    
     public static ConfigGroup TextDisplay;
     
     public static ConfigGroup ObjectMover;
@@ -730,6 +732,13 @@ public class ConfigGroup
             pngName,
             filter,
             ppu
+        );
+        
+        Wav = new ConfigGroup(Invisible,
+            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Clip URL", (o, value) =>
+            {
+                o.GetComponent<WavObject>().url = value.GetValue();
+            }).PreAwake(), "wav_url")
         );
 
         List<Sprite> headSprites =
