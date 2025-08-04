@@ -94,7 +94,7 @@ public static class CustomObjects
             new SimplePackElement(CreateDamagingOrb("energy_orb", "Energy Orb", 1), "Energy Orb", "Hazards")
                 .WithConfigGroup(ConfigGroup.EnergyOrb),
             new SimplePackElement(CreateDamagingOrb("radiant_orb", "Radiant Orb", 999), "Radiant Orb", "Hazards")
-                .WithConfigGroup(ConfigGroup.MovingObjects),
+                .WithConfigGroup(ConfigGroup.EnergyOrb),
             CreateBinding("nail", "Nail Binding", false),
             CreateBinding("shell", "Shell Binding", false),
             CreateBinding("charms", "Charm Binding", false),
@@ -231,6 +231,7 @@ public static class CustomObjects
         var point = new GameObject(name);
 
         point.AddComponent<SpriteRenderer>().sprite = sprite;
+        point.AddComponent<PngObject>();
         var collider = point.AddComponent<CircleCollider2D>();
         collider.radius = 0.35f;
         collider.isTrigger = true;
