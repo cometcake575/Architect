@@ -64,6 +64,22 @@ public static class EditorManager
             orig(self, go, side, amount, type);
         };
 
+        On.GameManager.EnterHero += (orig, self, search) =>
+        {
+            orig(self, search);
+            if (!search) return;
+            
+            if (self.startedOnThisScene) return;
+            if (string.IsNullOrEmpty(self.entryGateName)) return;
+            var entry = GameObject.Find(self.entryGateName);
+            if (entry && entry.activeInHierarchy) return;
+            
+            var hrm = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects()
+                .SelectMany(obj => obj.GetComponentsInChildren<TransitionPoint>(true))
+                .First();
+            self.StartCoroutine(self.hero_ctrl.EnterScene(hrm, 0));
+        };
+
         On.GameManager.FindEntryPoint += (orig, self, name, scene) =>
         {
             var point = orig(self, name, scene);
@@ -72,12 +88,12 @@ public static class EditorManager
                 var hrm = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects()
                     .SelectMany(obj => obj.GetComponentsInChildren<HazardRespawnMarker>(true))
                     .First();
-                point = hrm.transform.position;
+                return hrm.transform.position;
             }
 
             return point;
         };
-
+        
         On.HeroController.LocateSpawnPoint += (orig, self) =>
         {
             var point = orig(self);
@@ -86,7 +102,7 @@ public static class EditorManager
                 var hrm = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects()
                     .SelectMany(obj => obj.GetComponentsInChildren<HazardRespawnMarker>(true))
                     .First();
-                point = hrm.transform;
+                return hrm.transform;
             }
 
             return point;

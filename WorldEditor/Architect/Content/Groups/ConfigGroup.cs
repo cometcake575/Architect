@@ -27,6 +27,8 @@ public class ConfigGroup
     
     public static ConfigGroup Benches;
     
+    public static ConfigGroup Transitions;
+    
     public static ConfigGroup LaserCrystal;
     
     public static ConfigGroup Charm;
@@ -213,6 +215,51 @@ public class ConfigGroup
                 new BoolConfigType("Set Spawn",
                     (o, value) => { o.GetComponent<BenchConfig>().setSpawn = value.GetValue(); }).PreAwake(),
                 "bench_set_spawn")
+        );
+
+        Transitions = new ConfigGroup(Invisible,
+            Attributes.ConfigManager.RegisterConfigType(
+                new ChoiceConfigType("Gate Type",
+                    (o, value) =>
+                    {
+                        o.GetComponent<CustomTransitionPoint>().pointType = value.GetValue();
+                    }, "Door", "Left", "Right", "Top", "Bottom").WithDefaultValue(0).PreAwake(),
+                "trans_dir"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new StringConfigType("Door ID",
+                    (o, value) =>
+                    {
+                        o.name = value.GetValue();
+                    }),
+                "trans_door"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new StringConfigType("Target Door ID",
+                    (o, value) =>
+                    {
+                        o.GetComponent<TransitionPoint>().entryPoint = value.GetValue();
+                    }),
+                "trans_other_door"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new StringConfigType("Target Scene",
+                    (o, value) =>
+                    {
+                        o.GetComponent<TransitionPoint>().targetScene = value.GetValue();
+                    }),
+                "trans_other_room"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Entry Delay",
+                    (o, value) =>
+                    {
+                        o.GetComponent<TransitionPoint>().entryDelay = value.GetValue();
+                    }),
+                "trans_delay"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Collision Trigger",
+                    (o, value) =>
+                    {
+                        o.GetComponent<TransitionPoint>().isADoor = !value.GetValue();
+                    }),
+                "trans_collision")
         );
 
         Decorations = new ConfigGroup(Generic,

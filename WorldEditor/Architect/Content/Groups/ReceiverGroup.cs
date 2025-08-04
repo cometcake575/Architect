@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Reflection;
 using Architect.Attributes;
 using Architect.Content.Elements.Custom.Behaviour;
 using GlobalEnums;
@@ -30,6 +31,8 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
     internal static ReceiverGroup Stompers;
     
     internal static ReceiverGroup Playable;
+    
+    internal static ReceiverGroup Transitions;
     
     internal static ReceiverGroup Mov;
     
@@ -141,6 +144,20 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
             EventManager.RegisterEventReceiverType("play", o =>
             {
                 o.GetComponent<Playable>().Play();
+            })
+        );
+
+        var triggerEnter = typeof(TransitionPoint).GetMethod("OnTriggerEnter2D", 
+            BindingFlags.NonPublic | BindingFlags.Instance);
+        Transitions = new ReceiverGroup(Generic, 
+            EventManager.RegisterEventReceiverType("transition", o =>
+            {
+                var tp = o.GetComponent<TransitionPoint>();
+                
+                var wasADoor = tp.isADoor;
+                tp.isADoor = false;
+                triggerEnter?.Invoke(tp, [HeroController.instance.GetComponent<Collider2D>()]);
+                if (wasADoor) tp.isADoor = true;
             })
         );
 

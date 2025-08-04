@@ -29,6 +29,7 @@ public static class RoomObjects
                     ResourceUtils.LoadInternal("darkness")),
             new SimplePackElement(CreateBinoculars(), "Binoculars", "Room Edits")
                 .WithConfigGroup(ConfigGroup.Binoculars),
+            CreateTransitionPoint(),
             CreateCameraBorder(),
             CreateSceneBorderRemover(),
             CreateObjectRemover("room_remover", "Clear Room", o =>
@@ -179,8 +180,11 @@ public static class RoomObjects
     
     private static AbstractPackElement CreateTransitionPoint()
     {
-        var obj = new GameObject { name = "Transition Point" };
+        var obj = new GameObject("Transition Point");
 
+        CustomTransitionPoint.Init();
+        
+        obj.AddComponent<CustomTransitionPoint>();
         var point = obj.AddComponent<TransitionPoint>();
         point.nonHazardGate = true;
         point.transform.localScale *= 3;
@@ -195,7 +199,9 @@ public static class RoomObjects
 
         Object.DontDestroyOnLoad(obj);
         obj.SetActive(false);
-        return new SimplePackElement(obj, "Transition Point", "Room Edits", sprite);
+        return new PreviewablePackElement(obj, "Transition Point", "Room Edits", sprite)
+            .WithConfigGroup(ConfigGroup.Transitions)
+            .WithReceiverGroup(ReceiverGroup.Transitions);
     }
 
     public static Disabler[] GetObjects(ObjectRemover editor)
