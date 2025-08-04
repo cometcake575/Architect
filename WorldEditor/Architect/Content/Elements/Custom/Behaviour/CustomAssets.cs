@@ -34,7 +34,7 @@ public class MovObject : Playable
     private void Awake()
     {
         if (string.IsNullOrEmpty(url)) return;
-        CustomAssetLoader.DoLoadVideo(gameObject, url);
+        CustomAssetLoader.DoLoadVideo(gameObject, transform.GetScaleX(), url);
         _player = GetComponent<VideoPlayer>();
     }
 

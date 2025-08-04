@@ -35,12 +35,12 @@ public static class CustomAssetLoader
         Sounds.Clear();
     }
 
-    public static void DoLoadVideo(GameObject obj, string url)
+    public static void DoLoadVideo(GameObject obj, float? scale, string url)
     {
-        GameManager.instance.StartCoroutine(LoadVideo(url, obj));
+        GameManager.instance.StartCoroutine(LoadVideo(url, scale, obj));
     }
 
-    private static IEnumerator LoadVideo(string url, [CanBeNull] GameObject obj = null)
+    private static IEnumerator LoadVideo(string url, float? scale, [CanBeNull] GameObject obj = null)
     {
         var path = GetVideoPath(url);
         if (!File.Exists(path))
@@ -54,14 +54,16 @@ public static class CustomAssetLoader
             var player = obj.GetComponent<VideoPlayer>();
             player.url = path;
             while (player.width == 0) yield return null;
-            obj.transform.SetScaleX(obj.transform.GetScaleX() * player.width / 100);
-            obj.transform.SetScaleY(obj.transform.GetScaleY() * player.height / 100);
+
+            var sc = scale.GetValueOrDefault(EditorManager.Scale);
+            obj.transform.SetScaleX(sc * player.width / 100);
+            obj.transform.SetScaleY(sc * player.height / 100);
         }
     }
     
     public static void PrepareVideo(string url)
     {
-        GameManager.instance.StartCoroutine(LoadVideo(url));
+        GameManager.instance.StartCoroutine(LoadVideo(url, null));
     }
 
     private static string GetVideoPath(string url)

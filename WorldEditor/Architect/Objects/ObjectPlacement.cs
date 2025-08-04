@@ -172,7 +172,7 @@ public class ObjectPlacement
             else if (config.GetName() == "Video URL" && config is StringConfigValue video)
             {
                 _previewObject.AddComponent<VideoPlayer>().playbackSpeed = 0;
-                CustomAssetLoader.DoLoadVideo(_previewObject, video.GetValue());
+                CustomAssetLoader.DoLoadVideo(_previewObject, Scale, video.GetValue());
             }
         }
 

@@ -76,8 +76,11 @@ public static class CursorItem
         if (EditorUIManager.ConfigValues.TryGetValue("Clip URL", out cfgVal) && cfgVal is StringConfigValue clip) 
             CustomAssetLoader.PrepareClip(clip.GetValue());
         if (EditorUIManager.ConfigValues.TryGetValue("Video URL", out cfgVal) && cfgVal is StringConfigValue video)
-            CustomAssetLoader.DoLoadVideo(_display, video.GetValue());
-        else _player.url = null;
+        {
+            _player.enabled = true;
+            CustomAssetLoader.DoLoadVideo(_display, null, video.GetValue());
+        }
+        else _player.enabled = false;
         if (EditorUIManager.ConfigValues.TryGetValue("Filter", out cfgVal) && cfgVal is ChoiceConfigValue filter)
             point = filter.GetValue() == 0;
         if (EditorUIManager.ConfigValues.TryGetValue("Pixels Per Unit", out cfgVal) &&
