@@ -78,20 +78,20 @@ public static class CustomAssetLoader
     
     private static IEnumerator LoadSound(string url, [CanBeNull] GameObject obj = null)
     {
+        while (LoadingSounds.Contains(url)) yield break;
         if (!Sounds.ContainsKey(url))
         {
-            while (LoadingSounds.Contains(url)) yield break;
+            LoadingSounds.Add(url);
             var path = GetSoundPath(url);
             var tmp = ResourceUtils.LoadClip(path);
             if (!tmp)
             {
-                LoadingSounds.Add(url);
                 var task = Task.Run(() => Save(url, path));
                 while (!task.IsCompleted) yield return null;
                 tmp = ResourceUtils.LoadClip(path);
-                LoadingSounds.Remove(url);
             }
             Sounds[url] = tmp;
+            LoadingSounds.Remove(url);
         }
 
         if (obj) obj.GetComponent<WavObject>().sound = Sounds[url];

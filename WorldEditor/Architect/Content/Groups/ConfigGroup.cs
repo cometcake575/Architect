@@ -621,13 +621,6 @@ public class ConfigGroup
             }), "thorns_damage"),
             disableCollision
         );
-        
-        EnergyOrb = new ConfigGroup(MovingObjects,
-            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Damage Type", (o, value) =>
-            {
-                o.GetOrAddComponent<CustomDamager>().damageType = value.GetValue() * 2;
-            }, "Enemy", "Hazard"), "energy_orb_type")
-        );
 
         MovingPlatforms = new ConfigGroup(MovingObjects,
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Stick Player", (o, value) =>
@@ -734,6 +727,16 @@ public class ConfigGroup
             ppu
         );
         
+        EnergyOrb = new ConfigGroup(MovingObjects,
+            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Damage Type", (o, value) =>
+            {
+                o.GetOrAddComponent<CustomDamager>().damageType = value.GetValue() * 2;
+            }, "Enemy", "Hazard"), "energy_orb_type"),
+            pngName,
+            filter,
+            ppu
+        );
+
         Wav = new ConfigGroup(Invisible,
             Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Clip URL", (o, value) =>
             {

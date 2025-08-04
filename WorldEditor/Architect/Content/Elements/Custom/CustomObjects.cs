@@ -91,9 +91,9 @@ public static class CustomObjects
             CreateTemporaryAbilityGranter("single_shadow_dash_crystal", "Shadow Dash", true, "Single Use Shadow Dash Crystal"),
             CreateTemporaryAbilityGranter("wings_crystal", "Wings", false, "Wings Crystal"),
             CreateTemporaryAbilityGranter("single_wings_crystal", "Wings", true, "Single Use Wings Crystal"),
-            new SimplePackElement(CreateDamagingOrb("energy_orb", "Energy Orb", 1), "Energy Orb", "Custom")
+            new SimplePackElement(CreateDamagingOrb("energy_orb", "Energy Orb", 1), "Energy Orb", "Hazards")
                 .WithConfigGroup(ConfigGroup.EnergyOrb),
-            new SimplePackElement(CreateDamagingOrb("radiant_orb", "Radiant Orb", 999), "Radiant Orb", "Custom")
+            new SimplePackElement(CreateDamagingOrb("radiant_orb", "Radiant Orb", 999), "Radiant Orb", "Hazards")
                 .WithConfigGroup(ConfigGroup.MovingObjects),
             CreateBinding("nail", "Nail Binding", false),
             CreateBinding("shell", "Shell Binding", false),
