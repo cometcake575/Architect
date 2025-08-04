@@ -125,7 +125,7 @@ public static class CustomAssetLoader
             LoadingSounds.Add(url);
             var path = GetSoundPath(url);
             var tmp = ResourceUtils.LoadClip(path);
-            if (!tmp)
+            if (!tmp || tmp.length == 0)
             {
                 var task = Task.Run(() => SaveFile(url, path));
                 while (!task.IsCompleted) yield return null;
