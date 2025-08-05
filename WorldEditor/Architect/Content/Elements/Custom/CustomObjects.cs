@@ -111,6 +111,9 @@ public static class CustomObjects
             CreateBinding("spirit", "Vengeful Spirit Binding"),
             CreateBinding("dive", "Desolate Dive Binding"),
             CreateBinding("wraiths", "Howling Wraiths Binding"),
+            CreateBinding("shade_soul", "Shade Soul Binding"),
+            CreateBinding("descending_dark", "Descending Dark Binding"),
+            CreateBinding("abyss_shriek", "Abyss Shriek Binding"),
             CreateBinding("pogo", "Pogo Binding"),
             CreateBinding("lantern", "Lantern Binding"),
             CreateBinding("dash", "Dash Binding"),
@@ -618,16 +621,22 @@ public static class CustomObjects
     {
         fsm.InsertCustomAction("Has Fireball?", playMakerFsm =>
         {
-            if (!BindingCheck(true, "spirit")) playMakerFsm.FsmVariables.FindFsmInt("Spell Level").Value = 0;
+            var val = playMakerFsm.FsmVariables.FindFsmInt("Spell Level");
+            if (!BindingCheck(true, "spirit")) val.Value = 0;
+            else if (val.Value == 2 && !BindingCheck(true, "shade_soul")) val.Value = 1;
         }, 1);
         fsm.InsertCustomAction("Has Quake?", playMakerFsm =>
         {
-            if (!BindingCheck(true, "dive")) playMakerFsm.FsmVariables.FindFsmInt("Spell Level").Value = 0;
+            var val = playMakerFsm.FsmVariables.FindFsmInt("Spell Level");
+            if (!BindingCheck(true, "dive")) val.Value = 0;
+            else if (val.Value == 2 && !BindingCheck(true, "descending_dark")) val.Value = 1;
         }, 1);
         fsm.InsertCustomAction("Has Scream?", playMakerFsm =>
         {
-            if (!BindingCheck(true, "wraiths")) playMakerFsm.FsmVariables.FindFsmInt("Spell Level").Value = 0;
-        }, 1);
+            var val = playMakerFsm.FsmVariables.FindFsmInt("Spell Level");
+            if (!BindingCheck(true, "wraiths")) val.Value = 0;
+            else if (val.Value == 2 && !BindingCheck(true, "abyss_shriek")) val.Value = 1;
+        }, 1); 
         
         fsm.InsertCustomAction("Level Check", () =>
         {
