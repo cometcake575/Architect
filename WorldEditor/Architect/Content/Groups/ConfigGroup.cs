@@ -152,6 +152,8 @@ public class ConfigGroup
     public static ConfigGroup ObjectMover;
     
     public static ConfigGroup ObjectDuplicator;
+    
+    public static ConfigGroup ColosseumPlatform;
 
     public static void Initialize()
     {
@@ -356,6 +358,17 @@ public class ConfigGroup
                 new StringConfigType("Placement ID",
                     (o, value) => { o.GetComponent<ObjectDuplicator>().id = value.GetValue(); }),
                 "object_duplicator_identifier")
+        );
+
+        ColosseumPlatform = new ConfigGroup(Generic,
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Start Up",
+                    (o, value) =>
+                    {
+                        if (!value.GetValue()) return;
+                        o.LocateMyFSM("Control").SendEvent("PLAT EXPAND");
+                    }).WithDefaultValue(true),
+                "colo_plat_start_up")
         );
 
         GeoChest = new ConfigGroup(Generic,
@@ -869,7 +882,7 @@ public class ConfigGroup
                 new BoolConfigType("Ignore Void Heart", (o, value) =>
                 {
                     if (value.GetValue()) o.GetComponent<VhEffects>().ForceDisable();
-                }), "ignore_vh"
+                }).WithDefaultValue(true), "ignore_vh"
             );
         
         Abyss = new ConfigGroup(Invisible, ignoreVoidHeart);

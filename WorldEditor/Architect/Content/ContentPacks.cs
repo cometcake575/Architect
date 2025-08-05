@@ -409,7 +409,10 @@ public static class ContentPacks
             new TamerBeastElement(),
             new BenchElement("Room_Colosseum_02", "RestBench", "Colosseum Bench", "Interactable", weight:BenchWeight),
             
-            new ColosseumWallElement(weight:MiscInteractableWeight)
+            new ColosseumWallElement(weight:MiscInteractableWeight),
+            Create("Room_Colosseum_Gold", "Colosseum Manager/Waves/Arena 1/Colosseum Platform", "Colosseum Platform", "Interactable", weight:MiscInteractableWeight)
+                .WithConfigGroup(ConfigGroup.ColosseumPlatform)
+                .WithReceiverGroup(ReceiverGroup.ColosseumPlatform)
         });
         RegisterInternalPack(new ContentPack("Zoteboat", "Zotelings from the Eternal Ordeal")
         {
@@ -533,13 +536,13 @@ public static class ContentPacks
             CreateCustomDecoration("godhome_cloud_2", "Godhome Cloud 2"),
             new CustomSpriteElement("GG_Radiance", "Boss Control/Plat Sets/P2 SetA/Radiant Plat Small (2)", "Small Radiance Platform", "radiance_small", "Solids")
                 .WithConfigGroup(ConfigGroup.RadiancePlatforms)
-                .WithReceiverGroup(ReceiverGroup.RadiancePlatforms),
+                .WithReceiverGroup(ReceiverGroup.UpDownPlatforms),
             new CustomSpriteElement("GG_Radiance", "Boss Control/Plat Sets/P2 SetA/Radiant Plat Wide (2)", "Wide Radiance Platform", "radiance_wide", "Solids")
                 .WithConfigGroup(ConfigGroup.RadiancePlatforms)
-                .WithReceiverGroup(ReceiverGroup.RadiancePlatforms),
+                .WithReceiverGroup(ReceiverGroup.UpDownPlatforms),
             new CustomSpriteElement("GG_Radiance", "Boss Control/Plat Sets/P2 SetA/Radiant Plat Thick (2)", "Thick Radiance Platform", "radiance_thick", "Solids")
                 .WithConfigGroup(ConfigGroup.RadiancePlatforms)
-                .WithReceiverGroup(ReceiverGroup.RadiancePlatforms)
+                .WithReceiverGroup(ReceiverGroup.UpDownPlatforms)
         });
         /*RegisterInternalPack(new ContentPack("Experimental", "Experimental Features - These will be moved to a regular pack when confirmed to work")
         {,

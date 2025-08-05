@@ -41,7 +41,9 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
     
     internal static ReceiverGroup Awakable;
     
-    internal static ReceiverGroup RadiancePlatforms;
+    internal static ReceiverGroup UpDownPlatforms;
+    
+    internal static ReceiverGroup ColosseumPlatform;
     
     internal static ReceiverGroup Relays;
     
@@ -198,14 +200,25 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
             })
         );
 
-        RadiancePlatforms = new ReceiverGroup(Generic,
+        UpDownPlatforms = new ReceiverGroup(Generic,
             EventManager.RegisterEventReceiverType("up", o =>
-            { 
-                o.LocateMyFSM("radiant_plat").SendEvent("APPEAR");
+            {
+                var fsm = o.GetComponent<PlayMakerFSM>();
+                fsm.SendEvent("APPEAR");
+                fsm.SendEvent("PLAT EXPAND");
             }),
             EventManager.RegisterEventReceiverType("down", o =>
             { 
-                o.LocateMyFSM("radiant_plat").SendEvent("DISAPPEAR");
+                var fsm = o.GetComponent<PlayMakerFSM>();
+                fsm.SendEvent("DISAPPEAR");
+                fsm.SendEvent("PLAT RETRACT");
+            })
+        );
+
+        ColosseumPlatform = new ReceiverGroup(UpDownPlatforms,
+            EventManager.RegisterEventReceiverType("down_slow", o =>
+            { 
+                o.LocateMyFSM("Control").SendEvent("SLOW RETRACT");
             })
         );
 
