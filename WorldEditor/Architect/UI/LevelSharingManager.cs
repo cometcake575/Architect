@@ -31,6 +31,7 @@ public static class LevelSharingManager
     private static GridLayout _uploadArea;
     private static Button _leftButton;
     private static Button _rightButton;
+    private static Image _background;
 
     private static readonly List<(TextObject, TextObject, TextObject, Button, Image)> DownloadChoices = [];
     private static int _index;
@@ -44,11 +45,24 @@ public static class LevelSharingManager
 
     public static void Initialize(LayoutRoot layout)
     {
+        SetupBackground(layout);
         SetupSwitchArea(layout);
         SetupSearchArea(layout);
         SetupUploadArea(layout);
         SetupIndexButtons(layout);
         SetupLoginArea(layout);
+    }
+
+    private static void SetupBackground(LayoutRoot layout)
+    {
+        _background = new Image(layout, ResourceUtils.LoadInternal("level_sharer_bg"), "Background")
+        {
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            Visibility = Visibility.Hidden,
+            Width = 3000,
+            Height = 3000
+        };
     }
 
     private static void SetupIndexButtons(LayoutRoot layout)
@@ -126,6 +140,7 @@ public static class LevelSharingManager
             else
             {
                 img.Sprite = architectKnight;
+                _background.Visibility = Visibility.Hidden;
                 _searchArea.Visibility = Visibility.Hidden;
                 _loginArea.Visibility = Visibility.Hidden;
                 _downloadArea.Visibility = Visibility.Hidden;
@@ -228,6 +243,7 @@ public static class LevelSharingManager
 
         if (_viewing)
         {
+            _background.Visibility = Visibility.Visible;
             _searchArea.Visibility = Visibility.Visible;
             _loginArea.Visibility = Visibility.Visible;
             _downloadArea.Visibility = Visibility.Visible;

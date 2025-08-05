@@ -7,7 +7,7 @@ namespace Architect.Storage;
 
 public class WorldEditorGlobalSettings
 {
-    public List<string> Favourites = new();
+    public List<string> Favourites = [];
 
     public string ApiKey = "";
 
