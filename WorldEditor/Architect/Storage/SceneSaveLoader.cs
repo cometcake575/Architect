@@ -1,8 +1,12 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Architect.Attributes.Config;
 using Architect.Objects;
+using Architect.UI;
 using Modding.Converters;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -147,34 +151,46 @@ public static class SceneSaveLoader
         return JsonConvert.SerializeObject(data);
     }
 
-    public static void LoadAllScenes(Dictionary<string, string> placements)
+    public static IEnumerator LoadAllScenes(Dictionary<string, string> placements)
     {
         WipeAllScenes();
+        
+        var startTime = Time.realtimeSinceStartup;
+        
         foreach (var pair in placements)
         {
-            foreach (var placement in DeserializeSceneData(pair.Value))
-            {
-                var source = placement.Config.FirstOrDefault(config => config.GetName() == "Source URL");
-                if (source is StringConfigValue value)
-                {
-                    var filter = placement.Config.FirstOrDefault(config => config.GetName() == "Filter");
-                    var ppu = placement.Config.FirstOrDefault(config => config.GetName() == "Pixels Per Unit");
-
-                    CustomAssetLoader.PrepareImage(
-                        value.GetValue(),
-                        filter is ChoiceConfigValue filterValue && filterValue.GetValue() == 0,
-                        ppu is FloatConfigValue ppuValue ? ppuValue.GetValue() : 100
-                    );
-                }
-                
-                var clip = placement.Config.FirstOrDefault(config => config.GetName() == "Clip URL");
-                if (clip is StringConfigValue clipValue) CustomAssetLoader.PrepareClip(clipValue.GetValue());
-                
-                var video = placement.Config.FirstOrDefault(config => config.GetName() == "Video URL");
-                if (video is StringConfigValue videoValue) CustomAssetLoader.PrepareVideo(videoValue.GetValue());
-            }
-
+            var task = Task.Run(() => LoadEdits(pair.Value));
+            while (!task.IsCompleted) yield return null;
+            
             Save("Architect/" + pair.Key, pair.Value);
+        }
+
+        var elapsed = Time.realtimeSinceStartup - startTime;
+        if (elapsed < 1) yield return new WaitForSeconds(1 - elapsed);
+
+        LevelSharingManager.EnableControls();
+        LevelSharingManager.ShowStatus("Download Complete");
+    }
+
+    private static async Task LoadEdits(string data)
+    {
+        foreach (var config in DeserializeSceneData(data).Select(obj => obj.Config
+                     .ToDictionary(conf => conf.GetName())))
+        {
+            await TryDownload(config, "Source URL", CustomAssetLoader.GetSpritePath);
+            await TryDownload(config, "Clip URL", CustomAssetLoader.GetSoundPath);
+            await TryDownload(config, "Video URL", CustomAssetLoader.GetVideoPath);
+        }
+    }
+
+    private static async Task TryDownload(Dictionary<string, ConfigValue> config, string type,
+        Func<string, string> getPath)
+    {
+        if (config.TryGetValue(type, out var val) && val is StringConfigValue stringVal)
+        {
+            var url = stringVal.GetValue();
+            var path = getPath.Invoke(url);
+            await CustomAssetLoader.SaveFile(url, path);
         }
     }
 

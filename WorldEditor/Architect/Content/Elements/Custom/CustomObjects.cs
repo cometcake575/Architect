@@ -59,10 +59,16 @@ public static class CustomObjects
                 .WithBroadcasterGroup(BroadcasterGroup.Callable)
                 .WithReceiverGroup(ReceiverGroup.Relays)
                 .WithConfigGroup(ConfigGroup.Relays),
-            new SimplePackElement(CreateTextDisplay(), "Text Display", "Custom",
+            new SimplePackElement(CreateTextDisplay(0), "Text Display", "Custom",
                     ResourceUtils.LoadInternal("text_display", FilterMode.Point))
+                .WithBroadcasterGroup(BroadcasterGroup.TextDisplay)
                 .WithReceiverGroup(ReceiverGroup.TextDisplay)
                 .WithConfigGroup(ConfigGroup.TextDisplay),
+            new SimplePackElement(CreateTextDisplay(3), "Choice", "Custom",
+                    ResourceUtils.LoadInternal("choice", FilterMode.Point))
+                .WithBroadcasterGroup(BroadcasterGroup.Choice)
+                .WithReceiverGroup(ReceiverGroup.TextDisplay)
+                .WithConfigGroup(ConfigGroup.Choice),
             new SimplePackElement(CreatePlayerListener(), "Player Hook", "Custom",
                     ResourceUtils.LoadInternal("player_listener"))
                 .WithBroadcasterGroup(BroadcasterGroup.PlayerHook)
@@ -307,13 +313,15 @@ public static class CustomObjects
         return point;
     }
 
-    private static GameObject CreateTextDisplay()
+    private static GameObject CreateTextDisplay(int def)
     {
         var point = new GameObject("Text Display");
         point.transform.localScale *= 10;
 
+        TextDisplay.Init();
+        
         point.SetActive(false);
-        point.AddComponent<TextDisplay>();
+        point.AddComponent<TextDisplay>().displayType = def;
         Object.DontDestroyOnLoad(point);
 
         return point;

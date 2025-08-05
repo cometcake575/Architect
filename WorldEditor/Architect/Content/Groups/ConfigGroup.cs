@@ -145,6 +145,8 @@ public class ConfigGroup
     
     public static ConfigGroup TextDisplay;
     
+    public static ConfigGroup Choice;
+    
     public static ConfigGroup ObjectMover;
     
     public static ConfigGroup ObjectDuplicator;
@@ -815,7 +817,8 @@ public class ConfigGroup
             {
                 o.GetComponent<VideoPlayer>().playbackSpeed = value.GetValue();
             }).PreAwake(), "mov_speed"),
-            layerType
+            layerType,
+            zOffset
         );
 
         List<Sprite> headSprites =
@@ -1240,11 +1243,26 @@ public class ConfigGroup
             }).PreAwake(), "bv_noroar")
         );
 
-        TextDisplay = new ConfigGroup(Invisible,
+        var tc =
             Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Display Text", (o, value) =>
             {
                 CustomTexts[o.GetComponent<TextDisplay>().ID] = value.GetValue();
-            }), "textdisplay_text_content")
+            }), "textdisplay_text_content");
+        
+        Choice = new ConfigGroup(Invisible,
+            tc,
+            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Cost", (o, value) =>
+            {
+                o.GetComponent<TextDisplay>().cost = value.GetValue();
+            }).WithDefaultValue(0), "choice_cost")
+        );
+
+        TextDisplay = new ConfigGroup(Invisible,
+            tc,
+            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Display Type", (o, value) =>
+            {
+                o.GetComponent<TextDisplay>().displayType = value.GetValue();
+            }, "Dream", "Dream Box", "Talk Box").WithDefaultValue(0), "textdisplay_type")
         );
     }
 

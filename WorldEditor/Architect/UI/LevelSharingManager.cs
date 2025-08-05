@@ -21,6 +21,7 @@ namespace Architect.UI;
 
 public static class LevelSharingManager
 {
+    private static Button _switchButton;
     private const int LevelsPerPage = 5;
     
     private static bool _viewing;
@@ -43,24 +44,11 @@ public static class LevelSharingManager
 
     public static void Initialize(LayoutRoot layout)
     {
-        SetupSuccessText(layout);
         SetupSwitchArea(layout);
         SetupSearchArea(layout);
         SetupUploadArea(layout);
         SetupIndexButtons(layout);
         SetupLoginArea(layout);
-    }
-
-    private static void SetupSuccessText(LayoutRoot layout)
-    {
-        _success = new TextObject(layout, "Success")
-        {
-            FontSize = 40,
-            ContentColor = Color.green,
-            VerticalAlignment = VerticalAlignment.Center,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            Visibility = Visibility.Hidden
-        };
     }
 
     private static void SetupIndexButtons(LayoutRoot layout)
@@ -113,7 +101,7 @@ public static class LevelSharingManager
             PreserveAspectRatio = true,
             Padding = new Padding(30, 30)
         };
-        var find = new Button(layout, "Find Levels")
+        _switchButton = new Button(layout, "Find Levels")
         {
             HorizontalAlignment = HorizontalAlignment.Right,
             VerticalAlignment = VerticalAlignment.Top,
@@ -123,7 +111,7 @@ public static class LevelSharingManager
             Padding = new Padding(20, 20)
         };
 
-        find.Click += async _ =>
+        _switchButton.Click += async _ =>
         {
             var uiManager = UIManager.instance;
             _viewing = !_viewing;
@@ -184,6 +172,9 @@ public static class LevelSharingManager
     {
         if (_currentLevels.Count <= index) return;
         
+        DisableControls();
+        ShowStatus("Downloading...");
+        
         var jsonBody = JsonUtility.ToJson(new DownloadRequestData
         {
             level_id = _currentLevels[index]["level_id"]
@@ -199,14 +190,19 @@ public static class LevelSharingManager
         
         var operation = request.SendWebRequest();
         while (!operation.isDone) await Task.Yield();
-        if (request.responseCode != 200) return;
+        if (request.responseCode != 200)
+        {
+            ShowStatus("Error when downloading level");
+            EnableControls();
+            return;
+        }
 
         var json = request.downloadHandler.text;
 
         try
         {
             var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-            SceneSaveLoader.LoadAllScenes(data);
+            GameManager.instance.StartCoroutine(SceneSaveLoader.LoadAllScenes(data));
         }
         catch
         {
@@ -215,11 +211,6 @@ public static class LevelSharingManager
         }
         
         PlacementManager.InvalidateCache();
-
-        _success.Visibility = Visibility.Visible;
-        _success.Text = "Downloaded";
-        await Task.Delay(4000);
-        _success.Visibility = Visibility.Hidden;
     }
 
     private const float MenuFadeSpeed = 3.2f;
@@ -700,7 +691,7 @@ public static class LevelSharingManager
         var response = JsonConvert.DeserializeObject<Dictionary<string, string>>(request.downloadHandler.text);
         if (!response.TryGetValue("key", out var value))
         {
-            errorMessage.Text = response["error"];
+            errorMessage.Text = response.TryGetValue("error", out var error) ? error : "Error occured when uploading";
             return false;
         }
         Architect.GlobalSettings.ApiKey = value;
@@ -734,6 +725,15 @@ public static class LevelSharingManager
             VerticalAlignment = VerticalAlignment.Center,
             Enabled = Architect.GlobalSettings.ApiKey.Length > 0
         }.WithProp(GridLayout.Column, 2).WithProp(GridLayout.Row, 2);
+
+        _success = new TextObject(layout)
+        {
+            FontSize = 15,
+            Text = "",
+            Padding = padding,
+            VerticalAlignment = VerticalAlignment.Center,
+            HorizontalAlignment = HorizontalAlignment.Center
+        }.WithProp(GridLayout.Column, 1);
         
         var nameInput = new TextInput(layout)
         {
@@ -743,7 +743,7 @@ public static class LevelSharingManager
             Padding = padding,
             VerticalAlignment = VerticalAlignment.Center,
             HorizontalAlignment = HorizontalAlignment.Center
-        }.WithProp(GridLayout.Column, 1);
+        }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 1);
         
         var descInput = new TextInput(layout)
         {
@@ -753,7 +753,7 @@ public static class LevelSharingManager
             Padding = padding,
             VerticalAlignment = VerticalAlignment.Center,
             HorizontalAlignment = HorizontalAlignment.Center
-        }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 1);
+        }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 2);
         
         var urlInput = new TextInput(layout)
         {
@@ -763,11 +763,11 @@ public static class LevelSharingManager
             Padding = padding,
             VerticalAlignment = VerticalAlignment.Center,
             HorizontalAlignment = HorizontalAlignment.Center
-        }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 2);
+        }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 3);
         
         _uploadArea = new GridLayout(layout, "Upload Area")
         {
-            Padding = new Padding(50, 50),
+            Padding = new Padding(50, 70),
             HorizontalAlignment = HorizontalAlignment.Right,
             VerticalAlignment = VerticalAlignment.Bottom,
             ColumnDefinitions =
@@ -780,10 +780,12 @@ public static class LevelSharingManager
             {
                 new GridDimension(1, GridUnit.Proportional),
                 new GridDimension(1, GridUnit.Proportional),
+                new GridDimension(1, GridUnit.Proportional),
                 new GridDimension(1, GridUnit.Proportional)
             },
             Children =
             {
+                _success,
                 new TextObject(layout)
                 {
                     FontSize = 15,
@@ -791,7 +793,7 @@ public static class LevelSharingManager
                     Padding = padding,
                     VerticalAlignment = VerticalAlignment.Center,
                     HorizontalAlignment = HorizontalAlignment.Center
-                },
+                }.WithProp(GridLayout.Row, 1),
                 new TextObject(layout)
                 {
                     FontSize = 15,
@@ -799,7 +801,7 @@ public static class LevelSharingManager
                     Padding = padding,
                     VerticalAlignment = VerticalAlignment.Center,
                     HorizontalAlignment = HorizontalAlignment.Center
-                }.WithProp(GridLayout.Row, 1),
+                }.WithProp(GridLayout.Row, 2),
                 new TextObject(layout)
                 {
                     FontSize = 15,
@@ -807,7 +809,7 @@ public static class LevelSharingManager
                     Padding = padding,
                     VerticalAlignment = VerticalAlignment.Center,
                     HorizontalAlignment = HorizontalAlignment.Center
-                }.WithProp(GridLayout.Row, 2),
+                }.WithProp(GridLayout.Row, 3),
                 nameInput,
                 descInput,
                 urlInput,
@@ -846,13 +848,16 @@ public static class LevelSharingManager
         
         var operation = request.SendWebRequest();
         while (!operation.isDone) await Task.Yield();
-        if (request.responseCode != 201) return;
+        if (request.responseCode != 201)
+        {
+            var response = JsonConvert.DeserializeObject<Dictionary<string, string>>(request.downloadHandler.text);
+            var msg = response.TryGetValue("error", out var error) ? error : "Error occured when uploading";
+            ShowStatus(msg);
+            return;
+        }
 
         await PerformSearch();
-        _success.Visibility = Visibility.Visible;
-        _success.Text = "Uploaded";
-        await Task.Delay(4000);
-        _success.Visibility = Visibility.Hidden;
+        ShowStatus("Uploaded");
     }
 
     private static async Task DeleteLevel(string name)
@@ -873,12 +878,36 @@ public static class LevelSharingManager
         
         var operation = request.SendWebRequest();
         while (!operation.isDone) await Task.Yield();
-        if (request.responseCode != 201) return;
+        if (request.responseCode != 201)
+        {
+            var response = JsonConvert.DeserializeObject<Dictionary<string, string>>(request.downloadHandler.text);
+            var msg = response.TryGetValue("error", out var error) ? error : "Error occured when uploading";
+            ShowStatus(msg);
+            return;
+        }
 
         await PerformSearch();
-        _success.Visibility = Visibility.Visible;
-        _success.Text = "Deleted";
-        await Task.Delay(4000);
-        _success.Visibility = Visibility.Hidden;
+        ShowStatus("Deleted");
+    }
+
+    public static void ShowStatus(string text)
+    {
+        _success.Text = text;
+    }
+
+    public static void DisableControls()
+    {
+        foreach (var choice in DownloadChoices) choice.Item4.Enabled = false;
+        _switchButton.Enabled = false;
+        _leftButton.Enabled = false;
+        _rightButton.Enabled = false;
+    }
+
+    public static void EnableControls()
+    {
+        foreach (var choice in DownloadChoices) choice.Item4.Enabled = true;
+        _switchButton.Enabled = true;
+        _leftButton.Enabled = true;
+        _rightButton.Enabled = true;
     }
 }

@@ -23,7 +23,7 @@ public static class CustomAssetLoader
 
     private static readonly Vector2 Pivot = new(0.5f, 0.5f);
 
-    private static async Task SaveFile(string url, string path)
+    public static async Task SaveFile(string url, string path)
     {
         var webClient = new WebClient();
         await webClient.DownloadFileTaskAsync(url, path);
@@ -68,7 +68,7 @@ public static class CustomAssetLoader
         GameManager.instance.StartCoroutine(LoadVideo(url, null));
     }
 
-    private static string GetVideoPath(string url)
+    public static string GetVideoPath(string url)
     {
         var pathUrl = Path.GetInvalidFileNameChars()
             .Aggregate(url, (current, c) => current.Replace(c, '_'));
@@ -105,7 +105,7 @@ public static class CustomAssetLoader
         GameManager.instance.StartCoroutine(LoadSprite(url, point, ppu));
     }
 
-    private static string GetSpritePath(string url)
+    public static string GetSpritePath(string url)
     {
         var pathUrl = Path.GetInvalidFileNameChars()
             .Aggregate(url, (current, c) => current.Replace(c, '_'));
@@ -144,7 +144,7 @@ public static class CustomAssetLoader
         GameManager.instance.StartCoroutine(LoadSound(url));
     }
 
-    private static string GetSoundPath(string url)
+    public static string GetSoundPath(string url)
     {
         var pathUrl = Path.GetInvalidFileNameChars()
             .Aggregate(url, (current, c) => current.Replace(c, '_'));

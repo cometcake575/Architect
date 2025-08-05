@@ -11,6 +11,10 @@ public class BroadcasterGroup
     public static readonly string[] PersistentLevers = ["OnPull", "FirstPull", "LoadedPulled"];
     
     public static readonly string[] TriggerZones = ["ZoneEnter", "ZoneExit"];
+    
+    public static readonly string[] TextDisplay = ["BoxDown"];
+    
+    public static readonly string[] Choice = ["Yes", "No", "BoxDown"];
 
     public static readonly string[] Bindings = ["OnBind", "OnUnbind"];
 
