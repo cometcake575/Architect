@@ -29,7 +29,7 @@ public class BroadcasterGroup
     public static readonly string[] Breakable = ["OnBreak"];
     
     public static readonly string[] PlayerHook = [
-        "OnDamage", 
+        "OnDamage",
         "OnHeal",
         "OnHazardRespawn", 
         "OnDeath",

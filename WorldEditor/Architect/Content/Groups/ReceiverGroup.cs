@@ -2,6 +2,7 @@ using System.Linq;
 using System.Reflection;
 using Architect.Attributes;
 using Architect.Content.Elements.Custom.Behaviour;
+using Architect.Content.Elements.Internal.Fixers;
 using GlobalEnums;
 using JetBrains.Annotations;
 using Modding;
@@ -29,6 +30,8 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
     internal static ReceiverGroup HazardRespawnPoint;
     
     internal static ReceiverGroup Stompers;
+    
+    internal static ReceiverGroup MovingWall;
     
     internal static ReceiverGroup Playable;
     
@@ -139,6 +142,21 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
             {
                 o.GetComponentInChildren<StopAnimatorsAtPoint>().stopEvent.ReceiveEvent();
             }));
+
+        MovingWall = new ReceiverGroup(Generic,
+            EventManager.RegisterEventReceiverType("in", o =>
+            {
+                var fsm = o.LocateMyFSM("Control");
+                fsm.FsmVariables.FindFsmFloat("Distance").Value = o.GetComponent<CustomWallMover>().moveDistance;
+                fsm.SendEvent("MOVE");
+            }),
+            EventManager.RegisterEventReceiverType("out", o =>
+            {
+                var fsm = o.LocateMyFSM("Control");
+                fsm.FsmVariables.FindFsmFloat("Distance").Value = 0;
+                fsm.SendEvent("MOVE");
+            })
+        );
 
         Playable = new ReceiverGroup(Invisible, 
             EventManager.RegisterEventReceiverType("play", o =>

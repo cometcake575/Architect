@@ -407,7 +407,9 @@ public static class ContentPacks
             new ColosseumPackElement("Room_Colosseum_Gold", "Colosseum Manager/Waves/Wave 9/Colosseum Cage Small (1)", "Death Loodle", "Enemies"),
             new TwisterPackElement("Room_Colosseum_Gold", "Colosseum Manager/Waves/Wave 25/Electric Mage New", "Volt Twister", "Electric Mage"),
             new TamerBeastElement(),
-            new BenchElement("Room_Colosseum_02", "RestBench", "Colosseum Bench", "Interactable", weight:BenchWeight)
+            new BenchElement("Room_Colosseum_02", "RestBench", "Colosseum Bench", "Interactable", weight:BenchWeight),
+            
+            new ColosseumWallElement(weight:MiscInteractableWeight)
         });
         RegisterInternalPack(new ContentPack("Zoteboat", "Zotelings from the Eternal Ordeal")
         {

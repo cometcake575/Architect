@@ -37,6 +37,8 @@ public class ConfigGroup
 
     public static ConfigGroup GeoChest;
     
+    public static ConfigGroup MovingWall;
+    
     public static ConfigGroup KeyListeners;
     
     public static ConfigGroup Enemies;
@@ -377,6 +379,21 @@ public class ConfigGroup
                     }), "chest_small_geo")
         );
 
+        MovingWall = new ConfigGroup(Generic,
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Move Distance",
+                    (o, value) =>
+                    {
+                        o.GetComponent<CustomWallMover>().moveDistance = value.GetValue();
+                    }), "wall_dist"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Move Speed",
+                    (o, value) =>
+                    {
+                        o.GetComponent<CustomWallMover>().moveSpeed = value.GetValue();
+                    }).PreAwake(), "wall_speed")
+        );
+
         var enemyTypeField =
             typeof(HealthManager).GetField("enemyType", BindingFlags.NonPublic | BindingFlags.Instance);
         Enemies = new ConfigGroup(Generic,
@@ -681,7 +698,13 @@ public class ConfigGroup
                 o.GetOrAddComponent<MovingObject>().stickPlayer = false;
             }).PreAwake(), "mp_stick_player"),
             layerType,
-            disableCollision
+            disableCollision,
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Semi-Solid", (o, value) =>
+            {
+                if (!value.GetValue()) return;
+                o.AddComponent<PlatformEffector2D>().surfaceArc = 120;
+                o.GetComponent<Collider2D>().usedByEffector = true;
+            }), "semisolid")
         );
 
         RadiancePlatforms = new ConfigGroup(Generic,
@@ -1189,8 +1212,15 @@ public class ConfigGroup
                     case 3:
                         o.GetComponent<Collider2D>().isTrigger = false;
                         break;
+                    case 4:
+                        o.layer = terrain;
+                        o.AddComponent<PlatformEffector2D>().surfaceArc = 120;
+                        var col = o.GetComponent<Collider2D>();
+                        col.isTrigger = false;
+                        col.usedByEffector = true;
+                        break;
                 }
-            }, "None", "Hazard", "Terrain", "Solid"), "shape_collision")
+            }, "None", "Hazard", "Terrain", "Solid", "Semi-Solid Terrain"), "shape_collision")
         );
 
         Relays = new ConfigGroup(
