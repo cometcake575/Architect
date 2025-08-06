@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Architect.Attributes.Config;
 using Architect.Category;
 using Architect.Content.Groups;
 using Architect.MultiplayerHook;
@@ -57,6 +58,8 @@ public static class EditorManager
         On.HeroController.CanNailCharge += (orig, self) => !IsEditing && orig(self);
 
         On.HeroController.CanNailArt += (orig, self) => !IsEditing && orig(self);
+        
+        On.HeroController.CanDash += (orig, self) => !IsEditing && orig(self);
 
         On.HeroController.TakeDamage += (orig, self, go, side, amount, type) =>
         {
@@ -155,6 +158,9 @@ public static class EditorManager
 
         if (EditorUIManager.SelectedItem is DragObject)
         {
+            if (Architect.GlobalSettings.Keybinds.Copy.WasPressed) DoCopy();
+            if (Architect.GlobalSettings.Keybinds.Paste.WasPressed) DoPaste();
+            
             RefreshGroupSelectionBox();
             if (Dragged.Count > 0)
             {
@@ -221,6 +227,8 @@ public static class EditorManager
                             _ => 0
                         };
 
+                    if (Input.GetKey(KeyCode.LeftShift)) i = -i;
+                    
                     Rotation = (Rotation + i) % 360;
                     if (group == RotationGroup.Three && Mathf.Approximately(Rotation, 180)) Rotation = 270;
                     EditorUIManager.RotationChoice.Text = Rotation.ToString(CultureInfo.InvariantCulture);
@@ -435,6 +443,62 @@ public static class EditorManager
         _groupSelectionBox.width = 0;
         _groupSelectionBox.height = 0;
         _groupSelectionBox.UpdateOutline();
+    }
+
+    private static readonly List<DraggedObject> CopiedObjects = [];
+
+    public static void DoCopy()
+    {
+        CopiedObjects.Clear();
+        var wp = GetWorldPos(Input.mousePosition);
+
+        CopiedObjects.AddRange(Dragged.Select(obj => 
+            new DraggedObject(obj.Placement, wp - obj.Placement.GetPos())));
+    }
+
+    public static void DoPaste()
+    {
+        ReleaseDraggedItems(false);
+        var wp = GetWorldPos(Input.mousePosition);
+
+        var converts = new Dictionary<string, string>();
+        foreach (var obj in CopiedObjects)
+        {
+            converts[obj.Placement.GetId()] = Guid.NewGuid().ToString().Substring(0, 8);
+        }
+        
+        foreach (var obj in CopiedObjects)
+        {
+            var pl = obj.Placement;
+
+            var updatedConfig = new List<ConfigValue>();
+
+            foreach (var conf in pl.Config)
+            {
+                if (conf is StringConfigValue value)
+                {
+                    var val = value.GetValue();
+                    updatedConfig.Add(converts.TryGetValue(val, out var convert)
+                        ? Attributes.ConfigManager.DeserializeConfigValue(conf.GetTypeId(), convert)
+                        : conf);
+                } else updatedConfig.Add(conf);
+            }
+            
+            var np = new ObjectPlacement(
+                pl.Name,
+                wp - obj.Offset,
+                pl.Flipped,
+                pl.Rotation,
+                pl.Scale,
+                converts[pl.GetId()],
+                pl.Broadcasters,
+                pl.Receivers,
+                updatedConfig.ToArray()
+            );
+            PlacementManager.GetCurrentPlacements().Add(np);
+            np.PlaceGhost();
+            AddDraggedItem(np, wp, false);
+        }
     }
 
     public static void StopGroupSelect(Vector3 pos)

@@ -7,6 +7,8 @@ public class WorldEditorKeyBinds : PlayerActionSet
     public PlayerAction ToggleEditor;
     public PlayerAction Undo;
     public PlayerAction Redo;
+    public PlayerAction Copy;
+    public PlayerAction Paste;
     public PlayerAction FlipItem;
     public PlayerAction RotateItem;
     public PlayerAction UnsafeRotation;
@@ -21,6 +23,8 @@ public class WorldEditorKeyBinds : PlayerActionSet
         ToggleEditor = CreatePlayerAction("EditToggle");
         Undo = CreatePlayerAction("Undo");
         Redo = CreatePlayerAction("Redo");
+        Copy = CreatePlayerAction("Copy");
+        Paste = CreatePlayerAction("Paste");
         FlipItem = CreatePlayerAction("FlipItem");
         RotateItem = CreatePlayerAction("RotateItem");
         UnsafeRotation = CreatePlayerAction("UnsafeRotation");
@@ -33,6 +37,8 @@ public class WorldEditorKeyBinds : PlayerActionSet
         ToggleEditor.AddDefaultBinding(Key.E);
         Undo.AddDefaultBinding(Key.Z);
         Redo.AddDefaultBinding(Key.Y);
+        Copy.AddDefaultBinding(Key.C);
+        Paste.AddDefaultBinding(Key.V);
         FlipItem.AddDefaultBinding(Key.F);
         RotateItem.AddDefaultBinding(Key.R);
         UnsafeRotation.AddDefaultBinding(Key.LeftAlt);

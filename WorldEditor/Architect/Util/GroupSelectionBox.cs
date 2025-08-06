@@ -29,6 +29,6 @@ public class GroupSelectionBox : MonoBehaviour
             new(0, height, 0)
         ];
 
-        _lineRenderer.SetPositions(corners);
+        _lineRenderer?.SetPositions(corners);
     }
 }

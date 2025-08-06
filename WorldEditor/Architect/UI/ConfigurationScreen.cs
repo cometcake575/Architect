@@ -55,6 +55,14 @@ public static class ConfigurationScreen
                 playerAction: globalSettings.Keybinds.Redo
             ),
             new KeyBind(
+                name: "Copy Selection",
+                playerAction: globalSettings.Keybinds.Copy
+            ),
+            new KeyBind(
+                name: "Paste Selection",
+                playerAction: globalSettings.Keybinds.Paste
+            ),
+            new KeyBind(
                 name: "Flip",
                 playerAction: globalSettings.Keybinds.FlipItem
             ),

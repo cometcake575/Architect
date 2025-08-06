@@ -115,12 +115,14 @@ public static class CustomObjects
             CreateBinding("descending_dark", "Descending Dark Binding"),
             CreateBinding("abyss_shriek", "Abyss Shriek Binding"),
             CreateBinding("pogo", "Pogo Binding"),
+            CreateBinding("attack", "Attack Binding"),
             CreateBinding("lantern", "Lantern Binding"),
             CreateBinding("dash", "Dash Binding"),
             CreateBinding("shadow_dash", "Shadow Dash Binding"),
             CreateBinding("claw", "Mantis Claw Binding"),
             CreateBinding("cdash", "Crystal Heart Binding"),
             CreateBinding("tear", "Isma's Tear Binding"),
+            CreateBinding("jump", "Jump Binding"),
             CreateBinding("wings", "Monarch Wings Binding"),
             CreateBinding("dnail", "Dream Nail Binding"),
             CreateBinding("gate", "Dreamgate Binding"),
@@ -527,6 +529,8 @@ public static class CustomObjects
         On.HeroController.CanSuperDash += (orig, self) => BindingCheck(orig(self), "cdash");
         On.HeroController.CanWallJump += (orig, self) => BindingCheck(orig(self), "claw");
         On.HeroController.CanWallSlide += (orig, self) => BindingCheck(orig(self), "claw");
+        On.HeroController.CanAttack += (orig, self) => BindingCheck(orig(self), "attack");
+        On.HeroController.CanJump += (orig, self) => BindingCheck(orig(self), "jump");
         On.HeroController.CanDoubleJump += (orig, self) => BindingCheck(orig(self), "wings");
         On.HeroController.CanDreamNail += (orig, self) => BindingCheck(orig(self), "dnail");
         

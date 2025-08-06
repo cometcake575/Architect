@@ -74,7 +74,7 @@ public class ObjectPlacement
 
     public PlaceableObject GetPlaceableObject()
     {
-        return _placeableObject ??= PlaceableObject.AllObjects.TryGetValue(_name, out var obj)
+        return _placeableObject ??= PlaceableObject.AllObjects.TryGetValue(Name, out var obj)
             ? _placeableObject = obj as PlaceableObject
             : null;
     }
@@ -104,9 +104,9 @@ public class ObjectPlacement
     private Vector3 _oldPos;
     private Vector3 _pos;
     private PlaceableObject _placeableObject;
-    private readonly string _name;
     private readonly string _id;
     
+    public readonly string Name;
     public readonly float Rotation;
     public readonly float Scale;
     public readonly bool Flipped;
@@ -192,7 +192,7 @@ public class ObjectPlacement
         var prefab = packElement.GetPrefab(Flipped, Rotation);
         
         var obj = Object.Instantiate(prefab, _pos, prefab.transform.rotation);
-        obj.name = "[Architect] " + _name + " (" + _id + ")";
+        obj.name = "[Architect] " + Name + " (" + _id + ")";
         
         if (!Mathf.Approximately(Scale, 1))
         {
@@ -267,7 +267,7 @@ public class ObjectPlacement
         EventReceiver[] receivers, 
         ConfigValue[] config)
     {
-        _name = name;
+        Name = name;
         _pos = pos;
         Flipped = flipped;
         Scale = scale;
@@ -314,7 +314,7 @@ public class ObjectPlacement
             
             writer.WriteStartObject();
             writer.WritePropertyName("name");
-            writer.WriteValue(placement._name);
+            writer.WriteValue(placement.Name);
             writer.WritePropertyName("id");
             writer.WriteValue(placement._id);
             writer.WritePropertyName("pos");
