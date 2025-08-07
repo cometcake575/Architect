@@ -14,6 +14,7 @@ using Architect.UI;
 using Architect.Util;
 using GlobalEnums;
 using MagicUI.Core;
+using Satchel;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
@@ -30,13 +31,19 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
     public override List<(string, string)> GetPreloadNames()
     {
         ContentPacks.PreloadInternalPacks();
-        return ContentPacks.GetPreloadValues();
+        var preloadValues = ContentPacks.GetPreloadValues();
+        
+        preloadValues.Add(("Crossroads_47", "RestBench"));
+        
+        return preloadValues;
     }
     
     public override string GetVersion()
     {
         return Assembly.GetExecutingAssembly().GetName().Version.ToString();
     }
+
+    public static GameObject ArrowPromptNew;
     
     public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
     {
@@ -44,6 +51,9 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
         Instance = this;
         Log("Initialized");
 
+        ArrowPromptNew = preloadedObjects["Crossroads_47"]["RestBench"].LocateMyFSM("Bench Control")
+            .GetAction<ShowPromptMarker>("In Range", 0).prefab.Value;
+        
         foreach (var values in ContentPacks.GetPreloadValues())
         {
             Object.DontDestroyOnLoad(preloadedObjects[values.Item1][values.Item2]);

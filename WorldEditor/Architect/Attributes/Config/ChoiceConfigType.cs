@@ -19,12 +19,13 @@ public class ChoiceConfigType(string name, Action<GameObject, ChoiceConfigValue>
 
     public override ConfigValue GetDefaultValue()
     {
-        return !_defaultValue.HasValue ? null : new ChoiceConfigValue(this, _defaultValue.Value);
+        return !_defaultValue.HasValue ? null : new ChoiceConfigValue(this, _defaultValue.Value, options[_defaultValue.Value]);
     }
 
     public override ConfigValue Deserialize(string data)
     {
-        return new ChoiceConfigValue(this, Convert.ToInt32(data));
+        var index = Convert.ToInt32(data);
+        return new ChoiceConfigValue(this, index, options[index]);
     }
 
     public override ConfigElement CreateInput(LayoutRoot root, Button apply, string oldValue)
@@ -78,9 +79,12 @@ public class ChoiceConfigElement : ConfigElement
 
 public class ChoiceConfigValue : ConfigValue<ChoiceConfigType>
 {
-    public ChoiceConfigValue(ChoiceConfigType type, int value) : base(type)
+    private readonly string _stringValue;
+    
+    public ChoiceConfigValue(ChoiceConfigType type, int value, string stringValue) : base(type)
     {
         _value = value;
+        _stringValue = stringValue;
     }
 
     private readonly int _value;
@@ -88,6 +92,11 @@ public class ChoiceConfigValue : ConfigValue<ChoiceConfigType>
     public int GetValue()
     {
         return _value;
+    }
+
+    public string GetStringValue()
+    {
+        return _stringValue;
     }
 
     public override string SerializeValue()

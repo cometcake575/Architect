@@ -35,6 +35,10 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
     
     internal static ReceiverGroup Playable;
     
+    internal static ReceiverGroup Interactions;
+    
+    internal static ReceiverGroup WalkTarget;
+    
     internal static ReceiverGroup Transitions;
     
     internal static ReceiverGroup Mov;
@@ -164,6 +168,24 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
             EventManager.RegisterEventReceiverType("play", o =>
             {
                 o.GetComponent<Playable>().Play();
+            })
+        );
+
+        Interactions = new ReceiverGroup(Invisible, 
+            EventManager.RegisterEventReceiverType("show_label", o =>
+            {
+                o.GetComponent<Interaction>().GoUp();
+            }), 
+            EventManager.RegisterEventReceiverType("hide_label", o =>
+            {
+                o.GetComponent<Interaction>().GoDown();
+            })
+        );
+
+        WalkTarget = new ReceiverGroup(Invisible, 
+            EventManager.RegisterEventReceiverType("walk", o =>
+            {
+                o.GetComponent<WalkTarget>().DoWalk();
             })
         );
 

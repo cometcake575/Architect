@@ -87,6 +87,8 @@ public class ConfigGroup
     
     public static ConfigGroup TriggerZones;
     
+    public static ConfigGroup Interactions;
+    
     public static ConfigGroup VolatileZoteling;
     
     public static ConfigGroup Tablets;
@@ -1196,6 +1198,30 @@ public class ConfigGroup
             {
                 o.GetComponent<TriggerZone>().layer = value.GetValue();
             }), "trigger_layer")
+        );
+        
+        Interactions = new ConfigGroup(Stretchable,
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Label X Offset", (o, value) =>
+            {
+                o.GetComponent<Interaction>().xOffset = value.GetValue();
+            }), "interaction_x_offset"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Label Y Offset", (o, value) =>
+            {
+                o.GetComponent<Interaction>().yOffset = value.GetValue();
+            }), "interaction_y_offset"),
+            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Label", (o, value) =>
+            {
+                o.GetComponent<Interaction>().prompt = value.GetStringValue();
+            }, 
+                "Enter", "Inspect", "Listen", 
+                "Rest", "Shop", "Travel", 
+                "Challenge", "Exit", "Descent", 
+                "Sit", "Trade", "Accept", 
+                "Watch", "Ascend").WithDefaultValue(0), "interaction_label"),
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Hide on Interact", (o, value) =>
+            {
+                o.GetComponent<Interaction>().hideOnInteract = value.GetValue();
+            }).WithDefaultValue(false), "interaction_down")
         );
 
         VolatileZoteling = new ConfigGroup(KillableEnemies,

@@ -17,17 +17,17 @@ public static class RoomObjects
     {
         var edits = new ContentPack("Room Edits", "Tools used to edit rooms")
         {
-            new PreviewablePackElement(CreateHazardRespawnPoint(), "Hazard Respawn Point", "Room Edits",
+            new PreviewablePackElement(CreateHazardRespawnPoint(), "Hazard Respawn Point", "Utility",
                 ResourceUtils.LoadInternal("hazard_respawn_point"))
                 .WithConfigGroup(ConfigGroup.HazardRespawnPoint)
                 .WithReceiverGroup(ReceiverGroup.HazardRespawnPoint),
-            new SimplePackElement(CreateObject("Teleport Point"), "Teleport Point", "Room Edits",
+            new SimplePackElement(CreateObject("Teleport Point"), "Teleport Point", "Utility",
                     ResourceUtils.LoadInternal("teleport_point"))
                 .WithReceiverGroup(ReceiverGroup.TeleportPoint)
                 .WithConfigGroup(ConfigGroup.Invisible),
-            new PreviewablePackElement(CreateDarkness(), "Darkness", "Room Edits",
+            new PreviewablePackElement(CreateDarkness(), "Darkness", "Utility",
                     ResourceUtils.LoadInternal("darkness")),
-            new SimplePackElement(CreateBinoculars(), "Binoculars", "Room Edits")
+            new SimplePackElement(CreateBinoculars(), "Binoculars", "Utility")
                 .WithConfigGroup(ConfigGroup.Binoculars),
             CreateTransitionPoint(),
             CreateCameraBorder(),
@@ -144,7 +144,7 @@ public static class RoomObjects
         
         Object.DontDestroyOnLoad(obj);
         obj.SetActive(false);
-        return new PreviewablePackElement(obj, "Camera Border", "Room Edits", sprite)
+        return new PreviewablePackElement(obj, "Camera Border", "Utility", sprite)
             .WithConfigGroup(ConfigGroup.CameraBorder);
     }
 
@@ -159,7 +159,7 @@ public static class RoomObjects
         
         Object.DontDestroyOnLoad(obj);
         obj.SetActive(false);
-        return new PreviewablePackElement(obj, "Remove Top Right Border", "Room Edits", sprite);
+        return new PreviewablePackElement(obj, "Remove Top Right Border", "Utility", sprite);
     }
 
     private static SimplePackElement CreateObjectRemover(string id, string name, [CanBeNull] Func<GameObject, Disabler[]> action)
@@ -175,7 +175,7 @@ public static class RoomObjects
 
         Object.DontDestroyOnLoad(obj);
         obj.SetActive(false);
-        return new PreviewablePackElement(obj, name, "Room Edits", sprite);
+        return new PreviewablePackElement(obj, name, "Utility", sprite);
     }
     
     private static AbstractPackElement CreateTransitionPoint()
@@ -199,7 +199,7 @@ public static class RoomObjects
 
         Object.DontDestroyOnLoad(obj);
         obj.SetActive(false);
-        return new PreviewablePackElement(obj, "Transition Point", "Room Edits", sprite)
+        return new PreviewablePackElement(obj, "Transition Point", "Utility", sprite)
             .WithConfigGroup(ConfigGroup.Transitions)
             .WithReceiverGroup(ReceiverGroup.Transitions);
     }

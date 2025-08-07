@@ -37,52 +37,60 @@ public static class CustomObjects
 
     public static void Initialize()
     {
-        var customs = new ContentPack("Custom", "Custom assets that don't exist in the base game")
+        var customs = new ContentPack("Custom", "Various custom assets that don't exist in the base game")
         {
-            new SimplePackElement(CreateTriggerZone(), "Trigger Zone", "Custom",
+            new SimplePackElement(CreateTriggerZone(), "Trigger Zone", "Utility",
                     ResourceUtils.LoadInternal("trigger_zone", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.TriggerZones)
                 .WithConfigGroup(ConfigGroup.TriggerZones)
                 .WithReceiverGroup(ReceiverGroup.Invisible),
-            new SimplePackElement(CreateTimer(), "Timer", "Custom",
+            new SimplePackElement(CreateInteraction(), "Interaction", "Utility",
+                    ResourceUtils.LoadInternal("interaction", FilterMode.Point))
+                .WithConfigGroup(ConfigGroup.Interactions)
+                .WithBroadcasterGroup(BroadcasterGroup.Interactions)
+                .WithReceiverGroup(ReceiverGroup.Interactions),
+            new SimplePackElement(CreateTimer(), "Timer", "Utility",
                     ResourceUtils.LoadInternal("timer", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.Callable)
                 .WithConfigGroup(ConfigGroup.Timers)
                 .WithReceiverGroup(ReceiverGroup.Invisible),
-            new SimplePackElement(CreateKeyListener(), "Key Listener", "Custom",
+            new SimplePackElement(CreateKeyListener(), "Key Listener", "Utility",
                     ResourceUtils.LoadInternal("key_listener", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.KeyListeners)
                 .WithConfigGroup(ConfigGroup.KeyListeners)
                 .WithReceiverGroup(ReceiverGroup.Invisible),
-            new SimplePackElement(CreateRelay(), "Relay", "Custom",
+            new SimplePackElement(CreateRelay(), "Relay", "Utility",
                     ResourceUtils.LoadInternal("event_relay", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.Callable)
                 .WithReceiverGroup(ReceiverGroup.Relays)
                 .WithConfigGroup(ConfigGroup.Relays),
-            new SimplePackElement(CreateTextDisplay(0), "Text Display", "Custom",
+            new SimplePackElement(CreateTextDisplay(0), "Text Display", "Utility",
                     ResourceUtils.LoadInternal("text_display", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.TextDisplay)
                 .WithReceiverGroup(ReceiverGroup.TextDisplay)
                 .WithConfigGroup(ConfigGroup.TextDisplay),
-            new SimplePackElement(CreateTextDisplay(3), "Choice", "Custom",
+            new SimplePackElement(CreateTextDisplay(3), "Choice", "Utility",
                     ResourceUtils.LoadInternal("choice", FilterMode.Point))
                 .WithBroadcasterGroup(BroadcasterGroup.Choice)
                 .WithReceiverGroup(ReceiverGroup.TextDisplay)
                 .WithConfigGroup(ConfigGroup.Choice),
-            new SimplePackElement(CreatePlayerListener(), "Player Hook", "Custom",
+            new SimplePackElement(CreatePlayerListener(), "Player Hook", "Utility",
                     ResourceUtils.LoadInternal("player_listener"))
                 .WithBroadcasterGroup(BroadcasterGroup.PlayerHook)
                 .WithReceiverGroup(ReceiverGroup.PlayerHook)
                 .WithConfigGroup(ConfigGroup.Invisible),
-            new SimplePackElement(CreateEnemyBarrier(), "Enemy Barrier", "Custom",
+            new SimplePackElement(CreateWalkTarget(), "Walk Target", "Utility",
+                    ResourceUtils.LoadInternal("walk_target", FilterMode.Point))
+                .WithReceiverGroup(ReceiverGroup.WalkTarget),
+            new SimplePackElement(CreateEnemyBarrier(), "Enemy Barrier", "Utility",
                     ResourceUtils.LoadInternal("enemy_barrier"))
                 .WithConfigGroup(ConfigGroup.Stretchable)
                 .WithReceiverGroup(ReceiverGroup.Invisible),
-            new SimplePackElement(CreateObjectMover(), "Object Mover", "Custom",
+            new SimplePackElement(CreateObjectMover(), "Object Mover", "Utility",
                     ResourceUtils.LoadInternal("object_mover"))
                 .WithReceiverGroup(ReceiverGroup.ObjectMover)
                 .WithConfigGroup(ConfigGroup.ObjectMover),
-            new SimplePackElement(CreateObjectDuplicator(), "Object Duplicator", "Custom",
+            new SimplePackElement(CreateObjectDuplicator(), "Object Duplicator", "Utility",
                     ResourceUtils.LoadInternal("object_duplicator"))
                 .WithReceiverGroup(ReceiverGroup.ObjectDuplicator)
                 .WithConfigGroup(ConfigGroup.ObjectDuplicator),
@@ -92,7 +100,7 @@ public static class CustomObjects
             CreatePng(),
             CreateMov(),
             CreateWav(),
-            new SimplePackElement(CreateZoteTrophy(), "Winner's Trophy", "Custom"),
+            new SimplePackElement(CreateZoteTrophy(), "Winner's Trophy", "Utility"),
             CreateTemporaryAbilityGranter("dash_crystal", "Dash", false, "Dash Crystal"),
             CreateTemporaryAbilityGranter("single_dash_crystal", "Dash", true, "Single Use Dash Crystal"),
             CreateTemporaryAbilityGranter("shadow_dash_crystal", "Shadow Dash", false, "Shadow Dash Crystal"),
@@ -293,6 +301,25 @@ public static class CustomObjects
         return point;
     }
 
+    private static GameObject CreateInteraction()
+    {
+        Interaction.Init();
+        
+        var point = new GameObject("Trigger Zone");
+        point.transform.localScale *= 10;
+
+        var collider = point.AddComponent<BoxCollider2D>();
+        collider.isTrigger = true;
+        collider.size = new Vector2(0.32f, 0.32f);
+        
+        point.AddComponent<Interaction>();
+
+        point.SetActive(false);
+        Object.DontDestroyOnLoad(point);
+
+        return point;
+    }
+
     private static GameObject CreateKeyListener()
     {
         var point = new GameObject("Key Listener");
@@ -339,6 +366,18 @@ public static class CustomObjects
 
         point.SetActive(false);
         point.AddComponent<PlayerHook>();
+        Object.DontDestroyOnLoad(point);
+
+        return point;
+    }
+
+    private static GameObject CreateWalkTarget()
+    {
+        var point = new GameObject("Walk Target");
+        point.transform.localScale *= 10;
+
+        point.SetActive(false);
+        point.AddComponent<WalkTarget>();
         Object.DontDestroyOnLoad(point);
 
         return point;
@@ -454,7 +493,7 @@ public static class CustomObjects
 
         granterObj.transform.localScale *= 7;
 
-        return new SimplePackElement(granterObj, name, "Custom");
+        return new SimplePackElement(granterObj, name, "Abilities");
     }
 
     private static AbstractPackElement CreateBinding(string id, string name, bool extraVisuals = true)
@@ -480,7 +519,7 @@ public static class CustomObjects
         bindingObj.SetActive(false);
         Object.DontDestroyOnLoad(bindingObj);
 
-        return new SimplePackElement(bindingObj, name, "Custom")
+        return new SimplePackElement(bindingObj, name, "Abilities")
             .WithConfigGroup(ConfigGroup.Bindings)
             .WithBroadcasterGroup(BroadcasterGroup.Bindings);
     }

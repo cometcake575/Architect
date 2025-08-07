@@ -18,6 +18,8 @@ namespace Architect.Util;
 
 public static class EditorManager
 {
+    public static bool LostControlToCustomObject;
+    
     internal static bool IsEditing;
     internal static bool IsFlipped;
     internal static float Rotation;
@@ -147,7 +149,7 @@ public static class EditorManager
     private static void EditorUpdate()
     {
         var paused = GameManager.instance.isPaused;
-        
+
         if (_needsReload && !paused && !HeroController.instance.controlReqlinquished)
         {
             _needsReload = false;
@@ -303,6 +305,13 @@ public static class EditorManager
         var fsm = HeroController.instance.gameObject.LocateMyFSM("Surface Water");
         if (fsm.ActiveStateName == "Idle") fsm.SetState("Regain Control");
 
+        if (LostControlToCustomObject)
+        {
+            LostControlToCustomObject = false;
+            HeroController.instance.RegainControl();
+            HeroController.instance.StartAnimationControl();
+        }
+        
         if (HeroController.instance.controlReqlinquished) return;
 
         if (IsEditing) SceneSaveLoader.SaveScene(GameManager.instance.sceneName, PlacementManager.GetCurrentPlacements());
