@@ -527,8 +527,6 @@ public static class CustomObjects
         On.HeroController.CanDash += (orig, self) => BindingCheck(orig(self), "dash");
         On.HeroController.CanFocus += (orig, self) => BindingCheck(orig(self), "focus");
         On.HeroController.CanSuperDash += (orig, self) => BindingCheck(orig(self), "cdash");
-        On.HeroController.CanWallJump += (orig, self) => BindingCheck(orig(self), "claw");
-        On.HeroController.CanWallSlide += (orig, self) => BindingCheck(orig(self), "claw");
         On.HeroController.CanAttack += (orig, self) => BindingCheck(orig(self), "attack");
         On.HeroController.CanJump += (orig, self) => BindingCheck(orig(self), "jump");
         On.HeroController.CanDoubleJump += (orig, self) => BindingCheck(orig(self), "wings");
@@ -542,6 +540,7 @@ public static class CustomObjects
                                    || TemporaryAbilities.Contains("Shadow Dash") 
                                    || TemporaryAbilities.Contains("Shadow Dash Check"),
                 "hasLantern" => BindingCheck(orig, "lantern"),
+                "hasWalljump" => BindingCheck(orig, "claw"),
                 _ => orig
             };
         };
