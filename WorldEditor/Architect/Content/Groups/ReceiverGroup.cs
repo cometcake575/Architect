@@ -191,7 +191,7 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
 
         var triggerEnter = typeof(TransitionPoint).GetMethod("OnTriggerEnter2D", 
             BindingFlags.NonPublic | BindingFlags.Instance);
-        Transitions = new ReceiverGroup(Generic, 
+        Transitions = new ReceiverGroup(Invisible, 
             EventManager.RegisterEventReceiverType("transition", o =>
             {
                 var tp = o.GetComponent<TransitionPoint>();

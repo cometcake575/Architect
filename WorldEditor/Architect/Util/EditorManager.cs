@@ -507,7 +507,14 @@ public static class EditorManager
             PlacementManager.GetCurrentPlacements().Add(np);
             np.PlaceGhost();
             AddDraggedItem(np, wp, false);
+
+            if (Architect.UsingMultiplayer && Architect.GlobalSettings.CollaborationMode)
+            {
+                HkmpHook.Place(np, GameManager.instance.sceneName);
+            }
         }
+        
+        UndoManager.PerformAction(new PlaceObject(converts.Values.ToList()));
     }
 
     public static void StopGroupSelect(Vector3 pos)

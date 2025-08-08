@@ -30,6 +30,8 @@ public class MovingObject : MonoBehaviour
     {
         _speed = value;
         _currentSpeed = value;
+
+        if (_speed < 0) _flipped = true;
     }
 
     public void SetRotationSpeed(float value)

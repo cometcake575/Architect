@@ -145,7 +145,8 @@ public static class RoomObjects
         Object.DontDestroyOnLoad(obj);
         obj.SetActive(false);
         return new PreviewablePackElement(obj, "Camera Border", "Utility", sprite)
-            .WithConfigGroup(ConfigGroup.CameraBorder);
+            .WithConfigGroup(ConfigGroup.CameraBorder)
+            .WithReceiverGroup(ReceiverGroup.Invisible);
     }
 
     private static AbstractPackElement CreateSceneBorderRemover()
@@ -159,10 +160,11 @@ public static class RoomObjects
         
         Object.DontDestroyOnLoad(obj);
         obj.SetActive(false);
-        return new PreviewablePackElement(obj, "Remove Top Right Border", "Utility", sprite);
+        return new PreviewablePackElement(obj, "Remove Top Right Border", "Utility", sprite)
+            .WithReceiverGroup(ReceiverGroup.Invisible);
     }
 
-    private static SimplePackElement CreateObjectRemover(string id, string name, [CanBeNull] Func<GameObject, Disabler[]> action)
+    private static AbstractPackElement CreateObjectRemover(string id, string name, [CanBeNull] Func<GameObject, Disabler[]> action)
     {
         var obj = new GameObject { name = "Object Remover (" + id + ")" };
         
@@ -175,7 +177,8 @@ public static class RoomObjects
 
         Object.DontDestroyOnLoad(obj);
         obj.SetActive(false);
-        return new PreviewablePackElement(obj, name, "Utility", sprite);
+        return new PreviewablePackElement(obj, name, "Utility", sprite)
+            .WithReceiverGroup(ReceiverGroup.Invisible);
     }
     
     private static AbstractPackElement CreateTransitionPoint()
