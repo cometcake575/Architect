@@ -448,6 +448,8 @@ public static class LevelSharingManager
     {
         for (var i = 0; i < LevelsPerPage; i++)
         {
+            DownloadChoices[i].Item5.Sprite = Architect.BlankSprite;
+            
             var index = _index * LevelsPerPage + i;
             if (_currentLevels.Count > index)
             {
@@ -464,7 +466,6 @@ public static class LevelSharingManager
                 DownloadChoices[i].Item2.Text = "";
                 DownloadChoices[i].Item3.Text = "";
                 DownloadChoices[i].Item4.Visibility = Visibility.Hidden;
-                DownloadChoices[i].Item5.Sprite = Architect.BlankSprite;
             }
         }
     }

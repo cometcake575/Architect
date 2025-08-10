@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -62,11 +61,6 @@ public static class CustomAssetLoader
             obj.transform.SetScaleY(sc * player.height / 100);
         }
     }
-    
-    public static void PrepareVideo(string url)
-    {
-        GameManager.instance.StartCoroutine(LoadVideo(url, null));
-    }
 
     public static string GetVideoPath(string url)
     {
@@ -98,11 +92,6 @@ public static class CustomAssetLoader
 
         if (obj) obj.GetComponent<SpriteRenderer>().sprite = Sprites[id];
         yield return null;
-    }
-    
-    public static void PrepareImage(string url, bool point, float ppu)
-    {
-        GameManager.instance.StartCoroutine(LoadSprite(url, point, ppu));
     }
 
     public static string GetSpritePath(string url)

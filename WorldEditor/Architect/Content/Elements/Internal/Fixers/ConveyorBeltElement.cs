@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Architect.Content.Groups;
 using UnityEngine;
 
@@ -74,33 +75,49 @@ internal class ConveyorBeltElement : InternalPackElement
         
         On.ConveyorBelt.OnCollisionExit2D += (orig, self, collision) =>
         {
-            if (collision.gameObject.GetComponent<HeroController>())
+            if (self.vertical)
             {
-                if (self.vertical)
+                if (collision.gameObject.GetComponent<HeroController>())
                 {
                     CurrentVerticalBelts.Remove(self);
                     if (CurrentVerticalBelts.Count > 0) return;
                 }
-                else
+            }
+            else
+            {
+                var move = collision.gameObject.GetComponent<ConveyorMovement>();
+                if (move)
                 {
-                    CurrentBelts.Remove(self);
-                    if (CurrentBelts.Count > 0) return;
+                    if (CurrentBelts.TryGetValue(move, out var group))
+                    {
+                        group.Remove(self);
+                        if (group.Count > 0) return;
+                    }
                 }
             }
+
             orig(self, collision);
         };
         
         On.ConveyorBelt.OnCollisionEnter2D += (orig, self, collision) =>
         {
             orig(self, collision);
-            if (collision.gameObject.GetComponent<HeroController>())
+            if (self.vertical)
             {
-                if (self.vertical) CurrentVerticalBelts.Add(self);
-                else CurrentBelts.Add(self);
+                if (collision.gameObject.GetComponent<HeroController>()) CurrentVerticalBelts.Add(self);
+            }
+            else
+            {
+                var move = collision.gameObject.GetComponent<ConveyorMovement>();
+                if (move)
+                {
+                    if (!CurrentBelts.Keys.Contains(move)) CurrentBelts[move] = [self];
+                    else CurrentBelts[move].Add(self);
+                }
             }
         };
     }
 
+    private static readonly Dictionary<ConveyorMovement, List<ConveyorBelt>> CurrentBelts = [];
     private static readonly List<ConveyorBelt> CurrentVerticalBelts = [];
-    private static readonly List<ConveyorBelt> CurrentBelts = [];
 }

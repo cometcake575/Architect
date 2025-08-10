@@ -26,6 +26,7 @@ public class TextDisplay : MonoBehaviour
             {
                 if (!_current) return;
                 _current._displayType.Down();
+                EventManager.BroadcastEvent(_current.gameObject, "BoxDown");
                 _prev = _current;
                 _current = null;
             }, 0);

@@ -694,8 +694,10 @@ public static class EditorUIManager
         }.WithProp(GridLayout.Row, 1).WithProp(GridLayout.ColumnSpan, 3);
 
         var i = 0;
+        var prefab = placeable.PackElement.GetPrefab(false, 0);
         foreach (var type in placeable.PackElement.GetConfigGroup().Types)
         {
+            if (!type.Check(prefab)) continue;
             _configGrid.RowDefinitions.Add(new GridDimension(10, GridUnit.AbsoluteMin));
             _configGrid.Children.Add(
                 new TextObject(layout, type.Name + " Description")

@@ -270,6 +270,7 @@ internal class ZoteHeadElement : InternalPackElement
         _gameObject = preloads["Fungus1_20_v02"]["Zote Death/Head"];
         _gameObject.AddComponent<ZoteHead>();
         _gameObject.AddComponent<PngObject>();
+        _gameObject.AddComponent<ConveyorMovement>();
         _gameObject.transform.SetRotation2D(0);
     }
 }

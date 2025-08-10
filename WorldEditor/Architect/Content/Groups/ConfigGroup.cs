@@ -320,6 +320,8 @@ public class ConfigGroup
                 var body = o.GetOrAddComponent<Rigidbody2D>();
                 body.gravityScale = value.GetValue();
                 body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+
+                o.GetOrAddComponent<ConveyorMovement>();
             }), "gravity_scale")
         );
 
@@ -422,7 +424,15 @@ public class ConfigGroup
             {
                 o.AddComponent<EnemyInvulnerabilityMarker>().invincible = value.GetValue();
                 o.GetComponent<HealthManager>().IsInvincible = value.GetValue();
-            }), "enemy_invulnerable")
+            }), "enemy_invulnerable"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Alert Range Multiplier",
+                        (o, value) =>
+                        {
+                            var range = o.GetComponentInChildren<AlertRange>()?.transform ?? o.transform.Find("Alert Range");
+                            range.localScale *= value.GetValue();
+                        })
+                    .WithCondition(o => o.GetComponentInChildren<AlertRange>() || o.transform.Find("Alert Range")), "alert_range_trigger")
         );
 
         Goams = new ConfigGroup(Generic,

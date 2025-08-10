@@ -8,6 +8,13 @@ namespace Architect.Attributes.Config;
 
 public abstract class ConfigType
 {
+    private Func<GameObject, bool> _condition;
+
+    public bool Check(GameObject obj)
+    {
+        return _condition == null || _condition.Invoke(obj);
+    }
+    
     public readonly string Name;
     
     public bool IsPreAwake;
@@ -23,6 +30,12 @@ public abstract class ConfigType
     [CanBeNull] public abstract ConfigValue GetDefaultValue();
 
     public abstract ConfigElement CreateInput(LayoutRoot root, Button apply, [CanBeNull] string oldValue);
+
+    public ConfigType WithCondition(Func<GameObject, bool> condition)
+    {
+        _condition = condition;
+        return this;
+    }
     
     internal abstract void RunAction(GameObject obj, ConfigValue value);
 }
