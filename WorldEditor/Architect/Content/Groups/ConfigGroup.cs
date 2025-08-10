@@ -83,7 +83,7 @@ public class ConfigGroup
     
     public static ConfigGroup EnergyOrb;
     
-    public static ConfigGroup MovingPlatforms;
+    public static ConfigGroup Platforms;
     
     public static ConfigGroup TriggerZones;
     
@@ -716,7 +716,12 @@ public class ConfigGroup
             disableCollision
         );
 
-        MovingPlatforms = new ConfigGroup(MovingObjects,
+        var fallthrough = Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Fallthrough Time", (o, value) =>
+        {
+            o.AddComponent<Fallthrough>().fallthroughTime = value.GetValue();
+        }), "fallthrough_time");
+        
+        Platforms = new ConfigGroup(MovingObjects,
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Stick Player", (o, value) =>
             {
                 if (value.GetValue()) return;
@@ -729,7 +734,8 @@ public class ConfigGroup
                 if (!value.GetValue()) return;
                 o.AddComponent<PlatformEffector2D>().surfaceArc = 120;
                 o.GetComponent<Collider2D>().usedByEffector = true;
-            }), "semisolid")
+            }), "semisolid"),
+            fallthrough
         );
 
         RadiancePlatforms = new ConfigGroup(Generic,
@@ -1269,7 +1275,8 @@ public class ConfigGroup
                         col.usedByEffector = true;
                         break;
                 }
-            }, "None", "Hazard", "Terrain", "Solid", "Semi-Solid Terrain"), "shape_collision")
+            }, "None", "Hazard", "Terrain", "Solid", "Semi-Solid Terrain"), "shape_collision"),
+            fallthrough
         );
 
         Relays = new ConfigGroup(

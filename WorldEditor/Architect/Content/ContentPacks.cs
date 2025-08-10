@@ -79,7 +79,7 @@ public static class ContentPacks
     {
         return new GInternalPackElement(scene, path, name, "Solids", weight)
             .WithRotationGroup(RotationGroup.Four)
-            .WithConfigGroup(ConfigGroup.MovingPlatforms);
+            .WithConfigGroup(ConfigGroup.Platforms);
     }
 
     private static AbstractPackElement CreateDecoration(string scene, string path, string name, float offset = 0)
@@ -587,7 +587,7 @@ public static class ContentPacks
         Object.DontDestroyOnLoad(point);
 
         return new SimplePackElement(point, name, "Solids")
-            .WithConfigGroup(ConfigGroup.MovingPlatforms)
+            .WithConfigGroup(ConfigGroup.Platforms)
             .WithRotationGroup(RotationGroup.Four);
     }
 }
