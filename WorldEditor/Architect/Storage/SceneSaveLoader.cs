@@ -154,6 +154,7 @@ public static class SceneSaveLoader
     public static IEnumerator LoadAllScenes(Dictionary<string, string> placements)
     {
         WipeAllScenes();
+        var passed = true;
         
         var startTime = Time.realtimeSinceStartup;
         
@@ -161,6 +162,8 @@ public static class SceneSaveLoader
         {
             var task = Task.Run(() => LoadEdits(pair.Value));
             while (!task.IsCompleted) yield return null;
+
+            if (!task.Result) passed = false;
             
             Save("Architect/" + pair.Key, pair.Value);
         }
@@ -169,38 +172,35 @@ public static class SceneSaveLoader
         if (elapsed < 1) yield return new WaitForSeconds(1 - elapsed);
 
         LevelSharingManager.EnableControls();
-        LevelSharingManager.ShowStatus("Download Complete");
+        LevelSharingManager.ShowStatus(passed ? "Download Complete" : "Error downloading some assets");
     }
 
-    private static async Task LoadEdits(string data)
+    private static async Task<bool> LoadEdits(string data)
     {
+        var passed = true;
         foreach (var config in DeserializeSceneData(data).Select(obj => obj.Config
                      .ToDictionary(conf => conf.GetName())))
         {
-            await TryDownload(config, "Source URL", CustomAssetLoader.GetSpritePath);
-            await TryDownload(config, "Clip URL", CustomAssetLoader.GetSoundPath);
-            await TryDownload(config, "Video URL", CustomAssetLoader.GetVideoPath);
+            if (!await TryDownload(config, "Source URL", CustomAssetLoader.GetSpritePath)) passed = false;
+            if (!await TryDownload(config, "Clip URL", CustomAssetLoader.GetSoundPath)) passed = false;
+            if (!await TryDownload(config, "Video URL", CustomAssetLoader.GetVideoPath)) passed = false;
         }
+
+        return passed;
     }
 
-    private static async Task TryDownload(Dictionary<string, ConfigValue> config, string type,
+    private static async Task<bool> TryDownload(Dictionary<string, ConfigValue> config, string type,
         Func<string, string> getPath)
     {
+        var passed = true;
         if (config.TryGetValue(type, out var val) && val is StringConfigValue stringVal)
         {
             var url = stringVal.GetValue();
             var path = getPath.Invoke(url);
-            await CustomAssetLoader.SaveFile(url, path);
+            if (!await CustomAssetLoader.SaveFile(url, path)) passed = false;
         }
-    }
 
-    public static void LoadAllScenes(Dictionary<string, List<ObjectPlacement>> placements)
-    {
-        WipeAllScenes();
-        foreach (var pair in placements)
-        {
-            SaveScene(pair.Key, pair.Value);
-        }
+        return passed;
     }
 
     public static void ScheduleErase(string scene, string id)

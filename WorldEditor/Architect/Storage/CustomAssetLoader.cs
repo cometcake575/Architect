@@ -22,10 +22,18 @@ public static class CustomAssetLoader
 
     private static readonly Vector2 Pivot = new(0.5f, 0.5f);
 
-    public static async Task SaveFile(string url, string path)
+    public static async Task<bool> SaveFile(string url, string path)
     {
-        var webClient = new WebClient();
-        await webClient.DownloadFileTaskAsync(url, path);
+        try
+        {
+            var webClient = new WebClient();
+            await webClient.DownloadFileTaskAsync(url, path);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public static void WipeAssets()

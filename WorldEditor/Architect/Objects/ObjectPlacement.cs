@@ -342,10 +342,6 @@ public class ObjectPlacement
             bool hasExistingValue,
             JsonSerializer serializer)
         {
-            // Required for deserialization
-            ConfigGroup.Initialize();
-            ReceiverGroup.Initialize();
-            
             var name = "";
             string id = null;
             var pos = Vector3.zero;

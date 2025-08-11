@@ -91,7 +91,6 @@ public static class ContentPacks
 
     internal static void PreloadInternalPacks()
     {
-        // If there weren't any placements these didn't end up initialized, so they're initialized here
         ConfigGroup.Initialize();
         ReceiverGroup.Initialize();
         

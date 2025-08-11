@@ -214,16 +214,8 @@ public static class LevelSharingManager
 
         var json = request.downloadHandler.text;
 
-        try
-        {
-            var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-            GameManager.instance.StartCoroutine(SceneSaveLoader.LoadAllScenes(data));
-        }
-        catch
-        {
-            var legacyData = JsonConvert.DeserializeObject<Dictionary<string, List<ObjectPlacement>>>(json);
-            SceneSaveLoader.LoadAllScenes(legacyData);
-        }
+        var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(json); 
+        GameManager.instance.StartCoroutine(SceneSaveLoader.LoadAllScenes(data));
         
         PlacementManager.InvalidateCache();
     }
