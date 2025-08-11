@@ -32,7 +32,7 @@ public class Binoculars : MonoBehaviour
             _frozen = true;
             _active = true;
             HeroController.instance.damageMode = DamageMode.NO_DAMAGE;
-            HeroController.instance.vignette.enabled = false;
+            HeroController.instance.vignette.gameObject.SetActive(false);
             HeroController.instance.RelinquishControl();
         }
     }
@@ -47,7 +47,7 @@ public class Binoculars : MonoBehaviour
             _frozen = false;
             _active = false;
             HeroController.instance.damageMode = DamageMode.FULL_DAMAGE;
-            HeroController.instance.vignette.enabled = true;
+            HeroController.instance.vignette.gameObject.SetActive(true);
             HeroController.instance.RegainControl();
             return;
         }

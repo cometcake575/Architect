@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Reflection;
 using Architect.MultiplayerHook.Packets;
 using Hkmp.Api.Server;
 using Hkmp.Networking.Packet;
@@ -98,6 +99,6 @@ public class WeServerAddon : ServerAddon
     }
 
     protected override string Name => "Architect";
-    protected override string Version => "1.16.2.1";
+    protected override string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString();
     public override bool NeedsNetwork => true;
 }

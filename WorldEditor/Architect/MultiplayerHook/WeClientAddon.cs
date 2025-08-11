@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Architect.Attributes;
 using Architect.Content.Elements.Custom.Behaviour;
@@ -304,6 +305,6 @@ public class WeClientAddon : ClientAddon
     }
 
     protected override string Name => "Architect";
-    protected override string Version => "1.16.2.1";
+    protected override string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString();
     public override bool NeedsNetwork => true;
 }

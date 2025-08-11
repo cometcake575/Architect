@@ -14,6 +14,7 @@ public class ObjectMover : MonoBehaviour
     public float rotation;
     public float yMovement;
     public float xMovement;
+    public bool clearVelocity;
     
     private Quaternion _rotation;
     private Vector3 _movement;
@@ -49,6 +50,11 @@ public class ObjectMover : MonoBehaviour
             var move = _source.position + _movement;
             move.z = _object.transform.position.z;
             _object.transform.position = move;
+        }
+        if (clearVelocity)
+        {
+            var body = _object.GetComponent<Rigidbody2D>();
+            if (body) body.velocity = Vector2.zero;
         }
     }
 }

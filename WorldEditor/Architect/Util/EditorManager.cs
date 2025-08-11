@@ -300,10 +300,12 @@ public static class EditorManager
     {
         if (paused) return;
         _prevPaused = true;
-
+        
         if (!Architect.GlobalSettings.Keybinds.ToggleEditor.WasPressed) return;
         var fsm = HeroController.instance.gameObject.LocateMyFSM("Surface Water");
         if (fsm.ActiveStateName == "Idle") fsm.SetState("Regain Control");
+        
+        if (Dragged.Count > 0) ReleaseDraggedItems(true);
 
         if (LostControlToCustomObject)
         {

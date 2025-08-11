@@ -354,7 +354,11 @@ public class ConfigGroup
             Attributes.ConfigManager.RegisterConfigType(
                 new FloatConfigType("Y Movement",
                     (o, value) => { o.GetComponent<ObjectMover>().yMovement = value.GetValue(); }).PreAwake(),
-                "object_mover_y_move")
+                "object_mover_y_move"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Reset Velocity",
+                    (o, value) => { o.GetComponent<ObjectMover>().clearVelocity = value.GetValue(); }).PreAwake(),
+                "object_mover_reset_vel")
         );
 
         ObjectDuplicator = new ConfigGroup(Invisible,
