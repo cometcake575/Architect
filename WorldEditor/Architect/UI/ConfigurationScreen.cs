@@ -1,7 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Architect.Content;
+using Architect.Objects;
 using Architect.Storage;
+using InControl;
+using Modding.Menu;
+using Modding.Menu.Components;
+using Modding.Menu.Config;
 using Satchel.BetterMenus;
 using UnityEngine;
 
@@ -41,59 +46,94 @@ public static class ConfigurationScreen
                 },
                 loadSetting: () => globalSettings.TestMode ? 0 : 1
             ),
+            new TextPanel(""),
             new TextPanel("Keybinds"),
             new KeyBind(
                 name: "Toggle Editor",
                 playerAction: globalSettings.Keybinds.ToggleEditor
             ),
-            new KeyBind(
-                name: "Undo",
-                playerAction: globalSettings.Keybinds.Undo
-            ),
-            new KeyBind(
-                name: "Redo",
-                playerAction: globalSettings.Keybinds.Redo
-            ),
-            new KeyBind(
-                name: "Copy Selection",
-                playerAction: globalSettings.Keybinds.Copy
-            ),
-            new KeyBind(
-                name: "Paste Selection",
-                playerAction: globalSettings.Keybinds.Paste
-            ),
-            new KeyBind(
-                name: "Flip",
-                playerAction: globalSettings.Keybinds.FlipItem
-            ),
-            new KeyBind(
-                name: "Rotate",
-                playerAction: globalSettings.Keybinds.RotateItem
-            ),
-            new KeyBind(
-                name: "Use Unsafe Rotations",
-                playerAction: globalSettings.Keybinds.UnsafeRotation
-            ),
-            new KeyBind(
-                name: "Decrease Scale",
-                playerAction: globalSettings.Keybinds.DecreaseScale
-            ),
-            new KeyBind(
-                name: "Increase Scale",
-                playerAction: globalSettings.Keybinds.IncreaseScale
-            ),
-            new KeyBind(
-                name: "Lock Axis",
-                playerAction: globalSettings.Keybinds.LockAxis
-            ),
-            new KeyBind(
-                name: "Moving Object Preview",
-                playerAction: globalSettings.Keybinds.TogglePreview
-            ),
-            new KeyBind(
-                name: "Add Prefab",
-                playerAction: globalSettings.Keybinds.AddPrefab
-            ),
+            new MenuRow([
+                    new KeyBind(
+                        name: "Undo",
+                        playerAction: globalSettings.Keybinds.Undo
+                    ),
+                    new KeyBind(
+                        name: "Redo",
+                        playerAction: globalSettings.Keybinds.Redo
+                    )
+                ],
+                "undo_redo"),
+            new MenuRow([
+                    new KeyBind(
+                        name: "Copy Selection",
+                        playerAction: globalSettings.Keybinds.Copy
+                    ),
+                    new KeyBind(
+                        name: "Paste Selection",
+                        playerAction: globalSettings.Keybinds.Paste
+                    )
+                ],
+                "copy_paste"),
+            new MenuRow([
+                    new KeyBind(
+                        name: "Rotate",
+                        playerAction: globalSettings.Keybinds.RotateItem
+                    ),
+                    new KeyBind(
+                        name: "Use Unsafe Rotations",
+                        playerAction: globalSettings.Keybinds.UnsafeRotation
+                    )
+                ],
+                "rotations"),
+            new MenuRow([
+                    new KeyBind(
+                        name: "Decrease Scale",
+                        playerAction: globalSettings.Keybinds.DecreaseScale
+                    ),
+                    new KeyBind(
+                        name: "Increase Scale",
+                        playerAction: globalSettings.Keybinds.IncreaseScale
+                    )
+                ],
+                "scale"),
+            new MenuRow([
+                    new KeyBind(
+                        name: "Flip",
+                        playerAction: globalSettings.Keybinds.FlipItem
+                    ),
+                    new KeyBind(
+                        name: "Lock Axis",
+                        playerAction: globalSettings.Keybinds.LockAxis
+                    )
+                ],
+                "flip_lock"),
+            new MenuRow([
+                    new KeyBind(
+                        name: "Moving Object Preview",
+                        playerAction: globalSettings.Keybinds.TogglePreview
+                    ),
+                    new KeyBind(
+                        name: "Add Prefab",
+                        playerAction: globalSettings.Keybinds.AddPrefab
+                    )
+                ],
+                "preview_prefab"),
+            
+            new TextPanel(""),
+            new TextPanel("Management"),
+            new MenuButton("Delete All Edits", 
+                "",
+                _ =>
+                {
+                    if (GameManager.instance.IsGameplayScene())
+                    {
+                        ResetObject.ResetRoom(GameManager.instance.sceneName);
+                        PlacementManager.InvalidateCache();
+                    }
+                    SceneSaveLoader.WipeAllScenes();
+                }),
+            
+            new TextPanel(""),
             new TextPanel("Content Pack Toggles"),
             new TextPanel("Disable packs you don't need to reduce startup time and memory usage, changes are applied when game is rebooted.\n\nThings will break if you disable a pack that is in use!")
             {
@@ -116,6 +156,13 @@ public static class ConfigurationScreen
             name: Architect.Instance.Name,
             elements: elements.ToArray()
         );
-        return _menuRef.GetMenuScreen(modListMenu);
+        
+        var ms = _menuRef.GetMenuScreen(modListMenu);
+        var scroll = ms.content.transform.Find("Scrollbar").transform;
+        var pos = scroll.position;
+        pos.x += 1;
+        scroll.position = pos;
+        
+        return ms;
     }
 }
