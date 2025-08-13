@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using Architect.Util;
 using GlobalEnums;
@@ -43,7 +44,7 @@ public class Wind : MonoBehaviour
             _actuallyJumping = false;
             orig(self);
         };
-
+        
         _setState = typeof(HeroController).GetMethod("SetState", BindingFlags.Instance | BindingFlags.NonPublic);
         
         _windMaterial = new Material(Shader.Find("Sprites/Default"))
@@ -51,14 +52,27 @@ public class Wind : MonoBehaviour
             mainTexture = ResourceUtils.LoadInternal("wind_particle", FilterMode.Point).texture
         };
     }
+
+    private static bool _windPlayer;
     
     private void OnTriggerStay2D(Collider2D other)
     {
-        var hc = other.GetComponent<HeroController>();
+        var rb2d = other.GetComponent<Rigidbody2D>();
+        if (!rb2d) return;
         
-        other.GetComponent<Rigidbody2D>().AddForce(_force);
+        var hc = other.GetComponent<HeroController>();
+
+        if (hc && hc.controlReqlinquished && !hc.cState.superDashing)
+        {
+            if (_windPlayer) rb2d.velocity = Vector2.zero;
+            _windPlayer = false;
+            return;
+        }
+        
+        rb2d.AddForce(_force);
         
         if (!hc) return;
+        _windPlayer = true;
         
         if (hc.cState.onGround && !hc.CheckTouchingGround())
         {
@@ -67,6 +81,11 @@ public class Wind : MonoBehaviour
             hc.proxyFSM.SendEvent("HeroCtrl-LeftGround");
             _setState.Invoke(hc, [ActorStates.airborne]);
         }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.GetComponent<HeroController>()) _windPlayer = false;
     }
 
     private void Update()
