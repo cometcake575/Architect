@@ -103,6 +103,8 @@ public class ConfigGroup
     
     public static ConfigGroup Relays;
     
+    public static ConfigGroup Wind;
+    
     public static ConfigGroup Abyss;
     
     public static ConfigGroup VisibleAbyss;
@@ -1202,6 +1204,35 @@ public class ConfigGroup
             {
                 o.transform.SetScaleY(o.transform.GetScaleY() * value.GetValue());
             }), "height")
+        );
+        
+        Wind = new ConfigGroup(Stretchable, Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Wind Speed", (o, value) =>
+                {
+                    o.GetComponent<Wind>().speed = value.GetValue() * 10; 
+                }).PreAwake(), "wind_speed"), Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Show Particles", (o, value) =>
+                {
+                    if (!value.GetValue()) return;
+                    o.GetComponent<Wind>().SetupParticles();
+                }).WithDefaultValue(true), "wind_particles"),
+                Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("r", (o, value) =>
+                {
+                    o.GetComponent<Wind>().r = value.GetValue();
+                }).PreAwake(), "wind_r"),
+                Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("g", (o, value) =>
+                {
+                    o.GetComponent<Wind>().g = value.GetValue();
+                }).PreAwake(), "wind_g"),
+                Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("b", (o, value) =>
+                {
+                    o.GetComponent<Wind>().b = value.GetValue();
+                }).PreAwake(), "wind_b"),
+                Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("a", (o, value) =>
+                {
+                    o.GetComponent<Wind>().a = value.GetValue();
+                }).PreAwake(), "wind_a"),
+                zOffset
         );
 
         var activeRegion = LayerMask.NameToLayer("ActiveRegion");

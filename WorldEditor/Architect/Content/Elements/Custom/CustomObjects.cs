@@ -100,6 +100,9 @@ public static class CustomObjects
             CreatePng(),
             CreateMov(),
             CreateWav(),
+            new SimplePackElement(CreateWind(), "Wind", "Hazards",
+                sprite:ResourceUtils.LoadInternal("wind", FilterMode.Point, 3.2f))
+                .WithConfigGroup(ConfigGroup.Wind),
             new SimplePackElement(CreateZoteTrophy(), "Winner's Trophy", "Utility"),
             CreateTemporaryAbilityGranter("dash_crystal", "Dash", false, "Dash Crystal"),
             CreateTemporaryAbilityGranter("single_dash_crystal", "Dash", true, "Single Use Dash Crystal"),
@@ -465,6 +468,24 @@ public static class CustomObjects
 
         obj.AddComponent<ZoteTrophy>();
 
+        obj.SetActive(false);
+        Object.DontDestroyOnLoad(obj);
+
+        return obj;
+    }
+
+    private static GameObject CreateWind()
+    {
+        Wind.Init();
+        
+        var obj = new GameObject("Wind");
+
+        var collider = obj.AddComponent<BoxCollider2D>();
+        collider.size = new Vector2(10, 10);
+        collider.isTrigger = true;
+
+        obj.AddComponent<Wind>();
+        
         obj.SetActive(false);
         Object.DontDestroyOnLoad(obj);
 
