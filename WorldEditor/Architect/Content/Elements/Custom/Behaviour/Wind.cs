@@ -80,7 +80,7 @@ public class Wind : MonoBehaviour
             if (_main.HasValue)
             {
                 var main = _main.Value;
-                main.startRotationMultiplier = Mathf.Deg2Rad * transform.localRotation.eulerAngles.z;
+                main.startRotationMultiplier = Mathf.Deg2Rad * -transform.localRotation.eulerAngles.z;
             }
 
             if (_emission.HasValue)

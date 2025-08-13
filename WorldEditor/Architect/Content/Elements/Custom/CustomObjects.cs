@@ -102,7 +102,8 @@ public static class CustomObjects
             CreateWav(),
             new SimplePackElement(CreateWind(), "Wind", "Hazards",
                 sprite:ResourceUtils.LoadInternal("wind", FilterMode.Point, 3.2f))
-                .WithConfigGroup(ConfigGroup.Wind),
+                .WithConfigGroup(ConfigGroup.Wind)
+                .WithRotationGroup(RotationGroup.All),
             new SimplePackElement(CreateZoteTrophy(), "Winner's Trophy", "Utility"),
             CreateTemporaryAbilityGranter("dash_crystal", "Dash", false, "Dash Crystal"),
             CreateTemporaryAbilityGranter("single_dash_crystal", "Dash", true, "Single Use Dash Crystal"),
