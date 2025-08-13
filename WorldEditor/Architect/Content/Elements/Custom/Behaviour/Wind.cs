@@ -14,6 +14,7 @@ public class Wind : MonoBehaviour
     
     public float speed = 30;
     private Vector3 _force;
+    private Vector3 _wallForce;
     private bool _setForce;
 
     public float r = 1;
@@ -68,7 +69,8 @@ public class Wind : MonoBehaviour
             return;
         }
         
-        rb2d.AddForce(_force);
+        if (hc && hc.cState.touchingWall) rb2d.AddForce(_wallForce);
+        else rb2d.AddForce(_force);
         
         if (!hc) return;
         _windPlayer = true;
@@ -80,8 +82,6 @@ public class Wind : MonoBehaviour
             hc.proxyFSM.SendEvent("HeroCtrl-LeftGround");
             _setState.Invoke(hc, [ActorStates.airborne]);
         }
-        
-        if (!hc.touchingWallL && !hc.touchingWallR) hc.cState.touchingWall = false;
     }
 
     private void OnTriggerExit2D(Collider2D other)
@@ -96,6 +96,7 @@ public class Wind : MonoBehaviour
             _setForce = true;
             if (transform.localScale.x < 0) speed = -speed;
             _force = transform.localRotation * new Vector3(speed, 0, 0);
+            _wallForce = new Vector3(0, _force.y, 0);
             
             if (_main.HasValue)
             {
