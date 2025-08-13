@@ -62,7 +62,7 @@ public class Wind : MonoBehaviour
         
         var hc = other.GetComponent<HeroController>();
 
-        if (hc && hc.controlReqlinquished && !hc.cState.superDashing)
+        if (hc && hc.controlReqlinquished && !hc.cState.superDashing && !EditorManager.LostControlToCustomObject)
         {
             if (_windPlayer) rb2d.velocity = Vector2.zero;
             _windPlayer = false;
