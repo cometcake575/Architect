@@ -13,7 +13,6 @@ public class Binoculars : MonoBehaviour
 
     public float maxZoom = 2.5f;
     public float minZoom = 0.25f;
-    private float _zoom;
     
     public static void Init()
     {
@@ -26,7 +25,6 @@ public class Binoculars : MonoBehaviour
         On.HeroController.Move += (orig, self, direction) =>
         {
             if (_frozen) return;
-            GameCameras.instance.tk2dCam.ZoomFactor = 1;
             orig(self, direction);
         };
     }
@@ -35,7 +33,7 @@ public class Binoculars : MonoBehaviour
     {
         if (other.gameObject.GetComponent<NailSlash>())
         {
-            _zoom = 1;
+            GameCameras.instance.tk2dCam.ZoomFactor = 1;
             _frozen = true;
             _active = true;
             HeroController.instance.damageMode = DamageMode.NO_DAMAGE;
@@ -47,10 +45,11 @@ public class Binoculars : MonoBehaviour
     private void Update()
     {
         if (!_active) return;
-        
+
         var actions = InputHandler.Instance.inputActions;
         if (actions.jump.WasPressed)
         {
+            GameCameras.instance.tk2dCam.ZoomFactor = 1;
             _frozen = false;
             _active = false;
             HeroController.instance.damageMode = DamageMode.FULL_DAMAGE;
@@ -62,14 +61,15 @@ public class Binoculars : MonoBehaviour
         float vertical = 0;
         if (actions.up.IsPressed) vertical++;
         if (actions.down.IsPressed) vertical--;
-        
+
         float horizontal = 0;
         if (actions.right.IsPressed) horizontal++;
         if (actions.left.IsPressed) horizontal--;
-        
-        GameCameras.instance.cameraController.transform.Translate(horizontal * Time.deltaTime * speed, vertical * Time.deltaTime * speed, 0);
 
-        _zoom = Mathf.Clamp(_zoom + Input.mouseScrollDelta.y/20, minZoom, maxZoom);
-        GameCameras.instance.tk2dCam.ZoomFactor = _zoom;
+        GameCameras.instance.cameraController.transform.Translate(horizontal * Time.deltaTime * speed,
+            vertical * Time.deltaTime * speed, 0);
+
+        GameCameras.instance.tk2dCam.ZoomFactor =
+            Mathf.Clamp(GameCameras.instance.tk2dCam.ZoomFactor + Input.mouseScrollDelta.y / 20, minZoom, maxZoom);
     }
 }
