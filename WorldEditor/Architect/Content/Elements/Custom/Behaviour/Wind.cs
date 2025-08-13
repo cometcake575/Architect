@@ -1,4 +1,3 @@
-using System;
 using System.Reflection;
 using Architect.Util;
 using GlobalEnums;

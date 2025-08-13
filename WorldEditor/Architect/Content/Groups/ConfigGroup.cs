@@ -811,7 +811,15 @@ public class ConfigGroup
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Camera Speed", (o, value) =>
             {
                 o.GetComponent<Binoculars>().speed = value.GetValue() * 10;
-            }), "freecam_speed")
+            }).WithDefaultValue(4), "freecam_speed"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Zoom Minimum", (o, value) =>
+            {
+                o.GetComponent<Binoculars>().minZoom = value.GetValue();
+            }), "freecam_min_zoom"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Zoom Maximum", (o, value) =>
+            {
+                o.GetComponent<Binoculars>().maxZoom = value.GetValue();
+            }), "freecam_max_zoom")
         );
 
         CameraBorder = new ConfigGroup(Invisible,
