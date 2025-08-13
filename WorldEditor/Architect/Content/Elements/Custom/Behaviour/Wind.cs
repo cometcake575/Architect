@@ -103,8 +103,7 @@ public class Wind : MonoBehaviour
         var main = ps.main;
         main.scalingMode = ParticleSystemScalingMode.Shape;
         main.startLifetimeMultiplier = 100000;
-        main.startSpeedMultiplier = speed / 3.2f;
-        main.prewarm = true;
+        main.startSpeedMultiplier = Mathf.Sqrt(speed) * 2;
         main.startColor = new ParticleSystem.MinMaxGradient(new Color(r, g, b, a));
 
         var emission = ps.emission;
