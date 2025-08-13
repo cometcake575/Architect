@@ -150,23 +150,28 @@ internal class GruzMotherElement : InternalPackElement
         private void Update()
         {
             if (_madeChanges) return;
+
             var child = gameObject.transform.GetChild(3);
             if (child)
             {
+                _madeChanges = true;
+                
                 var corpse = child.gameObject.LocateMyFSM("corpse");
-                if (spawnGruzzers) corpse.AddCustomAction("Blow", fsm =>
+                if (spawnGruzzers)
                 {
-                    _madeChanges = true;
                     var flySpawn = Instantiate(_child);
                     flySpawn.name = gameObject.name + " Fly Spawn";
-                    flySpawn.SetActive(true);
-
-                    var makerFsm = fsm.FsmVariables.FindFsmGameObject("Burster").Value.LocateMyFSM("burster");
-                    makerFsm
-                        .GetAction<FindGameObject>("Initiate", 4)
-                        .objectName = flySpawn.name;
-                    makerFsm.RemoveAction("Geo", 0);
-                });
+                    
+                    corpse.AddCustomAction("Blow", fsm =>
+                    {
+                        flySpawn.SetActive(true);
+                        var makerFsm = fsm.FsmVariables.FindFsmGameObject("Burster").Value.LocateMyFSM("burster");
+                        makerFsm
+                            .GetAction<FindGameObject>("Initiate", 4)
+                            .objectName = flySpawn.name;
+                        makerFsm.RemoveAction("Geo", 0);
+                    });
+                }
                 else corpse.AddCustomAction("Blow", fsm =>
                 {
                     var makerFsm = fsm.FsmVariables.FindFsmGameObject("Burster").Value.LocateMyFSM("burster");
