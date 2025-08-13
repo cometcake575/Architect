@@ -479,7 +479,10 @@ public static class CustomObjects
     {
         Wind.Init();
         
-        var obj = new GameObject("Wind");
+        var obj = new GameObject("Wind")
+        {
+            layer = LayerMask.NameToLayer("Terrain")
+        };
 
         var collider = obj.AddComponent<BoxCollider2D>();
         collider.size = new Vector2(10, 10);
