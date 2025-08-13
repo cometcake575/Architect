@@ -73,13 +73,15 @@ public class Wind : MonoBehaviour
         if (!hc) return;
         _windPlayer = true;
         
-        if (hc.cState.onGround && !hc.CheckTouchingGround())
+        if (!hc.cState.superDashing && hc.cState.onGround && !hc.CheckTouchingGround())
         {
             hc.cState.onGround = false;
             hc.cState.falling = true;
             hc.proxyFSM.SendEvent("HeroCtrl-LeftGround");
             _setState.Invoke(hc, [ActorStates.airborne]);
         }
+        
+        if (!hc.touchingWallL && !hc.touchingWallR) hc.cState.touchingWall = false;
     }
 
     private void OnTriggerExit2D(Collider2D other)
