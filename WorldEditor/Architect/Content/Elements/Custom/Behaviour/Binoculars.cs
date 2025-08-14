@@ -1,5 +1,4 @@
 using GlobalEnums;
-using Modding;
 using UnityEngine;
 
 namespace Architect.Content.Elements.Custom.Behaviour;
@@ -66,10 +65,10 @@ public class Binoculars : MonoBehaviour
         if (actions.right.IsPressed) horizontal++;
         if (actions.left.IsPressed) horizontal--;
 
-        GameCameras.instance.cameraController.transform.Translate(horizontal * Time.deltaTime * speed,
-            vertical * Time.deltaTime * speed, 0);
+        var zf = GameCameras.instance.tk2dCam.ZoomFactor;
+        GameCameras.instance.cameraController.transform.Translate(horizontal * Time.deltaTime * speed / zf,
+            vertical * Time.deltaTime * speed / zf, 0);
 
-        GameCameras.instance.tk2dCam.ZoomFactor =
-            Mathf.Clamp(GameCameras.instance.tk2dCam.ZoomFactor + Input.mouseScrollDelta.y / 20, minZoom, maxZoom);
+        GameCameras.instance.tk2dCam.ZoomFactor = Mathf.Clamp(zf + Input.mouseScrollDelta.y / 20, minZoom, maxZoom);
     }
 }
