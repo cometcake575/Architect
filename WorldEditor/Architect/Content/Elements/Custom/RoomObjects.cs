@@ -29,7 +29,8 @@ public static class RoomObjects
                     ResourceUtils.LoadInternal("darkness")),
             new SimplePackElement(CreateBinoculars(), "Binoculars", "Utility")
                 .WithConfigGroup(ConfigGroup.Binoculars)
-                .WithBroadcasterGroup(BroadcasterGroup.Binoculars),
+                .WithBroadcasterGroup(BroadcasterGroup.Binoculars)
+                .WithReceiverGroup(ReceiverGroup.Binoculars),
             CreateTransitionPoint(),
             CreateCameraBorder(),
             CreateSceneBorderRemover(),
