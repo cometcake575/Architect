@@ -11,6 +11,7 @@ public class Wind : MonoBehaviour
     private static bool _actuallyJumping;
     private static MethodInfo _setState;
     private static Material _windMaterial;
+    private static float _verticalWindForce;
     
     public float speed = 30;
     private Vector3 _force;
@@ -21,6 +22,7 @@ public class Wind : MonoBehaviour
     public float g = 1;
     public float b = 1;
     public float a = 1;
+
 
     private ParticleSystem.MainModule? _main;
     private ParticleSystem.EmissionModule? _emission;
@@ -37,6 +39,12 @@ public class Wind : MonoBehaviour
             }
             else if (HeroController.instance.GetComponent<Rigidbody2D>().velocity.y < 0) _actuallyJumping = false;
         };
+
+        On.HeroController.SceneInit += (orig, self) =>
+        {
+            _verticalWindForce = 0;
+            orig(self);
+        };
         
         On.HeroController.JumpReleased += (orig, self) =>
         {
@@ -44,6 +52,8 @@ public class Wind : MonoBehaviour
             _actuallyJumping = false;
             orig(self);
         };
+
+        On.HeroController.ShouldHardLand += (orig, self, collision) => orig(self, collision) && _verticalWindForce <= 0;
         
         _setState = typeof(HeroController).GetMethod("SetState", BindingFlags.Instance | BindingFlags.NonPublic);
         
@@ -84,9 +94,18 @@ public class Wind : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.GetComponent<HeroController>()) _verticalWindForce += _force.y;
+    }
+
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.GetComponent<HeroController>()) _windPlayer = false;
+        if (other.GetComponent<HeroController>())
+        {
+            _verticalWindForce -= _force.y;
+            _windPlayer = false;
+        }
     }
 
     private void Update()
