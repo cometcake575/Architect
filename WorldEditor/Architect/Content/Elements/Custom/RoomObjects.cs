@@ -28,7 +28,8 @@ public static class RoomObjects
             new PreviewablePackElement(CreateDarkness(), "Darkness", "Utility",
                     ResourceUtils.LoadInternal("darkness")),
             new SimplePackElement(CreateBinoculars(), "Binoculars", "Utility")
-                .WithConfigGroup(ConfigGroup.Binoculars),
+                .WithConfigGroup(ConfigGroup.Binoculars)
+                .WithBroadcasterGroup(BroadcasterGroup.Binoculars),
             CreateTransitionPoint(),
             CreateCameraBorder(),
             CreateSceneBorderRemover(),

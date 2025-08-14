@@ -19,6 +19,8 @@ public class BroadcasterGroup
     public static readonly string[] Choice = ["Yes", "No", "BoxDown"];
 
     public static readonly string[] Bindings = ["OnBind", "OnUnbind"];
+    
+    public static readonly string[] Binoculars = ["StartUse", "StopUse"];
 
     public static readonly string[] Callable = ["OnCall"];
 

@@ -1,3 +1,4 @@
+using Architect.Attributes;
 using GlobalEnums;
 using UnityEngine;
 
@@ -12,6 +13,8 @@ public class Binoculars : MonoBehaviour
 
     public float maxZoom = 2.5f;
     public float minZoom = 0.25f;
+
+    private Vector3 _targetPos;
     
     public static void Init()
     {
@@ -38,6 +41,9 @@ public class Binoculars : MonoBehaviour
             HeroController.instance.damageMode = DamageMode.NO_DAMAGE;
             HeroController.instance.vignette.gameObject.SetActive(false);
             HeroController.instance.RelinquishControl();
+            _targetPos = GameCameras.instance.cameraController.transform.position;
+            
+            EventManager.BroadcastEvent(gameObject, "StartUse");
         }
     }
 
@@ -54,6 +60,7 @@ public class Binoculars : MonoBehaviour
             HeroController.instance.damageMode = DamageMode.FULL_DAMAGE;
             HeroController.instance.vignette.gameObject.SetActive(true);
             HeroController.instance.RegainControl();
+            EventManager.BroadcastEvent(gameObject, "StopUse");
             return;
         }
 
@@ -66,8 +73,10 @@ public class Binoculars : MonoBehaviour
         if (actions.left.IsPressed) horizontal--;
 
         var zf = GameCameras.instance.tk2dCam.ZoomFactor;
-        GameCameras.instance.cameraController.transform.Translate(horizontal * Time.deltaTime * speed / zf,
-            vertical * Time.deltaTime * speed / zf, 0);
+        
+        _targetPos += new Vector3(horizontal * Time.deltaTime * speed / zf, vertical * Time.deltaTime * speed / zf, 0);
+        var cameraTransform = GameCameras.instance.cameraController.transform;
+        cameraTransform.position = Vector3.Lerp(cameraTransform.position, _targetPos, 10 * Time.deltaTime);
 
         GameCameras.instance.tk2dCam.ZoomFactor = Mathf.Clamp(zf + Input.mouseScrollDelta.y / 20, minZoom, maxZoom);
     }
