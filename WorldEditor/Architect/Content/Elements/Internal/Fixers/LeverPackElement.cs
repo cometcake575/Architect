@@ -47,5 +47,9 @@ internal sealed class LeverPackElement : GInternalPackElement
             EventManager.BroadcastEvent(makerFsm.gameObject, "OnPull");
             EventManager.BroadcastEvent(makerFsm.gameObject, "FirstPull");
         });
+
+        if (scale > 1) return;
+        var rc = gameObject.transform.Find("Range Check");
+        if (rc) rc.transform.localScale /= scale;
     }
 }

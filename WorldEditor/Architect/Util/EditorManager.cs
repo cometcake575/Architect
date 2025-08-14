@@ -9,6 +9,7 @@ using Architect.MultiplayerHook;
 using Architect.Objects;
 using Architect.Storage;
 using Architect.UI;
+using GlobalEnums;
 using MagicUI.Core;
 using Modding;
 using UnityEngine;
@@ -267,29 +268,29 @@ public static class EditorManager
             }
         }
 
-        DoFreeMovement(actions);
+        DoFreeMovement(actions, paused);
     }
 
     private static Vector3 _freeMovePos;
 
-    private static void DoFreeMovement(HeroActions actions)
+    private static void DoFreeMovement(HeroActions actions, bool paused)
     {
         var up = actions.up.IsPressed;
         var down = actions.down.IsPressed;
         var left = actions.left.IsPressed;
         var right = actions.right.IsPressed;
 
-        if (up != down)
+        if (!paused && up != down)
         {
             _freeMovePos += (up ? Vector3.up : Vector3.down) * Time.deltaTime * 20;
         }
 
-        if (left != right)
+        if (!paused && left != right)
         {
             _freeMovePos += (left ? Vector3.left : Vector3.right) * Time.deltaTime * 20;
         }
 
-        if (HeroController.instance.transitionState == GlobalEnums.HeroTransitionState.WAITING_TO_TRANSITION)
+        if (HeroController.instance.transitionState == HeroTransitionState.WAITING_TO_TRANSITION)
         {
             HeroController.instance.transform.position = _freeMovePos;
         }   
