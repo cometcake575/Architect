@@ -14,7 +14,7 @@ public class Wind : MonoBehaviour
     private static float _verticalWindForce;
     private static readonly int EnemyLayer = LayerMask.NameToLayer("Enemies");
     private static readonly int ProjectileLayer = LayerMask.NameToLayer("Projectiles");
-    private static readonly int TdLayer = LayerMask.NameToLayer("Terrain Detector");
+    private static readonly int AttackLayer = LayerMask.NameToLayer("Enemy Attack");
     
     public float speed = 30;
     private Vector3 _force;
@@ -74,7 +74,7 @@ public class Wind : MonoBehaviour
     private void OnTriggerStay2D(Collider2D other)
     {
         if (!affectsEnemies && other.gameObject.layer == EnemyLayer) return;
-        if (!affectsProjectiles && (other.gameObject.layer == ProjectileLayer || other.gameObject.layer == TdLayer)) return;
+        if (!affectsProjectiles && (other.gameObject.layer == ProjectileLayer || other.gameObject.layer == AttackLayer)) return;
         
         var rb2d = other.GetComponent<Rigidbody2D>();
         if (!rb2d) return;
