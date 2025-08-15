@@ -1252,7 +1252,19 @@ public class ConfigGroup
                 {
                     o.GetComponent<Wind>().a = value.GetValue();
                 }).PreAwake(), "wind_a"),
-                zOffset
+                zOffset,
+                Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Affects Player", (o, value) =>
+                {
+                    o.GetComponent<Wind>().affectsPlayer = value.GetValue();
+                }), "wind_affects_player"),
+                Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Affects Enemies", (o, value) =>
+                {
+                    o.GetComponent<Wind>().affectsEnemies = value.GetValue();
+                }), "wind_affects_enemies"),
+                Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Affects Projectiles", (o, value) =>
+                {
+                    o.GetComponent<Wind>().affectsProjectiles = value.GetValue();
+                }), "wind_affects_proj")
         );
 
         var activeRegion = LayerMask.NameToLayer("ActiveRegion");

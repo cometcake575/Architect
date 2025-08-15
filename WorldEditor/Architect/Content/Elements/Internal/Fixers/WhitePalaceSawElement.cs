@@ -26,6 +26,6 @@ internal class WhitePalaceSawElement : InternalPackElement
     internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
     {
         _gameObject = preloads["White_Palace_07"]["wp_saw"];
-        _gameObject.layer = LayerMask.NameToLayer("Enemies");
+        _gameObject.layer = LayerMask.NameToLayer("Projectiles");
     }
 }

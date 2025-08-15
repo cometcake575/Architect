@@ -12,6 +12,9 @@ public class Wind : MonoBehaviour
     private static MethodInfo _setState;
     private static Material _windMaterial;
     private static float _verticalWindForce;
+    private static readonly int EnemyLayer = LayerMask.NameToLayer("Enemies");
+    private static readonly int ProjectileLayer = LayerMask.NameToLayer("Projectiles");
+    private static readonly int TdLayer = LayerMask.NameToLayer("Terrain Detector");
     
     public float speed = 30;
     private Vector3 _force;
@@ -23,6 +26,9 @@ public class Wind : MonoBehaviour
     public float b = 1;
     public float a = 1;
 
+    public bool affectsPlayer = true;
+    public bool affectsEnemies = true;
+    public bool affectsProjectiles = true;
 
     private ParticleSystem.MainModule? _main;
     private ParticleSystem.EmissionModule? _emission;
@@ -67,10 +73,14 @@ public class Wind : MonoBehaviour
     
     private void OnTriggerStay2D(Collider2D other)
     {
+        if (!affectsEnemies && other.gameObject.layer == EnemyLayer) return;
+        if (!affectsProjectiles && (other.gameObject.layer == ProjectileLayer || other.gameObject.layer == TdLayer)) return;
+        
         var rb2d = other.GetComponent<Rigidbody2D>();
         if (!rb2d) return;
         
         var hc = other.GetComponent<HeroController>();
+        if (!affectsPlayer && hc) return;
 
         if (hc && hc.controlReqlinquished && !hc.cState.superDashing && !EditorManager.LostControlToCustomObject)
         {
