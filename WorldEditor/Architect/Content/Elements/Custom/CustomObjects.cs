@@ -538,7 +538,8 @@ public static class CustomObjects
 
         obj.transform.position = new Vector3(0, 0, 0.004f);
 
-        return new SimplePackElement(obj, "Feather", "Abilities");
+        return new SimplePackElement(obj, "Feather", "Abilities")
+            .WithConfigGroup(ConfigGroup.Feather);
     }
 
     private static AbstractPackElement CreateBinding(string id, string name, bool extraVisuals = true)
