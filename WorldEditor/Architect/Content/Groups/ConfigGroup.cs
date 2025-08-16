@@ -131,6 +131,8 @@ public class ConfigGroup
     
     public static ConfigGroup RepeatNpcs;
     
+    public static ConfigGroup Feather;
+    
     public static ConfigGroup Midwife;
     
     public static ConfigGroup Timers;
@@ -158,6 +160,8 @@ public class ConfigGroup
     public static ConfigGroup ObjectDuplicator;
     
     public static ConfigGroup ColosseumPlatform;
+    
+    public static ConfigGroup PalaceLift;
 
     public static void Initialize()
     {
@@ -379,6 +383,23 @@ public class ConfigGroup
                         o.LocateMyFSM("Control").SendEvent("PLAT EXPAND");
                     }).WithDefaultValue(true),
                 "colo_plat_start_up")
+        );
+
+        PalaceLift = new ConfigGroup(Generic,
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Y Travel Distance",
+                    (o, value) =>
+                    {
+                        o.GetComponent<WpLiftConfig>().yMove = value.GetValue();
+                    }).WithDefaultValue(20).PreAwake(),
+                "palace_lift_y"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("X Travel Distance",
+                    (o, value) =>
+                    {
+                        o.GetComponent<WpLiftConfig>().xMove = value.GetValue();
+                    }).WithDefaultValue(0).PreAwake(),
+                "palace_lift_x")
         );
 
         GeoChest = new ConfigGroup(Generic,
@@ -1160,6 +1181,18 @@ public class ConfigGroup
             {
                 CustomTexts[o.GetComponent<NpcEditor>().SetRepeatConvo()] = value.GetValue();
             }), "npcs_repeat_convo")
+        );
+
+        Feather = new ConfigGroup(
+            Generic,
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Flight Time", (o, value) =>
+            {
+                o.GetComponent<Feather>().featherTime = value.GetValue();
+            }), "feather_fly_time"),
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Respawn Time", (o, value) =>
+            {
+                o.GetComponent<Feather>().respawnTime = value.GetValue();
+            }), "feather_respawn_time")
         );
 
         Midwife = new ConfigGroup(

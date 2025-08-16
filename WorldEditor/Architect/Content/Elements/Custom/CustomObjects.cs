@@ -140,7 +140,8 @@ public static class CustomObjects
             CreateBinding("gate", "Dreamgate Binding"),
             CreateBinding("gslash", "Great Slash Binding"),
             CreateBinding("cslash", "Cyclone Slash Binding"),
-            CreateBinding("dslash", "Dash Slash Binding")
+            CreateBinding("dslash", "Dash Slash Binding"),
+            CreateFeather()
         };
         ContentPacks.RegisterPack(customs);
 
@@ -519,6 +520,25 @@ public static class CustomObjects
         granterObj.transform.localScale *= 7;
 
         return new SimplePackElement(granterObj, name, "Abilities");
+    }
+
+    public static AbstractPackElement CreateFeather()
+    {
+        Feather.Init();
+
+        var obj = new GameObject("Feather");
+        Object.DontDestroyOnLoad(obj);
+
+        var col = obj.AddComponent<CircleCollider2D>();
+        col.radius = 0.5f;
+        col.isTrigger = true;
+
+        obj.SetActive(false);
+        obj.AddComponent<Feather>().Setup();
+
+        obj.transform.position = new Vector3(0, 0, 0.004f);
+
+        return new SimplePackElement(obj, "Feather", "Abilities");
     }
 
     private static AbstractPackElement CreateBinding(string id, string name, bool extraVisuals = true)

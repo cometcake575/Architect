@@ -12,16 +12,17 @@ namespace Architect.Content;
 public static class ContentPacks
 {
     public const int SoulSourceWeight = 1;
-    public const int BreakableWallsWeight = 2;
-    public const int LoreTabletWeight = 3;
-    public const int SpecialBenchWeight = 4;
-    public const int NailmasterBenchWeight = 5;
-    public const int BenchWeight = 6;
-    public const int NpcWeight = 7;
-    public const int MiscInteractableWeight = 8;
-    public const int LeverWeight = 9;
-    public const int GateWeight = 10;
-    //public const int ShinyWeight = 11;
+    public const int EssenceWeight = 2;
+    public const int BreakableWallsWeight = 3;
+    public const int LoreTabletWeight = 4;
+    public const int SpecialBenchWeight = 5;
+    public const int NailmasterBenchWeight = 6;
+    public const int BenchWeight = 7;
+    public const int NpcWeight = 8;
+    public const int MiscInteractableWeight = 9;
+    public const int LeverWeight = 10;
+    public const int GateWeight = 11;
+    //public const int ShinyWeight = 12;
 
     internal static readonly List<ContentPack> Packs = [];
     private static readonly List<ContentPack> InternalPacks = [];
@@ -442,6 +443,8 @@ public static class ContentPacks
         });
         RegisterInternalPack(new ContentPack("Resting Grounds", "Assets from the Resting Grounds")
         {
+            CreateSolid("RestingGrounds_05", "plat_float_08", "Resting Grounds Platform S"),
+            new BreakableCoffinElement(weight:BreakableWallsWeight),
             CreateEnemy("RestingGrounds_10", "Grave Zombie", "Entombed Husk")
         });
         RegisterInternalPack(new ContentPack("Ancient Basin", "Assets from the Ancient Basin")
@@ -520,7 +523,8 @@ public static class ContentPacks
             Create("White_Palace_03_hub", "White_Servant_01", "Royal Retainer 1", "Interactable", weight:SoulSourceWeight),
             Create("White_Palace_03_hub", "White_Servant_02", "Royal Retainer 2", "Interactable", weight:SoulSourceWeight).FlipHorizontal(),
             Create("White_Palace_03_hub", "White_Servant_03", "Royal Retainer 3", "Interactable", weight:SoulSourceWeight),
-            new BenchElement("White_Palace_03_hub", "WhiteBench", "White Palace Bench", "Interactable", weight:BenchWeight)
+            new BenchElement("White_Palace_03_hub", "WhiteBench", "White Palace Bench", "Interactable", weight:BenchWeight),
+            new WhitePalaceLiftElement(weight:MiscInteractableWeight)
         });
         RegisterInternalPack(new ContentPack("Godhome", "Assets from Godhome")
         {

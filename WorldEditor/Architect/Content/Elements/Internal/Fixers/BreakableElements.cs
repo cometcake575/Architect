@@ -52,3 +52,38 @@ internal class DiveGroundElement : InternalPackElement
         return _gameObject;
     }
 }
+
+internal class BreakableCoffinElement : InternalPackElement
+{
+    private GameObject _gameObject;
+    
+    public BreakableCoffinElement(int weight) : base("Dive Coffin", "Interactable", weight)
+    {
+        WithRotationGroup(RotationGroup.Four);
+        WithConfigGroup(ConfigGroup.Breakable);
+    }
+
+    internal override void AddPreloads(List<(string, string)> preloadInfo)
+    {
+        preloadInfo.Add(("RestingGrounds_05", "Quake Floor"));
+        preloadInfo.Add(("RestingGrounds_05", "rg_coffin_break_front"));
+    }
+
+    internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
+    {
+        _gameObject = preloads["RestingGrounds_05"]["rg_coffin_break_front"];
+        var child = preloads["RestingGrounds_05"]["Quake Floor"];
+        child.transform.parent = _gameObject.transform;
+        child.SetActive(true);
+    }
+
+    public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
+    {
+        gameObject.transform.GetChild(2).name = gameObject.name + " Quake Floor";
+    }
+
+    public override GameObject GetPrefab(bool flipped, float rotation)
+    {
+        return _gameObject;
+    }
+}
