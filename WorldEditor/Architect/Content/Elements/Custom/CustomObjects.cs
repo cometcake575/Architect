@@ -115,6 +115,8 @@ public static class CustomObjects
                 .WithConfigGroup(ConfigGroup.EnergyOrb),
             new SimplePackElement(CreateDamagingOrb("radiant_orb", "Radiant Orb", 999), "Radiant Orb", "Hazards")
                 .WithConfigGroup(ConfigGroup.EnergyOrb),
+            CreateDreamBlock(),
+            CreateFeather(),
             CreateBinding("nail", "Nail Binding", false),
             CreateBinding("shell", "Shell Binding", false),
             CreateBinding("charms", "Charm Binding", false),
@@ -140,8 +142,7 @@ public static class CustomObjects
             CreateBinding("gate", "Dreamgate Binding"),
             CreateBinding("gslash", "Great Slash Binding"),
             CreateBinding("cslash", "Cyclone Slash Binding"),
-            CreateBinding("dslash", "Dash Slash Binding"),
-            CreateFeather()
+            CreateBinding("dslash", "Dash Slash Binding")
         };
         ContentPacks.RegisterPack(customs);
 
@@ -154,7 +155,7 @@ public static class CustomObjects
     private static readonly FieldInfo SpriteFlash = typeof(HeroController).GetField("spriteFlash", 
         BindingFlags.NonPublic | BindingFlags.Instance);
 
-    private static void RefreshShadowDash()
+    public static void RefreshShadowDash()
     {
         if ((float) ShadowDashTimer.GetValue(HeroController.instance) <= 0) return;
         ShadowDashTimer.SetValue(HeroController.instance, 0.0f);
@@ -512,6 +513,7 @@ public static class CustomObjects
         granter.singleUse = singleUse;
 
         var collider = granterObj.AddComponent<CircleCollider2D>();
+        collider.radius = 0.056f;
         collider.isTrigger = true;
 
         granterObj.SetActive(false);
@@ -519,7 +521,10 @@ public static class CustomObjects
 
         granterObj.transform.localScale *= 7;
 
-        return new SimplePackElement(granterObj, name, "Abilities");
+        var element = new SimplePackElement(granterObj, name, "Abilities");
+        if (!singleUse) element.WithConfigGroup(ConfigGroup.Crystals);
+        
+        return element;
     }
 
     public static AbstractPackElement CreateFeather()
@@ -539,7 +544,34 @@ public static class CustomObjects
         obj.transform.position = new Vector3(0, 0, 0.004f);
 
         return new SimplePackElement(obj, "Feather", "Abilities")
-            .WithConfigGroup(ConfigGroup.Feather);
+            .WithConfigGroup(ConfigGroup.Feather)
+            .WithBroadcasterGroup(BroadcasterGroup.Feather);
+    }
+
+    public static AbstractPackElement CreateDreamBlock()
+    {
+        DreamBlock.Init();
+
+        var obj = new GameObject("Dream Block");
+        Object.DontDestroyOnLoad(obj);
+
+        obj.layer = LayerMask.NameToLayer("Terrain");
+
+        obj.AddComponent<BoxCollider2D>().size *= 10;
+        
+        var col = obj.AddComponent<BoxCollider2D>();
+        col.isTrigger = true;
+        col.size *= 9.8f;
+
+        obj.SetActive(false);
+        obj.AddComponent<DreamBlock>();
+
+        obj.AddComponent<SpriteRenderer>().sprite = ResourceUtils.LoadInternal("ScatteredAndLost.dream_block", FilterMode.Point);
+        
+        obj.transform.SetPositionZ(0.01f);
+
+        return new SimplePackElement(obj, "Dream Block", "Interactable", weight:ContentPacks.MiscInteractableWeight)
+            .WithConfigGroup(ConfigGroup.DreamBlocks);
     }
 
     private static AbstractPackElement CreateBinding(string id, string name, bool extraVisuals = true)

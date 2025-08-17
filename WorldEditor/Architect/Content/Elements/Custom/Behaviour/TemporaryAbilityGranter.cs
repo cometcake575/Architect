@@ -1,42 +1,54 @@
-using System;
-using JetBrains.Annotations;
+using System.Collections;
+using Architect.Util;
 using UnityEngine;
 
 namespace Architect.Content.Elements.Custom.Behaviour;
 
 public class TemporaryAbilityGranter : MonoBehaviour
 {
+    public float disableTime = 2.5f;
+    
     public string abilityType;
     public bool singleUse;
+    
     private SpriteRenderer _renderer;
-    private float _disabled;
+    private bool _disabled;
+    private AudioSource _source;
+
+    private static readonly Sprite Used = ResourceUtils.LoadInternal("used_crystal", FilterMode.Point);
+    private static readonly AudioClip Use = ResourceUtils.LoadInternalClip("crystal_use");
+    private static readonly AudioClip Return = ResourceUtils.LoadInternalClip("crystal_return");
 
     private void Start()
     {
         _renderer = GetComponent<SpriteRenderer>();
+        _source = HeroController.instance.GetComponent<AudioSource>();
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerStay2D(Collider2D other)
     {
         if (!other.gameObject.GetComponent<HeroController>()) return;
         
-        if (_disabled > 0) return;
+        if (_disabled) return;
         CustomObjects.TemporaryAbilities.Add(abilityType);
         if (singleUse) Destroy(gameObject);
         else
         {
-            _renderer.enabled = false;
-            _disabled = 2.5f;
+            _disabled = true;
+            StartCoroutine(TempDisable());
         }
         
         CustomObjects.CollectAbilityGranter(abilityType);
+        _source.PlayOneShot(Use);
     }
 
-    private void Update()
+    private IEnumerator TempDisable()
     {
-        if (_disabled <= 0) return;
-        _disabled -= Time.deltaTime;
-        if (_disabled > 0) return;
-        _renderer.enabled = true;
+        var sprite = _renderer.sprite;
+        _renderer.sprite = Used;
+        yield return new WaitForSeconds(disableTime);
+        _renderer.sprite = sprite;
+        _disabled = false;
+        _source.PlayOneShot(Return);
     }
 }

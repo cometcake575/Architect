@@ -8,8 +8,8 @@
         <Product>Architect</Product>
         <Description>A mod to add platforms, enemies and more to change areas in the game with an in-game level editor.</Description>
         <Copyright>Copyright © Arun Kapila 2025</Copyright>
-        <AssemblyVersion>1.16.10.0</AssemblyVersion>
-        <FileVersion>1.16.10.0</FileVersion>
+        <AssemblyVersion>1.16.11.0</AssemblyVersion>
+        <FileVersion>1.16.11.0</FileVersion>
         <OutputPath>bin\$(Configuration)\</OutputPath>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
@@ -347,11 +347,14 @@
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="Resources/*.png" />
+        <EmbeddedResource Include="Resources/*.wav" />
         <EmbeddedResource Include="Resources/ScatteredAndLost/*.png" />
+        <EmbeddedResource Include="Resources/ScatteredAndLost/*.wav" />
         <EmbeddedResource Include="Resources/ScatteredAndLost/feather/loop/*.png" />
         <EmbeddedResource Include="Resources/ScatteredAndLost/feather/flash/*.png" />
         <EmbeddedResource Include="Resources/ScatteredAndLost/feather/break/*.png" />
         <EmbeddedResource Include="Resources/ScatteredAndLost/feather/*.png" />
+        <EmbeddedResource Include="Resources/ScatteredAndLost/feather/*.wav" />
         <EmbeddedResource Include="Resources/Bindings/*.png" />
         <EmbeddedResource Include="Resources/Bindings/chain_cut.wav" />
     </ItemGroup>

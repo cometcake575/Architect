@@ -105,6 +105,8 @@ public class ConfigGroup
     
     public static ConfigGroup Wind;
     
+    public static ConfigGroup Crystals;
+    
     public static ConfigGroup Abyss;
     
     public static ConfigGroup VisibleAbyss;
@@ -140,6 +142,8 @@ public class ConfigGroup
     public static ConfigGroup Decorations;
     
     public static ConfigGroup Stretchable;
+    
+    public static ConfigGroup DreamBlocks;
     
     public static ConfigGroup Colours;
     
@@ -1258,6 +1262,14 @@ public class ConfigGroup
                 o.transform.SetScaleY(o.transform.GetScaleY() * value.GetValue());
             }), "height")
         );
+
+        DreamBlocks = new ConfigGroup([Generic, Stretchable],
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Show Particles", (o, value) =>
+            {
+                if (!value.GetValue()) return;
+                o.GetComponent<DreamBlock>().SetupParticles();
+            }).WithDefaultValue(true), "dreamblock_particles")
+        );
         
         Wind = new ConfigGroup(Stretchable, Attributes.ConfigManager.RegisterConfigType(
                 new FloatConfigType("Wind Speed", (o, value) =>
@@ -1298,6 +1310,13 @@ public class ConfigGroup
                 {
                     o.GetComponent<Wind>().affectsProjectiles = value.GetValue();
                 }), "wind_affects_proj")
+        );
+        
+        Crystals = new ConfigGroup(Generic,
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Respawn Time", (o, value) =>
+            {
+                o.GetComponent<TemporaryAbilityGranter>().disableTime = value.GetValue();
+            }), "crystal_respawn_time")
         );
 
         var activeRegion = LayerMask.NameToLayer("ActiveRegion");

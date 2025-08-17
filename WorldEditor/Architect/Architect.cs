@@ -15,7 +15,6 @@ using Architect.Util;
 using GlobalEnums;
 using MagicUI.Core;
 using Satchel;
-using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
 namespace Architect;

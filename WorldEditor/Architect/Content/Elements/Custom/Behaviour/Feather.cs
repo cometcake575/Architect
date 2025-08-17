@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using Architect.Attributes;
 using Architect.Util;
 using UnityEngine;
 
@@ -8,10 +9,10 @@ namespace Architect.Content.Elements.Custom.Behaviour;
 
 public class Feather : MonoBehaviour
 {
+    private const string FeatherFlyingSource = "FeatherFlying";
+    
     private static readonly List<Sprite> Sprites = [];
     private static readonly List<Sprite> BreakAnim = [];
-    private static readonly Sprite Outline = ResourceUtils.LoadInternal("ScatteredAndLost.feather.outline",
-        filterMode:FilterMode.Point, ppu:10);
     
     private SpriteRenderer _spriteRenderer;
     private float _dt; 
@@ -23,6 +24,11 @@ public class Feather : MonoBehaviour
     private static Rigidbody2D _cometBody;
     private static CircleCollider2D _cometCollider;
     private static bool _cometValid;
+
+    private static readonly AudioClip ObtainFeather = ResourceUtils.LoadInternalClip("ScatteredAndLost.feather.feather_get");
+    private static readonly AudioClip RenewFeather = ResourceUtils.LoadInternalClip("ScatteredAndLost.feather.feather_renew");
+    private static readonly AudioClip LoseFeather = ResourceUtils.LoadInternalClip("ScatteredAndLost.feather.feather_state_end");
+    private static readonly AudioClip Loop = ResourceUtils.LoadInternalClip("ScatteredAndLost.feather.feather_state_fast_loop");
     
     private static bool _show;
 
@@ -33,6 +39,8 @@ public class Feather : MonoBehaviour
     
     public float featherTime = 5; 
     public float respawnTime = 6;
+    
+    private static AudioSource _source;
 
     public static void Init()
     {
@@ -121,8 +129,19 @@ public class Feather : MonoBehaviour
     private void Start()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
-    }
+        
+        var sounds = HeroController.instance.transform.Find("Sounds");
 
+        _source = sounds.Find(FeatherFlyingSource)?.GetComponent<AudioSource>();
+        if (!_source)
+        {
+            _source = new GameObject(FeatherFlyingSource)
+            {
+                transform = { parent = sounds }
+            }.AddComponent<AudioSource>();
+        }
+    }
+    
     private void Update()
     {
         if (!_enabled) return;
@@ -135,7 +154,7 @@ public class Feather : MonoBehaviour
         _spriteRenderer.sprite = Sprites[_spriteIndex];
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerStay2D(Collider2D other)
     {
         if (!_enabled) return;
         if (!other.GetComponent<HeroController>()) return;
@@ -144,8 +163,46 @@ public class Feather : MonoBehaviour
         _spriteIndex = 2;
         _dt = 0;
         
+        CustomObjects.RefreshShadowDash();
         StartCoroutine(Fly());
         StartCoroutine(Respawn());
+    }
+
+    private static IEnumerator StartSound()
+    {
+        var maxVol = GameManager.instance.GetImplicitCinematicVolume() / 2;
+        
+        _source.volume = maxVol;
+        _source.time = 0;
+        _source.clip = ObtainFeather;
+        _source.loop = false;
+        _source.Play();
+
+        while (_source.isPlaying) yield return null;
+
+        _source.volume = 0;
+        _source.clip = Loop;
+        _source.loop = true;
+        _source.Play();
+
+        var paused = false;
+        while (_source.volume < maxVol)
+        {
+            if (GameManager.instance.isPaused)
+            {
+                if (!paused) _source.Pause();
+                paused = true;
+                yield return null;
+            } else if (paused)
+            {
+                paused = false;
+                _source.Play();
+            }
+
+            if (!_cometValid) yield break;
+            _source.volume = Mathf.Lerp(_source.volume, maxVol, Time.deltaTime);
+            yield return null;
+        }
     }
 
     private IEnumerator Fly()
@@ -154,7 +211,15 @@ public class Feather : MonoBehaviour
         
         _remainingTime = Mathf.Max(_remainingTime, featherTime);
         
-        if (hero.controlReqlinquished) yield break;
+        if (hero.controlReqlinquished)
+        {
+            _source.PlayOneShot(RenewFeather);
+            yield break;
+        }
+        
+        EventManager.BroadcastEvent(gameObject, "StartFlying");
+
+        StartCoroutine(StartSound());
 
         _comet.SetActive(true);
 
@@ -191,8 +256,21 @@ public class Feather : MonoBehaviour
             var target = new Vector2();
             if (up.IsPressed) target.y += 25;
             if (down.IsPressed) target.y -= 25;
-            if (right.IsPressed) target.x += 25;
-            if (left.IsPressed) target.x -= 25;
+            var rightP = right.IsPressed;
+            var leftP = left.IsPressed;
+            if (rightP != leftP)
+            {
+                if (rightP)
+                {
+                    hero.FaceRight();
+                    target.x += 25;
+                }
+                else
+                {
+                    hero.FaceLeft();
+                    target.x -= 25;
+                }   
+            }
             
             rb2d.velocity = Vector2.zero;
             hero.transform.position = _comet.transform.position;
@@ -218,7 +296,14 @@ public class Feather : MonoBehaviour
         DoubleJumpedField.SetValue(hero, false);
         
         _comet.SetActive(false);
-        _cometValid = false;
+        _cometValid = false; 
+        
+        _source.Stop();
+        _source.PlayOneShot(LoseFeather);
+
+        _remainingTime = 0;
+        
+        EventManager.BroadcastEvent(gameObject, "StopFlying");
     }
 
     private IEnumerator Respawn()

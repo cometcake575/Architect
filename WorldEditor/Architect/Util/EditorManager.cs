@@ -186,8 +186,6 @@ public static class EditorManager
 
         if (!IsEditing) return;
 
-        HeroController.instance.GetComponent<Rigidbody2D>().velocity.Set(0, 0);
-
         // Checks if the selected item is placeable
         if (EditorUIManager.SelectedItem is PlaceableObject placeable && !paused)
         {

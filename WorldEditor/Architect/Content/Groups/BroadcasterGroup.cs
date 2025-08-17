@@ -16,6 +16,8 @@ public class BroadcasterGroup
     
     public static readonly string[] Interactions = ["OnInteract"];
     
+    public static readonly string[] Feather = ["StartFlying", "StopFlying"];
+    
     public static readonly string[] Choice = ["Yes", "No", "BoxDown"];
 
     public static readonly string[] Bindings = ["OnBind", "OnUnbind"];
