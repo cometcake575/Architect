@@ -24,6 +24,7 @@ public class DreamBlock : MonoBehaviour
         BindingFlags.Instance | BindingFlags.NonPublic);
 
     private static int _walljumpCt;
+    private static bool _increaseKickspeed;
     
     public static void Init()
     {
@@ -40,8 +41,38 @@ public class DreamBlock : MonoBehaviour
             if (_walljumpCt > 0) _walljumpCt--;
         };
 
-        On.HeroController.CanJump += (orig, self) => orig(self) || 
-                                                     (self.playerData.GetBool("hasWalljump") && !self.cState.touchingNonSlider && _walljumpCt > 0);
+        On.HeroController.CanWallJump += (orig, self) =>
+        {
+            _increaseKickspeed = false;
+            if (orig(self)) return true;
+            if (_walljumpCt <= 0) return false;
+            _walljumpCt = 0;
+            
+            if (self.cState.facingRight) self.touchingWallL = true;
+            else self.touchingWallR = true;
+            if (self.playerData.GetBool("hasWalljump") && !self.cState.touchingNonSlider)
+            {
+                _increaseKickspeed = true;
+                return true;
+            }
+
+            return false;
+        };
+
+        On.HeroController.DoWallJump += (orig, self) =>
+        {
+            if (_increaseKickspeed)
+            {
+                self.WJLOCK_STEPS_LONG = 30;
+                self.WJ_KICKOFF_SPEED = 32;
+            }
+            else
+            {
+                self.WJLOCK_STEPS_LONG = 10;
+                self.WJ_KICKOFF_SPEED = 16;
+            }
+            orig(self);
+        };
 
         ModHooks.HeroUpdateHook += () =>
         {
@@ -189,7 +220,7 @@ public class DreamBlock : MonoBehaviour
 
         if (ActiveBlocks.Count == 0) MoveOut();
         
-        _walljumpCt = 1;
+        if (!HeroController.instance.dashingDown) _walljumpCt = 2;
     }
 
     private static void MoveOut()
