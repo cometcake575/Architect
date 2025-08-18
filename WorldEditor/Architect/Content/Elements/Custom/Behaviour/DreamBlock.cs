@@ -174,7 +174,11 @@ public class DreamBlock : MonoBehaviour
         {
             ActiveBlocks.Add(this);
             hc.GetComponent<MeshRenderer>().enabled = false;
-            if (ActiveBlocks.Count == 1) StartCoroutine(Play());
+            if (ActiveBlocks.Count == 1)
+            {
+                CustomObjects.RefreshShadowDash();
+                StartCoroutine(Play());
+            }
         }
     }
 
@@ -230,7 +234,6 @@ public class DreamBlock : MonoBehaviour
         if (!_damaging) hc.GetComponent<MeshRenderer>().enabled = true;
         _damaging = false;
         hc.ResetAirMoves();
-        CustomObjects.RefreshShadowDash();
 
         _source.Stop();
         _source.PlayOneShot(Exit);

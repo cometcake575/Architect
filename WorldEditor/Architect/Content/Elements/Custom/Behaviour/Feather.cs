@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Architect.Attributes;
 using Architect.Util;
+using Modding;
 using UnityEngine;
 
 namespace Architect.Content.Elements.Custom.Behaviour;
@@ -23,6 +24,8 @@ public class Feather : MonoBehaviour
     private static GameObject _comet;
     private static Rigidbody2D _cometBody;
     private static CircleCollider2D _cometCollider;
+    private static SpriteRenderer _cometRenderer;
+    private static ParticleSystemRenderer _cometParticleRenderer;
     private static bool _cometValid;
 
     private static readonly AudioClip ObtainFeather = ResourceUtils.LoadInternalClip("ScatteredAndLost.feather.feather_get");
@@ -30,6 +33,7 @@ public class Feather : MonoBehaviour
     private static readonly AudioClip LoseFeather = ResourceUtils.LoadInternalClip("ScatteredAndLost.feather.feather_state_end");
     private static readonly AudioClip Loop = ResourceUtils.LoadInternalClip("ScatteredAndLost.feather.feather_state_fast_loop");
     
+    private static bool _regainControl;
     private static bool _show;
 
     private static readonly FieldInfo AirDashedField = typeof(HeroController).GetField("airDashed", 
@@ -42,6 +46,20 @@ public class Feather : MonoBehaviour
     
     private static AudioSource _source;
 
+    private static readonly Sprite Comet = ResourceUtils.LoadInternal(
+        "ScatteredAndLost.feather.comet", filterMode: FilterMode.Point, ppu: 10);
+    private static readonly Sprite CometBlink = ResourceUtils.LoadInternal(
+        "ScatteredAndLost.feather.comet_blink", filterMode: FilterMode.Point, ppu: 10);
+    
+    private static readonly Material CometTrail = new(Shader.Find("Sprites/Default"))
+    {
+        mainTexture = ResourceUtils.LoadInternal("ScatteredAndLost.feather.comet_trail", FilterMode.Point).texture
+    };
+    private static readonly Material CometBlinkTrail = new(Shader.Find("Sprites/Default"))
+    {
+        mainTexture = ResourceUtils.LoadInternal("ScatteredAndLost.feather.comet_blink_trail", FilterMode.Point).texture
+    };
+
     public static void Init()
     {
         SetupSprites("ScatteredAndLost.feather.flash.f");
@@ -49,8 +67,8 @@ public class Feather : MonoBehaviour
         SetupBreakAnim();
 
         _comet = new GameObject("Comet");
-        _comet.AddComponent<SpriteRenderer>().sprite = ResourceUtils.LoadInternal(
-            "ScatteredAndLost.feather.comet", filterMode: FilterMode.Point, ppu: 10);
+        _cometRenderer = _comet.AddComponent<SpriteRenderer>();
+        _cometRenderer.sprite = Comet;
         _comet.SetActive(false);
 
         _cometCollider = _comet.AddComponent<CircleCollider2D>();
@@ -59,6 +77,7 @@ public class Feather : MonoBehaviour
         _cometCollider.offset = new Vector2(0, -1);
 
         _cometBody = _comet.AddComponent<Rigidbody2D>();
+        _cometBody.bodyType = RigidbodyType2D.Dynamic;
         _cometBody.gravityScale = 0;
 
         _comet.AddComponent<CometMovement>();
@@ -74,10 +93,8 @@ public class Feather : MonoBehaviour
         };
         
         var ps = child.AddComponent<ParticleSystem>();
-        ps.GetComponent<ParticleSystemRenderer>().material = new Material(Shader.Find("Sprites/Default"))
-        {
-            mainTexture = ResourceUtils.LoadInternal("ScatteredAndLost.feather.comet_trail", FilterMode.Point).texture
-        };
+        _cometParticleRenderer = ps.GetComponent<ParticleSystemRenderer>();
+        _cometParticleRenderer.material = CometTrail;
         
         var main = ps.main;
         main.simulationSpace = ParticleSystemSimulationSpace.World;
@@ -93,15 +110,22 @@ public class Feather : MonoBehaviour
         
         DontDestroyOnLoad(_comet);
 
-        On.HeroController.TakeDamage += (orig, self, go, side, amount, type) =>
+        ModHooks.AfterTakeDamageHook += (type, amount) =>
         {
             if (_cometValid)
             {
                 _cometValid = false;
-                _show = false;
+                _regainControl = false;
+                if (type != 1) _show = false;
             }
+            
+            return amount;
+        };
 
-            orig(self, go, side, amount, type);
+        On.HeroController.Awake += (orig, self) =>
+        {
+            orig(self);
+            Physics2D.IgnoreCollision(self.GetComponent<Collider2D>(), _cometCollider);
         };
     }
 
@@ -222,9 +246,12 @@ public class Feather : MonoBehaviour
         StartCoroutine(StartSound());
 
         _comet.SetActive(true);
+        _cometParticleRenderer.trailMaterial = CometTrail;
+        _cometRenderer.sprite = Comet;
 
         var rb2d = hero.GetComponent<Rigidbody2D>();
 
+        _regainControl = true;
         _show = true;
         
         _comet.transform.position = transform.position + new Vector3(0, 1);
@@ -243,8 +270,9 @@ public class Feather : MonoBehaviour
         
         while (_remainingTime > 0)
         {
-            if (rb2d.gravityScale == 0)
+            if (_cometValid && rb2d.gravityScale == 0)
             {
+                _regainControl = false;
                 _show = false;
                 _cometValid = false;
             }
@@ -286,11 +314,8 @@ public class Feather : MonoBehaviour
             yield return null;
         }
         
-        if (_show)
-        {
-            hero.RegainControl();
-            hero.GetComponent<MeshRenderer>().enabled = true;
-        }
+        if (_regainControl) hero.RegainControl();
+        if (_show) hero.GetComponent<MeshRenderer>().enabled = true;
         
         if (!dashed) AirDashedField.SetValue(hero, false);
         DoubleJumpedField.SetValue(hero, false);
@@ -323,8 +348,25 @@ public class Feather : MonoBehaviour
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (other.isTrigger) return;
-            Architect.Instance.Log(other.gameObject.name);
             _cometValid = false;
+        }
+
+        private float _spriteChangeTime;
+        private bool _blink;
+
+        private void Update()
+        {
+            if (_remainingTime < 2)
+            {
+                _spriteChangeTime += Time.deltaTime * 5;
+                if (_spriteChangeTime >= 1 * _remainingTime)
+                {
+                    _spriteChangeTime--;
+                    _blink = !_blink;
+                    _cometRenderer.sprite = _blink ? CometBlink : Comet;
+                    _cometParticleRenderer.material = _blink ? CometBlinkTrail : CometTrail;
+                }
+            }
         }
     }
 }
