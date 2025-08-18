@@ -246,7 +246,7 @@ public class Feather : MonoBehaviour
         StartCoroutine(StartSound());
 
         _comet.SetActive(true);
-        _cometParticleRenderer.trailMaterial = CometTrail;
+        _cometParticleRenderer.material = CometTrail;
         _cometRenderer.sprite = Comet;
 
         var rb2d = hero.GetComponent<Rigidbody2D>();
