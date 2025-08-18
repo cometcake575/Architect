@@ -234,6 +234,8 @@ public class Feather : MonoBehaviour
         var hero = HeroController.instance;
         
         _remainingTime = Mathf.Max(_remainingTime, featherTime);
+        _cometParticleRenderer.material = CometTrail;
+        _cometRenderer.sprite = Comet;
         
         if (hero.controlReqlinquished)
         {
@@ -246,8 +248,6 @@ public class Feather : MonoBehaviour
         StartCoroutine(StartSound());
 
         _comet.SetActive(true);
-        _cometParticleRenderer.material = CometTrail;
-        _cometRenderer.sprite = Comet;
 
         var rb2d = hero.GetComponent<Rigidbody2D>();
 
