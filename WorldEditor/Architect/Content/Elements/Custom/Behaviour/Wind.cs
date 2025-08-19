@@ -39,10 +39,7 @@ public class Wind : MonoBehaviour
         {
             if (HeroController.instance.cState.jumping
                 || HeroController.instance.cState.doubleJumping
-                || HeroController.instance.cState.wallJumping)
-            {
-                _actuallyJumping = true;
-            }
+                || HeroController.instance.cState.wallJumping) _actuallyJumping = true;
             else if (HeroController.instance.GetComponent<Rigidbody2D>().velocity.y < 0) _actuallyJumping = false;
         };
 
@@ -51,11 +48,18 @@ public class Wind : MonoBehaviour
             _verticalWindForce = 0;
             orig(self);
         };
-        
+
+        On.HeroController.BackOnGround += (orig, self) =>
+        {
+            _actuallyJumping = false;
+            orig(self);
+        };
+
+        var jumpSteps = typeof(HeroController).GetField("jump_steps", BindingFlags.NonPublic | BindingFlags.Instance);
         On.HeroController.JumpReleased += (orig, self) =>
         {
             if (!_actuallyJumping) return;
-            _actuallyJumping = false;
+            if ((int) jumpSteps!.GetValue(self) >= self.JUMP_STEPS_MIN) _actuallyJumping = false;
             orig(self);
         };
 

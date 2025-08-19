@@ -155,7 +155,8 @@ public class DreamBlock : MonoBehaviour
             _setup = true;
             
             _emission.rateOverTimeMultiplier *= transform.localScale.x * transform.localScale.y;
-            _shape.scale = new Vector3(10 - 3 / transform.localScale.x, 10 - 3 / transform.localScale.y, 10);
+            _shape.scale = new Vector3(10 - 3 / transform.localScale.x, 10 - 3 / transform.localScale.y, 
+                10 / transform.localScale.z);
 
             _trigger.size = new Vector2(_collider.size.x - 0.2f / transform.localScale.x,
                 _collider.size.y - 0.2f / transform.localScale.y);
