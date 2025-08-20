@@ -291,6 +291,14 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
             EventManager.RegisterEventReceiverType("full_heal_player", _ =>
             {
                 HeroController.instance.MaxHealth();
+            }),
+            EventManager.RegisterEventReceiverType("gain_soul", _ =>
+            {
+                HeroController.instance.SoulGain();
+            }),
+            EventManager.RegisterEventReceiverType("max_soul", _ =>
+            {
+                HeroController.instance.AddMPCharge(999);
             })
         );
 

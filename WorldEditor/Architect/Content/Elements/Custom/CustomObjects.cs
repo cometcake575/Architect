@@ -140,6 +140,7 @@ public static class CustomObjects
             CreateBinding("wings", "Monarch Wings Binding"),
             CreateBinding("dnail", "Dream Nail Binding"),
             CreateBinding("gate", "Dreamgate Binding"),
+            CreateBinding("map", "Quickmap Binding"),
             CreateBinding("gslash", "Great Slash Binding"),
             CreateBinding("cslash", "Cyclone Slash Binding"),
             CreateBinding("dslash", "Dash Slash Binding")
@@ -648,6 +649,7 @@ public static class CustomObjects
         On.HeroController.CanJump += (orig, self) => BindingCheck(orig(self), "jump");
         On.HeroController.CanDoubleJump += (orig, self) => BindingCheck(orig(self), "wings");
         On.HeroController.CanDreamNail += (orig, self) => BindingCheck(orig(self), "dnail");
+        On.HeroController.CanQuickMap += (orig, self) => BindingCheck(orig(self), "map");
         
         ModHooks.GetPlayerBoolHook += (name, orig) =>
         {

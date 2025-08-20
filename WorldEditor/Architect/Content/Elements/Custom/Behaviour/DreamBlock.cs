@@ -46,7 +46,6 @@ public class DreamBlock : MonoBehaviour
             _increaseKickspeed = false;
             if (orig(self)) return true;
             if (_walljumpCt <= 0) return false;
-            _walljumpCt = 0;
             
             if (self.cState.facingRight) self.touchingWallL = true;
             else self.touchingWallR = true;
@@ -61,6 +60,7 @@ public class DreamBlock : MonoBehaviour
 
         On.HeroController.DoWallJump += (orig, self) =>
         {
+            _walljumpCt = 0;
             if (_increaseKickspeed)
             {
                 self.WJLOCK_STEPS_LONG = 30;
