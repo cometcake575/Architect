@@ -737,6 +737,12 @@ public static class CustomObjects
             orig(self);
             TemporaryAbilities.Remove("Wings");
         };
+
+        On.HeroController.TakeDamage += (orig, self, go, side, amount, type) =>
+        {
+            if (type != 1) TemporaryAbilities.Clear();
+            orig(self, go, side, amount, type);
+        };
     }
 
     private static void InitSpellHooks(PlayMakerFSM fsm)
