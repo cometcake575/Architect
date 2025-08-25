@@ -338,11 +338,29 @@ public class ConfigGroup
         Animated = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(
                 new FloatConfigType("Speed",
-                    (o, value) => { o.GetComponentInChildren<Animator>().speed = value.GetValue(); }),
+                    (o, value) =>
+                    {
+                        o.GetComponentInChildren<Animator>().speed = value.GetValue();
+                    }),
                 "animator_speed"),
             Attributes.ConfigManager.RegisterConfigType(
                 new FloatConfigType("Offset",
-                    (o, value) => { o.AddComponent<AnimatorDelay>().delay = value.GetValue(); }), "animator_offset")
+                    (o, value) =>
+                    {
+                        o.AddComponent<AnimatorDelay>().delay = value.GetValue();
+                    }), "animator_offset"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Culling Enabled",
+                    (o, value) =>
+                    {
+                        var anim = o.GetComponentInChildren<Animator>();
+                        if (value.GetValue())
+                        {
+                            anim.cullingMode = AnimatorCullingMode.CullCompletely;
+                            return;
+                        }
+                        anim.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+                    }).WithDefaultValue(false), "animator_sync")
         );
 
         ObjectMover = new ConfigGroup(Invisible,
@@ -694,7 +712,13 @@ public class ConfigGroup
             Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Beam Time", (o, value) => {
                     o.LocateMyFSM("Laser Bug").FsmVariables.FindFsmFloat("Beam Time").Value = value.GetValue();
                 }
-            ), "beam_beam_time")
+            ), "beam_beam_time"),
+            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Culling Enabled", (o, value) =>
+                {
+                    if (value.GetValue()) return;
+                    o.LocateMyFSM("Laser Bug").DisableAction("Idle", 2);
+                }
+            ).WithDefaultValue(false), "beam_culling")
         );
 
         Levers = new ConfigGroup(Generic,

@@ -619,6 +619,8 @@ public static class CustomObjects
 
     private static void InitializeHooks()
     {
+        MovingObject.Init();
+        
         SetupPlayerListeners();
         
         On.PersistentBoolItem.Awake += (orig, self) =>

@@ -1,3 +1,4 @@
+using Modding;
 using UnityEngine;
 
 namespace Architect.Content.Elements.Custom.Behaviour;
@@ -25,6 +26,15 @@ public class MovingObject : MonoBehaviour
     private Transform _movingPart;
     private bool _platform;
     private bool _flipped;
+
+    public static void Init()
+    {
+        ModHooks.AfterTakeDamageHook += (type, amount) =>
+        {
+            if (type != 1) LeavePlayer(HeroController.instance.gameObject);
+            return amount;
+        };
+    }
 
     public void SetSpeed(float value)
     {
@@ -94,10 +104,15 @@ public class MovingObject : MonoBehaviour
         
         var collisionObject = collision.gameObject;
         if (collisionObject.layer != 9) return;
-        var component1 = collisionObject.GetComponent<HeroController>();
+        LeavePlayer(collisionObject);
+    }
+
+    private static void LeavePlayer(GameObject obj)
+    {
+        var component1 = obj.GetComponent<HeroController>();
         if (component1) component1.SetHeroParent(null);
-        else collisionObject.transform.SetParent(null);
-        var component2 = collisionObject.GetComponent<Rigidbody2D>();
+        else obj.transform.SetParent(null);
+        var component2 = obj.GetComponent<Rigidbody2D>();
         if (!component2) return;
         component2.interpolation = RigidbodyInterpolation2D.Interpolate;
     }
