@@ -96,7 +96,7 @@ public class Wind : MonoBehaviour
         
         if (!hc) return;
         _windPlayer = true;
-        hc.ResetHardLandingTimer();
+        if (_force.y > 0) hc.ResetHardLandingTimer();
         
         if (!hc.cState.superDashing && hc.cState.onGround && !hc.CheckTouchingGround())
         {
