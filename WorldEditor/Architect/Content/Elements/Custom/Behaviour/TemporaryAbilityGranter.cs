@@ -39,6 +39,7 @@ public class TemporaryAbilityGranter : MonoBehaviour
         }
         
         CustomObjects.CollectAbilityGranter(abilityType);
+        _source.pitch = 1;
         _source.PlayOneShot(Use);
     }
 
@@ -49,6 +50,7 @@ public class TemporaryAbilityGranter : MonoBehaviour
         yield return new WaitForSeconds(disableTime);
         _renderer.sprite = sprite;
         _disabled = false;
+        _source.pitch = 1;
         _source.PlayOneShot(Return);
     }
 }

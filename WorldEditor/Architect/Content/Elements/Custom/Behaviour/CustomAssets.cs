@@ -79,6 +79,7 @@ public class WavObject : Playable
     public override void Play()
     {
         if (!sound) return;
+        _source.pitch = 1;
         _source.PlayOneShot(sound, volume);
     }
 }

@@ -62,8 +62,6 @@ public class Wind : MonoBehaviour
             if ((int) jumpSteps!.GetValue(self) >= self.JUMP_STEPS_MIN) _actuallyJumping = false;
             orig(self);
         };
-
-        On.HeroController.ShouldHardLand += (orig, self, collision) => orig(self, collision) && _verticalWindForce <= 0;
         
         _setState = typeof(HeroController).GetMethod("SetState", BindingFlags.Instance | BindingFlags.NonPublic);
         
@@ -90,6 +88,7 @@ public class Wind : MonoBehaviour
         {
             if (_windPlayer) rb2d.velocity = Vector2.zero;
             _windPlayer = false;
+            hc.ResetHardLandingTimer();
             return;
         }
         

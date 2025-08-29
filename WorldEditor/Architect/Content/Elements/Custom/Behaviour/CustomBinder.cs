@@ -55,7 +55,11 @@ public class CustomBinder : MonoBehaviour
         
         EventManager.BroadcastEvent(gameObject, active ? "OnBind" : "OnUnbind");
         
-        if (_source) _source.PlayOneShot(_clip, 1f);
+        if (_source)
+        {
+            _source.pitch = 1;
+            _source.PlayOneShot(_clip, 1f);
+        }
         
         CustomObjects.RefreshBinding(bindingType);
 

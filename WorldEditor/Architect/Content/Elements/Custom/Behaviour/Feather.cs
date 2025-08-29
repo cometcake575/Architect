@@ -127,6 +127,12 @@ public class Feather : MonoBehaviour
             orig(self);
             Physics2D.IgnoreCollision(self.GetComponent<Collider2D>(), _cometCollider);
         };
+
+        On.HeroController.SceneInit += (orig, self) =>
+        {
+            self.GetComponent<MeshRenderer>().enabled = true;
+            orig(self);
+        };
     }
 
     private static void SetupSprites(string name)
