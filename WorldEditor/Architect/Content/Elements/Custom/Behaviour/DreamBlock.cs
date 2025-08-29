@@ -23,8 +23,9 @@ public class DreamBlock : MonoBehaviour
     private static readonly FieldInfo DashTimer = typeof(HeroController).GetField("dash_timer", 
         BindingFlags.Instance | BindingFlags.NonPublic);
 
-    private static int _walljumpCt;
-    private static bool _increaseKickspeed;
+    private static int _wallJumpBuffer;
+    private static int _turnaroundBuffer;
+    private static bool _extendedJump;
     
     public static void Init()
     {
@@ -38,20 +39,21 @@ public class DreamBlock : MonoBehaviour
         On.HeroController.FixedUpdate += (orig, self) =>
         {
             orig(self);
-            if (_walljumpCt > 0) _walljumpCt--;
+            if (_wallJumpBuffer > 0) _wallJumpBuffer--;
+            if (_turnaroundBuffer > 0) _turnaroundBuffer--;
         };
 
         On.HeroController.CanWallJump += (orig, self) =>
         {
-            _increaseKickspeed = false;
+            _extendedJump = false;
             if (orig(self)) return true;
-            if (_walljumpCt <= 0) return false;
+            if (_wallJumpBuffer <= 0) return false;
             
             if (self.cState.facingRight) self.touchingWallL = true;
             else self.touchingWallR = true;
             if (self.playerData.GetBool("hasWalljump") && !self.cState.touchingNonSlider)
             {
-                _increaseKickspeed = true;
+                _extendedJump = true;
                 return true;
             }
 
@@ -60,8 +62,8 @@ public class DreamBlock : MonoBehaviour
 
         On.HeroController.DoWallJump += (orig, self) =>
         {
-            _walljumpCt = 0;
-            if (_increaseKickspeed)
+            _wallJumpBuffer = 0;
+            if (_extendedJump)
             {
                 self.WJLOCK_STEPS_LONG = 30;
                 self.WJ_KICKOFF_SPEED = 32;
@@ -81,6 +83,8 @@ public class DreamBlock : MonoBehaviour
             {
                 DashTimer.SetValue(hc, 0);
             }
+
+            if (InputHandler.Instance.inputActions.jump.WasPressed) _turnaroundBuffer = 3;
         };
 
         On.HeroController.TakeDamage += (orig, self, go, side, amount, type) =>
@@ -124,11 +128,25 @@ public class DreamBlock : MonoBehaviour
             orig(self);
         };
 
+        var dwj = typeof(HeroController).GetMethod("DoWallJump", BindingFlags.Instance | BindingFlags.NonPublic);
         On.HeroController.OnCollisionEnter2D += (orig, self, collision) =>
         {
             if (ActiveBlocks.Count > 0 && !collision.gameObject.GetComponent<DreamBlock>())
             {
-                self.TakeDamage(collision.gameObject, CollisionSide.other, 1, 2);
+                if (self.playerData.hasWalljump &&
+                    (_turnaroundBuffer > 0 || InputHandler.Instance.inputActions.jump.WasPressed))
+                {
+                    self.touchingWallR = !self.cState.facingRight;
+                    self.touchingWallL = self.cState.facingRight;
+
+                    self.cState.touchingWall = true;
+                    self.cState.wallSliding = true;
+                    self.cState.wallJumping = false;
+                    dwj!.Invoke(self, []);
+
+                    if (self.cState.facingRight) self.FaceLeft();
+                    else self.FaceRight();
+                } else self.TakeDamage(collision.gameObject, CollisionSide.other, 1, 2);
             }
             orig(self, collision);
         };
@@ -225,7 +243,7 @@ public class DreamBlock : MonoBehaviour
 
         if (ActiveBlocks.Count == 0) MoveOut();
         
-        if (!HeroController.instance.dashingDown) _walljumpCt = 2;
+        if (!HeroController.instance.dashingDown) _wallJumpBuffer = 2;
     }
 
     private static void MoveOut()
