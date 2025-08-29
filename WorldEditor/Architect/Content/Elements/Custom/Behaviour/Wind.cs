@@ -88,7 +88,6 @@ public class Wind : MonoBehaviour
         {
             if (_windPlayer) rb2d.velocity = Vector2.zero;
             _windPlayer = false;
-            hc.ResetHardLandingTimer();
             return;
         }
         
@@ -97,6 +96,7 @@ public class Wind : MonoBehaviour
         
         if (!hc) return;
         _windPlayer = true;
+        hc.ResetHardLandingTimer();
         
         if (!hc.cState.superDashing && hc.cState.onGround && !hc.CheckTouchingGround())
         {
