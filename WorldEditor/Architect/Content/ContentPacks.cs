@@ -111,7 +111,9 @@ public static class ContentPacks
                 .WithConfigGroup(ConfigGroup.Tablets),
             Create("Tutorial_01", "_Props/Health Cocoon", "Lifeblood Cocoon", "Interactable", weight:MiscInteractableWeight)
                 .WithConfigGroup(ConfigGroup.Cocoon),
-            new BenchElement("Room_nailmaster", "RestBench", "Nailmaster Mato's Bench", "Interactable", weight:NailmasterBenchWeight)
+            new BenchElement("Room_nailmaster", "RestBench", "Nailmaster Mato's Bench", "Interactable", weight:NailmasterBenchWeight),
+            new ElderbugElement(weight:NpcWeight),
+            new ZoteElement(weight:NpcWeight)
         });
         RegisterInternalPack(new ContentPack("Forgotten Crossroads", "Assets from the regular Forgotten Crossroads")
         {
@@ -169,7 +171,8 @@ public static class ContentPacks
                 .WithBroadcasterGroup(BroadcasterGroup.Breakable),
             new DiveGroundElement(weight:BreakableWallsWeight),
             new LeverPackElement("Room_Town_Stag_Station", "Gate Switch", "Small Lever", weight:LeverWeight)
-                .FlipHorizontal()
+                .FlipHorizontal(),
+            new QuirrelElement(weight:NpcWeight)
         });
         RegisterInternalPack(new ContentPack("Infected Crossroads", "Assets unique to the Infected Crossroads")
         {

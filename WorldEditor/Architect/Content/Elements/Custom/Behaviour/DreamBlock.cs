@@ -203,7 +203,7 @@ public class DreamBlock : MonoBehaviour
 
     private static IEnumerator Play()
     {
-        _source.volume = GameManager.instance.GetImplicitCinematicVolume(); 
+        _source.volume = GameManager.instance.GetImplicitCinematicVolume() / 5; 
         
         _source.loop = false;
         _source.clip = Enter;

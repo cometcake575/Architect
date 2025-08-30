@@ -133,6 +133,8 @@ public class ConfigGroup
     
     public static ConfigGroup RepeatNpcs;
     
+    public static ConfigGroup Npcs;
+    
     public static ConfigGroup Feather;
     
     public static ConfigGroup Midwife;
@@ -1199,12 +1201,16 @@ public class ConfigGroup
             )
         );
 
-        RepeatNpcs = new ConfigGroup(
+        Npcs = new ConfigGroup(
             Generic,
             Attributes.ConfigManager.RegisterConfigType(new StringConfigType("First Convo", (o, value) =>
             {
                 CustomTexts[o.GetComponent<NpcEditor>().SetFirstConvo()] = value.GetValue();
-            }), "npcs_first_convo"),
+            }), "npcs_first_convo")
+        );
+
+        RepeatNpcs = new ConfigGroup(
+            Npcs,
             Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Repeat Convo", (o, value) =>
             {
                 CustomTexts[o.GetComponent<NpcEditor>().SetRepeatConvo()] = value.GetValue();

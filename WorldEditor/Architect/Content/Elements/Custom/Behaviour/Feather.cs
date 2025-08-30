@@ -200,7 +200,7 @@ public class Feather : MonoBehaviour
 
     private static IEnumerator StartSound()
     {
-        var maxVol = GameManager.instance.GetImplicitCinematicVolume() / 2;
+        var maxVol = GameManager.instance.GetImplicitCinematicVolume() / 5;
         
         _source.volume = maxVol;
         _source.time = 0;

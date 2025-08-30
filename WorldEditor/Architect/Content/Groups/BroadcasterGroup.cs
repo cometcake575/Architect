@@ -12,6 +12,8 @@ public class BroadcasterGroup
     
     public static readonly string[] TriggerZones = ["ZoneEnter", "ZoneExit"];
     
+    public static readonly string[] Npcs = ["OnConvoEnd"];
+    
     public static readonly string[] TextDisplay = ["BoxDown"];
     
     public static readonly string[] Interactions = ["OnInteract"];
