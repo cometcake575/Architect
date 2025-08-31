@@ -8,7 +8,7 @@ internal class ColosseumWallElement : InternalPackElement
 {
     private GameObject _gameObject;
 
-    public ColosseumWallElement(int weight) : base("Moving Colosseum Wall", "Interactable", weight:weight)
+    public ColosseumWallElement(int weight) : base("Moving Colosseum Wall", "Interactable", weight)
     {
         WithConfigGroup(ConfigGroup.MovingWall);
         WithReceiverGroup(ReceiverGroup.MovingWall);
@@ -29,9 +29,9 @@ internal class ColosseumWallElement : InternalPackElement
     {
         _gameObject = preloads["Room_Colosseum_Gold"]["Colosseum Manager/Walls/Colosseum Wall L"];
         var managedChild = _gameObject.transform.GetChild(0);
-        
+
         managedChild.GetChild(0).gameObject.SetActive(false);
-        foreach (var i in new []{0, 2, 4, 5, 6}) managedChild.GetChild(1).GetChild(i).gameObject.SetActive(false);
+        foreach (var i in new[] { 0, 2, 4, 5, 6 }) managedChild.GetChild(1).GetChild(i).gameObject.SetActive(false);
 
         var col = managedChild.GetComponent<BoxCollider2D>();
         col.size = new Vector2(1.4581f, 6.4249f);

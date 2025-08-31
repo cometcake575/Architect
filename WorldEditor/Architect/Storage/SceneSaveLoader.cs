@@ -18,7 +18,11 @@ public static class SceneSaveLoader
     internal static readonly ObjectPlacement.ObjectPlacementConverter Opc = new();
     internal static readonly Vector3Converter V3C = new();
 
-    public static string DataPath; 
+    public static string DataPath;
+
+    private static readonly Dictionary<string, List<string>> ScheduledErases = new();
+    private static readonly Dictionary<string, List<(string, Vector3)>> ScheduledUpdates = new();
+    private static readonly Dictionary<string, List<ObjectPlacement>> ScheduledEdits = new();
 
     internal static void Initialize()
     {
@@ -28,7 +32,7 @@ public static class SceneSaveLoader
         On.GameManager.SaveGame += (orig, self) =>
         {
             List<string> scenes = [];
-            
+
             scenes.AddRange(ScheduledErases.Keys);
             scenes.AddRange(ScheduledEdits.Keys);
             scenes.AddRange(ScheduledUpdates.Keys);
@@ -36,16 +40,15 @@ public static class SceneSaveLoader
             foreach (var scene in scenes)
             {
                 var placements = LoadScene(scene);
-                if (ScheduledErases.TryGetValue(scene, out var erases)) placements.RemoveAll(obj => erases.Contains(obj.GetId()));
+                if (ScheduledErases.TryGetValue(scene, out var erases))
+                    placements.RemoveAll(obj => erases.Contains(obj.GetId()));
                 if (ScheduledEdits.TryGetValue(scene, out var edits)) placements.AddRange(edits);
                 if (ScheduledUpdates.TryGetValue(scene, out var updates))
                     foreach (var pair in updates)
-                    {
                         placements.First(obj => obj.GetId() == pair.Item1).Move(pair.Item2);
-                    }
                 SaveScene(scene, placements);
             }
-            
+
             orig(self);
         };
     }
@@ -54,12 +57,12 @@ public static class SceneSaveLoader
     {
         return Load("Architect/" + name);
     }
-    
+
     public static List<ObjectPlacement> Load(string name)
     {
         var path = DataPath + name + ".architect.json";
         if (!File.Exists(path)) return [];
-        
+
         var content = File.ReadAllText(path);
         var data = DeserializeSceneData(content);
 
@@ -77,22 +80,19 @@ public static class SceneSaveLoader
 
         if (ScheduledUpdates.TryGetValue(name, out var scheduledUpdate))
         {
-            foreach (var update in scheduledUpdate)
-            {
-                data.First(obj => obj.GetId() == update.Item1).Move(update.Item2);
-            }
+            foreach (var update in scheduledUpdate) data.First(obj => obj.GetId() == update.Item1).Move(update.Item2);
 
             ScheduledUpdates.Remove(name);
         }
-        
+
         return data;
     }
-    
+
     public static void SaveScene(string name, List<ObjectPlacement> placements)
     {
         Save("Architect/" + name, placements);
     }
-    
+
     public static void Save(string name, List<ObjectPlacement> placements)
     {
         var data = SerializeSceneData(placements);
@@ -105,10 +105,10 @@ public static class SceneSaveLoader
         if (File.Exists(path)) File.Delete(path);
 
         if (data == "[]") return;
-        
+
         using var stream = File.Create(path);
         using var writer = new StreamWriter(stream);
-        
+
         writer.Write(data);
     }
 
@@ -144,7 +144,7 @@ public static class SceneSaveLoader
         {
             var name = Path.GetFileName(file);
             if (!name.EndsWith(".architect.json")) continue;
-            
+
             data[name.Replace(".architect.json", "")] = File.ReadAllText(file);
         }
 
@@ -155,16 +155,16 @@ public static class SceneSaveLoader
     {
         WipeAllScenes();
         var passed = true;
-        
+
         var startTime = Time.realtimeSinceStartup;
-        
+
         foreach (var pair in placements)
         {
             var task = Task.Run(() => LoadEdits(pair.Value));
             while (!task.IsCompleted) yield return null;
 
             if (!task.Result) passed = false;
-            
+
             Save("Architect/" + pair.Key, pair.Value);
         }
 
@@ -220,8 +220,4 @@ public static class SceneSaveLoader
         if (!ScheduledUpdates.ContainsKey(scene)) ScheduledUpdates[scene] = [];
         ScheduledUpdates[scene].Add((id, pos));
     }
-
-    private static readonly Dictionary<string, List<string>> ScheduledErases = new();
-    private static readonly Dictionary<string, List<(string, Vector3)>> ScheduledUpdates = new();
-    private static readonly Dictionary<string, List<ObjectPlacement>> ScheduledEdits = new();
 }

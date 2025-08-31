@@ -1,18 +1,16 @@
 using Architect.Attributes;
-using Architect.Attributes.Broadcasters;
 using UnityEngine;
 
 namespace Architect.Content.Elements.Custom.Behaviour;
 
 public class Timer : MonoBehaviour
 {
-    private float _time;
-    private int _calls;
-
     public float startDelay = 1;
     public float repeatDelay = 1;
     public int maxCalls = -1;
-    
+    private int _calls;
+    private float _time;
+
     private void Update()
     {
         if (startDelay > 0)
@@ -20,13 +18,14 @@ public class Timer : MonoBehaviour
             startDelay -= Time.deltaTime;
             if (startDelay > 0) return;
             _time -= startDelay;
-        } else
+        }
+        else
         {
             _time += Time.deltaTime;
             if (_time < repeatDelay) return;
             _time -= repeatDelay;
         }
-        
+
         _calls++;
         EventManager.BroadcastEvent(gameObject, "OnCall");
         if (maxCalls != -1 && _calls >= maxCalls)

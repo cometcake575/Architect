@@ -7,9 +7,11 @@ namespace Architect.Content.Elements.Internal.Fixers;
 
 internal class ConveyorBeltElement : InternalPackElement
 {
+    private static readonly Dictionary<ConveyorMovement, List<ConveyorBelt>> CurrentBelts = [];
+    private static readonly List<ConveyorBelt> CurrentVerticalBelts = [];
     private GameObject _gameObject;
 
-    public ConveyorBeltElement(int weight) : base("Crystal Peak Conveyor Belt", "Interactable", weight:weight)
+    public ConveyorBeltElement(int weight) : base("Crystal Peak Conveyor Belt", "Interactable", weight)
     {
         WithRotationGroup(RotationGroup.Three);
         WithConfigGroup(ConfigGroup.Conveyors);
@@ -29,9 +31,9 @@ internal class ConveyorBeltElement : InternalPackElement
     internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
     {
         Initialize();
-        
+
         _gameObject = preloads["Mines_31"]["conveyor_belt_0mid (3)/conveyor_belt_simple0004"];
-        
+
         var col = preloads["Mines_31"]["Conveyor Block"];
         col.transform.parent = _gameObject.transform;
 
@@ -40,17 +42,17 @@ internal class ConveyorBeltElement : InternalPackElement
         scale.y = 0.5f;
         scale.z = 1;
         col.transform.localScale = scale;
-        
+
         var colPos = col.transform.localPosition;
         colPos.x = 0;
         colPos.y = -0.0703f;
         colPos.z = 0;
         col.transform.localPosition = colPos;
-        
+
         var pos = _gameObject.transform.position;
         pos.z = 0;
         _gameObject.transform.position = pos;
-        
+
         col.SetActive(true);
     }
 
@@ -72,7 +74,7 @@ internal class ConveyorBeltElement : InternalPackElement
             HeroController.instance.cState.onConveyor = false;
             HeroController.instance.cState.onConveyorV = false;
         };
-        
+
         On.ConveyorBelt.OnCollisionExit2D += (orig, self, collision) =>
         {
             if (self.vertical)
@@ -87,18 +89,16 @@ internal class ConveyorBeltElement : InternalPackElement
             {
                 var move = collision.gameObject.GetComponent<ConveyorMovement>();
                 if (move)
-                {
                     if (CurrentBelts.TryGetValue(move, out var group))
                     {
                         group.Remove(self);
                         if (group.Count > 0) return;
                     }
-                }
             }
 
             orig(self, collision);
         };
-        
+
         On.ConveyorBelt.OnCollisionEnter2D += (orig, self, collision) =>
         {
             orig(self, collision);
@@ -117,7 +117,4 @@ internal class ConveyorBeltElement : InternalPackElement
             }
         };
     }
-
-    private static readonly Dictionary<ConveyorMovement, List<ConveyorBelt>> CurrentBelts = [];
-    private static readonly List<ConveyorBelt> CurrentVerticalBelts = [];
 }

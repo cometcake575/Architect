@@ -7,10 +7,12 @@ namespace Architect.Content.Elements.Internal.Fixers;
 
 internal class ShadeGateElement : InternalPackElement
 {
-    private GameObject _gameObject;
-    private readonly Sprite _sprite = ResourceUtils.LoadInternal("shade_gate", new Vector2(0.6600646809f, 0.2272230928f), ppu:64);
+    private readonly Sprite _sprite =
+        ResourceUtils.LoadInternal("shade_gate", new Vector2(0.6600646809f, 0.2272230928f), ppu: 64);
 
-    public ShadeGateElement(int weight) : base("Shade Gate", "Interactable", weight:weight)
+    private GameObject _gameObject;
+
+    public ShadeGateElement(int weight) : base("Shade Gate", "Interactable", weight)
     {
         WithRotationGroup(RotationGroup.Eight);
     }

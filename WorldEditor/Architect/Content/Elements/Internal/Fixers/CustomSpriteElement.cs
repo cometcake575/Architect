@@ -11,7 +11,7 @@ internal class CustomSpriteElement(
     string category)
     : GInternalPackElement(scene, path, name, category, 0)
 {
-    private readonly Sprite _sprite = ResourceUtils.LoadInternal(spritePath, ppu:64);
+    private readonly Sprite _sprite = ResourceUtils.LoadInternal(spritePath, ppu: 64);
 
     public override Sprite GetSprite()
     {

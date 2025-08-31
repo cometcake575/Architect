@@ -6,18 +6,17 @@ namespace Architect.Content.Elements.Custom.Behaviour;
 
 public class TemporaryAbilityGranter : MonoBehaviour
 {
-    public float disableTime = 2.5f;
-    
-    public string abilityType;
-    public bool singleUse;
-    
-    private SpriteRenderer _renderer;
-    private bool _disabled;
-    private AudioSource _source;
-
     private static readonly Sprite Used = ResourceUtils.LoadInternal("used_crystal", FilterMode.Point);
     private static readonly AudioClip Use = ResourceUtils.LoadInternalClip("crystal_use");
     private static readonly AudioClip Return = ResourceUtils.LoadInternalClip("crystal_return");
+    public float disableTime = 2.5f;
+
+    public string abilityType;
+    public bool singleUse;
+    private bool _disabled;
+
+    private SpriteRenderer _renderer;
+    private AudioSource _source;
 
     private void Start()
     {
@@ -28,16 +27,19 @@ public class TemporaryAbilityGranter : MonoBehaviour
     private void OnTriggerStay2D(Collider2D other)
     {
         if (!other.gameObject.GetComponent<HeroController>()) return;
-        
+
         if (_disabled) return;
         CustomObjects.TemporaryAbilities.Add(abilityType);
-        if (singleUse) Destroy(gameObject);
+        if (singleUse)
+        {
+            Destroy(gameObject);
+        }
         else
         {
             _disabled = true;
             StartCoroutine(TempDisable());
         }
-        
+
         CustomObjects.CollectAbilityGranter(abilityType);
         _source.pitch = 1;
         _source.PlayOneShot(Use);

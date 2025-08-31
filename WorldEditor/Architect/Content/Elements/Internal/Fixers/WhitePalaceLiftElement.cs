@@ -11,7 +11,7 @@ internal sealed class WhitePalaceLiftElement : InternalPackElement
 {
     private GameObject _gameObject;
 
-    public WhitePalaceLiftElement(int weight) : base("White Palace Lift", "Interactable", weight:weight)
+    public WhitePalaceLiftElement(int weight) : base("White Palace Lift", "Interactable", weight)
     {
         WithConfigGroup(ConfigGroup.PalaceLift);
     }
@@ -41,20 +41,17 @@ internal sealed class WhitePalaceLiftElement : InternalPackElement
         var setVel = fsm.GetAction<SetVelocity2d>("Rise", 5);
 
         var move = new Vector2(config.xMove, config.yMove).normalized * 30;
-        
+
         rise.x = move.x;
         rise.y = move.y;
         setVel.vector = move;
 
         var endX = gameObject.transform.position.x + config.xMove;
         var endY = gameObject.transform.position.y + config.yMove;
-        
+
         fsm.DisableAction("Rise", 7);
 
-        fsm.InsertCustomAction("Rise", makerFsm =>
-        {
-            config.StartCoroutine(Rise(config, makerFsm, endX, endY));
-        }, 7);
+        fsm.InsertCustomAction("Rise", makerFsm => { config.StartCoroutine(Rise(config, makerFsm, endX, endY)); }, 7);
 
         var sp = fsm.GetAction<SetPosition>("Hit Top", 0);
         sp.x = endX;
@@ -71,7 +68,7 @@ internal sealed class WhitePalaceLiftElement : InternalPackElement
         while (!xMoved || !yMoved)
         {
             var pos = makerFsm.transform.position;
-            
+
             yMoved = config.yMove == 0 ||
                      (config.yMove > 0 && pos.y >= endY) ||
                      (config.yMove < 0 && pos.y <= endY);
@@ -82,6 +79,7 @@ internal sealed class WhitePalaceLiftElement : InternalPackElement
 
             yield return null;
         }
+
         makerFsm.SendEvent("TOP");
     }
 }

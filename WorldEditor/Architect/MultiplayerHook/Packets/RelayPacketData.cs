@@ -5,7 +5,7 @@ namespace Architect.MultiplayerHook.Packets;
 public class RelayPacketData : IPacketData
 {
     public string EventName;
-    
+
     public void WriteData(IPacket packet)
     {
         packet.Write(EventName);

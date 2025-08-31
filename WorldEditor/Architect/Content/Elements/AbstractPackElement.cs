@@ -7,25 +7,33 @@ namespace Architect.Content.Elements;
 
 public abstract class AbstractPackElement
 {
-    public abstract GameObject GetPrefab(bool flipped, float rotation);
+    private readonly string _category;
 
     private readonly string _name;
-    private readonly string _category;
-        
-    private bool _flipVertical;
-    private bool _flipHorizontal;
-    private string[] _broadcasterGroup = BroadcasterGroup.EmptyGroup;
-    private ReceiverGroup _receiverGroup = ReceiverGroup.Generic;
-    private ConfigGroup _configGroup = ConfigGroup.Generic;
-    private RotationGroup _rotationGroup = RotationGroup.None;
 
     internal readonly int Weight;
+    private string[] _broadcasterGroup = BroadcasterGroup.EmptyGroup;
+    private ConfigGroup _configGroup = ConfigGroup.Generic;
+    private bool _flipHorizontal;
+
+    private bool _flipVertical;
+    private ReceiverGroup _receiverGroup = ReceiverGroup.Generic;
+    private RotationGroup _rotationGroup = RotationGroup.None;
+
+    protected AbstractPackElement(string name, string category, int weight)
+    {
+        _name = name;
+        _category = category;
+        Weight = weight;
+    }
+
+    public abstract GameObject GetPrefab(bool flipped, float rotation);
 
     public virtual Sprite? GetSprite()
     {
         return null;
     }
-    
+
     internal string[] GetBroadcasterGroup()
     {
         return _broadcasterGroup;
@@ -80,13 +88,6 @@ public abstract class AbstractPackElement
         return _category;
     }
 
-    protected AbstractPackElement(string name, string category, int weight)
-    {
-        _name = name;
-        _category = category;
-        Weight = weight;
-    }
-
     public virtual bool OverrideFlip()
     {
         return false;
@@ -125,8 +126,12 @@ public abstract class AbstractPackElement
     }
 
     // After the object is spawned in
-    public virtual void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale) { }
-    
+    public virtual void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
+    {
+    }
+
     // After the preview is spawned in
-    public virtual void PostPlace(ObjectPlacement placement, GameObject preview) { }
+    public virtual void PostPlace(ObjectPlacement placement, GameObject preview)
+    {
+    }
 }

@@ -9,7 +9,8 @@ namespace Architect.Content.Elements.Internal.Fixers;
 
 internal sealed class LeverPackElement : GInternalPackElement
 {
-    public LeverPackElement(string scene, string path, string name, int weight = 0) : base(scene, path, name, "Interactable", weight)
+    public LeverPackElement(string scene, string path, string name, int weight = 0) : base(scene, path, name,
+        "Interactable", weight)
     {
         WithBroadcasterGroup(BroadcasterGroup.PersistentLevers);
         WithConfigGroup(ConfigGroup.Levers);
@@ -18,7 +19,7 @@ internal sealed class LeverPackElement : GInternalPackElement
     internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
     {
         base.AfterPreload(preloads);
-        
+
         var scale = GameObject.transform.localScale;
         scale.y = Mathf.Abs(scale.y);
         GameObject.transform.localScale = scale;
@@ -27,7 +28,7 @@ internal sealed class LeverPackElement : GInternalPackElement
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         var fsm = gameObject.LocateMyFSM("Switch Control");
-        
+
         var str = fsm.FsmVariables.FindFsmString("Player Data");
         if (str != null) str.Value = "";
 
@@ -35,7 +36,9 @@ internal sealed class LeverPackElement : GInternalPackElement
         {
             fsm.RemoveTransition("Activated", "FINISHED");
         }
-        catch (OverflowException) { }
+        catch (OverflowException)
+        {
+        }
 
         fsm.AddCustomAction("Activated", makerFsm =>
         {

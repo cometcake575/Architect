@@ -19,12 +19,16 @@ namespace Architect.MultiplayerHook;
 public class WeClientAddon : ClientAddon
 {
     private const int SplitSize = 600;
-    
+    private readonly Dictionary<int, byte[]> _packets = new();
+
     private IClientApi _api;
 
     private string _currentPacketGroup;
     private int _totalPacketCount;
-    private readonly Dictionary<int, byte[]> _packets = new();
+
+    protected override string Name => "Architect";
+    protected override string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString();
+    public override bool NeedsNetwork => true;
 
     public override void Initialize(IClientApi clientApi)
     {
@@ -50,13 +54,10 @@ public class WeClientAddon : ClientAddon
             {
                 var bytes = new byte[SplitSize * (_packets.Count - 1) + _packets[_packets.Count - 1].Length];
 
-                foreach (var data in _packets)
-                {
-                    data.Value.CopyTo(bytes, data.Key * SplitSize);
-                }
+                foreach (var data in _packets) data.Value.CopyTo(bytes, data.Key * SplitSize);
 
                 var json = ZipUtils.Unzip(bytes);
-                
+
                 SceneSaveLoader.Save("Architect/" + packet.SceneName, json);
 
                 if (packet.SceneName == GameManager.instance.sceneName)
@@ -88,7 +89,7 @@ public class WeClientAddon : ClientAddon
 
             var json = ZipUtils.Unzip(packet.Edits);
             var edit = JsonConvert.DeserializeObject<ObjectPlacement>(json);
-            
+
             if (packet.SceneName == GameManager.instance.sceneName)
             {
                 PlacementManager.GetCurrentPlacements().Add(edit);
@@ -96,7 +97,8 @@ public class WeClientAddon : ClientAddon
             }
             else
             {
-                SceneSaveLoader.ScheduleEdit(packet.SceneName, edit); // This will store it in a list to be added when the scene is next loaded, or saved when the game is next closed
+                SceneSaveLoader.ScheduleEdit(packet.SceneName,
+                    edit); // This will store it in a list to be added when the scene is next loaded, or saved when the game is next closed
             }
         });
 
@@ -107,7 +109,8 @@ public class WeClientAddon : ClientAddon
 
             if (packet.SceneName == GameManager.instance.sceneName)
             {
-                if (EditorManager.IsEditing) {
+                if (EditorManager.IsEditing)
+                {
                     var objects = PlacementManager.GetCurrentPlacements()
                         .Where(obj => obj.GetId() == packet.Id).ToArray();
 
@@ -120,7 +123,8 @@ public class WeClientAddon : ClientAddon
             }
             else
             {
-                SceneSaveLoader.ScheduleErase(packet.SceneName, packet.Id); // This will store it in a list to be added when the scene is next loaded, or saved when the game is next closed
+                SceneSaveLoader.ScheduleErase(packet.SceneName,
+                    packet.Id); // This will store it in a list to be added when the scene is next loaded, or saved when the game is next closed
             }
         });
 
@@ -146,7 +150,9 @@ public class WeClientAddon : ClientAddon
             }
             else
             {
-                SceneSaveLoader.ScheduleUpdate(packet.SceneName, packet.Id, new Vector3(packet.X, packet.Y, packet.Z)); // This will store it in a list to be added when the scene is next loaded, or saved when the game is next closed
+                SceneSaveLoader.ScheduleUpdate(packet.SceneName, packet.Id,
+                    new Vector3(packet.X, packet.Y,
+                        packet.Z)); // This will store it in a list to be added when the scene is next loaded, or saved when the game is next closed
             }
         });
     }
@@ -156,7 +162,7 @@ public class WeClientAddon : ClientAddon
         if (!_api.NetClient.IsConnected) return;
 
         Logger.Info("Sending Place Packet");
-        
+
         var json = JsonConvert.SerializeObject(placement,
             SceneSaveLoader.Opc,
             SceneSaveLoader.V3C);
@@ -175,9 +181,9 @@ public class WeClientAddon : ClientAddon
     public void Erase(string guid, string scene)
     {
         if (!_api.NetClient.IsConnected) return;
-        
+
         Logger.Info("Sending Erase Packet");
-        
+
         _api.NetClient.GetNetworkSender<PacketId>(this)
             .SendSingleData(PacketId.Erase, new ErasePacketData
             {
@@ -189,9 +195,9 @@ public class WeClientAddon : ClientAddon
     public void ClearRoom(string scene)
     {
         if (!_api.NetClient.IsConnected) return;
-        
+
         Logger.Info("Sending Clear Packet");
-        
+
         _api.NetClient.GetNetworkSender<PacketId>(this)
             .SendSingleData(PacketId.Clear, new ClearPacketData
             {
@@ -202,9 +208,9 @@ public class WeClientAddon : ClientAddon
     public void Update(string guid, string scene, Vector3 pos)
     {
         if (!_api.NetClient.IsConnected) return;
-        
+
         Logger.Info("Sending Update Packet");
-        
+
         _api.NetClient.GetNetworkSender<PacketId>(this)
             .SendSingleData(PacketId.Update, new UpdatePacketData
             {
@@ -219,7 +225,7 @@ public class WeClientAddon : ClientAddon
     public void BroadcastEvent(string name)
     {
         if (!_api.NetClient.IsConnected) return;
-        
+
         _api.NetClient.GetNetworkSender<PacketId>(this)
             .SendSingleData(PacketId.Relay, new RelayPacketData
             {
@@ -232,18 +238,18 @@ public class WeClientAddon : ClientAddon
         try
         {
             if (!_api.NetClient.IsConnected) return;
-        
+
             Logger.Info("Sending Refresh Packets");
-        
+
             var scene = GameManager.instance.sceneName;
             var json = SceneSaveLoader.SerializeSceneData(PlacementManager.GetCurrentPlacements());
-        
+
             var bytes = Split(ZipUtils.Zip(json), SplitSize);
-        
+
             var count = bytes.Length;
             var i = 0;
             var guid = Guid.NewGuid().ToString();
-        
+
             foreach (var byteGroup in bytes)
             {
                 _api.NetClient.GetNetworkSender<PacketId>(this)
@@ -264,16 +270,13 @@ public class WeClientAddon : ClientAddon
             Architect.Instance.LogError(e);
         }
     }
-    
+
     public static byte[][] Split(byte[] array, int size)
     {
-        var count = Mathf.CeilToInt((float) array.Length / size);
+        var count = Mathf.CeilToInt((float)array.Length / size);
         var bytes = new byte[count][];
-        
-        for (var i = 0; i < count; i++)
-        {
-            bytes[i] = array.Skip(i * size).Take(size).ToArray();
-        }
+
+        for (var i = 0; i < count; i++) bytes[i] = array.Skip(i * size).Take(size).ToArray();
 
         return bytes;
     }
@@ -281,14 +284,14 @@ public class WeClientAddon : ClientAddon
     public void BroadcastWin()
     {
         if (!_api.NetClient.IsConnected) return;
-        
+
         _api.NetClient.GetNetworkSender<PacketId>(this)
             .SendSingleData(PacketId.Win, new WinPacketData
             {
                 WinnerName = _api.ClientManager.Username
             });
     }
-    
+
     public IPacketData InstantiatePacket(PacketId packetId)
     {
         return packetId switch
@@ -303,8 +306,4 @@ public class WeClientAddon : ClientAddon
             _ => null
         };
     }
-
-    protected override string Name => "Architect";
-    protected override string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString();
-    public override bool NeedsNetwork => true;
 }

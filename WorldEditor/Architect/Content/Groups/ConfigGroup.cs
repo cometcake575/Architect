@@ -20,154 +20,182 @@ namespace Architect.Content.Groups;
 public class ConfigGroup
 {
     private static bool _initialized;
-    
+
     public static ConfigGroup Invisible;
-    
+
     public static ConfigGroup Generic;
-    
+
     public static ConfigGroup Benches;
-    
+
     public static ConfigGroup Transitions;
-    
+
     public static ConfigGroup LaserCrystal;
-    
+
     public static ConfigGroup Charm;
-    
+
     public static ConfigGroup Animated;
 
     public static ConfigGroup GeoChest;
-    
+
     public static ConfigGroup MovingWall;
-    
+
     public static ConfigGroup KeyListeners;
-    
+
     public static ConfigGroup Enemies;
-    
+
     public static ConfigGroup Goams;
-    
+
     public static ConfigGroup Wingsmould;
 
     public static ConfigGroup KillableEnemies;
-    
+
     public static ConfigGroup FlukeZoteling;
-    
+
     public static ConfigGroup Mantis;
-    
+
     public static ConfigGroup Twisters;
-    
+
     public static ConfigGroup Awakable;
-    
+
     public static ConfigGroup RadiancePlatforms;
-    
+
     public static ConfigGroup MassiveMc;
-    
+
     public static ConfigGroup GruzMother;
-    
+
     public static ConfigGroup VengeflyKing;
-    
+
     public static ConfigGroup Cocoon;
-    
+
     public static ConfigGroup Breakable;
-    
+
     public static ConfigGroup Levers;
-    
+
     public static ConfigGroup TollBench;
-    
+
     public static ConfigGroup Toll;
-    
+
     public static ConfigGroup Gravity;
-    
+
     public static ConfigGroup MovingObjects;
-    
+
     public static ConfigGroup Thorns;
-    
+
     public static ConfigGroup EnergyOrb;
-    
+
     public static ConfigGroup Platforms;
-    
+
     public static ConfigGroup TriggerZones;
-    
+
     public static ConfigGroup Interactions;
-    
+
     public static ConfigGroup VolatileZoteling;
-    
+
     public static ConfigGroup Tablets;
-    
+
     public static ConfigGroup BouncyMushrooms;
-    
+
     public static ConfigGroup Binoculars;
-    
+
     public static ConfigGroup CameraBorder;
-    
+
     public static ConfigGroup ZoteHead;
-    
+
     public static ConfigGroup Relays;
-    
+
     public static ConfigGroup Wind;
-    
+
     public static ConfigGroup Crystals;
-    
+
     public static ConfigGroup Abyss;
-    
+
     public static ConfigGroup VisibleAbyss;
-    
+
     public static ConfigGroup Grub;
-    
+
     public static ConfigGroup BattleGate;
-    
+
     public static ConfigGroup ShieldGate;
-    
+
     public static ConfigGroup BrokenVessel;
-    
+
     public static ConfigGroup Bindings;
-    
+
     public static ConfigGroup Conveyors;
-    
+
     public static ConfigGroup FallingCrystals;
-    
+
     public static ConfigGroup RoomClearer;
-    
+
     public static ConfigGroup ObjectRemover;
-    
+
     public static ConfigGroup HazardRespawnPoint;
-    
+
     public static ConfigGroup RepeatNpcs;
-    
+
     public static ConfigGroup Npcs;
-    
+
     public static ConfigGroup Feather;
-    
+
     public static ConfigGroup Midwife;
-    
+
     public static ConfigGroup Timers;
-    
+
     public static ConfigGroup Decorations;
-    
+
     public static ConfigGroup Stretchable;
-    
+
     public static ConfigGroup DreamBlocks;
-    
+
     public static ConfigGroup Colours;
-    
+
     public static ConfigGroup Shapes;
-    
+
     public static ConfigGroup Png;
-    
+
     public static ConfigGroup Wav;
-    
+
     public static ConfigGroup Mov;
-    
+
     public static ConfigGroup TextDisplay;
-    
+
     public static ConfigGroup Choice;
-    
+
     public static ConfigGroup ObjectMover;
-    
+
     public static ConfigGroup ObjectDuplicator;
-    
+
     public static ConfigGroup ColosseumPlatform;
-    
+
     public static ConfigGroup PalaceLift;
+
+    private static readonly Dictionary<string, string> CustomTexts = new();
+
+    public readonly ConfigType[] Types;
+
+    public ConfigGroup(ConfigGroup[] parents, params ConfigType[] types)
+    {
+        var list = types.ToList();
+
+        foreach (var parent in parents)
+        foreach (var type in parent.Types)
+        {
+            if (list.Contains(type)) continue;
+            list.Add(type);
+        }
+
+        Types = list.ToArray();
+    }
+
+    public ConfigGroup(ConfigGroup parent, params ConfigType[] types)
+    {
+        Types = types.Concat(parent.Types).ToArray();
+    }
+
+    public ConfigGroup(params ConfigType[] types)
+    {
+        Types = types;
+    }
 
     public static void Initialize()
     {
@@ -240,45 +268,28 @@ public class ConfigGroup
         Transitions = new ConfigGroup(Invisible,
             Attributes.ConfigManager.RegisterConfigType(
                 new ChoiceConfigType("Gate Type",
-                    (o, value) =>
-                    {
-                        o.GetComponent<CustomTransitionPoint>().pointType = value.GetValue();
-                    }, "Door", "Left", "Right", "Top", "Bottom").WithDefaultValue(0).PreAwake(),
+                    (o, value) => { o.GetComponent<CustomTransitionPoint>().pointType = value.GetValue(); }, "Door",
+                    "Left", "Right", "Top", "Bottom").WithDefaultValue(0).PreAwake(),
                 "trans_dir"),
             Attributes.ConfigManager.RegisterConfigType(
                 new StringConfigType("Door ID",
-                    (o, value) =>
-                    {
-                        o.name = value.GetValue();
-                    }),
+                    (o, value) => { o.name = value.GetValue(); }),
                 "trans_door"),
             Attributes.ConfigManager.RegisterConfigType(
                 new StringConfigType("Target Door ID",
-                    (o, value) =>
-                    {
-                        o.GetComponent<TransitionPoint>().entryPoint = value.GetValue();
-                    }),
+                    (o, value) => { o.GetComponent<TransitionPoint>().entryPoint = value.GetValue(); }),
                 "trans_other_door"),
             Attributes.ConfigManager.RegisterConfigType(
                 new StringConfigType("Target Scene",
-                    (o, value) =>
-                    {
-                        o.GetComponent<TransitionPoint>().targetScene = value.GetValue();
-                    }),
+                    (o, value) => { o.GetComponent<TransitionPoint>().targetScene = value.GetValue(); }),
                 "trans_other_room"),
             Attributes.ConfigManager.RegisterConfigType(
                 new FloatConfigType("Entry Delay",
-                    (o, value) =>
-                    {
-                        o.GetComponent<TransitionPoint>().entryDelay = value.GetValue();
-                    }),
+                    (o, value) => { o.GetComponent<TransitionPoint>().entryDelay = value.GetValue(); }),
                 "trans_delay"),
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Collision Trigger",
-                    (o, value) =>
-                    {
-                        o.GetComponent<TransitionPoint>().isADoor = !value.GetValue();
-                    }),
+                    (o, value) => { o.GetComponent<TransitionPoint>().isADoor = !value.GetValue(); }),
                 "trans_collision")
         );
 
@@ -340,17 +351,11 @@ public class ConfigGroup
         Animated = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(
                 new FloatConfigType("Speed",
-                    (o, value) =>
-                    {
-                        o.GetComponentInChildren<Animator>().speed = value.GetValue();
-                    }),
+                    (o, value) => { o.GetComponentInChildren<Animator>().speed = value.GetValue(); }),
                 "animator_speed"),
             Attributes.ConfigManager.RegisterConfigType(
                 new FloatConfigType("Offset",
-                    (o, value) =>
-                    {
-                        o.AddComponent<AnimatorDelay>().delay = value.GetValue();
-                    }), "animator_offset"),
+                    (o, value) => { o.AddComponent<AnimatorDelay>().delay = value.GetValue(); }), "animator_offset"),
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Culling Enabled",
                     (o, value) =>
@@ -361,6 +366,7 @@ public class ConfigGroup
                             anim.cullingMode = AnimatorCullingMode.CullCompletely;
                             return;
                         }
+
                         anim.cullingMode = AnimatorCullingMode.AlwaysAnimate;
                     }).WithDefaultValue(false), "animator_sync")
         );
@@ -412,17 +418,13 @@ public class ConfigGroup
         PalaceLift = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(
                 new FloatConfigType("Y Travel Distance",
-                    (o, value) =>
-                    {
-                        o.GetComponent<WpLiftConfig>().yMove = value.GetValue();
-                    }).WithDefaultValue(20).PreAwake(),
+                        (o, value) => { o.GetComponent<WpLiftConfig>().yMove = value.GetValue(); }).WithDefaultValue(20)
+                    .PreAwake(),
                 "palace_lift_y"),
             Attributes.ConfigManager.RegisterConfigType(
                 new FloatConfigType("X Travel Distance",
-                    (o, value) =>
-                    {
-                        o.GetComponent<WpLiftConfig>().xMove = value.GetValue();
-                    }).WithDefaultValue(0).PreAwake(),
+                        (o, value) => { o.GetComponent<WpLiftConfig>().xMove = value.GetValue(); }).WithDefaultValue(0)
+                    .PreAwake(),
                 "palace_lift_x")
         );
 
@@ -450,16 +452,11 @@ public class ConfigGroup
         MovingWall = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(
                 new FloatConfigType("Move Distance",
-                    (o, value) =>
-                    {
-                        o.GetComponent<CustomWallMover>().moveDistance = value.GetValue();
-                    }), "wall_dist"),
+                    (o, value) => { o.GetComponent<CustomWallMover>().moveDistance = value.GetValue(); }), "wall_dist"),
             Attributes.ConfigManager.RegisterConfigType(
                 new FloatConfigType("Move Speed",
-                    (o, value) =>
-                    {
-                        o.GetComponent<CustomWallMover>().moveSpeed = value.GetValue();
-                    }).PreAwake(), "wall_speed")
+                    (o, value) => { o.GetComponent<CustomWallMover>().moveSpeed = value.GetValue(); }).PreAwake(),
+                "wall_speed")
         );
 
         var enemyTypeField =
@@ -480,10 +477,12 @@ public class ConfigGroup
                 new FloatConfigType("Alert Range Multiplier",
                         (o, value) =>
                         {
-                            var range = o.GetComponentInChildren<AlertRange>()?.transform ?? o.transform.Find("Alert Range");
+                            var range = o.GetComponentInChildren<AlertRange>()?.transform ??
+                                        o.transform.Find("Alert Range");
                             range.localScale *= value.GetValue();
                         })
-                    .WithCondition(o => o.GetComponentInChildren<AlertRange>() || o.transform.Find("Alert Range")), "alert_range_trigger")
+                    .WithCondition(o => o.GetComponentInChildren<AlertRange>() || o.transform.Find("Alert Range")),
+                "alert_range_trigger")
         );
 
         Goams = new ConfigGroup(Generic,
@@ -508,23 +507,19 @@ public class ConfigGroup
                 new IntConfigType("Health",
                     (o, value) => { o.GetComponent<HealthManager>().hp = Mathf.Abs(value.GetValue()); }),
                 "enemy_health"),
-
             Attributes.ConfigManager.RegisterConfigType(
                 new IntConfigType("Large Geo Drops",
                     (o, value) => { o.GetComponent<HealthManager>().SetGeoLarge(Mathf.Abs(value.GetValue())); }),
                 "enemy_large_geo"),
-
             Attributes.ConfigManager.RegisterConfigType(
                 new IntConfigType("Medium Geo Drops",
                     (o, value) => { o.GetComponent<HealthManager>().SetGeoMedium(Mathf.Abs(value.GetValue())); }),
                 "enemy_med_geo"),
-
             Attributes.ConfigManager.RegisterConfigType(
                 new IntConfigType("Small Geo Drops",
                     (o, value) => { o.GetComponent<HealthManager>().SetGeoSmall(Mathf.Abs(value.GetValue())); }),
                 "enemy_small_geo"),
-
-            Attributes.ConfigManager.RegisterConfigType(MakePersistenceConfigType("Stay Dead", (o) =>
+            Attributes.ConfigManager.RegisterConfigType(MakePersistenceConfigType("Stay Dead", o =>
             {
                 var item = o.GetComponent<PersistentBoolItem>();
                 item.OnSetSaveState += b => { o.GetComponent<HealthManager>().isDead = b; };
@@ -560,10 +555,7 @@ public class ConfigGroup
                 }
 
                 var child = o.LocateMyFSM("Mantis Flyer");
-                if (child)
-                {
-                    child.SendEvent("TOOK DAMAGE");
-                }
+                if (child) child.SendEvent("TOOK DAMAGE");
             }), "ignore_lords_respect")
         );
 
@@ -601,10 +593,7 @@ public class ConfigGroup
                 if (!value.GetValue()) return;
                 var mossy = o.LocateMyFSM("Mossy Control");
                 for (var i = 3; i < 6; i++) mossy.DisableAction("Roar", 3);
-                mossy.InsertCustomAction("Roar", fsm =>
-                {
-                    fsm.SendEvent("FINISHED");
-                }, 8);
+                mossy.InsertCustomAction("Roar", fsm => { fsm.SendEvent("FINISHED"); }, 8);
             }), "mcc_no_roar"),
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Start Awake", (o, value) =>
             {
@@ -697,21 +686,27 @@ public class ConfigGroup
         );
 
         LaserCrystal = new ConfigGroup(MovingObjects,
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Start Pause", (o, value) =>
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Start Pause",
+                (o, value) =>
                 {
                     o.LocateMyFSM("Laser Bug").FsmVariables.FindFsmFloat("Start Pause").Value = value.GetValue();
                 }
             ), "beam_start_time"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Idle Time", (o, value) =>
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Idle Time",
+                (o, value) =>
                 {
                     o.LocateMyFSM("Laser Bug").FsmVariables.FindFsmFloat("Idle Time").Value = value.GetValue();
                 }
             ), "beam_idle_time"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Charge Time", (o, value) => {
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Charge Time",
+                (o, value) =>
+                {
                     o.LocateMyFSM("Laser Bug").FsmVariables.FindFsmFloat("Antic Time").Value = value.GetValue();
                 }
             ), "beam_charge_time"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Beam Time", (o, value) => {
+            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Beam Time",
+                (o, value) =>
+                {
                     o.LocateMyFSM("Laser Bug").FsmVariables.FindFsmFloat("Beam Time").Value = value.GetValue();
                 }
             ), "beam_beam_time"),
@@ -724,7 +719,8 @@ public class ConfigGroup
         );
 
         Levers = new ConfigGroup(Generic,
-            Attributes.ConfigManager.RegisterConfigType(MakePersistenceConfigType("Stay Activated"), "levers_stay_active")
+            Attributes.ConfigManager.RegisterConfigType(MakePersistenceConfigType("Stay Activated"),
+                "levers_stay_active")
         );
 
         TollBench = new ConfigGroup(Levers,
@@ -743,14 +739,13 @@ public class ConfigGroup
         );
 
         Toll = new ConfigGroup(TollBench,
-            
             Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Text", (o, value) =>
             {
                 var fsm = o.LocateMyFSM("Toll Machine");
-                
+
                 var id = "Custom Toll Text " + o.name;
                 CustomTexts[id] = value.GetValue();
-                
+
                 fsm.InsertAction("Send Text", new SetStringValue
                 {
                     stringVariable = fsm.FsmVariables.GetFsmString("Prompt Convo"),
@@ -766,18 +761,18 @@ public class ConfigGroup
                 o.RemoveComponent<Collider2D>();
             }), "disable_collision");
         Thorns = new ConfigGroup(Colours,
-            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Damage Amount", (o, value) =>
-            {
-                o.GetOrAddComponent<CustomDamager>().damageAmount = value.GetValue();
-            }), "thorns_damage"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new IntConfigType("Damage Amount",
+                    (o, value) => { o.GetOrAddComponent<CustomDamager>().damageAmount = value.GetValue(); }),
+                "thorns_damage"),
             disableCollision
         );
 
-        var fallthrough = Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Fallthrough Time", (o, value) =>
-        {
-            o.AddComponent<Fallthrough>().fallthroughTime = value.GetValue();
-        }), "fallthrough_time");
-        
+        var fallthrough = Attributes.ConfigManager.RegisterConfigType(
+            new FloatConfigType("Fallthrough Time",
+                (o, value) => { o.AddComponent<Fallthrough>().fallthroughTime = value.GetValue(); }),
+            "fallthrough_time");
+
         Platforms = new ConfigGroup(MovingObjects,
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Stick Player", (o, value) =>
             {
@@ -803,14 +798,15 @@ public class ConfigGroup
             }).WithDefaultValue(true), "radplat_start_up")
         );
 
-        ModHooks.LanguageGetHook += (key, _, orig) => CustomTexts.TryGetValue(key, out var customText) ? customText : orig;
+        ModHooks.LanguageGetHook +=
+            (key, _, orig) => CustomTexts.TryGetValue(key, out var customText) ? customText : orig;
 
         Tablets = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Content", (o, value) =>
             {
                 var fsm = o.LocateMyFSM("Inspection");
                 var id = "Custom Tablet " + o.name;
-                
+
                 fsm.FsmVariables.GetFsmString("Convo Name").Value = id;
                 fsm.FsmVariables.GetFsmString("Sheet Name").Value = "Custom";
                 CustomTexts[id] = value.GetValue();
@@ -842,13 +838,11 @@ public class ConfigGroup
             idleRoutine?.SetValue(self, self.StartCoroutine((IEnumerator)idle?.Invoke(self, [])));
 
             foreach (var ced in self.GetComponentsInChildren<CollisionEnterEvent>())
-            {
                 ced.OnCollisionEnteredDirectional += (direction, _) =>
                 {
                     if (direction == CollisionEnterEvent.Direction.Top) HeroController.instance.SendMessage("Bounce");
                     bounceSmall?.Invoke(self, []);
                 };
-            }
         };
         BouncyMushrooms = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Side Bounces", (o, value) =>
@@ -859,106 +853,98 @@ public class ConfigGroup
         );
 
         Binoculars = new ConfigGroup(Generic,
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Camera Speed", (o, value) =>
-            {
-                o.GetComponent<Binoculars>().speed = value.GetValue() * 10;
-            }).WithDefaultValue(2), "freecam_speed"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Start Zoom", (o, value) =>
-            {
-                o.GetComponent<Binoculars>().startZoom = value.GetValue();
-            }), "freecam_start_zoom"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Zoom Minimum", (o, value) =>
-            {
-                o.GetComponent<Binoculars>().minZoom = value.GetValue();
-            }), "freecam_min_zoom"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Zoom Maximum", (o, value) =>
-            {
-                o.GetComponent<Binoculars>().maxZoom = value.GetValue();
-            }), "freecam_max_zoom"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Start Offset X", (o, value) =>
-            {
-                o.GetComponent<Binoculars>().startOffset.x = value.GetValue();
-            }), "freecam_offset_x"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Start Offset Y", (o, value) =>
-            {
-                o.GetComponent<Binoculars>().startOffset.y = value.GetValue();
-            }), "freecam_offset_y")
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Camera Speed",
+                    (o, value) => { o.GetComponent<Binoculars>().speed = value.GetValue() * 10; }).WithDefaultValue(2),
+                "freecam_speed"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Start Zoom",
+                    (o, value) => { o.GetComponent<Binoculars>().startZoom = value.GetValue(); }),
+                "freecam_start_zoom"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Zoom Minimum",
+                    (o, value) => { o.GetComponent<Binoculars>().minZoom = value.GetValue(); }), "freecam_min_zoom"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Zoom Maximum",
+                    (o, value) => { o.GetComponent<Binoculars>().maxZoom = value.GetValue(); }), "freecam_max_zoom"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Start Offset X",
+                    (o, value) => { o.GetComponent<Binoculars>().startOffset.x = value.GetValue(); }),
+                "freecam_offset_x"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Start Offset Y",
+                    (o, value) => { o.GetComponent<Binoculars>().startOffset.y = value.GetValue(); }),
+                "freecam_offset_y")
         );
 
         CameraBorder = new ConfigGroup(Invisible,
-            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Border Type", (o, value) =>
-            {
-                o.GetComponent<CameraBorder>().type = value.GetValue();
-            }, "Left", "Right", "Top", "Bottom"), "camera_border_type")
+            Attributes.ConfigManager.RegisterConfigType(
+                new ChoiceConfigType("Border Type",
+                    (o, value) => { o.GetComponent<CameraBorder>().type = value.GetValue(); }, "Left", "Right", "Top",
+                    "Bottom"), "camera_border_type")
         );
 
-        var pngName = Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Source URL", (o, value) =>
-        {
-            o.GetComponent<PngObject>().url = value.GetValue();
-        }).PreAwake(), "png_name");
-        var filter = Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Filter", (o, value) =>
-        {
-            o.GetComponent<PngObject>().point = value.GetValue() == 0;
-        }, "Point", "Bilinear").WithDefaultValue(1).PreAwake(), "png_filter");
-        var ppu = Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Pixels Per Unit", (o, value) =>
-        {
-            o.GetComponent<PngObject>().ppu = value.GetValue();
-        }).PreAwake(), "png_ppu");
+        var pngName = Attributes.ConfigManager.RegisterConfigType(
+            new StringConfigType("Source URL", (o, value) => { o.GetComponent<PngObject>().url = value.GetValue(); })
+                .PreAwake(), "png_name");
+        var filter = Attributes.ConfigManager.RegisterConfigType(
+            new ChoiceConfigType("Filter", (o, value) => { o.GetComponent<PngObject>().point = value.GetValue() == 0; },
+                "Point", "Bilinear").WithDefaultValue(1).PreAwake(), "png_filter");
+        var ppu = Attributes.ConfigManager.RegisterConfigType(
+            new FloatConfigType("Pixels Per Unit",
+                (o, value) => { o.GetComponent<PngObject>().ppu = value.GetValue(); }).PreAwake(), "png_ppu");
         Png = new ConfigGroup(Colours,
             pngName,
             filter,
             ppu
         );
-        
+
         EnergyOrb = new ConfigGroup(MovingObjects,
-            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Damage Type", (o, value) =>
-            {
-                o.GetOrAddComponent<CustomDamager>().damageType = value.GetValue() * 2;
-            }, "Enemy", "Hazard"), "energy_orb_type"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new ChoiceConfigType("Damage Type",
+                    (o, value) => { o.GetOrAddComponent<CustomDamager>().damageType = value.GetValue() * 2; }, "Enemy",
+                    "Hazard"), "energy_orb_type"),
             pngName,
             filter,
             ppu
         );
 
         Wav = new ConfigGroup(Invisible,
-            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Clip URL", (o, value) =>
-            {
-                o.GetComponent<WavObject>().url = value.GetValue();
-            }).PreAwake(), "wav_url"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Clip Volume", (o, value) =>
-            {
-                o.GetComponent<WavObject>().volume = value.GetValue();
-            }), "wav_volume")
+            Attributes.ConfigManager.RegisterConfigType(
+                new StringConfigType("Clip URL", (o, value) => { o.GetComponent<WavObject>().url = value.GetValue(); })
+                    .PreAwake(), "wav_url"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Clip Volume",
+                    (o, value) => { o.GetComponent<WavObject>().volume = value.GetValue(); }), "wav_volume")
         );
 
         Mov = new ConfigGroup(Invisible,
-            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Video URL", (o, value) =>
-            {
-                o.GetComponent<MovObject>().url = value.GetValue();
-            }).PreAwake(), "mov_url"),
-            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Play on Start", (o, value) =>
-            {
-                o.GetComponent<MovObject>().playOnStart = value.GetValue();
-            }).PreAwake(), "mov_start_playing"),
-            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Loop Video", (o, value) =>
-            {
-                o.GetComponent<VideoPlayer>().isLooping = value.GetValue();
-            }).PreAwake(), "mov_looping"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Playback Speed", (o, value) =>
-            {
-                o.GetComponent<VideoPlayer>().playbackSpeed = value.GetValue();
-            }).PreAwake(), "mov_speed"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new StringConfigType("Video URL", (o, value) => { o.GetComponent<MovObject>().url = value.GetValue(); })
+                    .PreAwake(), "mov_url"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Play on Start",
+                    (o, value) => { o.GetComponent<MovObject>().playOnStart = value.GetValue(); }).PreAwake(),
+                "mov_start_playing"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Loop Video",
+                    (o, value) => { o.GetComponent<VideoPlayer>().isLooping = value.GetValue(); }).PreAwake(),
+                "mov_looping"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Playback Speed",
+                    (o, value) => { o.GetComponent<VideoPlayer>().playbackSpeed = value.GetValue(); }).PreAwake(),
+                "mov_speed"),
             layerType,
             zOffset
         );
 
         List<Sprite> headSprites =
         [
-            ResourceUtils.LoadInternal("knight_head", ppu:64),
-            ResourceUtils.LoadInternal("nosk_head", ppu:64),
-            ResourceUtils.LoadInternal("hornet_head", ppu:64),
-            ResourceUtils.LoadInternal("grub", ppu:192),
-            ResourceUtils.LoadInternal("inverted_zote", ppu:64)
+            ResourceUtils.LoadInternal("knight_head", ppu: 64),
+            ResourceUtils.LoadInternal("nosk_head", ppu: 64),
+            ResourceUtils.LoadInternal("hornet_head", ppu: 64),
+            ResourceUtils.LoadInternal("grub", ppu: 192),
+            ResourceUtils.LoadInternal("inverted_zote", ppu: 64)
         ];
         ZoteHead = new ConfigGroup(Gravity,
             Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Mode", (o, value) =>
@@ -979,7 +965,7 @@ public class ConfigGroup
                     if (value.GetValue()) o.GetComponent<VhEffects>().ForceDisable();
                 }).WithDefaultValue(true), "ignore_vh"
             );
-        
+
         Abyss = new ConfigGroup(Invisible, ignoreVoidHeart);
 
         VisibleAbyss = new ConfigGroup(Generic, ignoreVoidHeart);
@@ -1009,16 +995,18 @@ public class ConfigGroup
         ShieldGate = new ConfigGroup(
             BattleGate,
             Attributes.ConfigManager.RegisterConfigType(
-                new FloatConfigType("Close Time", (o, value) =>
-                {
-                    o.LocateMyFSM("FSM").FsmVariables.FindFsmFloat("Up Time").Value = value.GetValue();
-                }), "shield_close_time"
+                new FloatConfigType("Close Time",
+                    (o, value) =>
+                    {
+                        o.LocateMyFSM("FSM").FsmVariables.FindFsmFloat("Up Time").Value = value.GetValue();
+                    }), "shield_close_time"
             ),
             Attributes.ConfigManager.RegisterConfigType(
-                new FloatConfigType("Open Time", (o, value) =>
-                {
-                    o.LocateMyFSM("FSM").FsmVariables.FindFsmFloat("Down Time").Value = value.GetValue();
-                }), "shield_open_time"
+                new FloatConfigType("Open Time",
+                    (o, value) =>
+                    {
+                        o.LocateMyFSM("FSM").FsmVariables.FindFsmFloat("Down Time").Value = value.GetValue();
+                    }), "shield_open_time"
             )
         );
 
@@ -1183,10 +1171,9 @@ public class ConfigGroup
         ObjectRemover = new ConfigGroup(
             Invisible,
             Attributes.ConfigManager.RegisterConfigType(
-                new StringConfigType("Path", (o, value) =>
-                {
-                    o.GetOrAddComponent<ObjectRemoverConfig>().objectPath = value.GetValue();
-                }).PreAwake(), "remover_path"
+                new StringConfigType("Path",
+                        (o, value) => { o.GetOrAddComponent<ObjectRemoverConfig>().objectPath = value.GetValue(); })
+                    .PreAwake(), "remover_path"
             )
         );
 
@@ -1203,30 +1190,29 @@ public class ConfigGroup
 
         Npcs = new ConfigGroup(
             Generic,
-            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("First Convo", (o, value) =>
-            {
-                CustomTexts[o.GetComponent<NpcEditor>().SetFirstConvo()] = value.GetValue();
-            }), "npcs_first_convo")
+            Attributes.ConfigManager.RegisterConfigType(
+                new StringConfigType("First Convo",
+                    (o, value) => { CustomTexts[o.GetComponent<NpcEditor>().SetFirstConvo()] = value.GetValue(); }),
+                "npcs_first_convo")
         );
 
         RepeatNpcs = new ConfigGroup(
             Npcs,
-            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Repeat Convo", (o, value) =>
-            {
-                CustomTexts[o.GetComponent<NpcEditor>().SetRepeatConvo()] = value.GetValue();
-            }), "npcs_repeat_convo")
+            Attributes.ConfigManager.RegisterConfigType(
+                new StringConfigType("Repeat Convo",
+                    (o, value) => { CustomTexts[o.GetComponent<NpcEditor>().SetRepeatConvo()] = value.GetValue(); }),
+                "npcs_repeat_convo")
         );
 
         Feather = new ConfigGroup(
             Generic,
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Flight Time", (o, value) =>
-            {
-                o.GetComponent<Feather>().featherTime = value.GetValue();
-            }), "feather_fly_time"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Respawn Time", (o, value) =>
-            {
-                o.GetComponent<Feather>().respawnTime = value.GetValue();
-            }), "feather_respawn_time")
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Flight Time",
+                    (o, value) => { o.GetComponent<Feather>().featherTime = value.GetValue(); }), "feather_fly_time"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Respawn Time",
+                    (o, value) => { o.GetComponent<Feather>().respawnTime = value.GetValue(); }),
+                "feather_respawn_time")
         );
 
         Midwife = new ConfigGroup(
@@ -1235,7 +1221,7 @@ public class ConfigGroup
             {
                 var fsm = o.transform.GetChild(1).gameObject.LocateMyFSM("Conversation Control");
                 var id = "Custom Midwife " + o.name;
-                
+
                 fsm.DisableAction("Convo Choice", 1);
                 fsm.DisableAction("Convo Choice", 2);
                 fsm.DisableAction("Convo Choice", 3);
@@ -1246,29 +1232,25 @@ public class ConfigGroup
             }), "midwife_convo"),
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Start Angered", (o, value) =>
             {
-                if (value.GetValue()) o.transform.GetChild(1).gameObject.LocateMyFSM("Conversation Control").AddCustomAction("Idle", fsm =>
-                {
-                    fsm.SetState("Talk Finish");
-                });
+                if (value.GetValue())
+                    o.transform.GetChild(1).gameObject.LocateMyFSM("Conversation Control")
+                        .AddCustomAction("Idle", fsm => { fsm.SetState("Talk Finish"); });
             }), "midwife_angered")
         );
 
         Timers = new ConfigGroup(
             Invisible,
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Start Delay", (o, value) =>
-            {
-                o.GetComponent<Timer>().startDelay = value.GetValue();
-            }), "timer_start"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Repeat Delay", (o, value) =>
-            {
-                o.GetComponent<Timer>().repeatDelay = value.GetValue();
-            }), "timer_delay"),
-            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Max Calls", (o, value) =>
-            {
-                o.GetComponent<Timer>().maxCalls = value.GetValue();
-            }), "timer_max_calls")
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Start Delay",
+                    (o, value) => { o.GetComponent<Timer>().startDelay = value.GetValue(); }), "timer_start"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Repeat Delay",
+                    (o, value) => { o.GetComponent<Timer>().repeatDelay = value.GetValue(); }), "timer_delay"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new IntConfigType("Max Calls", (o, value) => { o.GetComponent<Timer>().maxCalls = value.GetValue(); }),
+                "timer_max_calls")
         );
-        
+
         KeyListeners = new ConfigGroup(
             Invisible,
             Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Key", (o, value) =>
@@ -1276,21 +1258,19 @@ public class ConfigGroup
                 if (!Enum.TryParse<KeyCode>(value.GetValue(), true, out var key)) return;
                 o.GetComponent<KeyListener>().key = key;
             }), "keylistener_key"),
-            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Type", (o, value) =>
-            {
-                o.GetComponent<KeyListener>().listenMode = value.GetValue();
-            }, "Press", "Release", "Hold"), "keylistener_type")
+            Attributes.ConfigManager.RegisterConfigType(
+                new ChoiceConfigType("Type",
+                    (o, value) => { o.GetComponent<KeyListener>().listenMode = value.GetValue(); }, "Press", "Release",
+                    "Hold"), "keylistener_type")
         );
 
         Stretchable = new ConfigGroup(Invisible,
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("width", (o, value) =>
-            {
-                o.transform.SetScaleX(o.transform.GetScaleX() * value.GetValue());
-            }), "width"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("height", (o, value) =>
-            {
-                o.transform.SetScaleY(o.transform.GetScaleY() * value.GetValue());
-            }), "height")
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("width",
+                    (o, value) => { o.transform.SetScaleX(o.transform.GetScaleX() * value.GetValue()); }), "width"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("height",
+                    (o, value) => { o.transform.SetScaleY(o.transform.GetScaleY() * value.GetValue()); }), "height")
         );
 
         DreamBlocks = new ConfigGroup([Generic, Stretchable],
@@ -1300,53 +1280,47 @@ public class ConfigGroup
                 o.GetComponent<DreamBlock>().SetupParticles();
             }).WithDefaultValue(true), "dreamblock_particles")
         );
-        
+
         Wind = new ConfigGroup(Stretchable, Attributes.ConfigManager.RegisterConfigType(
-                new FloatConfigType("Wind Speed", (o, value) =>
-                {
-                    o.GetComponent<Wind>().speed = value.GetValue() * 10; 
-                }).PreAwake(), "wind_speed"), Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Wind Speed",
+                    (o, value) => { o.GetComponent<Wind>().speed = value.GetValue() * 10; }).PreAwake(), "wind_speed"),
+            Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Show Particles", (o, value) =>
                 {
                     if (!value.GetValue()) return;
                     o.GetComponent<Wind>().SetupParticles();
                 }).WithDefaultValue(true), "wind_particles"),
-                Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("r", (o, value) =>
-                {
-                    o.GetComponent<Wind>().r = value.GetValue();
-                }).PreAwake(), "wind_r"),
-                Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("g", (o, value) =>
-                {
-                    o.GetComponent<Wind>().g = value.GetValue();
-                }).PreAwake(), "wind_g"),
-                Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("b", (o, value) =>
-                {
-                    o.GetComponent<Wind>().b = value.GetValue();
-                }).PreAwake(), "wind_b"),
-                Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("a", (o, value) =>
-                {
-                    o.GetComponent<Wind>().a = value.GetValue();
-                }).PreAwake(), "wind_a"),
-                zOffset,
-                Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Affects Player", (o, value) =>
-                {
-                    o.GetComponent<Wind>().affectsPlayer = value.GetValue();
-                }), "wind_affects_player"),
-                Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Affects Enemies", (o, value) =>
-                {
-                    o.GetComponent<Wind>().affectsEnemies = value.GetValue();
-                }), "wind_affects_enemies"),
-                Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Affects Projectiles", (o, value) =>
-                {
-                    o.GetComponent<Wind>().affectsProjectiles = value.GetValue();
-                }), "wind_affects_proj")
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("r", (o, value) => { o.GetComponent<Wind>().r = value.GetValue(); }).PreAwake(),
+                "wind_r"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("g", (o, value) => { o.GetComponent<Wind>().g = value.GetValue(); }).PreAwake(),
+                "wind_g"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("b", (o, value) => { o.GetComponent<Wind>().b = value.GetValue(); }).PreAwake(),
+                "wind_b"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("a", (o, value) => { o.GetComponent<Wind>().a = value.GetValue(); }).PreAwake(),
+                "wind_a"),
+            zOffset,
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Affects Player",
+                    (o, value) => { o.GetComponent<Wind>().affectsPlayer = value.GetValue(); }), "wind_affects_player"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Affects Enemies",
+                    (o, value) => { o.GetComponent<Wind>().affectsEnemies = value.GetValue(); }),
+                "wind_affects_enemies"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Affects Projectiles",
+                    (o, value) => { o.GetComponent<Wind>().affectsProjectiles = value.GetValue(); }),
+                "wind_affects_proj")
         );
-        
+
         Crystals = new ConfigGroup(Generic,
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Respawn Time", (o, value) =>
-            {
-                o.GetComponent<TemporaryAbilityGranter>().disableTime = value.GetValue();
-            }), "crystal_respawn_time")
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Respawn Time",
+                    (o, value) => { o.GetComponent<TemporaryAbilityGranter>().disableTime = value.GetValue(); }),
+                "crystal_respawn_time")
         );
 
         var activeRegion = LayerMask.NameToLayer("ActiveRegion");
@@ -1359,34 +1333,31 @@ public class ConfigGroup
 
                 o.layer = val == 3 ? activeRegion : softTerrain;
             }, "Player", "Nail Swing", "Enemy", "Zote Head", "Trigger Zone"), "trigger_mode"),
-            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Trigger Layer", (o, value) =>
-            {
-                o.GetComponent<TriggerZone>().layer = value.GetValue();
-            }), "trigger_layer")
+            Attributes.ConfigManager.RegisterConfigType(
+                new IntConfigType("Trigger Layer",
+                    (o, value) => { o.GetComponent<TriggerZone>().layer = value.GetValue(); }), "trigger_layer")
         );
-        
+
         Interactions = new ConfigGroup(Stretchable,
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Label X Offset", (o, value) =>
-            {
-                o.GetComponent<Interaction>().xOffset = value.GetValue();
-            }), "interaction_x_offset"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Label Y Offset", (o, value) =>
-            {
-                o.GetComponent<Interaction>().yOffset = value.GetValue();
-            }), "interaction_y_offset"),
-            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Label", (o, value) =>
-            {
-                o.GetComponent<Interaction>().prompt = value.GetStringValue();
-            }, 
-                "Enter", "Inspect", "Listen", 
-                "Rest", "Shop", "Travel", 
-                "Challenge", "Exit", "Descent", 
-                "Sit", "Trade", "Accept", 
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Label X Offset",
+                    (o, value) => { o.GetComponent<Interaction>().xOffset = value.GetValue(); }),
+                "interaction_x_offset"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Label Y Offset",
+                    (o, value) => { o.GetComponent<Interaction>().yOffset = value.GetValue(); }),
+                "interaction_y_offset"),
+            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Label",
+                (o, value) => { o.GetComponent<Interaction>().prompt = value.GetStringValue(); },
+                "Enter", "Inspect", "Listen",
+                "Rest", "Shop", "Travel",
+                "Challenge", "Exit", "Descent",
+                "Sit", "Trade", "Accept",
                 "Watch", "Ascend").WithDefaultValue(0), "interaction_label"),
-            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Hide on Interact", (o, value) =>
-            {
-                o.GetComponent<Interaction>().hideOnInteract = value.GetValue();
-            }).WithDefaultValue(false), "interaction_down")
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Hide on Interact",
+                        (o, value) => { o.GetComponent<Interaction>().hideOnInteract = value.GetValue(); })
+                    .WithDefaultValue(false), "interaction_down")
         );
 
         VolatileZoteling = new ConfigGroup(KillableEnemies,
@@ -1429,14 +1400,13 @@ public class ConfigGroup
         );
 
         Relays = new ConfigGroup(
-            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Relay ID", (o, value) =>
-            {
-                o.GetComponent<Relay>().id = value.GetValue();
-            }).PreAwake(), "relay_id"),
-            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Start Enabled", (o, value) =>
-            {
-                o.GetComponent<Relay>().startActivated = value.GetValue();
-            }).PreAwake(), "relay_start_active"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new StringConfigType("Relay ID", (o, value) => { o.GetComponent<Relay>().id = value.GetValue(); })
+                    .PreAwake(), "relay_id"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Start Enabled",
+                    (o, value) => { o.GetComponent<Relay>().startActivated = value.GetValue(); }).PreAwake(),
+                "relay_start_active"),
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Reset on Bench", (o, value) =>
             {
                 if (!value.GetValue()) return;
@@ -1447,18 +1417,16 @@ public class ConfigGroup
                 if (!value.GetValue()) return;
                 o.GetComponent<Relay>().multiplayerBroadcast = true;
             }), "relay_multiplayer_mode"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Delay", (o, value) =>
-            {
-                o.GetComponent<Relay>().delay = value.GetValue();
-            }), "relay_delay"),
-            Attributes.ConfigManager.RegisterConfigType(new FloatConfigType("Relay Chance", (o, value) =>
-            {
-                o.GetComponent<Relay>().relayChance = value.GetValue();
-            }), "relay_run_chance"),
-            Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Trigger on Load", (o, value) =>
-            {
-                o.GetComponent<Relay>().broadcastImmediately = value.GetValue();
-            }), "relay_trigger_load")
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Delay", (o, value) => { o.GetComponent<Relay>().delay = value.GetValue(); }),
+                "relay_delay"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new FloatConfigType("Relay Chance",
+                    (o, value) => { o.GetComponent<Relay>().relayChance = value.GetValue(); }), "relay_run_chance"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Trigger on Load",
+                    (o, value) => { o.GetComponent<Relay>().broadcastImmediately = value.GetValue(); }),
+                "relay_trigger_load")
         );
 
         BrokenVessel = new ConfigGroup(KillableEnemies,
@@ -1467,10 +1435,12 @@ public class ConfigGroup
                 if (value.GetValue() != 1) return;
                 o.GetComponent<BrokenVesselElement.BrokenVesselConfig>().localJump = false;
             }, "Local", "Arena").PreAwake(), "bv_jump_mode"),
-            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Infected Balloons", (o, value) =>
-            {
-                o.GetComponent<BrokenVesselElement.BrokenVesselConfig>().balloons = value.GetValue();
-            }, "Local", "Arena", "Disabled").PreAwake(), "bv_balloon_type"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new ChoiceConfigType("Infected Balloons",
+                    (o, value) =>
+                    {
+                        o.GetComponent<BrokenVesselElement.BrokenVesselConfig>().balloons = value.GetValue();
+                    }, "Local", "Arena", "Disabled").PreAwake(), "bv_balloon_type"),
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Disable Roar", (o, value) =>
             {
                 if (value.GetValue()) return;
@@ -1479,25 +1449,24 @@ public class ConfigGroup
         );
 
         var tc =
-            Attributes.ConfigManager.RegisterConfigType(new StringConfigType("Display Text", (o, value) =>
-            {
-                CustomTexts[o.GetComponent<TextDisplay>().ID] = value.GetValue();
-            }), "textdisplay_text_content");
-        
+            Attributes.ConfigManager.RegisterConfigType(
+                new StringConfigType("Display Text",
+                    (o, value) => { CustomTexts[o.GetComponent<TextDisplay>().ID] = value.GetValue(); }),
+                "textdisplay_text_content");
+
         Choice = new ConfigGroup(Invisible,
             tc,
-            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Cost", (o, value) =>
-            {
-                o.GetComponent<TextDisplay>().cost = value.GetValue();
-            }).WithDefaultValue(0), "choice_cost")
+            Attributes.ConfigManager.RegisterConfigType(
+                new IntConfigType("Cost", (o, value) => { o.GetComponent<TextDisplay>().cost = value.GetValue(); })
+                    .WithDefaultValue(0), "choice_cost")
         );
 
         TextDisplay = new ConfigGroup(Invisible,
             tc,
-            Attributes.ConfigManager.RegisterConfigType(new ChoiceConfigType("Display Type", (o, value) =>
-            {
-                o.GetComponent<TextDisplay>().displayType = value.GetValue();
-            }, "Dream", "Dream Box", "Talk Box").WithDefaultValue(0), "textdisplay_type")
+            Attributes.ConfigManager.RegisterConfigType(
+                new ChoiceConfigType("Display Type",
+                    (o, value) => { o.GetComponent<TextDisplay>().displayType = value.GetValue(); }, "Dream",
+                    "Dream Box", "Talk Box").WithDefaultValue(0), "textdisplay_type")
         );
     }
 
@@ -1507,7 +1476,10 @@ public class ConfigGroup
         {
             var val = value.GetValue();
 
-            if (val == 0) o.RemoveComponent<PersistentBoolItem>();
+            if (val == 0)
+            {
+                o.RemoveComponent<PersistentBoolItem>();
+            }
             else
             {
                 var item = o.GetComponent<PersistentBoolItem>();
@@ -1523,48 +1495,18 @@ public class ConfigGroup
                     item.enabled = true;
                     action?.Invoke(o);
                 }
-                
+
                 item.semiPersistent = val == 1;
                 item.persistentBoolData.semiPersistent = val == 1;
             }
         }, "False", "Bench", "True").PreAwake();
     }
 
-    private static readonly Dictionary<string, string> CustomTexts = new();
-
-    public readonly ConfigType[] Types;
-
-    public ConfigGroup(ConfigGroup[] parents, params ConfigType[] types)
-    {
-        var list = types.ToList();
-        
-        foreach (var parent in parents)
-        {
-            foreach (var type in parent.Types)
-            {
-                if (list.Contains(type)) continue;
-                list.Add(type);
-            }
-        }
-
-        Types = list.ToArray();
-    }
-
-    public ConfigGroup(ConfigGroup parent, params ConfigType[] types)
-    {
-        Types = types.Concat(parent.Types).ToArray();
-    }
-
-    public ConfigGroup(params ConfigType[] types)
-    {
-        Types = types;
-    }
-
     private class EnemyInvulnerabilityMarker : MonoBehaviour
     {
-        private HealthManager _manager;
         public bool invincible;
-        
+        private HealthManager _manager;
+
         private void Awake()
         {
             _manager = GetComponent<HealthManager>();

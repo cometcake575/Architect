@@ -6,7 +6,7 @@ namespace Architect.Content.Elements.Internal.Fixers;
 internal sealed class HopperPackElement : GInternalPackElement
 {
     private readonly bool _flip;
-    
+
     public HopperPackElement(string scene, string path, string name, bool flip) : base(scene, path, name, "Enemies", 0)
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
@@ -25,8 +25,12 @@ internal sealed class HopperPackElement : GInternalPackElement
             oldScale.x = -oldScale.x;
             gameObject.transform.localScale = oldScale;
             if (flipped) return;
-        } else if (!flipped) return;
-        
+        }
+        else if (!flipped)
+        {
+            return;
+        }
+
         var b = fsm.FsmVariables.FindFsmBool("Moving Right");
         b.Value = !b.Value;
     }

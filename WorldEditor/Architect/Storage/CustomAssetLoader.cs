@@ -17,7 +17,7 @@ public static class CustomAssetLoader
 {
     public static readonly Dictionary<string, Sprite> Sprites = new();
     public static readonly Dictionary<string, AudioClip> Sounds = new();
-    
+
     public static readonly HashSet<string> LoadingSounds = [];
 
     private static readonly Vector2 Pivot = new(0.5f, 0.5f);
@@ -95,6 +95,7 @@ public static class CustomAssetLoader
                 while (!task.IsCompleted) yield return null;
                 tmp = ResourceUtils.Load(path, Pivot, point, ppu);
             }
+
             Sprites[id] = tmp;
         }
 
@@ -113,7 +114,7 @@ public static class CustomAssetLoader
     {
         GameManager.instance.StartCoroutine(LoadSound(url, obj));
     }
-    
+
     private static IEnumerator LoadSound(string url, [CanBeNull] GameObject obj = null)
     {
         while (LoadingSounds.Contains(url)) yield break;
@@ -128,6 +129,7 @@ public static class CustomAssetLoader
                 while (!task.IsCompleted) yield return null;
                 tmp = ResourceUtils.LoadClip(path);
             }
+
             Sounds[url] = tmp;
             LoadingSounds.Remove(url);
         }
@@ -135,7 +137,7 @@ public static class CustomAssetLoader
         if (obj) obj.GetComponent<WavObject>().sound = Sounds[url];
         yield return null;
     }
-    
+
     public static void PrepareClip(string url)
     {
         GameManager.instance.StartCoroutine(LoadSound(url));

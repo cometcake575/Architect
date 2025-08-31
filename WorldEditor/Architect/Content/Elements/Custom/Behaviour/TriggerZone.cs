@@ -1,4 +1,3 @@
-using System;
 using Architect.Attributes;
 using Architect.Content.Elements.Internal.Fixers;
 using UnityEngine;
@@ -31,6 +30,7 @@ public class TriggerZone : MonoBehaviour
                 if (!tz || tz.layer != layer) return;
                 break;
         }
+
         EventManager.BroadcastEvent(gameObject, "ZoneEnter");
     }
 
@@ -54,6 +54,7 @@ public class TriggerZone : MonoBehaviour
                 if (!other.gameObject.GetComponent<TriggerZone>()) return;
                 break;
         }
+
         EventManager.BroadcastEvent(gameObject, "ZoneExit");
     }
 }

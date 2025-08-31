@@ -1,4 +1,3 @@
-using System.Linq;
 using Architect.Util;
 using UnityEngine;
 
@@ -7,7 +6,9 @@ namespace Architect.Objects;
 internal class DragObject : SelectableObject
 {
     internal static readonly DragObject Instance = new();
-    
+
+    private readonly Sprite _sprite;
+
     private DragObject() : base("Drag")
     {
         _sprite = PrepareSprite();
@@ -21,13 +22,14 @@ internal class DragObject : SelectableObject
     public override void OnClickInWorld(Vector3 pos, bool first)
     {
         if (!first) return;
-        
+
         var pl = PlacementManager.FindClickedObject(pos);
         if (pl == null)
         {
             EditorManager.StartGroupSelect(pos);
             return;
         }
+
         EditorManager.AddDraggedItem(pl, pos, !Input.GetKey(KeyCode.LeftControl));
     }
 
@@ -35,8 +37,6 @@ internal class DragObject : SelectableObject
     {
         return false;
     }
-
-    private readonly Sprite _sprite;
 
     public override Sprite GetSprite()
     {

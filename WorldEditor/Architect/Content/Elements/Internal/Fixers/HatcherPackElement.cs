@@ -9,21 +9,23 @@ namespace Architect.Content.Elements.Internal.Fixers;
 
 internal sealed class HatcherPackElement : GInternalPackElement
 {
-    private GameObject _cageObject;
-    
-    private readonly string _scene;
+    private static bool _init;
     private readonly string _cagePath;
     private readonly string _fsmName;
 
-    public HatcherPackElement(string scene, string path, string cagePath, string name, string fsmName, string category = "Enemies") : base(scene, path, name, category, 0)
+    private readonly string _scene;
+    private GameObject _cageObject;
+
+    public HatcherPackElement(string scene, string path, string cagePath, string name, string fsmName,
+        string category = "Enemies") : base(scene, path, name, category, 0)
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
         WithConfigGroup(ConfigGroup.KillableEnemies);
         WithReceiverGroup(ReceiverGroup.Enemies);
-        
+
         _scene = scene;
         _cagePath = cagePath;
-        
+
         _fsmName = fsmName;
     }
 
@@ -39,7 +41,7 @@ internal sealed class HatcherPackElement : GInternalPackElement
         Initialize();
         _cageObject = preloads[_scene][_cagePath];
     }
-    
+
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         var cage = Object.Instantiate(_cageObject);
@@ -48,19 +50,14 @@ internal sealed class HatcherPackElement : GInternalPackElement
         cage.name = gameObject.name + " Cage";
 
         var fsm = gameObject.LocateMyFSM(_fsmName);
-        if (!fsm.TryGetState("Init", out var state))
-        {
-            state = fsm.GetValidState("Initiate");
-        }
+        if (!fsm.TryGetState("Init", out var state)) state = fsm.GetValidState("Initiate");
 
         var fgo = state.GetAction<FindGameObject>(1) ?? state.GetAction<FindGameObject>(2);
         fgo.objectName = cage.name;
-        
+
         gameObject.AddComponent<PlacedHatcher>().cage = cage;
     }
 
-    private static bool _init;
-    
     // Modifies the death effects so that the correct enemy spawns upon killing the hatcher
     private static void Initialize()
     {
@@ -70,7 +67,7 @@ internal sealed class HatcherPackElement : GInternalPackElement
         On.EnemyDeathEffects.PreInstantiate += (orig, self) =>
         {
             orig(self);
-            
+
             // Copies placed hatcher info to the corpse
             var corpse = self.GetComponentInChildren<Corpse>(true);
             if (!corpse) return;
@@ -78,7 +75,7 @@ internal sealed class HatcherPackElement : GInternalPackElement
             if (!placedHatcher) return;
             corpse.gameObject.AddComponent<PlacedHatcher>().cage = placedHatcher.cage;
         };
-        
+
         On.CorpseHatcher.Smash += (orig, self) =>
         {
             var hatcher = self.GetComponent<PlacedHatcher>();
@@ -88,9 +85,12 @@ internal sealed class HatcherPackElement : GInternalPackElement
                 orig(self);
                 EnableOthers(toEnable);
             }
-            else orig(self);
+            else
+            {
+                orig(self);
+            }
         };
-        
+
         On.CorpseZomHive.LandEffects += (orig, self) =>
         {
             var hatcher = self.GetComponent<PlacedHatcher>();
@@ -100,7 +100,10 @@ internal sealed class HatcherPackElement : GInternalPackElement
                 orig(self);
                 EnableOthers(toEnable);
             }
-            else orig(self);
+            else
+            {
+                orig(self);
+            }
         };
     }
 
@@ -119,6 +122,7 @@ internal sealed class HatcherPackElement : GInternalPackElement
             obj.tag = "Untagged";
             toEnable.Add(obj);
         }
+
         return toEnable;
     }
 

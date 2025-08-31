@@ -4,19 +4,19 @@ namespace Architect.Storage;
 
 public class WorldEditorKeyBinds : PlayerActionSet
 {
-    public PlayerAction ToggleEditor;
-    public PlayerAction Undo;
-    public PlayerAction Redo;
-    public PlayerAction Copy;
-    public PlayerAction Paste;
-    public PlayerAction FlipItem;
-    public PlayerAction RotateItem;
-    public PlayerAction UnsafeRotation;
-    public PlayerAction IncreaseScale;
-    public PlayerAction DecreaseScale;
-    public PlayerAction LockAxis;
-    public PlayerAction TogglePreview;
     public PlayerAction AddPrefab;
+    public PlayerAction Copy;
+    public PlayerAction DecreaseScale;
+    public PlayerAction FlipItem;
+    public PlayerAction IncreaseScale;
+    public PlayerAction LockAxis;
+    public PlayerAction Paste;
+    public PlayerAction Redo;
+    public PlayerAction RotateItem;
+    public PlayerAction ToggleEditor;
+    public PlayerAction TogglePreview;
+    public PlayerAction Undo;
+    public PlayerAction UnsafeRotation;
 
     public WorldEditorKeyBinds()
     {
@@ -33,7 +33,7 @@ public class WorldEditorKeyBinds : PlayerActionSet
         LockAxis = CreatePlayerAction("LockAxis");
         TogglePreview = CreatePlayerAction("TogglePreview");
         AddPrefab = CreatePlayerAction("AddPrefab");
-        
+
         ToggleEditor.AddDefaultBinding(Key.E);
         Undo.AddDefaultBinding(Key.Z);
         Redo.AddDefaultBinding(Key.Y);

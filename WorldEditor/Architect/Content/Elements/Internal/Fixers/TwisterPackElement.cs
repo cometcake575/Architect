@@ -8,8 +8,9 @@ namespace Architect.Content.Elements.Internal.Fixers;
 internal sealed class TwisterPackElement : GInternalPackElement
 {
     private readonly string _fsmName;
-    
-    public TwisterPackElement(string scene, string path, string name, string fsmName) : base(scene, path, name, "Enemies", 0)
+
+    public TwisterPackElement(string scene, string path, string name, string fsmName) : base(scene, path, name,
+        "Enemies", 0)
     {
         WithBroadcasterGroup(BroadcasterGroup.Enemies);
         WithConfigGroup(ConfigGroup.Twisters);
@@ -32,7 +33,7 @@ internal sealed class TwisterPackElement : GInternalPackElement
         var collider = teleplane.AddComponent<BoxCollider2D>();
         collider.size = new Vector2(10, 10);
         collider.isTrigger = true;
-        
+
         fsm.DisableAction("Select Target", 1);
         fsm.InsertAction("Select Target", new FindGameObject
         {

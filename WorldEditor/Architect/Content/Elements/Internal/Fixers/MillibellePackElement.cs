@@ -33,7 +33,7 @@ internal class MillibellePackElement : InternalPackElement
         var fsm = gameObject.LocateMyFSM("Hit Around");
         fsm.DisableAction("Init", 1);
         fsm.DisableAction("Init", 2);
-        
+
         for (var i = 1; i < 4; i++) gameObject.transform.GetChild(i).gameObject.SetActive(false);
     }
 }

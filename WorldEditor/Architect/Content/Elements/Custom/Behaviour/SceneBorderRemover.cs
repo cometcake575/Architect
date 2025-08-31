@@ -17,7 +17,13 @@ public class SceneBorderRemover : MonoBehaviour
         _count++;
         Refresh();
     }
-    
+
+    private void OnDisable()
+    {
+        _count--;
+        Refresh();
+    }
+
     public static void Refresh()
     {
         if (!_camera) _camera = GameCameras.instance.cameraController;
@@ -31,11 +37,5 @@ public class SceneBorderRemover : MonoBehaviour
             _camera.yLimit = float.MaxValue;
             _camera.xLimit = float.MaxValue;
         }
-    }
-
-    private void OnDisable()
-    {
-        _count--;
-        Refresh();
     }
 }

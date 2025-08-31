@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Linq;
 using Architect.UI;
 using Architect.Util;
 using UnityEngine;
@@ -9,7 +8,9 @@ namespace Architect.Objects;
 internal class PickObject : SelectableObject
 {
     internal static readonly PickObject Instance = new();
-    
+
+    private readonly Sprite _sprite;
+
     private PickObject() : base("Pick")
     {
         _sprite = PrepareSprite();
@@ -34,8 +35,6 @@ internal class PickObject : SelectableObject
         return false;
     }
 
-    private readonly Sprite _sprite;
-
     public override Sprite GetSprite()
     {
         return _sprite;
@@ -51,13 +50,13 @@ internal class PickObject : SelectableObject
         foreach (var config in pl.Config) EditorUIManager.ConfigValues[config.GetName()] = config;
         foreach (var broadcaster in pl.Broadcasters) EditorUIManager.Broadcasters.Add(broadcaster);
         foreach (var receiver in pl.Receivers) EditorUIManager.Receivers.Add(receiver);
-        
+
         EditorUIManager.RefreshSelectedItem(false);
-        
+
         EditorManager.Scale = pl.Scale;
         EditorManager.Rotation = pl.Rotation;
         EditorManager.IsFlipped = pl.Flipped;
-        
+
         EditorUIManager.ScaleChoice.Text = pl.Scale.ToString(CultureInfo.InvariantCulture);
         EditorUIManager.RotationChoice.Text = pl.Rotation.ToString(CultureInfo.InvariantCulture);
     }

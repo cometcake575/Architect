@@ -5,10 +5,11 @@ namespace Architect.Content.Elements.Internal.Fixers;
 
 internal class MultiPartBenchElement : BenchElement
 {
-    private readonly string _scene;
     private readonly string _extra;
+    private readonly string _scene;
 
-    public MultiPartBenchElement(string scene, string path, string extra, string name, string category, int weight = 0) : base(scene, path, name, category, weight)
+    public MultiPartBenchElement(string scene, string path, string extra, string name, string category, int weight = 0)
+        : base(scene, path, name, category, weight)
     {
         _scene = scene;
         _extra = extra;

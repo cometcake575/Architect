@@ -21,7 +21,7 @@ public class StringConfigType(string name, Action<GameObject, StringConfigValue>
     {
         return _defaultValue == null ? null : new StringConfigValue(this, _defaultValue);
     }
-    
+
     public override ConfigValue Deserialize(string data)
     {
         return new StringConfigValue(this, data);
@@ -36,14 +36,14 @@ public class StringConfigType(string name, Action<GameObject, StringConfigValue>
 public class StringConfigElement : ConfigElement
 {
     private readonly TextInput _input;
-    
+
     public StringConfigElement(string name, LayoutRoot layout, Button apply, [CanBeNull] string oldValue)
     {
         _input = new TextInput(layout, name + " Input")
         {
             MinWidth = 80
         };
-        
+
         if (oldValue != null) _input.Text = oldValue;
         var last = _input.Text;
 
@@ -68,12 +68,12 @@ public class StringConfigElement : ConfigElement
 
 public class StringConfigValue : ConfigValue<StringConfigType>
 {
+    private readonly string _value;
+
     public StringConfigValue(StringConfigType type, string value) : base(type)
     {
         _value = value;
     }
-
-    private readonly string _value;
 
     public string GetValue()
     {

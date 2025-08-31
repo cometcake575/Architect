@@ -1,4 +1,3 @@
-using System;
 using Architect.Storage;
 using UnityEngine;
 using UnityEngine.Video;
@@ -10,7 +9,7 @@ public class PngObject : MonoBehaviour
     public string url;
     public bool point;
     public float ppu = 100;
-    
+
     private void Awake()
     {
         if (string.IsNullOrEmpty(url)) return;
@@ -26,10 +25,10 @@ public abstract class Playable : MonoBehaviour
 public class MovObject : Playable
 {
     public string url;
+    public bool playOnStart = true;
     private VideoPlayer _player;
 
     private bool _started;
-    public bool playOnStart = true;
 
     private void Awake()
     {
@@ -65,9 +64,9 @@ public class WavObject : Playable
 {
     public string url;
     public AudioClip sound;
-    private AudioSource _source;
-    
+
     public float volume = 1;
+    private AudioSource _source;
 
     private void Awake()
     {

@@ -6,7 +6,9 @@ namespace Architect.Attributes.Receivers;
 public class EventReceiverInstance : MonoBehaviour
 {
     private int _calls;
-    
+
+    [CanBeNull] public EventReceiver Receiver;
+
     public void ReceiveEvent()
     {
         _calls++;
@@ -14,6 +16,4 @@ public class EventReceiverInstance : MonoBehaviour
         if (Receiver != null) EventManager.RunEvent(Receiver.TypeName, gameObject);
         _calls = 0;
     }
-
-    [CanBeNull] public EventReceiver Receiver;
 }

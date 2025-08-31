@@ -5,7 +5,12 @@ namespace Architect.Objects;
 public abstract class SelectableObject
 {
     private readonly string _name;
-    
+
+    protected SelectableObject(string name)
+    {
+        _name = name;
+    }
+
     public abstract void OnClickInWorld(Vector3 pos, bool first);
 
     public abstract bool IsFavourite();
@@ -21,16 +26,10 @@ public abstract class SelectableObject
 
     public virtual void AfterSelect()
     {
-        
     }
 
     public string GetName()
     {
         return _name;
-    }
-
-    protected SelectableObject(string name)
-    {
-        _name = name;
     }
 }

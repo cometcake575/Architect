@@ -36,7 +36,7 @@ internal class WhiteThornsElement : InternalPackElement
         var col = _gameObject.AddComponent<EdgeCollider2D>();
 
         col.isTrigger = true;
-        
+
         col.points =
         [
             new Vector2(-3.672f, -1.265f),
@@ -46,7 +46,7 @@ internal class WhiteThornsElement : InternalPackElement
             new Vector2(2.353f, 0.813f),
             new Vector2(3.754f, -0.674f)
         ];
-        
+
         _gameObject.AddComponent<CustomDamager>().damageAmount = 1;
     }
 }

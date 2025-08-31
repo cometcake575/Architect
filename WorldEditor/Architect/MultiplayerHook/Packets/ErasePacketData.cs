@@ -6,7 +6,7 @@ public class ErasePacketData : IPacketData
 {
     public string Id;
     public string SceneName;
-    
+
     public void WriteData(IPacket packet)
     {
         packet.Write(Id);

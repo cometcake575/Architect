@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Architect.Attributes;
 using Architect.Content.Elements.Custom.Behaviour;
@@ -6,16 +5,13 @@ using Architect.Content.Groups;
 using HutongGames.PlayMaker.Actions;
 using Satchel;
 using UnityEngine;
-using Bounds = UnityEngine.Bounds;
-using Object = UnityEngine.Object;
 
 namespace Architect.Content.Elements.Internal.Fixers;
 
 internal class ZotelingElement : InternalPackElement
 {
-    protected GameObject GameObject;
-
     private readonly string _path;
+    protected GameObject GameObject;
 
     public ZotelingElement(string path, string name) : base(name, "Enemies")
     {
@@ -52,9 +48,8 @@ internal class ZotelingElement : InternalPackElement
 
 internal class BallZotelingElement : InternalPackElement
 {
-    private GameObject _gameObject;
-
     private readonly string _type;
+    private GameObject _gameObject;
 
     public BallZotelingElement(string name, string type) : base(name, "Enemies")
     {
@@ -86,7 +81,7 @@ internal class BallZotelingElement : InternalPackElement
         var random = control.GetAction<WaitRandom>("Ball", 6);
         random.timeMin = 0.0001f;
         random.timeMax = 0.001f;
-            
+
         control.AddCustomAction("Dormant", fsm => fsm.SendEvent("SPAWN"));
         gameObject.GetComponent<HealthManager>().hasSpecialDeath = false;
 
@@ -97,12 +92,14 @@ internal class BallZotelingElement : InternalPackElement
 
 internal sealed class TallZotelingElement : ZotelingElement
 {
-    public TallZotelingElement() : base("Tall Zotes/Zote Crew Tall (1)", "Lanky Zoteling") { }
+    public TallZotelingElement() : base("Tall Zotes/Zote Crew Tall (1)", "Lanky Zoteling")
+    {
+    }
 
     internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
     {
         base.AfterPreload(preloads);
-        
+
         var constrain = GameObject.GetComponent<ConstrainPosition>();
         if (constrain) constrain.enabled = false;
     }
@@ -110,7 +107,7 @@ internal sealed class TallZotelingElement : ZotelingElement
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         base.PostSpawn(gameObject, flipped, rotation, scale);
-        
+
         var control = gameObject.LocateMyFSM("Control");
         var posSet = control.GetAction<SetPosition>("Grav", 1);
         posSet.Enabled = false;
@@ -119,17 +116,17 @@ internal sealed class TallZotelingElement : ZotelingElement
 
 internal sealed class FatZotelingElement : ZotelingElement
 {
-    public FatZotelingElement() : base("Fat Zotes/Zote Crew Fat (1)", "Heavy Zoteling") { }
+    public FatZotelingElement() : base("Fat Zotes/Zote Crew Fat (1)", "Heavy Zoteling")
+    {
+    }
 
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         base.PostSpawn(gameObject, flipped, rotation, scale);
-        
+
         var control = gameObject.LocateMyFSM("Control");
-        control.InsertCustomAction("Land Waves", fsm =>
-        {
-            fsm.FsmVariables.FindFsmFloat("Shockwave Y").Value = fsm.transform.position.y - 2.3516f;
-        }, 2);
+        control.InsertCustomAction("Land Waves",
+            fsm => { fsm.FsmVariables.FindFsmFloat("Shockwave Y").Value = fsm.transform.position.y - 2.3516f; }, 2);
     }
 }
 
@@ -143,13 +140,13 @@ internal sealed class VolatileZotelingElement : InternalPackElement
         WithConfigGroup(ConfigGroup.VolatileZoteling);
         WithReceiverGroup(ReceiverGroup.Enemies);
     }
-    
+
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         var control = gameObject.LocateMyFSM("Control");
         control.AddCustomAction("Dormant", fsm => fsm.SendEvent("BALLOON SPAWN"));
         gameObject.GetComponent<HealthManager>().hasSpecialDeath = false;
-        
+
         control.DisableAction("Set Pos", 6);
     }
 
@@ -179,13 +176,13 @@ internal sealed class FlukeZotelingElement : InternalPackElement
         WithConfigGroup(ConfigGroup.FlukeZoteling);
         WithReceiverGroup(ReceiverGroup.Enemies);
     }
-    
+
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         var control = gameObject.LocateMyFSM("Control");
         control.AddCustomAction("Dormant", fsm => fsm.SendEvent("GO"));
         gameObject.GetComponent<HealthManager>().hasSpecialDeath = false;
-        
+
         control.DisableAction("Pos", 3);
 
         control.GetAction<FloatCompare>("Climb", 3).float2 = gameObject.transform.position.y + 18.88f;
@@ -217,13 +214,13 @@ internal sealed class ZoteCurseElement : InternalPackElement
         WithConfigGroup(ConfigGroup.KillableEnemies);
         WithReceiverGroup(ReceiverGroup.Enemies);
     }
-    
+
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         var control = gameObject.LocateMyFSM("Control");
         control.AddCustomAction("Dormant", fsm => fsm.SendEvent("START"));
         gameObject.GetComponent<HealthManager>().hasSpecialDeath = false;
-        
+
         control.DisableAction("Appear", 3);
         control.DisableAction("Appear", 6);
     }
@@ -248,7 +245,7 @@ internal class ZoteHeadElement : InternalPackElement
 {
     private GameObject _gameObject;
 
-    public ZoteHeadElement(int weight) : base("Zote Head", "Interactable", weight:weight)
+    public ZoteHeadElement(int weight) : base("Zote Head", "Interactable", weight)
     {
         WithRotationGroup(RotationGroup.All);
         WithConfigGroup(ConfigGroup.ZoteHead);
@@ -314,13 +311,13 @@ internal class ZoteHead : MonoBehaviour
         double x1 = bounds1.min.x;
         bounds1 = _col2d.bounds;
         double y1 = bounds1.center.y;
-        var vector21 = new Vector2((float) x1, (float) y1);
+        var vector21 = new Vector2((float)x1, (float)y1);
         Vector2 center = _col2d.bounds.center;
         var bounds2 = _col2d.bounds;
         double x2 = bounds2.max.x;
         bounds2 = _col2d.bounds;
         double y2 = bounds2.center.y;
-        var vector22 = new Vector2((float) x2, (float) y2);
+        var vector22 = new Vector2((float)x2, (float)y2);
         bounds2 = _col2d.bounds;
         var distance = bounds2.extents.y + 0.16f;
         Debug.DrawRay(vector21, Vector2.down, Color.yellow);

@@ -20,7 +20,7 @@ namespace Architect.Util;
 public static class EditorManager
 {
     public static bool LostControlToCustomObject;
-    
+
     internal static bool IsEditing;
     internal static bool IsFlipped;
     internal static float Rotation;
@@ -31,6 +31,32 @@ public static class EditorManager
     private static bool _needsReload;
 
     internal static Camera GameCamera;
+
+    private static bool _prevPaused;
+
+    private static Vector3 _freeMovePos;
+
+    private static float _lastX;
+    private static float _lastY;
+
+    private static string _validLastPosScene;
+
+    public static readonly List<DraggedObject> Dragged = [];
+    private static bool _dragging;
+
+    private static bool _groupSelecting;
+    private static Vector3 _groupSelectionCorner;
+    private static GroupSelectionBox _groupSelectionBox;
+
+    private static readonly List<DraggedObject> CopiedObjects = [];
+
+    private static readonly int Color1 = Shader.PropertyToID("_Color");
+
+    private static bool HasValidLastPos
+    {
+        get => _validLastPosScene == GameManager.instance.sceneName;
+        set => _validLastPosScene = value ? GameManager.instance.sceneName : "";
+    }
 
     public static void Initialize()
     {
@@ -61,7 +87,7 @@ public static class EditorManager
         On.HeroController.CanNailCharge += (orig, self) => !IsEditing && orig(self);
 
         On.HeroController.CanNailArt += (orig, self) => !IsEditing && orig(self);
-        
+
         On.HeroController.CanDash += (orig, self) => !IsEditing && orig(self);
 
         On.HeroController.TakeDamage += (orig, self, go, side, amount, type) =>
@@ -74,12 +100,12 @@ public static class EditorManager
         {
             orig(self, search);
             if (!search) return;
-            
+
             if (self.startedOnThisScene) return;
             if (string.IsNullOrEmpty(self.entryGateName)) return;
             var entry = GameObject.Find(self.entryGateName);
             if (entry && entry.activeInHierarchy) return;
-            
+
             var hrm = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects()
                 .SelectMany(obj => obj.GetComponentsInChildren<TransitionPoint>(true))
                 .First();
@@ -99,7 +125,7 @@ public static class EditorManager
 
             return point;
         };
-        
+
         On.HeroController.LocateSpawnPoint += (orig, self) =>
         {
             var point = orig(self);
@@ -120,13 +146,11 @@ public static class EditorManager
                              (IsEditing && EditorUIManager.SelectedItem is not PlaceableObject);
         };
 
-        
+
         On.PersistentBoolItem.Awake += (orig, self) =>
         {
             if (Architect.GlobalSettings.TestMode && self.gameObject.name.StartsWith("[Architect] "))
-            {
                 self.OnGetSaveState += (ref bool value) => value = false;
-            }
             orig(self);
         };
 
@@ -145,8 +169,6 @@ public static class EditorManager
         orig(self, search);
     }
 
-    private static bool _prevPaused;
-
     private static void EditorUpdate()
     {
         var paused = GameManager.instance.isPaused;
@@ -163,11 +185,14 @@ public static class EditorManager
         {
             if (Architect.GlobalSettings.Keybinds.Copy.WasPressed) DoCopy();
             if (Architect.GlobalSettings.Keybinds.Paste.WasPressed) DoPaste();
-            
+
             RefreshGroupSelectionBox();
             if (Dragged.Count > 0)
             {
-                if ((!Input.GetMouseButton(0) || paused) && _dragging) ReleaseDraggedItems(true);
+                if ((!Input.GetMouseButton(0) || paused) && _dragging)
+                {
+                    ReleaseDraggedItems(true);
+                }
                 else if (!paused && Input.GetMouseButton(0) &&
                          (Input.GetAxis("Mouse X") != 0 || Input.GetAxis("Mouse Y") != 0))
                 {
@@ -176,7 +201,11 @@ public static class EditorManager
                     foreach (var dragged in Dragged) dragged.Placement.Move(wp + dragged.Offset);
                 }
             }
-        } else if (EditorUIManager.SelectedItem is not EraserObject) ReleaseDraggedItems(false);
+        }
+        else if (EditorUIManager.SelectedItem is not EraserObject)
+        {
+            ReleaseDraggedItems(false);
+        }
 
         if (!GameCamera) GameCamera = GameCameras.instance.mainCamera;
 
@@ -215,9 +244,7 @@ public static class EditorManager
                 {
                     float i;
                     if (group == RotationGroup.All)
-                    {
                         i = Time.deltaTime * 60;
-                    }
                     else
                         i = group switch
                         {
@@ -229,7 +256,7 @@ public static class EditorManager
                         };
 
                     if (Input.GetKey(KeyCode.LeftShift)) i = -i;
-                    
+
                     Rotation = (Rotation + i) % 360;
                     if (group == RotationGroup.Three && Mathf.Approximately(Rotation, 180)) Rotation = 270;
                     EditorUIManager.RotationChoice.Text = Rotation.ToString(CultureInfo.InvariantCulture);
@@ -253,7 +280,7 @@ public static class EditorManager
         if (Architect.GlobalSettings.Keybinds.AddPrefab.WasPressed) PrefabsCategory.TryAddPrefab();
 
         var actions = InputHandler.Instance.inputActions;
-        
+
         if (paused) ShiftSelection(actions);
         else TryPlace();
 
@@ -261,15 +288,11 @@ public static class EditorManager
         {
             _prevPaused = paused;
             foreach (var element in EditorUIManager.PauseOptions)
-            {
                 element.Visibility = paused ? Visibility.Visible : Visibility.Hidden;
-            }
         }
 
         DoFreeMovement(actions, paused);
     }
-
-    private static Vector3 _freeMovePos;
 
     private static void DoFreeMovement(HeroActions actions, bool paused)
     {
@@ -278,20 +301,12 @@ public static class EditorManager
         var left = actions.left.IsPressed;
         var right = actions.right.IsPressed;
 
-        if (!paused && up != down)
-        {
-            _freeMovePos += (up ? Vector3.up : Vector3.down) * Time.deltaTime * 20;
-        }
+        if (!paused && up != down) _freeMovePos += (up ? Vector3.up : Vector3.down) * Time.deltaTime * 20;
 
-        if (!paused && left != right)
-        {
-            _freeMovePos += (left ? Vector3.left : Vector3.right) * Time.deltaTime * 20;
-        }
+        if (!paused && left != right) _freeMovePos += (left ? Vector3.left : Vector3.right) * Time.deltaTime * 20;
 
         if (HeroController.instance.transitionState == HeroTransitionState.WAITING_TO_TRANSITION)
-        {
             HeroController.instance.transform.position = _freeMovePos;
-        }   
         else _freeMovePos = HeroController.instance.transform.position;
     }
 
@@ -299,11 +314,11 @@ public static class EditorManager
     {
         if (paused) return;
         _prevPaused = true;
-        
+
         if (!Architect.GlobalSettings.Keybinds.ToggleEditor.WasPressed) return;
         var fsm = HeroController.instance.gameObject.LocateMyFSM("Surface Water");
         if (fsm.ActiveStateName == "Idle") fsm.SetState("Regain Control");
-        
+
         if (Dragged.Count > 0) ReleaseDraggedItems(true);
 
         if (LostControlToCustomObject)
@@ -312,14 +327,15 @@ public static class EditorManager
             HeroController.instance.RegainControl();
             HeroController.instance.StartAnimationControl();
         }
-        
+
         if (HeroController.instance.controlReqlinquished) return;
 
-        if (IsEditing) SceneSaveLoader.SaveScene(GameManager.instance.sceneName, PlacementManager.GetCurrentPlacements());
+        if (IsEditing)
+            SceneSaveLoader.SaveScene(GameManager.instance.sceneName, PlacementManager.GetCurrentPlacements());
         else _freeMovePos = HeroController.instance.transform.position;
 
         IsEditing = !IsEditing;
-        
+
         ReloadScene();
     }
 
@@ -346,10 +362,10 @@ public static class EditorManager
     {
         if (Architect.GlobalSettings.Keybinds.Undo.WasPressed) UndoManager.UndoLast();
         if (Architect.GlobalSettings.Keybinds.Redo.WasPressed) UndoManager.RedoLast();
-        
+
         var b1 = Input.GetMouseButtonDown(0);
         var b2 = Input.GetMouseButton(0);
-        
+
         if (!b2) ResetObject.RestartDelay();
 
         if (!b1 && !b2) return;
@@ -368,17 +384,6 @@ public static class EditorManager
         HasValidLastPos = true;
     }
 
-    private static float _lastX;
-    private static float _lastY;
-
-    private static bool HasValidLastPos
-    {
-        get => _validLastPosScene == GameManager.instance.sceneName;
-        set => _validLastPosScene = value ? GameManager.instance.sceneName : "";
-    }
-
-    private static string _validLastPosScene;
-
     public static Vector3 GetWorldPos(Vector3 mousePosition)
     {
         mousePosition.z = -GameCamera.transform.position.z;
@@ -393,17 +398,18 @@ public static class EditorManager
         return pos;
     }
 
-    public static readonly List<DraggedObject> Dragged = [];
-    private static bool _dragging;
-
     public static void AddDraggedItem(ObjectPlacement placement, Vector3 clickPos, bool startDragging)
     {
         if (placement.StartDragging(!startDragging))
         {
             placement.StoreOldPos();
             Dragged.Add(new DraggedObject(placement, placement.GetPos() - clickPos));
-        } else if (!startDragging) Dragged.RemoveAll(obj => obj.Placement == placement);
-        
+        }
+        else if (!startDragging)
+        {
+            Dragged.RemoveAll(obj => obj.Placement == placement);
+        }
+
         if (startDragging) BeginDragging(clickPos);
     }
 
@@ -416,38 +422,33 @@ public static class EditorManager
     public static void ReleaseDraggedItems(bool storeUndo)
     {
         var deselect = !Input.GetKey(KeyCode.LeftControl);
-        
-        if (storeUndo) UndoManager.PerformAction(new MoveObjects(
-            Dragged.Select(obj => (obj.Placement.GetId(), obj.Placement.GetOldPos())).ToList()
-        ));
-        
+
+        if (storeUndo)
+            UndoManager.PerformAction(new MoveObjects(
+                Dragged.Select(obj => (obj.Placement.GetId(), obj.Placement.GetOldPos())).ToList()
+            ));
+
         foreach (var dragged in Dragged)
         {
             if (deselect) dragged.Placement.StopDragging();
             var id = dragged.Placement.GetId();
             if (Architect.UsingMultiplayer && Architect.GlobalSettings.CollaborationMode)
-            {
                 HkmpHook.Update(id, GameManager.instance.sceneName, dragged.Placement.GetPos());
-            }
 
             dragged.Placement.StoreOldPos();
         }
-        
+
         _dragging = false;
         if (deselect) Dragged.Clear();
     }
 
-    private static bool _groupSelecting;
-    private static Vector3 _groupSelectionCorner;
-    private static GroupSelectionBox _groupSelectionBox;
-
     public static void StartGroupSelect(Vector3 pos)
     {
         if (Dragged.Count > 0) return;
-        
+
         _groupSelectionCorner = pos;
         _groupSelecting = true;
-        
+
         _groupSelectionBox.gameObject.SetActive(true);
         _groupSelectionBox.transform.position = pos;
         _groupSelectionBox.width = 0;
@@ -455,14 +456,12 @@ public static class EditorManager
         _groupSelectionBox.UpdateOutline();
     }
 
-    private static readonly List<DraggedObject> CopiedObjects = [];
-
     public static void DoCopy()
     {
         CopiedObjects.Clear();
         var wp = GetWorldPos(Input.mousePosition);
 
-        CopiedObjects.AddRange(Dragged.Select(obj => 
+        CopiedObjects.AddRange(Dragged.Select(obj =>
             new DraggedObject(obj.Placement, wp - obj.Placement.GetPos())));
     }
 
@@ -472,11 +471,8 @@ public static class EditorManager
         var wp = GetWorldPos(Input.mousePosition);
 
         var converts = new Dictionary<string, string>();
-        foreach (var obj in CopiedObjects)
-        {
-            converts[obj.Placement.GetId()] = Guid.NewGuid().ToString().Substring(0, 8);
-        }
-        
+        foreach (var obj in CopiedObjects) converts[obj.Placement.GetId()] = Guid.NewGuid().ToString().Substring(0, 8);
+
         foreach (var obj in CopiedObjects)
         {
             var pl = obj.Placement;
@@ -484,16 +480,18 @@ public static class EditorManager
             var updatedConfig = new List<ConfigValue>();
 
             foreach (var conf in pl.Config)
-            {
                 if (conf is StringConfigValue value)
                 {
                     var val = value.GetValue();
                     updatedConfig.Add(converts.TryGetValue(val, out var convert)
                         ? Attributes.ConfigManager.DeserializeConfigValue(conf.GetTypeId(), convert)
                         : conf);
-                } else updatedConfig.Add(conf);
-            }
-            
+                }
+                else
+                {
+                    updatedConfig.Add(conf);
+                }
+
             var np = new ObjectPlacement(
                 pl.Name,
                 wp - obj.Offset,
@@ -510,11 +508,9 @@ public static class EditorManager
             AddDraggedItem(np, wp, false);
 
             if (Architect.UsingMultiplayer && Architect.GlobalSettings.CollaborationMode)
-            {
                 HkmpHook.Place(np, GameManager.instance.sceneName);
-            }
         }
-        
+
         UndoManager.PerformAction(new PlaceObject(converts.Values.ToList()));
     }
 
@@ -524,13 +520,11 @@ public static class EditorManager
 
         foreach (var obj in PlacementManager.GetCurrentPlacements()
                      .Where(obj => obj.IsWithinZone(_groupSelectionCorner, pos)))
-        {
             AddDraggedItem(obj, pos, false);
-        }
 
         _groupSelecting = false;
     }
-    
+
     private static void RefreshGroupSelectionBox()
     {
         if (!_groupSelecting) return;
@@ -541,14 +535,12 @@ public static class EditorManager
             StopGroupSelect(wp);
             return;
         }
-        
+
         _groupSelectionBox.width = wp.x - _groupSelectionCorner.x;
         _groupSelectionBox.height = wp.y - _groupSelectionCorner.y;
         _groupSelectionBox.UpdateOutline();
     }
 
-    private static readonly int Color1 = Shader.PropertyToID("_Color");
-    
     private static void SetupGroupSelectionBox()
     {
         var box = new GameObject("[Architect] Group Selection Box");
@@ -558,7 +550,7 @@ public static class EditorManager
         var particleMaterial = new Material(Shader.Find("Sprites/Default"));
         particleMaterial.SetColor(Color1, new Color(0, 1, 0, 0.3f));
         box.AddComponent<LineRenderer>().material = particleMaterial;
-        
+
         _groupSelectionBox = box.AddComponent<GroupSelectionBox>();
     }
 

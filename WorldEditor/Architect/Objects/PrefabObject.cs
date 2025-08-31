@@ -5,7 +5,7 @@ namespace Architect.Objects;
 public class PrefabObject : PlaceableObject
 {
     private readonly ObjectPlacement _placement;
-    
+
     public PrefabObject(ObjectPlacement placement) : base(placement.GetPlaceableObject().PackElement)
     {
         _placement = placement;

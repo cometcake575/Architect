@@ -8,6 +8,12 @@ public class Fallthrough : MonoBehaviour
     public float fallthroughTime;
     private float _time;
 
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (!collision.gameObject.GetComponent<HeroController>()) return;
+        _time = 0;
+    }
+
     private void OnCollisionStay2D(Collision2D collision)
     {
         if (!collision.gameObject.GetComponent<HeroController>()) return;
@@ -17,19 +23,13 @@ public class Fallthrough : MonoBehaviour
             _time = 0;
             return;
         }
-        
+
         _time += Time.deltaTime;
         if (_time < fallthroughTime) return;
-        
+
         _time = 0;
         Physics2D.IgnoreCollision(collision.collider, collision.otherCollider);
         StartCoroutine(ReEnableCollision(collision.collider, collision.otherCollider));
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if (!collision.gameObject.GetComponent<HeroController>()) return;
-        _time = 0;
     }
 
     private static IEnumerator ReEnableCollision(Collider2D self, Collider2D other)

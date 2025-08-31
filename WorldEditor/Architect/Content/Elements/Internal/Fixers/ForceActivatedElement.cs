@@ -16,7 +16,7 @@ internal class ForceActivatedElement(
     internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
     {
         base.AfterPreload(preloads);
-        
+
         GameObject.RemoveComponent<DeactivateIfPlayerdataFalse>();
         GameObject.RemoveComponent<DeactivateIfPlayerdataTrue>();
     }

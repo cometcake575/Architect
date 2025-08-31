@@ -32,19 +32,16 @@ internal class HornetElement : InternalPackElement
     {
         _gameObject = preloads["Abyss_06_Core"]["Hornet Abyss NPC"];
         foreach (var fsm in _gameObject.GetComponents<PlayMakerFSM>())
-        {
-            if (fsm.FsmName == "FSM") fsm.enabled = false;
-        }
+            if (fsm.FsmName == "FSM")
+                fsm.enabled = false;
 
         _gameObject.AddComponent<HornetEditor>();
     }
 
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
-        gameObject.LocateMyFSM("Conversation Control").InsertCustomAction("End", makerFsm =>
-        {
-            EventManager.BroadcastEvent(makerFsm.gameObject, "OnConvoEnd");
-        }, 0);
+        gameObject.LocateMyFSM("Conversation Control").InsertCustomAction("End",
+            makerFsm => { EventManager.BroadcastEvent(makerFsm.gameObject, "OnConvoEnd"); }, 0);
     }
 
     private class HornetEditor : NpcEditor
@@ -62,7 +59,7 @@ internal class HornetElement : InternalPackElement
             var fsm = gameObject.LocateMyFSM("Conversation Control");
             var id = "Custom Hornet Repeat " + gameObject.name;
             fsm.GetAction<CallMethodProper>("Repeat", 1).parameters[0].stringValue = id;
-            
+
             return id;
         }
     }
@@ -100,10 +97,8 @@ internal class QuirrelElement : InternalPackElement
 
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
-        gameObject.LocateMyFSM("Conversation Control").InsertCustomAction("End", makerFsm =>
-        {
-            EventManager.BroadcastEvent(makerFsm.gameObject, "OnConvoEnd");
-        }, 0);
+        gameObject.LocateMyFSM("Conversation Control").InsertCustomAction("End",
+            makerFsm => { EventManager.BroadcastEvent(makerFsm.gameObject, "OnConvoEnd"); }, 0);
     }
 
     private class QuirrelEditor : NpcEditor
@@ -154,10 +149,8 @@ internal class ElderbugElement : InternalPackElement
     {
         var fsm = gameObject.LocateMyFSM("Conversation Control");
         fsm.DisableAction("Grimm?", 0);
-        fsm.InsertCustomAction("End", makerFsm =>
-        {
-            EventManager.BroadcastEvent(makerFsm.gameObject, "OnConvoEnd");
-        }, 0);
+        fsm.InsertCustomAction("End", makerFsm => { EventManager.BroadcastEvent(makerFsm.gameObject, "OnConvoEnd"); },
+            0);
     }
 
     private class ElderbugEditor : NpcEditor
@@ -165,16 +158,16 @@ internal class ElderbugElement : InternalPackElement
         public override string SetFirstConvo()
         {
             var id = name + " Elderbug Convo";
-            
+
             var fsm = gameObject.LocateMyFSM("Conversation Control");
             fsm.InsertCustomAction("Convo Choice", makerFsm => makerFsm.SendEvent("KINGS PASS"), 0);
             fsm.GetAction<CallMethodProper>("Kings Pass", 2).parameters[0].stringValue = id;
             fsm.DisableAction("Kings Pass", 0);
-            
+
             var act = fsm.GetAction<CheckTargetDirection>("Check Direction 2", 0);
             if (gameObject.transform.localScale.x < 0)
                 (act.leftEvent, act.rightEvent) = (act.rightEvent, act.leftEvent);
-            
+
             return id;
         }
     }
@@ -211,10 +204,8 @@ internal class ZoteElement : InternalPackElement
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         var fsm = gameObject.LocateMyFSM("Conversation Control");
-        fsm.InsertCustomAction("End", makerFsm =>
-        {
-            EventManager.BroadcastEvent(makerFsm.gameObject, "OnConvoEnd");
-        }, 0);
+        fsm.InsertCustomAction("End", makerFsm => { EventManager.BroadcastEvent(makerFsm.gameObject, "OnConvoEnd"); },
+            0);
         fsm.DisableAction("Check Active", 1);
         fsm.DisableAction("Check Active", 2);
     }
@@ -224,16 +215,16 @@ internal class ZoteElement : InternalPackElement
         public override string SetFirstConvo()
         {
             var id = name + " Zote Convo";
-            
+
             var fsm = gameObject.LocateMyFSM("Conversation Control");
             fsm.InsertCustomAction("Convo Choice", makerFsm => makerFsm.SendEvent("1"), 0);
             fsm.GetAction<CallMethodProper>("1", 1).parameters[0].stringValue = id;
             fsm.DisableAction("1", 2);
-            
+
             var act = fsm.GetAction<CheckTargetDirection>("Check Direction 2", 0);
             if (gameObject.transform.localScale.x < 0)
                 (act.leftEvent, act.rightEvent) = (act.rightEvent, act.leftEvent);
-            
+
             return id;
         }
     }
@@ -268,10 +259,8 @@ internal class GodseekerElement : InternalPackElement
 
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
-        gameObject.LocateMyFSM("Conversation Control").InsertCustomAction("End", makerFsm =>
-        {
-            EventManager.BroadcastEvent(makerFsm.gameObject, "OnConvoEnd");
-        }, 0);
+        gameObject.LocateMyFSM("Conversation Control").InsertCustomAction("End",
+            makerFsm => { EventManager.BroadcastEvent(makerFsm.gameObject, "OnConvoEnd"); }, 0);
     }
 
     private class GodseekerEditor : NpcEditor
@@ -280,7 +269,7 @@ internal class GodseekerElement : InternalPackElement
         {
             var fsm = gameObject.LocateMyFSM("Conversation Control");
             var id = "Custom Godseeker First " + gameObject.name;
-                
+
             fsm.AddCustomAction("Init", makerFsm =>
             {
                 makerFsm.FsmVariables.FindFsmBool("Door Completed").Value = false;
@@ -293,7 +282,7 @@ internal class GodseekerElement : InternalPackElement
         {
             var fsm = gameObject.LocateMyFSM("Conversation Control");
             var id = "Custom Godseeker Repeat " + gameObject.name;
-                
+
             fsm.AddCustomAction("Init", makerFsm =>
             {
                 makerFsm.FsmVariables.FindFsmBool("Door Completed").Value = false;
@@ -333,11 +322,9 @@ internal class MidwifeElement : InternalPackElement
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         var go = gameObject.transform.GetChild(1).gameObject;
-        go.LocateMyFSM("Conversation Control").InsertCustomAction("End", makerFsm =>
-        {
-            EventManager.BroadcastEvent(gameObject, "OnConvoEnd");
-        }, 0);
-        
+        go.LocateMyFSM("Conversation Control").InsertCustomAction("End",
+            makerFsm => { EventManager.BroadcastEvent(gameObject, "OnConvoEnd"); }, 0);
+
         if (flipped == Mathf.Approximately(rotation, 180)) return;
         go.LocateMyFSM("npc_control").FsmVariables
             .FindFsmFloat("Move To Offset")
@@ -349,5 +336,8 @@ public abstract class NpcEditor : MonoBehaviour
 {
     public abstract string SetFirstConvo();
 
-    public virtual string SetRepeatConvo() => null;
+    public virtual string SetRepeatConvo()
+    {
+        return null;
+    }
 }

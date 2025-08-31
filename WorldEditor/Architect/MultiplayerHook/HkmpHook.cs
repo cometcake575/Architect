@@ -1,9 +1,7 @@
 using System.Threading.Tasks;
-using Architect.MultiplayerHook.Packets;
 using Architect.Objects;
 using Hkmp.Api.Client;
 using Hkmp.Api.Server;
-using Hkmp.Networking.Packet;
 using UnityEngine;
 
 namespace Architect.MultiplayerHook;
@@ -11,7 +9,7 @@ namespace Architect.MultiplayerHook;
 public static class HkmpHook
 {
     private static WeClientAddon _clientAddon;
-    
+
     public static void Initialize()
     {
         _clientAddon = new WeClientAddon();

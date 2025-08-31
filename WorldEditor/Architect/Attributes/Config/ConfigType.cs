@@ -8,26 +8,26 @@ namespace Architect.Attributes.Config;
 
 public abstract class ConfigType
 {
+    public readonly string Name;
     private Func<GameObject, bool> _condition;
+    public string Id;
+
+    public bool IsPreAwake;
+
+    protected ConfigType(string name)
+    {
+        Name = name;
+    }
 
     public bool Check(GameObject obj)
     {
         return _condition == null || _condition.Invoke(obj);
     }
-    
-    public readonly string Name;
-    
-    public bool IsPreAwake;
-    public string Id;
-    
-    protected ConfigType(string name)
-    {
-        Name = name;
-    }
-    
+
     public abstract ConfigValue Deserialize(string data);
 
-    [CanBeNull] public abstract ConfigValue GetDefaultValue();
+    [CanBeNull]
+    public abstract ConfigValue GetDefaultValue();
 
     public abstract ConfigElement CreateInput(LayoutRoot root, Button apply, [CanBeNull] string oldValue);
 
@@ -36,7 +36,7 @@ public abstract class ConfigType
         _condition = condition;
         return this;
     }
-    
+
     internal abstract void RunAction(GameObject obj, ConfigValue value);
 }
 
@@ -75,16 +75,18 @@ public abstract class ConfigValue
     public abstract string SerializeValue();
 
     public abstract string GetTypeId();
-    
+
     public abstract string GetName();
 
     public abstract bool PreAwake();
-    
+
     public abstract void Setup(GameObject obj);
 }
 
 public abstract class ConfigValue<TType> : ConfigValue where TType : ConfigType
 {
+    private readonly TType _type;
+
     protected ConfigValue(TType type)
     {
         _type = type;
@@ -99,8 +101,6 @@ public abstract class ConfigValue<TType> : ConfigValue where TType : ConfigType
     {
         return _type.Name;
     }
-
-    private readonly TType _type;
 
     public override void Setup(GameObject obj)
     {

@@ -6,7 +6,7 @@ namespace Architect.Category;
 internal class NormalCategory : ObjectCategory
 {
     private readonly List<SelectableObject> _selectableObjects;
-    
+
     internal NormalCategory(string name) : base(name)
     {
         _selectableObjects = new List<SelectableObject>();
@@ -25,7 +25,7 @@ internal class NormalCategory : ObjectCategory
     internal void Sort()
     {
         _selectableObjects.Sort(Compare);
-        
+
         if (GetName() == "Hazards") _selectableObjects.Reverse();
     }
 

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Architect.Attributes;
-using Architect.Attributes.Broadcasters;
 using Architect.Content.Groups;
 using Satchel;
 using UnityEngine;
@@ -35,11 +34,9 @@ internal class ReusableLeverElement : InternalPackElement
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         var fsm = gameObject.LocateMyFSM("Call Lever");
-        
+
         fsm.DisableAction("Send Msg", 2);
-        fsm.InsertCustomAction("Check Already Called", makerFsm =>
-        {
-            EventManager.BroadcastEvent(makerFsm.gameObject, "OnPull");
-        }, 0);
+        fsm.InsertCustomAction("Check Already Called",
+            makerFsm => { EventManager.BroadcastEvent(makerFsm.gameObject, "OnPull"); }, 0);
     }
 }

@@ -5,17 +5,15 @@ namespace Architect.Content;
 
 public class ContentPack : List<AbstractPackElement>
 {
-    private readonly string _name;
     private readonly string _description;
+    private readonly string _name;
 
     public ContentPack(string name, string description, bool enabledByDefault = true)
     {
         _name = name;
         _description = description;
         if (!Architect.GlobalSettings.ContentPackSettings.ContainsKey(name))
-        {
             Architect.GlobalSettings.ContentPackSettings[name] = enabledByDefault;
-        }
     }
 
     public string GetName()

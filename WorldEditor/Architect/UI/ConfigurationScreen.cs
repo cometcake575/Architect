@@ -3,10 +3,6 @@ using System.Linq;
 using Architect.Content;
 using Architect.Objects;
 using Architect.Storage;
-using InControl;
-using Modding.Menu;
-using Modding.Menu.Components;
-using Modding.Menu.Config;
 using Satchel.BetterMenus;
 using UnityEngine;
 
@@ -15,7 +11,7 @@ namespace Architect.UI;
 public static class ConfigurationScreen
 {
     private static Menu _menuRef;
-    
+
     public static MenuScreen GetScreen(MenuScreen modListMenu, WorldEditorGlobalSettings globalSettings)
     {
         string[] values =
@@ -27,101 +23,95 @@ public static class ConfigurationScreen
         {
             new TextPanel("Editor"),
             new HorizontalOption(
-                name: "Allow Editing",
-                description: "Enables the keybind to activate the editor",
-                values: values,
-                applySetting: i =>
-                {
-                    globalSettings.CanEnableEditing = i == 0;
-                },
-                loadSetting: () => globalSettings.CanEnableEditing ? 0 : 1
+                "Allow Editing",
+                "Enables the keybind to activate the editor",
+                values,
+                i => { globalSettings.CanEnableEditing = i == 0; },
+                () => globalSettings.CanEnableEditing ? 0 : 1
             ),
             new HorizontalOption(
-                name: "Test Mode",
-                description: "Stops the game from storing persistent data such as enemies being killed",
-                values: values,
-                applySetting: i =>
-                {
-                    globalSettings.TestMode = i == 0;
-                },
-                loadSetting: () => globalSettings.TestMode ? 0 : 1
+                "Test Mode",
+                "Stops the game from storing persistent data such as enemies being killed",
+                values,
+                i => { globalSettings.TestMode = i == 0; },
+                () => globalSettings.TestMode ? 0 : 1
             ),
             new TextPanel(""),
             new TextPanel("Keybinds"),
             new KeyBind(
-                name: "Toggle Editor",
-                playerAction: globalSettings.Keybinds.ToggleEditor
+                "Toggle Editor",
+                globalSettings.Keybinds.ToggleEditor
             ),
             new MenuRow([
                     new KeyBind(
-                        name: "Undo",
-                        playerAction: globalSettings.Keybinds.Undo
+                        "Undo",
+                        globalSettings.Keybinds.Undo
                     ),
                     new KeyBind(
-                        name: "Redo",
-                        playerAction: globalSettings.Keybinds.Redo
+                        "Redo",
+                        globalSettings.Keybinds.Redo
                     )
                 ],
                 "undo_redo"),
             new MenuRow([
                     new KeyBind(
-                        name: "Copy Selection",
-                        playerAction: globalSettings.Keybinds.Copy
+                        "Copy Selection",
+                        globalSettings.Keybinds.Copy
                     ),
                     new KeyBind(
-                        name: "Paste Selection",
-                        playerAction: globalSettings.Keybinds.Paste
+                        "Paste Selection",
+                        globalSettings.Keybinds.Paste
                     )
                 ],
                 "copy_paste"),
             new MenuRow([
                     new KeyBind(
-                        name: "Rotate",
-                        playerAction: globalSettings.Keybinds.RotateItem
+                        "Rotate",
+                        globalSettings.Keybinds.RotateItem
                     ),
                     new KeyBind(
-                        name: "Use Unsafe Rotations",
-                        playerAction: globalSettings.Keybinds.UnsafeRotation
+                        "Use Unsafe Rotations",
+                        globalSettings.Keybinds.UnsafeRotation
                     )
                 ],
                 "rotations"),
             new MenuRow([
                     new KeyBind(
-                        name: "Decrease Scale",
-                        playerAction: globalSettings.Keybinds.DecreaseScale
+                        "Decrease Scale",
+                        globalSettings.Keybinds.DecreaseScale
                     ),
                     new KeyBind(
-                        name: "Increase Scale",
-                        playerAction: globalSettings.Keybinds.IncreaseScale
+                        "Increase Scale",
+                        globalSettings.Keybinds.IncreaseScale
                     )
                 ],
                 "scale"),
             new MenuRow([
                     new KeyBind(
-                        name: "Flip",
-                        playerAction: globalSettings.Keybinds.FlipItem
+                        "Flip",
+                        globalSettings.Keybinds.FlipItem
                     ),
                     new KeyBind(
-                        name: "Lock Axis",
-                        playerAction: globalSettings.Keybinds.LockAxis
+                        "Lock Axis",
+                        globalSettings.Keybinds.LockAxis
                     )
                 ],
                 "flip_lock"),
             new MenuRow([
                     new KeyBind(
-                        name: "Moving Object Preview",
-                        playerAction: globalSettings.Keybinds.TogglePreview
+                        "Moving Object Preview",
+                        globalSettings.Keybinds.TogglePreview
                     ),
                     new KeyBind(
-                        name: "Add Prefab",
-                        playerAction: globalSettings.Keybinds.AddPrefab
+                        "Add Prefab",
+                        globalSettings.Keybinds.AddPrefab
                     )
                 ],
                 "preview_prefab"),
-            
+
             new TextPanel(""),
             new TextPanel("Management"),
-            new MenuButton("Delete All Edits", 
+            new MenuButton("Delete All Edits",
                 "",
                 _ =>
                 {
@@ -130,39 +120,41 @@ public static class ConfigurationScreen
                         ResetObject.ResetRoom(GameManager.instance.sceneName);
                         PlacementManager.InvalidateCache();
                     }
+
                     SceneSaveLoader.WipeAllScenes();
                 }),
-            
+
             new TextPanel(""),
             new TextPanel("Content Pack Toggles"),
-            new TextPanel("Disable packs you don't need to reduce startup time and memory usage, changes are applied when game is rebooted.\n\nThings will break if you disable a pack that is in use!")
+            new TextPanel(
+                "Disable packs you don't need to reduce startup time and memory usage, changes are applied when game is rebooted.\n\nThings will break if you disable a pack that is in use!")
             {
                 FontSize = 20,
                 Anchor = TextAnchor.UpperCenter
             }
         };
-        if (Architect.UsingMultiplayer) elements.Insert(3, new HorizontalOption(
-            name: "Collaboration Mode",
-            description: "Shares edits across of an HKMP server as soon as they're made, to allow working together online",
-            values: values,
-            applySetting: i =>
-            {
-                globalSettings.CollaborationMode = i == 0;
-            },
-            loadSetting: () => globalSettings.CollaborationMode ? 0 : 1
-        ));
-        elements.AddRange(ContentPacks.Packs.Select(pack => new HorizontalOption(name: pack.GetName(), description: pack.GetDescription(), values: values, applySetting: i => { globalSettings.ContentPackSettings[pack.GetName()] = i == 0; }, loadSetting: () => globalSettings.ContentPackSettings[pack.GetName()] ? 0 : 1)));
+        if (Architect.UsingMultiplayer)
+            elements.Insert(3, new HorizontalOption(
+                "Collaboration Mode",
+                "Shares edits across of an HKMP server as soon as they're made, to allow working together online",
+                values,
+                i => { globalSettings.CollaborationMode = i == 0; },
+                () => globalSettings.CollaborationMode ? 0 : 1
+            ));
+        elements.AddRange(ContentPacks.Packs.Select(pack => new HorizontalOption(pack.GetName(), pack.GetDescription(),
+            values, i => { globalSettings.ContentPackSettings[pack.GetName()] = i == 0; },
+            () => globalSettings.ContentPackSettings[pack.GetName()] ? 0 : 1)));
         _menuRef ??= new Menu(
-            name: Architect.Instance.Name,
-            elements: elements.ToArray()
+            Architect.Instance.Name,
+            elements.ToArray()
         );
-        
+
         var ms = _menuRef.GetMenuScreen(modListMenu);
         var scroll = ms.content.transform.Find("Scrollbar").transform;
         var pos = scroll.position;
         pos.x += 1;
         scroll.position = pos;
-        
+
         return ms;
     }
 }

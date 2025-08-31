@@ -1,27 +1,48 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using Architect.Content.Elements;
 using Architect.MultiplayerHook;
 using Architect.UI;
 using Architect.Util;
+using UnityEngine;
 
 namespace Architect.Objects;
 
 public class PlaceableObject : SelectableObject
 {
     public static readonly Dictionary<string, SelectableObject> AllObjects = new();
-    
+
+    private static int _nextWeight;
+    private readonly int _weight;
+    public readonly AbstractPackElement PackElement;
+    private float _rotation;
+
+    private Sprite _sprite;
+    private float _zPosition;
+
+    public Vector3 Offset;
+    public Vector2 Scale = Vector2.one;
+
+    public PlaceableObject(AbstractPackElement element) : base(element.GetName())
+    {
+        _weight = element.Weight * -1000 + _nextWeight;
+        _nextWeight++;
+        PackElement = element;
+
+        var prefab = element.GetPrefab(false, 0);
+        PreparePlacementData(prefab);
+    }
+
     public override void OnClickInWorld(Vector3 pos, bool first)
     {
         if (!first) return;
 
         var placement = MakePlacement(pos);
-        
+
         PlacementManager.GetCurrentPlacements().Add(placement);
         placement.PlaceGhost();
-        
+
         UndoManager.PerformAction(new PlaceObject([placement.GetId()]));
 
         if (!Architect.UsingMultiplayer || !Architect.GlobalSettings.CollaborationMode) return;
@@ -35,13 +56,13 @@ public class PlaceableObject : SelectableObject
         var broadcasters = EditorUIManager.Broadcasters.ToArray();
         var receivers = EditorUIManager.Receivers.ToArray();
         var config = EditorUIManager.ConfigValues.Values.ToArray();
-        
+
         return new ObjectPlacement(
             GetName(),
-            pos, 
-            EditorManager.IsFlipped, 
-            EditorManager.Rotation, 
-            EditorManager.Scale, 
+            pos,
+            EditorManager.IsFlipped,
+            EditorManager.Rotation,
+            EditorManager.Scale,
             Guid.NewGuid().ToString().Substring(0, 8),
             broadcasters,
             receivers,
@@ -72,9 +93,8 @@ public class PlaceableObject : SelectableObject
     public void ToggleFavourite()
     {
         if (IsFavourite())
-        {
             Architect.GlobalSettings.Favourites.Remove(GetName());
-        }  else Architect.GlobalSettings.Favourites.Add(GetName());
+        else Architect.GlobalSettings.Favourites.Add(GetName());
     }
 
     private void PreparePlacementData(GameObject prefab)
@@ -86,9 +106,9 @@ public class PlaceableObject : SelectableObject
             Offset.z = -prefab.transform.GetPositionZ();
             return;
         }
-        
+
         _zPosition = prefab.transform.position.z;
-        
+
         var spriteRenderer = prefab.gameObject.GetComponent<SpriteRenderer>();
         if (spriteRenderer)
         {
@@ -97,13 +117,14 @@ public class PlaceableObject : SelectableObject
             _rotation += spriteRenderer.gameObject.transform.rotation.eulerAngles.z;
             return;
         }
+
         var sprite = prefab.gameObject.GetComponent<tk2dSprite>();
         if (sprite)
         {
             PrepareSpriteWithTk2D(sprite);
             return;
         }
-        
+
         var cSprite = prefab.gameObject.GetComponentInChildren<tk2dSprite>();
         if (cSprite)
         {
@@ -111,9 +132,10 @@ public class PlaceableObject : SelectableObject
             Offset += prefab.transform.InverseTransformPoint(cSprite.gameObject.transform.position);
             return;
         }
+
         var cSpriteRenderer = prefab.gameObject.GetComponentInChildren<SpriteRenderer>();
         if (!cSpriteRenderer) return;
-        
+
         Scale = cSpriteRenderer.gameObject.transform.lossyScale;
         _sprite = cSpriteRenderer.sprite;
         Offset += prefab.transform.InverseTransformPoint(cSpriteRenderer.gameObject.transform.position);
@@ -123,18 +145,22 @@ public class PlaceableObject : SelectableObject
     private void PrepareSpriteWithTk2D(tk2dSprite sprite)
     {
         Scale = sprite.gameObject.transform.lossyScale;
-        
+
         var animator = sprite.gameObject.GetComponent<tk2dSpriteAnimator>();
         tk2dSpriteDefinition def;
-        
+
         if (animator)
         {
             var frame = animator.DefaultClip.frames[0];
             def = frame.spriteCollection.spriteDefinitions[frame.spriteId];
         }
-        else def = sprite.CurrentSprite;
+        else
+        {
+            def = sprite.CurrentSprite;
+        }
 
-        _sprite = ResourceUtils.ConvertFrom2DToolkit(def, 1 / (sprite.scale.x * sprite.GetCurrentSpriteDef().texelSize.x));
+        _sprite = ResourceUtils.ConvertFrom2DToolkit(def,
+            1 / (sprite.scale.x * sprite.GetCurrentSpriteDef().texelSize.x));
         if (def.flipped != tk2dSpriteDefinition.FlipMode.None) _rotation += 90;
         _rotation += sprite.gameObject.transform.rotation.eulerAngles.z;
         Offset = def.GetBounds().center;
@@ -143,27 +169,6 @@ public class PlaceableObject : SelectableObject
     public override float GetSpriteRotation()
     {
         return _rotation;
-    }
-    
-    private Sprite _sprite;
-    private float _rotation;
-    public readonly AbstractPackElement PackElement;
-
-    public Vector3 Offset;
-    public Vector2 Scale = Vector2.one;
-    private float _zPosition;
-    private readonly int _weight;
-
-    private static int _nextWeight;
-
-    public PlaceableObject(AbstractPackElement element) : base(element.GetName())
-    {
-        _weight = element.Weight * -1000 + _nextWeight;
-        _nextWeight++;
-        PackElement = element;
-
-        var prefab = element.GetPrefab(false, 0);
-        PreparePlacementData(prefab);
     }
 
     public static SelectableObject Create(AbstractPackElement element)

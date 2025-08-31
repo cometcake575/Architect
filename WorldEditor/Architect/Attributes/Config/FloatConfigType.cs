@@ -24,7 +24,7 @@ public class FloatConfigType(string name, Action<GameObject, FloatConfigValue> a
     {
         return !_defaultValue.HasValue ? null : new FloatConfigValue(this, _defaultValue.Value);
     }
-    
+
     public override ConfigValue Deserialize(string data)
     {
         return new FloatConfigValue(this, Convert.ToSingle(data.Replace(",", "."), CultureInfo.InvariantCulture));
@@ -72,12 +72,12 @@ public class FloatConfigElement : ConfigElement
 
 public class FloatConfigValue : ConfigValue<FloatConfigType>
 {
+    private readonly float _value;
+
     public FloatConfigValue(FloatConfigType type, float value) : base(type)
     {
         _value = value;
     }
-
-    private readonly float _value;
 
     public float GetValue()
     {

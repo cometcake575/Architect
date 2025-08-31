@@ -9,7 +9,9 @@ namespace Architect.Objects;
 internal class EraserObject : SelectableObject
 {
     internal static readonly EraserObject Instance = new();
-    
+
+    private readonly Sprite _sprite;
+
     private EraserObject() : base("Eraser")
     {
         _sprite = PrepareSprite();
@@ -28,16 +30,16 @@ internal class EraserObject : SelectableObject
 
         var placement = PlacementManager.FindClickedObject(pos);
         if (placement != null && !placements.Contains(placement)) placements.Add(placement);
-        
+
         if (placements.Count == 0) return;
 
         UndoManager.PerformAction(new EraseObject(placements));
-        
+
         foreach (var pl in placements)
         {
             pl.StopDragging();
             pl.Destroy();
-            
+
             if (!Architect.UsingMultiplayer || !Architect.GlobalSettings.CollaborationMode) continue;
             var id = pl.GetId();
             HkmpHook.Erase(id, GameManager.instance.sceneName);
@@ -48,8 +50,6 @@ internal class EraserObject : SelectableObject
     {
         return false;
     }
-
-    private readonly Sprite _sprite;
 
     public override Sprite GetSprite()
     {

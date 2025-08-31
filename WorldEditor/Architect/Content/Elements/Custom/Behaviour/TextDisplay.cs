@@ -8,51 +8,12 @@ public class TextDisplay : MonoBehaviour
 {
     private static TextDisplay _current;
     private static TextDisplay _prev;
-    
-    public string ID { get; private set; }
-    
+
     public int cost;
     public int displayType;
     private DisplayType _displayType;
-    
-    public static void Init()
-    {
-        On.PlayMakerFSM.Awake += (orig, self) =>
-        {
-            orig(self);
-            if (self.FsmName != "Dialogue Page Control") return;
-            
-            self.InsertCustomAction("End Conversation", () =>
-            {
-                if (!_current) return;
-                _current._displayType.Down();
-                EventManager.BroadcastEvent(_current.gameObject, "BoxDown");
-                _prev = _current;
-                _current = null;
-            }, 0);
 
-            if (self.name != "Text YN") return;
-            
-            self.InsertCustomAction("Activate Geo Text?", fsm =>
-            {
-                if (_current) fsm.FsmVariables.FindFsmInt("Toll Cost").Value = _current.cost;
-            }, 0);
-            
-            self.InsertCustomAction("Yes", () =>
-            {
-                if (!_prev) return;
-                EventManager.BroadcastEvent(_prev.gameObject, "Yes");
-                _prev = null;
-            }, 0);
-            
-            self.InsertCustomAction("No", () =>
-            {
-                if (!_prev) return;
-                EventManager.BroadcastEvent(_prev.gameObject, "No");
-                _prev = null;
-            }, 0);
-        };
-    }
+    public string ID { get; private set; }
 
     private void Awake()
     {
@@ -70,13 +31,52 @@ public class TextDisplay : MonoBehaviour
         };
         _displayType.Start();
     }
-    
+
+    public static void Init()
+    {
+        On.PlayMakerFSM.Awake += (orig, self) =>
+        {
+            orig(self);
+            if (self.FsmName != "Dialogue Page Control") return;
+
+            self.InsertCustomAction("End Conversation", () =>
+            {
+                if (!_current) return;
+                _current._displayType.Down();
+                EventManager.BroadcastEvent(_current.gameObject, "BoxDown");
+                _prev = _current;
+                _current = null;
+            }, 0);
+
+            if (self.name != "Text YN") return;
+
+            self.InsertCustomAction("Activate Geo Text?", fsm =>
+            {
+                if (_current) fsm.FsmVariables.FindFsmInt("Toll Cost").Value = _current.cost;
+            }, 0);
+
+            self.InsertCustomAction("Yes", () =>
+            {
+                if (!_prev) return;
+                EventManager.BroadcastEvent(_prev.gameObject, "Yes");
+                _prev = null;
+            }, 0);
+
+            self.InsertCustomAction("No", () =>
+            {
+                if (!_prev) return;
+                EventManager.BroadcastEvent(_prev.gameObject, "No");
+                _prev = null;
+            }, 0);
+        };
+    }
+
     public void Display()
     {
         if (!isActiveAndEnabled) return;
 
         if (_current) _current._displayType.Down();
-        
+
         _current = this;
         _displayType.Display(ID);
     }
@@ -84,16 +84,16 @@ public class TextDisplay : MonoBehaviour
     public abstract class DisplayType
     {
         public abstract void Start();
-        
+
         public abstract void Display(string id);
-        
+
         public abstract void Down();
     }
 
     public class DreamDisplayType : DisplayType
     {
         private PlayMakerFSM _dreamDialogue;
-        
+
         public override void Start()
         {
             _dreamDialogue = GameObject.Find("_GameCameras/HudCamera/DialogueManager/Dream Msg").LocateMyFSM("Display");
@@ -105,13 +105,15 @@ public class TextDisplay : MonoBehaviour
             _dreamDialogue.SendEvent("DISPLAY DREAM MSG ALT");
         }
 
-        public override void Down() { }
+        public override void Down()
+        {
+        }
     }
 
     public class StillDreamDisplayType : DisplayType
     {
-        private DialogueBox _text;
         private PlayMakerFSM _manager;
+        private DialogueBox _text;
 
         public override void Start()
         {
@@ -135,8 +137,8 @@ public class TextDisplay : MonoBehaviour
 
     public class SpeakDisplayType : DisplayType
     {
-        private DialogueBox _text;
         private PlayMakerFSM _manager;
+        private DialogueBox _text;
 
         public override void Start()
         {
@@ -160,8 +162,8 @@ public class TextDisplay : MonoBehaviour
 
     public class ChoiceDisplayType : DisplayType
     {
-        private DialogueBox _text;
         private PlayMakerFSM _manager;
+        private DialogueBox _text;
 
         public override void Start()
         {

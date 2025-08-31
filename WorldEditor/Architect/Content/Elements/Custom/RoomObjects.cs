@@ -13,12 +13,14 @@ namespace Architect.Content.Elements.Custom;
 
 public static class RoomObjects
 {
+    private static readonly Dictionary<string, Func<GameObject, Disabler[]>> EditActions = new();
+
     public static void Initialize()
     {
         var edits = new ContentPack("Room Edits", "Tools used to edit rooms")
         {
             new PreviewablePackElement(CreateHazardRespawnPoint(), "Hazard Respawn Point", "Utility",
-                ResourceUtils.LoadInternal("hazard_respawn_point"))
+                    ResourceUtils.LoadInternal("hazard_respawn_point"))
                 .WithConfigGroup(ConfigGroup.HazardRespawnPoint)
                 .WithReceiverGroup(ReceiverGroup.HazardRespawnPoint),
             new SimplePackElement(CreateObject("Teleport Point"), "Teleport Point", "Utility",
@@ -26,7 +28,7 @@ public static class RoomObjects
                 .WithReceiverGroup(ReceiverGroup.TeleportPoint)
                 .WithConfigGroup(ConfigGroup.Invisible),
             new PreviewablePackElement(CreateDarkness(), "Darkness", "Utility",
-                    ResourceUtils.LoadInternal("darkness")),
+                ResourceUtils.LoadInternal("darkness")),
             new SimplePackElement(CreateBinoculars(), "Binoculars", "Utility")
                 .WithConfigGroup(ConfigGroup.Binoculars)
                 .WithBroadcasterGroup(BroadcasterGroup.Binoculars)
@@ -38,8 +40,8 @@ public static class RoomObjects
             {
                 var clearer = o.GetOrAddComponent<RoomClearerConfig>();
 
-                var objects = o.scene.GetRootGameObjects().Where(obj => 
-                    !obj.name.StartsWith("[Architect]") 
+                var objects = o.scene.GetRootGameObjects().Where(obj =>
+                    !obj.name.StartsWith("[Architect]")
                     && !obj.name.StartsWith("_SceneManager")
                 );
 
@@ -75,7 +77,8 @@ public static class RoomObjects
 
                 return objects.Select(obj => obj.GetOrAddComponent<Disabler>()).ToArray();
             }).WithConfigGroup(ConfigGroup.RoomClearer),
-            CreateObjectRemover("hrp_remover", "Remove Hazard Respawn Point", FindObjectsToDisable<HazardRespawnTrigger>)
+            CreateObjectRemover("hrp_remover", "Remove Hazard Respawn Point",
+                    FindObjectsToDisable<HazardRespawnTrigger>)
                 .WithConfigGroup(ConfigGroup.Invisible)
                 .WithReceiverGroup(ReceiverGroup.Invisible),
             CreateObjectRemover("door_remover", "Remove Transition", FindObjectsToDisable<TransitionPoint>)
@@ -88,18 +91,21 @@ public static class RoomObjects
                 .WithConfigGroup(ConfigGroup.Invisible)
                 .WithReceiverGroup(ReceiverGroup.Invisible),
             CreateObjectRemover("object_remover", "Remove Object", o =>
-            {
-                var config = o.GetComponent<ObjectRemoverConfig>();
-                GameObject point = null;
-                
-                if (config)
                 {
-                    try { point = o.scene.FindGameObject(config.objectPath); }
-                    catch (ArgumentException) { }
-                }
+                    var config = o.GetComponent<ObjectRemoverConfig>();
+                    GameObject point = null;
 
-                return point is not null ? [point.GetOrAddComponent<Disabler>()] : [];
-            })
+                    if (config)
+                        try
+                        {
+                            point = o.scene.FindGameObject(config.objectPath);
+                        }
+                        catch (ArgumentException)
+                        {
+                        }
+
+                    return point is not null ? [point.GetOrAddComponent<Disabler>()] : [];
+                })
                 .WithConfigGroup(ConfigGroup.ObjectRemover)
                 .WithReceiverGroup(ReceiverGroup.Invisible)
         };
@@ -112,7 +118,7 @@ public static class RoomObjects
             .Where(obj => !obj.name.StartsWith("[Architect] "))
             .SelectMany(root => root.GetComponentsInChildren<T>(true))
             .Select(obj => obj.gameObject);
-        
+
         var lowest = float.MaxValue;
         GameObject point = null;
         foreach (var obj in objects)
@@ -127,23 +133,21 @@ public static class RoomObjects
                 point = obj;
             }
         }
-        
+
         return point is not null && lowest <= 500 ? [point.gameObject.GetOrAddComponent<Disabler>()] : [];
     }
-
-    private static readonly Dictionary<string, Func<GameObject, Disabler[]>> EditActions = new();
 
     private static AbstractPackElement CreateCameraBorder()
     {
         CameraBorder.Init();
-        
+
         var obj = new GameObject("Camera Border");
         obj.AddComponent<CameraBorder>();
-        
+
         var sprite = ResourceUtils.LoadInternal("camera");
         obj.layer = 10;
         obj.transform.position += new Vector3(0, 0, 0.1f);
-        
+
         Object.DontDestroyOnLoad(obj);
         obj.SetActive(false);
         return new PreviewablePackElement(obj, "Camera Border", "Utility", sprite)
@@ -155,24 +159,25 @@ public static class RoomObjects
     {
         var obj = new GameObject("Scene Border Remover");
         obj.AddComponent<SceneBorderRemover>();
-        
+
         var sprite = ResourceUtils.LoadInternal("scene_border_remover");
         obj.layer = 10;
         obj.transform.position += new Vector3(0, 0, 0.1f);
-        
+
         Object.DontDestroyOnLoad(obj);
         obj.SetActive(false);
         return new PreviewablePackElement(obj, "Remove Top Right Border", "Utility", sprite)
             .WithReceiverGroup(ReceiverGroup.Invisible);
     }
 
-    private static AbstractPackElement CreateObjectRemover(string id, string name, [CanBeNull] Func<GameObject, Disabler[]> action)
+    private static AbstractPackElement CreateObjectRemover(string id, string name,
+        [CanBeNull] Func<GameObject, Disabler[]> action)
     {
         var obj = new GameObject { name = "Object Remover (" + id + ")" };
-        
+
         EditActions[id] = action;
         obj.AddComponent<ObjectRemover>().triggerName = id;
-        
+
         var sprite = ResourceUtils.LoadInternal(id, FilterMode.Point);
         obj.layer = 10;
         obj.transform.position += new Vector3(0, 0, 0.1f);
@@ -182,18 +187,18 @@ public static class RoomObjects
         return new PreviewablePackElement(obj, name, "Utility", sprite)
             .WithReceiverGroup(ReceiverGroup.Invisible);
     }
-    
+
     private static AbstractPackElement CreateTransitionPoint()
     {
         var obj = new GameObject("Transition Point");
 
         CustomTransitionPoint.Init();
-        
+
         obj.AddComponent<CustomTransitionPoint>();
         var point = obj.AddComponent<TransitionPoint>();
         point.nonHazardGate = true;
         point.transform.localScale *= 3;
-        
+
         var col = obj.AddComponent<BoxCollider2D>();
         col.size = new Vector2(1, 1);
         col.isTrigger = true;
@@ -227,7 +232,7 @@ public static class RoomObjects
     private static GameObject CreateDarkness()
     {
         Darkness.Init();
-        
+
         var point = new GameObject("Darkness");
 
         point.AddComponent<Darkness>();
@@ -244,14 +249,14 @@ public static class RoomObjects
         var col = point.AddComponent<BoxCollider2D>();
         col.isTrigger = true;
         col.size = new Vector2(1.25f, 1.06f);
-        
+
         point.AddComponent<SpriteRenderer>().sprite = ResourceUtils.LoadInternal("binoculars");
-        
+
         Binoculars.Init();
         var softTerrain = LayerMask.NameToLayer("Soft Terrain");
         point.layer = softTerrain;
         point.AddComponent<Binoculars>();
-        
+
         point.SetActive(false);
         Object.DontDestroyOnLoad(point);
 

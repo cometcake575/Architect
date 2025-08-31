@@ -5,7 +5,7 @@ namespace Architect.MultiplayerHook.Packets;
 public class WinPacketData : IPacketData
 {
     public string WinnerName;
-    
+
     public void WriteData(IPacket packet)
     {
         packet.Write(WinnerName);

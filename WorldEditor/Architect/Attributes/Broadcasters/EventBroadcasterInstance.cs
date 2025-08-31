@@ -13,7 +13,7 @@ public class EventBroadcasterInstance : MonoBehaviour
     }
 
     public void Broadcast(bool multiplayer)
-    { 
+    {
         EventManager.BroadcastEvent(eventName, multiplayer);
     }
 }

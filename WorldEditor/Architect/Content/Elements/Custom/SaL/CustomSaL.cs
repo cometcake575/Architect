@@ -9,23 +9,24 @@ public static class CustomSaL
 {
     public static void Initialize()
     {
-        var pack = new ContentPack("Architect S&L", "Architect's expansions for the Celeste themed Scattered and Lost mod")
+        var pack = new ContentPack("Architect S&L",
+            "Architect's expansions for the Celeste themed Scattered and Lost mod")
         {
-            MakeCrystalObject(),
+            MakeCrystalObject()
         };
-        
+
         ContentPacks.RegisterPack(pack);
     }
-    
+
     private static GameObject MakeObject(string name, string sprite)
     {
         var obj = new GameObject(name);
 
-        obj.AddComponent<SpriteRenderer>().sprite = ResourceUtils.LoadInternal(sprite, FilterMode.Point, ppu:10);
+        obj.AddComponent<SpriteRenderer>().sprite = ResourceUtils.LoadInternal(sprite, FilterMode.Point, 10);
         obj.SetActive(false);
 
         Object.DontDestroyOnLoad(obj);
-        
+
         return obj;
     }
 

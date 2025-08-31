@@ -23,7 +23,7 @@ public class IntConfigType(string name, Action<GameObject, IntConfigValue> actio
     {
         return !_defaultValue.HasValue ? null : new IntConfigValue(this, _defaultValue.Value);
     }
-    
+
     public override ConfigValue Deserialize(string data)
     {
         return new IntConfigValue(this, Convert.ToInt32(data));
@@ -38,7 +38,7 @@ public class IntConfigType(string name, Action<GameObject, IntConfigValue> actio
 public class IntConfigElement : ConfigElement
 {
     private readonly TextInput _input;
-    
+
     public IntConfigElement(string name, LayoutRoot layout, Button apply, [CanBeNull] string oldValue)
     {
         _input = new TextInput(layout, name + " Input")
@@ -46,7 +46,7 @@ public class IntConfigElement : ConfigElement
             MinWidth = 80,
             ContentType = InputField.ContentType.IntegerNumber
         };
-        
+
         if (oldValue != null) _input.Text = oldValue;
         var last = _input.Text;
 
@@ -71,12 +71,12 @@ public class IntConfigElement : ConfigElement
 
 public class IntConfigValue : ConfigValue<IntConfigType>
 {
+    private readonly int _value;
+
     public IntConfigValue(IntConfigType type, int value) : base(type)
     {
         _value = value;
     }
-
-    private readonly int _value;
 
     public int GetValue()
     {

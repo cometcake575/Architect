@@ -4,13 +4,13 @@ namespace Architect.MultiplayerHook.Packets;
 
 public class EditPacketData : IPacketData
 {
-    public string SceneName;
     public byte[] Edits;
-    
+    public string SceneName;
+
     public void WriteData(IPacket packet)
     {
         packet.Write(SceneName);
-        
+
         packet.Write(Edits.Length);
         foreach (var b in Edits) packet.Write(b);
     }
@@ -21,11 +21,8 @@ public class EditPacketData : IPacketData
 
         var count = packet.ReadInt();
         Edits = new byte[count];
-        
-        for (var i = 0; i < count; i++)
-        {
-            Edits[i] = packet.ReadByte();
-        }
+
+        for (var i = 0; i < count; i++) Edits[i] = packet.ReadByte();
     }
 
     public bool IsReliable => true;

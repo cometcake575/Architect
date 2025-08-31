@@ -1,15 +1,13 @@
-using System;
 using UnityEngine;
 
 namespace Architect.Content.Elements.Custom.Behaviour;
 
 public class AnimatorDelay : MonoBehaviour
 {
+    public float delay;
     private Animator _animator;
     private bool _done;
-    
-    public float delay;
-    
+
     private void Start()
     {
         _animator = GetComponentInChildren<Animator>();

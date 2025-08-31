@@ -19,7 +19,9 @@ public class ChoiceConfigType(string name, Action<GameObject, ChoiceConfigValue>
 
     public override ConfigValue GetDefaultValue()
     {
-        return !_defaultValue.HasValue ? null : new ChoiceConfigValue(this, _defaultValue.Value, options[_defaultValue.Value]);
+        return !_defaultValue.HasValue
+            ? null
+            : new ChoiceConfigValue(this, _defaultValue.Value, options[_defaultValue.Value]);
     }
 
     public override ConfigValue Deserialize(string data)
@@ -38,8 +40,9 @@ public class ChoiceConfigElement : ConfigElement
 {
     private readonly Button _input;
     private int _choice;
-    
-    public ChoiceConfigElement(string name, LayoutRoot layout, Button apply, string[] options, [CanBeNull] string oldValue)
+
+    public ChoiceConfigElement(string name, LayoutRoot layout, Button apply, string[] options,
+        [CanBeNull] string oldValue)
     {
         _input = new Button(layout, name + " Input")
         {
@@ -80,14 +83,14 @@ public class ChoiceConfigElement : ConfigElement
 public class ChoiceConfigValue : ConfigValue<ChoiceConfigType>
 {
     private readonly string _stringValue;
-    
+
+    private readonly int _value;
+
     public ChoiceConfigValue(ChoiceConfigType type, int value, string stringValue) : base(type)
     {
         _value = value;
         _stringValue = stringValue;
     }
-
-    private readonly int _value;
 
     public int GetValue()
     {

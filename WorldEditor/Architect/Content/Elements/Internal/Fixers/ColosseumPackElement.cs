@@ -6,11 +6,12 @@ namespace Architect.Content.Elements.Internal.Fixers;
 
 internal class ColosseumPackElement : InternalPackElement
 {
-    private GameObject _gameObject;
-    private readonly string _scene;
     private readonly string _path;
+    private readonly string _scene;
+    private GameObject _gameObject;
 
-    public ColosseumPackElement(string scene, string path, string name, string category, int weight = 0) : base(name, category, weight)
+    public ColosseumPackElement(string scene, string path, string name, string category, int weight = 0) : base(name,
+        category, weight)
     {
         _scene = scene;
         _path = path;
@@ -34,14 +35,14 @@ internal class ColosseumPackElement : InternalPackElement
         var cage = preloads[_scene][_path];
 
         var fsm = cage.LocateMyFSM("Spawn");
-        
+
         var corpse = fsm.FsmVariables.FindFsmGameObject("Corpse to Instantiate");
         if (corpse != null)
         {
             _gameObject = corpse.Value;
             return;
         }
-        
+
         _gameObject = fsm.FsmVariables.FindFsmGameObject("Enemy Type").Value;
     }
 }

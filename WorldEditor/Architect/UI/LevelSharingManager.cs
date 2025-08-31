@@ -21,9 +21,13 @@ namespace Architect.UI;
 
 public static class LevelSharingManager
 {
-    private static Button _switchButton;
     private const int LevelsPerPage = 5;
-    
+
+    private const string URL = "https://cometcake575.pythonanywhere.com";
+
+    private const float MenuFadeSpeed = 3.2f;
+    private static Button _switchButton;
+
     private static bool _viewing;
     private static GridLayout _searchArea;
     private static GridLayout _downloadArea;
@@ -38,10 +42,11 @@ public static class LevelSharingManager
     private static List<Dictionary<string, string>> _currentLevels;
     private static TextInput _descriptionInput;
     private static TextInput _creatorInput;
-    
+
     private static TextObject _success;
 
-    private const string URL = "https://cometcake575.pythonanywhere.com";
+    private static Button _uploadButton;
+    private static Button _deleteButton;
 
     public static void Initialize(LayoutRoot layout)
     {
@@ -68,7 +73,7 @@ public static class LevelSharingManager
     private static void SetupIndexButtons(LayoutRoot layout)
     {
         var arrowPadding = new Padding(150, 0);
-        
+
         _leftButton = new Button(layout, "Left")
         {
             Content = "<=",
@@ -84,7 +89,7 @@ public static class LevelSharingManager
             if (_index < 0) _index = _currentLevels.Count / LevelsPerPage;
             RefreshCurrentLevels();
         };
-        
+
         _rightButton = new Button(layout, "Right")
         {
             Content = "=>",
@@ -168,15 +173,15 @@ public static class LevelSharingManager
             desc = description,
             creator = creator
         });
-        
+
         var request = new UnityWebRequest(URL + "/search", "POST");
-        
+
         var bodyRaw = Encoding.UTF8.GetBytes(jsonBody);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
-        
+
         request.SetRequestHeader("Content-Type", "application/json");
-        
+
         var operation = request.SendWebRequest();
         while (!operation.isDone) await Task.Yield();
 
@@ -186,23 +191,23 @@ public static class LevelSharingManager
     private static async Task DownloadLevel(int index)
     {
         if (_currentLevels.Count <= index) return;
-        
+
         DisableControls();
         ShowStatus("Downloading...");
-        
+
         var jsonBody = JsonUtility.ToJson(new DownloadRequestData
         {
             level_id = _currentLevels[index]["level_id"]
         });
-        
+
         var request = new UnityWebRequest(URL + "/download", "POST");
-        
+
         var bodyRaw = Encoding.UTF8.GetBytes(jsonBody);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
-        
+
         request.SetRequestHeader("Content-Type", "application/json");
-        
+
         var operation = request.SendWebRequest();
         while (!operation.isDone) await Task.Yield();
         if (request.responseCode != 200)
@@ -214,23 +219,23 @@ public static class LevelSharingManager
 
         var json = request.downloadHandler.text;
 
-        var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(json); 
+        var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
         GameManager.instance.StartCoroutine(SceneSaveLoader.LoadAllScenes(data));
-        
+
         PlacementManager.InvalidateCache();
     }
 
-    private const float MenuFadeSpeed = 3.2f;
-    
     private static IEnumerator FadeGameTitle()
     {
         var sprite = UIManager.instance.gameTitle;
         while (sprite.color.a > 0.0)
         {
             if (!_viewing) break;
-            sprite.color = new Color(sprite.color.r, sprite.color.g, sprite.color.b, sprite.color.a - Time.unscaledDeltaTime * MenuFadeSpeed);
+            sprite.color = new Color(sprite.color.r, sprite.color.g, sprite.color.b,
+                sprite.color.a - Time.unscaledDeltaTime * MenuFadeSpeed);
             yield return null;
         }
+
         sprite.color = new Color(sprite.color.r, sprite.color.g, sprite.color.b, _viewing ? 0 : 1);
 
         if (_viewing)
@@ -243,41 +248,8 @@ public static class LevelSharingManager
             _leftButton.Visibility = Visibility.Visible;
             _rightButton.Visibility = Visibility.Visible;
         }
-        
+
         yield return null;
-    }
-    
-    [Serializable]
-    public class SearchRequestData
-    {
-        public string desc;
-        public string creator;
-    }
-    
-    [Serializable]
-    public class DownloadRequestData
-    {
-        // ReSharper disable once InconsistentNaming
-        // ReSharper disable once NotAccessedField.Global
-        public string level_id;
-    }
-    
-    [Serializable]
-    public class AuthRequestData
-    {
-        // ReSharper disable once NotAccessedField.Global
-        public string username;
-        // ReSharper disable once NotAccessedField.Global
-        public string password;
-    }
-    
-    [Serializable]
-    public class DeleteRequestData
-    {
-        // ReSharper disable once NotAccessedField.Global
-        public string key;
-        // ReSharper disable once NotAccessedField.Global
-        public string name;
     }
 
     private static void SetupSearchArea(LayoutRoot layout)
@@ -374,7 +346,7 @@ public static class LevelSharingManager
 
         var dcPadding = new Padding(0, 20, 30, 0);
         var descPadding = new Padding(0, 0, 0, 15);
-        
+
         for (var i = 0; i < LevelsPerPage; i++)
         {
             var img = new Image(layout, Architect.BlankSprite, "Image " + i)
@@ -385,7 +357,7 @@ public static class LevelSharingManager
                 Height = 70,
                 PreserveAspectRatio = true
             }.WithProp(GridLayout.Row, i * 2).WithProp(GridLayout.RowSpan, 2);
-            
+
             var downloadCount = new TextObject(layout, "Download Count " + i)
             {
                 Text = "",
@@ -396,7 +368,7 @@ public static class LevelSharingManager
                 VerticalAlignment = VerticalAlignment.Top,
                 HorizontalAlignment = HorizontalAlignment.Center
             }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, i * 2).WithProp(GridLayout.RowSpan, 2);
-            
+
             var infoName = new TextObject(layout, "Info 1A")
             {
                 Text = "",
@@ -422,9 +394,9 @@ public static class LevelSharingManager
                 VerticalAlignment = VerticalAlignment.Center,
                 Visibility = Visibility.Hidden
             }.WithProp(GridLayout.Column, 4).WithProp(GridLayout.Row, i * 2);
-            
+
             DownloadChoices.Add((downloadCount, infoName, infoDesc, download, img));
-            
+
             var k = i;
             download.Click += async _ => await DownloadLevel(_index * LevelsPerPage + k);
 
@@ -441,7 +413,7 @@ public static class LevelSharingManager
         for (var i = 0; i < LevelsPerPage; i++)
         {
             DownloadChoices[i].Item5.Sprite = Architect.BlankSprite;
-            
+
             var index = _index * LevelsPerPage + i;
             if (_currentLevels.Count > index)
             {
@@ -450,7 +422,8 @@ public static class LevelSharingManager
                 DownloadChoices[i].Item2.Text = name + new string(' ', Mathf.Max(0, 50 - name.Length));
                 DownloadChoices[i].Item3.Text = SplitText(_currentLevels[index]["level_desc"]);
                 DownloadChoices[i].Item4.Visibility = Visibility.Visible;
-                UIManager.instance.StartCoroutine(GetSprite(DownloadChoices[i].Item5, _index, _currentLevels[index]["url"]));
+                UIManager.instance.StartCoroutine(GetSprite(DownloadChoices[i].Item5, _index,
+                    _currentLevels[index]["url"]));
             }
             else
             {
@@ -478,21 +451,20 @@ public static class LevelSharingManager
             image.Sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), default);
         }
     }
-    
+
     private static string SplitText(string text)
     {
         var segments = new List<string>();
         var words = text.Split(' ');
-        
+
         var currentSegment = "\t";
         var sub = 0;
 
         foreach (var word in words)
-        {
             if (currentSegment.Length + word.Length - sub <= 100)
             {
                 if (currentSegment.Length > 1) currentSegment += " ";
-                
+
                 currentSegment += word;
             }
             else
@@ -503,13 +475,13 @@ public static class LevelSharingManager
                 if (segments.Count >= 4) break;
                 currentSegment = "\n\t" + word;
             }
-        }
 
         if (segments.Count < 4 && currentSegment.Length > 0)
         {
             currentSegment += new string(' ', Mathf.Max(0, 100 - currentSegment.Length + sub));
             segments.Add(currentSegment);
         }
+
         while (segments.Count < 4) segments.Add("\n");
 
         return segments.Aggregate("", (current, seg) => current + seg);
@@ -518,7 +490,7 @@ public static class LevelSharingManager
     private static void SetupLoginArea(LayoutRoot layout)
     {
         var padding = new Padding(20, 0);
-        
+
         var errorMessage = new TextObject(layout)
         {
             FontSize = 15,
@@ -527,7 +499,7 @@ public static class LevelSharingManager
             VerticalAlignment = VerticalAlignment.Center,
             HorizontalAlignment = HorizontalAlignment.Center
         }.WithProp(GridLayout.ColumnSpan, 2);
-        
+
         var usernameInput = new TextInput(layout)
         {
             MinWidth = 160,
@@ -537,7 +509,7 @@ public static class LevelSharingManager
             VerticalAlignment = VerticalAlignment.Center,
             HorizontalAlignment = HorizontalAlignment.Center
         }.WithProp(GridLayout.Row, 2);
-        
+
         var passwordInput = new TextInput(layout)
         {
             MinWidth = 160,
@@ -572,7 +544,7 @@ public static class LevelSharingManager
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center
         }.WithProp(GridLayout.Column, 2);
-        
+
         _loginArea = new GridLayout(layout, "Login Area")
         {
             Padding = new Padding(50, 50),
@@ -633,7 +605,10 @@ public static class LevelSharingManager
             Visibility = Visibility.Hidden
         };
 
-        if (Architect.GlobalSettings.ApiKey.Length == 0) logOutButton.Enabled = false;
+        if (Architect.GlobalSettings.ApiKey.Length == 0)
+        {
+            logOutButton.Enabled = false;
+        }
         else
         {
             signUpButton.Enabled = false;
@@ -641,7 +616,7 @@ public static class LevelSharingManager
             usernameInput.Enabled = false;
             passwordInput.Enabled = false;
         }
-        
+
         logOutButton.Click += button =>
         {
             Architect.GlobalSettings.ApiKey = "";
@@ -677,44 +652,43 @@ public static class LevelSharingManager
             _deleteButton.Enabled = true;
         };
     }
-    
-    private static async Task<bool> SendAuthRequest(string username, string password, string path, TextObject errorMessage)
+
+    private static async Task<bool> SendAuthRequest(string username, string password, string path,
+        TextObject errorMessage)
     {
         var jsonBody = JsonUtility.ToJson(new AuthRequestData
         {
             username = username,
             password = password
         });
-        
+
         var request = new UnityWebRequest(URL + path, "POST");
-        
+
         var bodyRaw = Encoding.UTF8.GetBytes(jsonBody);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
-        
+
         request.SetRequestHeader("Content-Type", "application/json");
-        
+
         var operation = request.SendWebRequest();
         while (!operation.isDone) await Task.Yield();
-        
+
         var response = JsonConvert.DeserializeObject<Dictionary<string, string>>(request.downloadHandler.text);
         if (!response.TryGetValue("key", out var value))
         {
             errorMessage.Text = response.TryGetValue("error", out var error) ? error : "Error occured when uploading";
             return false;
         }
+
         Architect.GlobalSettings.ApiKey = value;
         errorMessage.Text = "";
         return true;
     }
 
-    private static Button _uploadButton;
-    private static Button _deleteButton;
-
     private static void SetupUploadArea(LayoutRoot layout)
     {
         var padding = new Padding(10, 5);
-        
+
         _uploadButton = new Button(layout)
         {
             FontSize = 15,
@@ -724,7 +698,7 @@ public static class LevelSharingManager
             VerticalAlignment = VerticalAlignment.Center,
             Enabled = Architect.GlobalSettings.ApiKey.Length > 0
         }.WithProp(GridLayout.Column, 2).WithProp(GridLayout.Row, 1);
-        
+
         _deleteButton = new Button(layout)
         {
             FontSize = 15,
@@ -743,7 +717,7 @@ public static class LevelSharingManager
             VerticalAlignment = VerticalAlignment.Center,
             HorizontalAlignment = HorizontalAlignment.Center
         }.WithProp(GridLayout.Column, 1);
-        
+
         var nameInput = new TextInput(layout)
         {
             MinWidth = 320,
@@ -753,7 +727,7 @@ public static class LevelSharingManager
             VerticalAlignment = VerticalAlignment.Center,
             HorizontalAlignment = HorizontalAlignment.Center
         }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 1);
-        
+
         var descInput = new TextInput(layout)
         {
             MinWidth = 320,
@@ -763,7 +737,7 @@ public static class LevelSharingManager
             VerticalAlignment = VerticalAlignment.Center,
             HorizontalAlignment = HorizontalAlignment.Center
         }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 2);
-        
+
         var urlInput = new TextInput(layout)
         {
             MinWidth = 320,
@@ -773,7 +747,7 @@ public static class LevelSharingManager
             VerticalAlignment = VerticalAlignment.Center,
             HorizontalAlignment = HorizontalAlignment.Center
         }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 3);
-        
+
         _uploadArea = new GridLayout(layout, "Upload Area")
         {
             Padding = new Padding(50, 70),
@@ -828,33 +802,27 @@ public static class LevelSharingManager
             Visibility = Visibility.Hidden
         };
 
-        _uploadButton.Click += async _ =>
-        {
-            await UploadLevel(nameInput.Text, descInput.Text, urlInput.Text);
-        };
+        _uploadButton.Click += async _ => { await UploadLevel(nameInput.Text, descInput.Text, urlInput.Text); };
 
-        _deleteButton.Click += async _ =>
-        {
-            await DeleteLevel(nameInput.Text);
-        };
+        _deleteButton.Click += async _ => { await DeleteLevel(nameInput.Text); };
     }
 
     private static async Task UploadLevel(string name, string desc, string iconUrl)
     {
         var form = new WWWForm();
-        
+
         form.AddField("key", Architect.GlobalSettings.ApiKey);
         form.AddField("name", name);
         form.AddField("desc", desc);
         form.AddField("url", iconUrl);
-        
+
         var jsonData = SceneSaveLoader.SerializeAllScenes();
-        
+
         var jsonBytes = Encoding.UTF8.GetBytes(jsonData);
         form.AddBinaryData("level", jsonBytes, "level.json", "application/json");
-        
+
         var request = UnityWebRequest.Post(URL + "/upload", form);
-        
+
         var operation = request.SendWebRequest();
         while (!operation.isDone) await Task.Yield();
         if (request.responseCode != 201)
@@ -876,15 +844,15 @@ public static class LevelSharingManager
             key = Architect.GlobalSettings.ApiKey,
             name = name
         });
-        
+
         var request = new UnityWebRequest(URL + "/delete", "POST");
-        
+
         var bodyRaw = Encoding.UTF8.GetBytes(jsonBody);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
-        
+
         request.SetRequestHeader("Content-Type", "application/json");
-        
+
         var operation = request.SendWebRequest();
         while (!operation.isDone) await Task.Yield();
         if (request.responseCode != 201)
@@ -918,5 +886,40 @@ public static class LevelSharingManager
         _switchButton.Enabled = true;
         _leftButton.Enabled = true;
         _rightButton.Enabled = true;
+    }
+
+    [Serializable]
+    public class SearchRequestData
+    {
+        public string desc;
+        public string creator;
+    }
+
+    [Serializable]
+    public class DownloadRequestData
+    {
+        // ReSharper disable once InconsistentNaming
+        // ReSharper disable once NotAccessedField.Global
+        public string level_id;
+    }
+
+    [Serializable]
+    public class AuthRequestData
+    {
+        // ReSharper disable once NotAccessedField.Global
+        public string username;
+
+        // ReSharper disable once NotAccessedField.Global
+        public string password;
+    }
+
+    [Serializable]
+    public class DeleteRequestData
+    {
+        // ReSharper disable once NotAccessedField.Global
+        public string key;
+
+        // ReSharper disable once NotAccessedField.Global
+        public string name;
     }
 }

@@ -5,6 +5,13 @@ namespace Architect.Category;
 
 internal abstract class ObjectCategory
 {
+    private readonly string _name;
+
+    protected ObjectCategory(string name)
+    {
+        _name = name;
+    }
+
     internal string GetName()
     {
         return _name;
@@ -16,11 +23,4 @@ internal abstract class ObjectCategory
     }
 
     internal abstract List<SelectableObject> GetObjects();
-
-    private readonly string _name;
-
-    protected ObjectCategory(string name)
-    {
-        _name = name;
-    }
 }

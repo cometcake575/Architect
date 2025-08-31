@@ -7,7 +7,7 @@ public class CustomDamager : MonoBehaviour
 {
     public int damageAmount;
     public int damageType = 2;
-    
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         var controller = other.gameObject.GetComponent<HeroController>();

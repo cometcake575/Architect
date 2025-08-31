@@ -6,7 +6,8 @@ namespace Architect.Content.Elements.Internal.Fixers;
 
 internal class BreakableWallElement : GInternalPackElement
 {
-    public BreakableWallElement(string scene, string path, string name, int weight) : base(scene, path, name, "Interactable", weight)
+    public BreakableWallElement(string scene, string path, string name, int weight) : base(scene, path, name,
+        "Interactable", weight)
     {
         WithRotationGroup(RotationGroup.Four);
         WithConfigGroup(ConfigGroup.Breakable);
@@ -15,7 +16,7 @@ internal class BreakableWallElement : GInternalPackElement
     internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
     {
         base.AfterPreload(preloads);
-        
+
         for (var i = 0; i < GameObject.transform.childCount; i++)
         {
             var obj = GameObject.transform.GetChild(i).gameObject;
@@ -27,7 +28,7 @@ internal class BreakableWallElement : GInternalPackElement
 internal class DiveGroundElement : InternalPackElement
 {
     private GameObject _gameObject;
-    
+
     public DiveGroundElement(int weight) : base("Dive Ground", "Interactable", weight)
     {
         WithRotationGroup(RotationGroup.Four);
@@ -56,7 +57,7 @@ internal class DiveGroundElement : InternalPackElement
 internal class BreakableCoffinElement : InternalPackElement
 {
     private GameObject _gameObject;
-    
+
     public BreakableCoffinElement(int weight) : base("Dive Coffin", "Interactable", weight)
     {
         WithRotationGroup(RotationGroup.Four);

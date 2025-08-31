@@ -21,7 +21,7 @@ public class BoolConfigType(string name, Action<GameObject, BoolConfigValue> act
     {
         return !_defaultValue.HasValue ? null : new BoolConfigValue(this, _defaultValue.Value);
     }
-    
+
     public override ConfigValue Deserialize(string data)
     {
         return new BoolConfigValue(this, Convert.ToBoolean(data));
@@ -37,7 +37,7 @@ public class BoolConfigElement : ConfigElement
 {
     private readonly Button _input;
     private bool _choice;
-    
+
     public BoolConfigElement(string name, LayoutRoot layout, Button apply, [CanBeNull] string oldValue)
     {
         _input = new Button(layout, name + " Input")
@@ -50,7 +50,11 @@ public class BoolConfigElement : ConfigElement
         {
             _choice = oldValue == bool.TrueString;
             _input.Content = _choice.ToString();
-        } else _input.Content = "Default";
+        }
+        else
+        {
+            _input.Content = "Default";
+        }
 
         _input.Click += button =>
         {
@@ -73,12 +77,12 @@ public class BoolConfigElement : ConfigElement
 
 public class BoolConfigValue : ConfigValue<BoolConfigType>
 {
+    private readonly bool _value;
+
     public BoolConfigValue(BoolConfigType type, bool value) : base(type)
     {
         _value = value;
     }
-
-    private readonly bool _value;
 
     public bool GetValue()
     {

@@ -10,12 +10,12 @@ public class UpdatePacketData : IPacketData
     public float X;
     public float Y;
     public float Z;
-    
+
     public void WriteData(IPacket packet)
     {
         packet.Write(Id);
         packet.Write(SceneName);
-        
+
         packet.Write(X);
         packet.Write(Y);
         packet.Write(X);

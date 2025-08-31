@@ -7,21 +7,23 @@ namespace Architect.Content.Elements.Custom.Behaviour;
 
 public class ZoteTrophy : MonoBehaviour
 {
-    private ParticleSystem _system;
-    private SpriteRenderer _renderer;
+    private static GameObject _titleCard;
+    private static FsmString _titleCardData;
     private bool _collected;
     private float _collectedTime;
     private bool _particlesStopped;
-    
+    private SpriteRenderer _renderer;
+    private ParticleSystem _system;
+
     private void Start()
     {
         _renderer = GetComponent<SpriteRenderer>();
-        
+
         _system = GetComponent<ParticleSystem>();
         _system.Stop();
-        
+
         _system.textureSheetAnimation.AddSprite(_renderer.sprite);
-        
+
         var particleRenderer = _system.GetComponent<ParticleSystemRenderer>();
 
         var particleMaterial = new Material(Shader.Find("Sprites/Default"))
@@ -43,25 +45,6 @@ public class ZoteTrophy : MonoBehaviour
 
         rot.z = new ParticleSystem.MinMaxCurve(2.0f, curve, curve2);
     }
-    
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (!other.gameObject.GetComponent<HeroController>()) return;
-        
-        if (_collected) return;
-        
-        if (Architect.UsingMultiplayer)
-        {
-            WinScreen("You Win!");
-            HkmpHook.BroadcastWin();
-        }
-
-        _system.Play();
-        _system.time = 4;
-        
-        _renderer.enabled = false;
-        _collected = true;
-    }
 
     private void Update()
     {
@@ -73,14 +56,30 @@ public class ZoteTrophy : MonoBehaviour
         _system.Stop();
     }
 
-    private static GameObject _titleCard;
-    private static FsmString _titleCardData;
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (!other.gameObject.GetComponent<HeroController>()) return;
+
+        if (_collected) return;
+
+        if (Architect.UsingMultiplayer)
+        {
+            WinScreen("You Win!");
+            HkmpHook.BroadcastWin();
+        }
+
+        _system.Play();
+        _system.time = 4;
+
+        _renderer.enabled = false;
+        _collected = true;
+    }
 
     public static void Init()
     {
         _titleCard = GameCameras.instance.hudCamera.transform.GetChild(10).GetChild(0).gameObject;
         _titleCardData = _titleCard.LocateMyFSM("Area Title Control").FsmVariables.FindFsmString("Area Event");
-        
+
         ModHooks.LanguageGetHook += (key, _, orig) =>
         {
             if (key.EndsWith("_RawText_SUPER") || key.EndsWith("_RawText_SUB")) return "";

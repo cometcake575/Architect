@@ -9,7 +9,7 @@ public class KeyListener : MonoBehaviour
     public KeyCode key = KeyCode.Space;
 
     private float _keyHeld;
-    
+
     private void Update()
     {
         switch (listenMode)
@@ -30,6 +30,7 @@ public class KeyListener : MonoBehaviour
                     EventManager.BroadcastEvent(gameObject, "KeyPress");
                     _keyHeld -= 0.01f;
                 }
+
                 break;
         }
     }

@@ -1,4 +1,3 @@
-using System;
 using Architect.Attributes;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -17,10 +16,49 @@ public class Relay : MonoBehaviour
     public bool multiplayerBroadcast;
     public float delay;
     public bool broadcastImmediately;
-    
+
     private PersistentRelayItem _item;
-    private bool _shouldRelay;
     private float _schedule = -1;
+    private bool _shouldRelay;
+
+    private void Awake()
+    {
+        _shouldRelay = startActivated;
+        if (string.IsNullOrEmpty(id)) return;
+
+        _item = gameObject.AddComponent<PersistentRelayItem>();
+
+        _item.persistentRelayData = new PersistentIntData
+        {
+            id = id,
+            sceneName = "Universal",
+            value = startActivated ? 1 : 0
+        };
+
+        _item.OnSetSaveState += value =>
+        {
+            if (value == -1) return;
+            _shouldRelay = value == 1;
+            if (broadcastImmediately) DoRelay();
+        };
+
+        _item.OnGetSaveState += (ref int value) => { value = _shouldRelay ? 1 : 0; };
+
+        _item.semiPersistent = semiPersistent;
+        _item.persistentRelayData.semiPersistent = semiPersistent;
+
+        _item.enabled = true;
+    }
+
+    private void Update()
+    {
+        canCall = true;
+        if (_schedule > 0)
+        {
+            _schedule -= Time.deltaTime;
+            if (_schedule <= 0) EventManager.BroadcastEvent(gameObject, "OnCall", multiplayerBroadcast);
+        }
+    }
 
     public bool ShouldRelay()
     {
@@ -36,48 +74,6 @@ public class Relay : MonoBehaviour
         else _schedule = delay;
     }
 
-    private void Awake()
-    {
-        _shouldRelay = startActivated;
-        if (string.IsNullOrEmpty(id)) return;
-        
-        _item = gameObject.AddComponent<PersistentRelayItem>();
-        
-        _item.persistentRelayData = new PersistentIntData
-        {
-            id = id,
-            sceneName = "Universal",
-            value = startActivated ? 1 : 0
-        };
-
-        _item.OnSetSaveState += value =>
-        {
-            if (value == -1) return;
-            _shouldRelay = value == 1;
-            if (broadcastImmediately) DoRelay();
-        };
-
-        _item.OnGetSaveState += (ref int value) =>
-        {
-            value = _shouldRelay ? 1 : 0;
-        };
-
-        _item.semiPersistent = semiPersistent;
-        _item.persistentRelayData.semiPersistent = semiPersistent;
-        
-        _item.enabled = true;
-    }
-
-    private void Update()
-    {
-        canCall = true;
-        if (_schedule > 0)
-        {
-            _schedule -= Time.deltaTime;
-            if (_schedule <= 0) EventManager.BroadcastEvent(gameObject, "OnCall", multiplayerBroadcast);
-        }
-    }
-
     public void EnableRelay()
     {
         _shouldRelay = true;
@@ -91,53 +87,59 @@ public class Relay : MonoBehaviour
 
 public class PersistentRelayItem : MonoBehaviour
 {
-  [SerializeField] public bool semiPersistent;
-  [SerializeField] public PersistentIntData persistentRelayData;
-  private GameManager _gm;
+    public delegate void IntEvent(int value);
 
-  public event IntEvent OnSetSaveState;
+    public delegate void IntRefEvent(ref int value);
 
-  public event IntRefEvent OnGetSaveState;
+    [SerializeField] public bool semiPersistent;
+    [SerializeField] public PersistentIntData persistentRelayData;
+    private GameManager _gm;
 
-  private void OnEnable()
-  {
-    _gm = GameManager.instance;
-    _gm.SavePersistentObjects += SaveState;
-    if (semiPersistent) _gm.ResetSemiPersistentObjects += ResetState;
-  }
-
-  private void OnDisable()
-  {
-    _gm.SavePersistentObjects -= SaveState;
-    _gm.ResetSemiPersistentObjects -= ResetState;
-  }
-
-  private void Start()
-  {
-    var myState = SceneData.instance.FindMyState(persistentRelayData);
-    if (myState != null)
-    { 
-        persistentRelayData.value = myState.value; 
-        OnSetSaveState?.Invoke(myState.value);
+    private void Start()
+    {
+        var myState = SceneData.instance.FindMyState(persistentRelayData);
+        if (myState != null)
+        {
+            persistentRelayData.value = myState.value;
+            OnSetSaveState?.Invoke(myState.value);
+        }
+        else
+        {
+            OnGetSaveState?.Invoke(ref persistentRelayData.value);
+        }
     }
-    else OnGetSaveState?.Invoke(ref persistentRelayData.value);
-  }
 
-  public void SaveState()
-  {
-    OnGetSaveState?.Invoke(ref persistentRelayData.value);
-    SceneData.instance.SaveMyState(persistentRelayData);
-  }
+    private void OnEnable()
+    {
+        _gm = GameManager.instance;
+        _gm.SavePersistentObjects += SaveState;
+        if (semiPersistent) _gm.ResetSemiPersistentObjects += ResetState;
+    }
 
-  private void ResetState()
-  {
-    if (!semiPersistent) return;
-    persistentRelayData.value = -1;
-  }
+    private void OnDisable()
+    {
+        _gm.SavePersistentObjects -= SaveState;
+        _gm.ResetSemiPersistentObjects -= ResetState;
+    }
 
-  public void PreSetup() => Start();
+    public event IntEvent OnSetSaveState;
 
-  public delegate void IntEvent(int value);
+    public event IntRefEvent OnGetSaveState;
 
-  public delegate void IntRefEvent(ref int value);
+    public void SaveState()
+    {
+        OnGetSaveState?.Invoke(ref persistentRelayData.value);
+        SceneData.instance.SaveMyState(persistentRelayData);
+    }
+
+    private void ResetState()
+    {
+        if (!semiPersistent) return;
+        persistentRelayData.value = -1;
+    }
+
+    public void PreSetup()
+    {
+        Start();
+    }
 }

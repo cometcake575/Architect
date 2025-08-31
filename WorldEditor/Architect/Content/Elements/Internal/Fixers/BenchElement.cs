@@ -7,7 +7,8 @@ namespace Architect.Content.Elements.Internal.Fixers;
 
 internal class BenchElement : GInternalPackElement
 {
-    public BenchElement(string scene, string path, string name, string category, int weight, float offset = 0) : base(scene, path, name, category, weight, offset)
+    public BenchElement(string scene, string path, string name, string category, int weight, float offset = 0) : base(
+        scene, path, name, category, weight, offset)
     {
         WithRotationGroup(RotationGroup.All);
         WithConfigGroup(ConfigGroup.Benches);
@@ -23,9 +24,9 @@ internal class BenchElement : GInternalPackElement
     {
         var bench = gameObject.GetComponentInChildren<RestBench>().gameObject;
         var fsm = bench.LocateMyFSM("Bench Control");
-        
+
         fsm.FsmVariables.FindFsmBool("Set Respawn").Value = gameObject.GetComponent<BenchConfig>().setSpawn;
-        
+
         if (rotation == 0) return;
         fsm.FsmVariables
             .FindFsmBool("Tilter").Value = true;
@@ -37,7 +38,7 @@ internal class BenchElement : GInternalPackElement
         var obj = placement.SpawnObject();
         obj.transform.parent = preview.transform;
         var ls = obj.transform.lossyScale;
-        
+
         ls.x /= Mathf.Max(0.01f, preview.transform.localScale.x);
         ls.y /= Mathf.Max(0.01f, preview.transform.localScale.y);
         ls.z /= Mathf.Max(0.01f, preview.transform.localScale.z);

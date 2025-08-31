@@ -4,19 +4,19 @@ namespace Architect.MultiplayerHook.Packets;
 
 public class RefreshPacketData : IPacketData
 {
-    public string SceneName;
-    public int TotalPackets;
-    public int PacketId;
     public byte[] Edits;
     public string Guid;
-    
+    public int PacketId;
+    public string SceneName;
+    public int TotalPackets;
+
     public void WriteData(IPacket packet)
     {
         packet.Write(PacketId);
         packet.Write(TotalPackets);
         packet.Write(SceneName);
         packet.Write(Guid);
-        
+
         packet.Write(Edits.Length);
         foreach (var b in Edits) packet.Write(b);
     }
@@ -27,14 +27,11 @@ public class RefreshPacketData : IPacketData
         TotalPackets = packet.ReadInt();
         SceneName = packet.ReadString();
         Guid = packet.ReadString();
-        
+
         var count = packet.ReadInt();
-        
+
         var bytes = new byte[count];
-        for (var i = 0; i < count; i++)
-        {
-            bytes[i] = packet.ReadByte();
-        }
+        for (var i = 0; i < count; i++) bytes[i] = packet.ReadByte();
 
         Edits = bytes;
     }

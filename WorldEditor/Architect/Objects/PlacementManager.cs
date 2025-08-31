@@ -14,11 +14,13 @@ public static class PlacementManager
     private static string _sceneName;
     private static List<ObjectPlacement> _currentPlacements;
 
+    public static readonly Dictionary<string, GameObject> Objects = [];
+
     public static List<ObjectPlacement> GetCurrentPlacements()
     {
         var sceneName = GameManager.instance.sceneName;
         if (_sceneName == sceneName) return _currentPlacements;
-        
+
         if (EditorManager.IsEditing) SceneSaveLoader.SaveScene(_sceneName, _currentPlacements);
         _sceneName = sceneName;
         _currentPlacements = SceneSaveLoader.LoadScene(sceneName);
@@ -31,20 +33,14 @@ public static class PlacementManager
         _sceneName = "Invalid";
     }
 
-    public static readonly Dictionary<string, GameObject> Objects = [];
-
     private static void LoadPlacements()
     {
         Objects.Clear();
         CustomObjects.PlayerListeners.Clear();
         foreach (var placement in GetCurrentPlacements().Where(placement => placement.GetPlaceableObject() != null))
-        {
             if (EditorManager.IsEditing) placement.PlaceGhost();
             else
-            {
                 Objects[placement.GetId()] = placement.SpawnObject();
-            }
-        }
     }
 
     internal static void Initialize()
@@ -65,6 +61,6 @@ public static class PlacementManager
     [CanBeNull]
     public static ObjectPlacement FindClickedObject(Vector3 mousePos)
     {
-        return GetCurrentPlacements().FirstOrDefault(placement => placement.Touching(mousePos));        
+        return GetCurrentPlacements().FirstOrDefault(placement => placement.Touching(mousePos));
     }
 }

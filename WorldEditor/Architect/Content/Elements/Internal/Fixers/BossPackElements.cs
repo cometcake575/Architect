@@ -40,20 +40,21 @@ internal class VengeflyKingElement : InternalPackElement
         var vengeflyRule = config.vengeflyRule;
 
         if (vengeflyRule == -1) vengeflyRule = targetPlayer ? 2 : 1;
-        
+
         var fsm = gameObject.LocateMyFSM("Big Buzzer");
-        
+
         fsm.DisableAction("Init", 3);
-        
+
         var pos = gameObject.transform.position;
-        
+
         fsm.AddCustomAction("Swoop Antic", makerFsm =>
         {
-            makerFsm.FsmVariables.FindFsmFloat("Swoop Height").Value = 
-                targetPlayer ? HeroController.instance.transform.position.y + 1
-                : pos.y - 3.28f;
+            makerFsm.FsmVariables.FindFsmFloat("Swoop Height").Value =
+                targetPlayer
+                    ? HeroController.instance.transform.position.y + 1
+                    : pos.y - 3.28f;
         });
-        
+
         var s1 = fsm.GetAction<CreateObject>("Summon", 1);
         var s2 = fsm.GetAction<CreateObject>("Summon", 3);
         switch (vengeflyRule)
@@ -76,39 +77,40 @@ internal class VengeflyKingElement : InternalPackElement
                 {
                     var obj = makerFsm.FsmVariables.FindFsmGameObject("Buzzer Instance").Value;
                     var mpos = makerFsm.transform.position;
-                    if (obj) obj.transform.position = new Vector3(mpos.x + 20.3926f *
-                        (makerFsm.transform.GetScaleX() > 0
-                            ? -1
-                            : 1), mpos.y + 6.9023f, 17);
+                    if (obj)
+                        obj.transform.position = new Vector3(mpos.x + 20.3926f *
+                            (makerFsm.transform.GetScaleX() > 0
+                                ? -1
+                                : 1), mpos.y + 6.9023f, 17);
                 }, 4);
-                
+
                 fsm.InsertCustomAction("Summon", makerFsm =>
                 {
                     var obj = makerFsm.FsmVariables.FindFsmGameObject("Buzzer Instance").Value;
                     var mpos = makerFsm.transform.position;
-                    if (obj) obj.transform.position = new Vector3(mpos.x + 1.3926f *
-                                                                            (makerFsm.transform.GetScaleX() > 0
-                                                                                ? -1
-                                                                                : 1), mpos.y + 6.9023f, 17);
+                    if (obj)
+                        obj.transform.position = new Vector3(mpos.x + 1.3926f *
+                            (makerFsm.transform.GetScaleX() > 0
+                                ? -1
+                                : 1), mpos.y + 6.9023f, 17);
                 }, 2);
-                
+
                 break;
         }
-
     }
 
     internal class VkConfig : MonoBehaviour
     {
         public bool targetPlayer = true;
-        
+
         public int vengeflyRule = -1;
     }
 }
 
 internal class GruzMotherElement : InternalPackElement
 {
-    private GameObject _gameObject;
     private static GameObject _child;
+    private GameObject _gameObject;
 
     public GruzMotherElement() : base("Gruz Mother", "Enemies")
     {
@@ -132,7 +134,7 @@ internal class GruzMotherElement : InternalPackElement
     {
         _gameObject = preloads["Crossroads_04"]["_Enemies/Giant Fly"];
         _child = preloads["Crossroads_04"]["_Enemies/Fly Spawn"];
-        
+
         var child = _gameObject.transform.GetChild(2).gameObject;
         child.gameObject.RemoveComponent<PolygonCollider2D>();
         var box = child.AddComponent<BoxCollider2D>();
@@ -155,13 +157,13 @@ internal class GruzMotherElement : InternalPackElement
             if (child)
             {
                 _madeChanges = true;
-                
+
                 var corpse = child.gameObject.LocateMyFSM("corpse");
                 if (spawnGruzzers)
                 {
                     var flySpawn = Instantiate(_child);
                     flySpawn.name = gameObject.name + " Fly Spawn";
-                    
+
                     corpse.AddCustomAction("Blow", fsm =>
                     {
                         flySpawn.SetActive(true);
@@ -172,14 +174,17 @@ internal class GruzMotherElement : InternalPackElement
                         makerFsm.RemoveAction("Geo", 0);
                     });
                 }
-                else corpse.AddCustomAction("Blow", fsm =>
+                else
                 {
-                    var makerFsm = fsm.FsmVariables.FindFsmGameObject("Burster").Value.LocateMyFSM("burster");
-                    var check = makerFsm
-                        .GetAction<GGCheckIfBossScene>("Stop", 1);
-                    check.regularSceneEvent = check.bossSceneEvent;
-                    makerFsm.RemoveAction("Geo", 0);
-                });
+                    corpse.AddCustomAction("Blow", fsm =>
+                    {
+                        var makerFsm = fsm.FsmVariables.FindFsmGameObject("Burster").Value.LocateMyFSM("burster");
+                        var check = makerFsm
+                            .GetAction<GGCheckIfBossScene>("Stop", 1);
+                        check.regularSceneEvent = check.bossSceneEvent;
+                        makerFsm.RemoveAction("Geo", 0);
+                    });
+                }
             }
         }
     }
@@ -257,20 +262,20 @@ internal class TmgElement : InternalPackElement
     {
         gameObject.LocateMyFSM("Constrain Y").enabled = false;
         gameObject.LocateMyFSM("constrain_x").enabled = false;
-        
+
         var fsm = gameObject.LocateMyFSM("Control");
 
         var ground = gameObject.transform.position.y;
         fsm.FsmVariables.FindFsmFloat("Ground Y").Value = ground;
-        
+
         fsm.GetAction<FloatCompare>("Uppercut Up", 7).float2 = ground + 9;
         fsm.GetAction<SetPosition>("UP Explode", 0).y = ground + 9;
-        
+
         fsm.GetAction<SetPosition>("AD Tele In", 3).y = ground + 6.7f;
-        
+
         fsm.GetAction<SetPosition>("Balloon Pos", 0).y = ground + 5.2f;
         fsm.GetAction<SetPosition>("Balloon Pos", 0).x = gameObject.transform.position.x;
-        
+
         var spikes = Object.Instantiate(_spikes, gameObject.transform, true);
         spikes.SetActive(true);
         spikes.transform.SetPositionY(ground - 4.96f);
@@ -278,10 +283,7 @@ internal class TmgElement : InternalPackElement
         var spikeFsm = spikes.LocateMyFSM("Spike Control");
         spikeFsm.DisableAction("Ready", 0);
         var xPos = spikeFsm.FsmVariables.FindFsmFloat("X Pos");
-        spikeFsm.InsertCustomAction("Ready", () =>
-        {
-            xPos.Value = 1 + Random.value > 0.5f ? 0 : 1.125f;
-        }, 0);
+        spikeFsm.InsertCustomAction("Ready", () => { xPos.Value = 1 + Random.value > 0.5f ? 0 : 1.125f; }, 0);
     }
 }
 
@@ -408,24 +410,16 @@ internal class SoulWarriorElement : InternalPackElement
     {
         var body = gameObject.GetComponent<Rigidbody2D>();
         var fsm = gameObject.LocateMyFSM("Mage Knight");
-        
-        fsm.AddCustomAction("Sleep", makerFsm =>
-        {
-            makerFsm.SendEvent("WAKE");
-        });
-        
-        fsm.InsertCustomAction("Side Tele Aim", makerFsm =>
-        {
-            makerFsm.FsmVariables.FindFsmFloat("Floor Y").Value = makerFsm.gameObject.transform.position.y;
-        }, 0);
-        fsm.InsertCustomAction("Up Tele Aim", _ =>
-        {
-            body.gravityScale = 0;
-        }, 0);
-        fsm.InsertCustomAction("Idle", _ =>
-        {
-            body.gravityScale = 1;
-        }, 0);
+
+        fsm.AddCustomAction("Sleep", makerFsm => { makerFsm.SendEvent("WAKE"); });
+
+        fsm.InsertCustomAction("Side Tele Aim",
+            makerFsm =>
+            {
+                makerFsm.FsmVariables.FindFsmFloat("Floor Y").Value = makerFsm.gameObject.transform.position.y;
+            }, 0);
+        fsm.InsertCustomAction("Up Tele Aim", _ => { body.gravityScale = 0; }, 0);
+        fsm.InsertCustomAction("Idle", _ => { body.gravityScale = 1; }, 0);
     }
 }
 
@@ -452,10 +446,13 @@ internal class BrokenVesselElement : GInternalPackElement
     public override void PostSpawn(GameObject gameObject, bool flipped, float rotation, float scale)
     {
         var config = gameObject.GetComponent<BrokenVesselConfig>();
-        
+
         var fsm = gameObject.LocateMyFSM("IK Control");
-        
-        if (fsm.TryGetState("Set Pos", out var state)) state.DisableAction(1);
+
+        if (fsm.TryGetState("Set Pos", out var state))
+        {
+            state.DisableAction(1);
+        }
         else
         {
             fsm.DisableAction("Set X", 0);
@@ -464,12 +461,12 @@ internal class BrokenVesselElement : GInternalPackElement
         }
 
         foreach (var act in fsm.GetActions<PlayerDataBoolTest>("Init")) act.isFalse = act.isTrue;
-        
+
         var waiting = fsm.GetAction<BoolTest>("Waiting", 3);
         waiting.isFalse = waiting.isTrue;
-        
+
         fsm.DisableAction("Close Gates", 0);
-        
+
         if (config.disableRoar) fsm.DisableAction("Roar", 5);
 
         var pos = fsm.gameObject.transform.position;
@@ -477,7 +474,7 @@ internal class BrokenVesselElement : GInternalPackElement
         fsm.FsmVariables.FindFsmFloat("Min Dstab Height").Value = -100;
 
         var aimJump2 = fsm.GetAction<RandomFloat>("Aim Jump 2", 0);
-        
+
         if (config.localJump)
         {
             fsm.InsertCustomAction("Aim Jump", makerFsm =>
@@ -494,11 +491,11 @@ internal class BrokenVesselElement : GInternalPackElement
         {
             fsm.FsmVariables.FindFsmFloat("Left X").Value = pos.x - 10.235f;
             fsm.FsmVariables.FindFsmFloat("Right X").Value = pos.x + 10.235f;
-            
+
             aimJump2.min = pos.x - 1;
             aimJump2.max = pos.x + 1;
         }
-        
+
         fsm.DisableAction("Set Height", 0);
 
         var balloonFsm = gameObject.LocateMyFSM("Spawn Balloon");
@@ -510,7 +507,7 @@ internal class BrokenVesselElement : GInternalPackElement
                     var newPos = makerFsm.gameObject.transform.position;
                     makerFsm.FsmVariables.FindFsmFloat("X Min").Value = newPos.x - 9.55f;
                     makerFsm.FsmVariables.FindFsmFloat("X Max").Value = newPos.x + 9.55f;
-                
+
                     makerFsm.FsmVariables.FindFsmFloat("Y Min").Value = newPos.y;
                     makerFsm.FsmVariables.FindFsmFloat("Y Max").Value = newPos.y + 5.26f;
                 }, 0);
@@ -518,7 +515,7 @@ internal class BrokenVesselElement : GInternalPackElement
             case 1:
                 fsm.FsmVariables.FindFsmFloat("X Min").Value = pos.x - 9.55f;
                 fsm.FsmVariables.FindFsmFloat("X Max").Value = pos.x + 9.55f;
-                
+
                 fsm.FsmVariables.FindFsmFloat("Y Min").Value = pos.y;
                 fsm.FsmVariables.FindFsmFloat("Y Max").Value = pos.y + 5.26f;
                 break;
@@ -531,13 +528,12 @@ internal class BrokenVesselElement : GInternalPackElement
     public class BrokenVesselConfig : MonoBehaviour
     {
         public bool localJump = true;
-        
+
         public int balloons;
-        
+
         public bool disableRoar = true;
     }
 }
-
 
 internal class PureVesselElement : InternalPackElement
 {
@@ -610,7 +606,6 @@ internal class MassiveMossChargerElement : InternalPackElement
         return true;
     }
 }
-
 
 internal class HornetProtectorElement : InternalPackElement
 {

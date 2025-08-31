@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading.Tasks;
 using Architect.UI;
 using Architect.Util;
@@ -9,7 +8,9 @@ namespace Architect.Objects;
 internal class CursorObject : SelectableObject
 {
     internal static readonly CursorObject Instance = new();
-    
+
+    private readonly Sprite _sprite;
+
     private CursorObject() : base("Cursor")
     {
         _sprite = PrepareSprite();
@@ -34,8 +35,6 @@ internal class CursorObject : SelectableObject
     {
         return false;
     }
-
-    private readonly Sprite _sprite;
 
     public override Sprite GetSprite()
     {

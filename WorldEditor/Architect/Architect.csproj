@@ -346,17 +346,17 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
-        <EmbeddedResource Include="Resources/*.png" />
-        <EmbeddedResource Include="Resources/*.wav" />
-        <EmbeddedResource Include="Resources/ScatteredAndLost/*.png" />
-        <EmbeddedResource Include="Resources/ScatteredAndLost/*.wav" />
-        <EmbeddedResource Include="Resources/ScatteredAndLost/feather/loop/*.png" />
-        <EmbeddedResource Include="Resources/ScatteredAndLost/feather/flash/*.png" />
-        <EmbeddedResource Include="Resources/ScatteredAndLost/feather/break/*.png" />
-        <EmbeddedResource Include="Resources/ScatteredAndLost/feather/*.png" />
-        <EmbeddedResource Include="Resources/ScatteredAndLost/feather/*.wav" />
-        <EmbeddedResource Include="Resources/Bindings/*.png" />
-        <EmbeddedResource Include="Resources/Bindings/chain_cut.wav" />
+        <EmbeddedResource Include="Resources/*.png"/>
+        <EmbeddedResource Include="Resources/*.wav"/>
+        <EmbeddedResource Include="Resources/ScatteredAndLost/*.png"/>
+        <EmbeddedResource Include="Resources/ScatteredAndLost/*.wav"/>
+        <EmbeddedResource Include="Resources/ScatteredAndLost/feather/loop/*.png"/>
+        <EmbeddedResource Include="Resources/ScatteredAndLost/feather/flash/*.png"/>
+        <EmbeddedResource Include="Resources/ScatteredAndLost/feather/break/*.png"/>
+        <EmbeddedResource Include="Resources/ScatteredAndLost/feather/*.png"/>
+        <EmbeddedResource Include="Resources/ScatteredAndLost/feather/*.wav"/>
+        <EmbeddedResource Include="Resources/Bindings/*.png"/>
+        <EmbeddedResource Include="Resources/Bindings/chain_cut.wav"/>
     </ItemGroup>
     <ItemGroup>
         <None Include=".gitignore"/>

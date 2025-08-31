@@ -11,6 +11,10 @@ namespace Architect.Attributes;
 
 public static class EventManager
 {
+    private static readonly Dictionary<string, Action<GameObject>> EventReceiverTypes = new();
+
+    private static readonly Dictionary<string, List<EventReceiverInstance>> Events = new();
+
     // Called on Initialize as broadcaster types are an enum and do not require initialization for deserialization
     public static void InitializeBroadcasters()
     {
@@ -33,7 +37,7 @@ public static class EventManager
             orig(self, min, max, multiplier);
             BroadcastEvent(self.gameObject, "OnBreak");
         };
-        
+
         On.HealthManager.Awake += (orig, self) =>
         {
             orig(self);
@@ -53,14 +57,11 @@ public static class EventManager
         EventReceiverTypes[name] = action;
         return name;
     }
-    
-    public static void RunEvent(string eventName, GameObject gameObject) {
+
+    public static void RunEvent(string eventName, GameObject gameObject)
+    {
         EventReceiverTypes[eventName].Invoke(gameObject);
     }
-
-    private static readonly Dictionary<string, Action<GameObject>> EventReceiverTypes = new();
-    
-    private static readonly Dictionary<string, List<EventReceiverInstance>> Events = new();
 
     public static void RegisterEventReceiver(string name, EventReceiverInstance receiver)
     {
@@ -87,20 +88,16 @@ public static class EventManager
     public static void BroadcastEvent(GameObject gameObject, string type, bool multiplayer = false)
     {
         var broadcasters = gameObject.GetComponents<EventBroadcasterInstance>();
-            
+
         foreach (var broadcaster in broadcasters)
-        {
-            if (broadcaster.GetEventType().Equals(type, StringComparison.InvariantCultureIgnoreCase)) broadcaster.Broadcast(multiplayer);
-        }
+            if (broadcaster.GetEventType().Equals(type, StringComparison.InvariantCultureIgnoreCase))
+                broadcaster.Broadcast(multiplayer);
     }
-    
+
     public static void BroadcastEvent(string name, bool multiplayer = false)
     {
         if (multiplayer && Architect.UsingMultiplayer) HkmpHook.BroadcastEvent(name);
         if (!Events.TryGetValue(name, out var @event)) return;
-        foreach (var receiver in @event.Where(receiver => receiver && receiver.gameObject))
-        {
-            receiver.ReceiveEvent();
-        }
+        foreach (var receiver in @event.Where(receiver => receiver && receiver.gameObject)) receiver.ReceiveEvent();
     }
 }

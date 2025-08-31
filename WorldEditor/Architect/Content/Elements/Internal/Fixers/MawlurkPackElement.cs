@@ -6,8 +6,8 @@ namespace Architect.Content.Elements.Internal.Fixers;
 
 internal sealed class MawlurkPackElement : InternalPackElement
 {
-    private GameObject _normal;
     private GameObject _inverted;
+    private GameObject _normal;
 
     public MawlurkPackElement() : base("Mawlurk", "Enemies")
     {

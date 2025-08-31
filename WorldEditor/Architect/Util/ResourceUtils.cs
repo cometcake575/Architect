@@ -13,12 +13,13 @@ public static class ResourceUtils
         return LoadInternal(spritePath, new Vector2(0.5f, 0.5f), filterMode, ppu);
     }
 
-    internal static Sprite LoadInternal(string spritePath, Vector2 pivot, FilterMode filterMode = FilterMode.Bilinear, float ppu = 100)
+    internal static Sprite LoadInternal(string spritePath, Vector2 pivot, FilterMode filterMode = FilterMode.Bilinear,
+        float ppu = 100)
     {
         var path = $"Architect.Resources.{spritePath}.png";
-        
+
         var asm = Assembly.GetExecutingAssembly();
-        
+
         using var s = asm.GetManifestResourceStream(path);
         if (s == null) return null;
         var buffer = new byte[s.Length];
@@ -26,7 +27,7 @@ public static class ResourceUtils
         var tex = new Texture2D(2, 2);
         tex.LoadImage(buffer, true);
         tex.wrapMode = TextureWrapMode.Clamp;
-        
+
         var sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), pivot, ppu);
         sprite.texture.filterMode = filterMode;
         return sprite;
@@ -36,7 +37,7 @@ public static class ResourceUtils
     internal static Sprite Load(string spritePath, Vector2 pivot, bool point, float ppu)
     {
         if (!File.Exists(spritePath)) return null;
-        
+
         var tex = new Texture2D(2, 2);
         tex.LoadImage(File.ReadAllBytes(spritePath), true);
         tex.wrapMode = TextureWrapMode.Clamp;
@@ -84,12 +85,12 @@ public static class ResourceUtils
             maxX = Mathf.Max(maxX, def.uvs[i].x);
             maxY = Mathf.Max(maxY, def.uvs[i].y);
         }
-        
+
         var x = minX * texture.width;
         var y = minY * texture.height;
         var width = (maxX - minX) * texture.width;
         var height = (maxY - minY) * texture.height;
-        
+
         return Sprite.Create(texture, new Rect(x, y, width, height),
             new Vector2(0.5f, 0.5f), ppu);
     }

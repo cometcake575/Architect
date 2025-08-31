@@ -7,14 +7,25 @@ namespace Architect.Content.Elements.Custom.Behaviour;
 
 public class Interaction : MonoBehaviour
 {
-    private PromptMarker _prompt;
+    private static readonly List<Interaction> Interactable = [];
 
     public float xOffset;
     public float yOffset;
     public string prompt;
     public bool hideOnInteract;
+    private PromptMarker _prompt;
 
-    private static readonly List<Interaction> Interactable = [];
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (!other.gameObject.GetComponent<HeroController>()) return;
+        GoUp();
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (!other.gameObject.GetComponent<HeroController>()) return;
+        GoDown();
+    }
 
     public static void Init()
     {
@@ -33,10 +44,9 @@ public class Interaction : MonoBehaviour
                 }
 
                 if (HeroController.instance.transform.position.x > interaction.transform.position.x)
-                {
                     HeroController.instance.FaceLeft();
-                } else HeroController.instance.FaceRight();
-                
+                else HeroController.instance.FaceRight();
+
                 EventManager.BroadcastEvent(interaction.gameObject, "OnInteract");
                 if (interaction.hideOnInteract) willDown.Add(interaction);
             }
@@ -44,18 +54,6 @@ public class Interaction : MonoBehaviour
             foreach (var interaction in willRemove) Interactable.Remove(interaction);
             foreach (var interaction in willDown) interaction.GoDown();
         };
-    }
-    
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (!other.gameObject.GetComponent<HeroController>()) return;
-        GoUp();
-    }
-    
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        if (!other.gameObject.GetComponent<HeroController>()) return;
-        GoDown();
     }
 
     public void GoDown()
@@ -70,11 +68,11 @@ public class Interaction : MonoBehaviour
         obj.transform.position = transform.position + new Vector3(xOffset, yOffset + 2);
 
         _prompt = obj.GetComponent<PromptMarker>();
-        
+
         _prompt.SetLabel(prompt);
         _prompt.SetOwner(gameObject);
         _prompt.Show();
-        
+
         Interactable.Add(this);
     }
 }

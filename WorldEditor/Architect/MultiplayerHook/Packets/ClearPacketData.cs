@@ -5,7 +5,7 @@ namespace Architect.MultiplayerHook.Packets;
 public class ClearPacketData : IPacketData
 {
     public string SceneName;
-    
+
     public void WriteData(IPacket packet)
     {
         packet.Write(SceneName);

@@ -10,7 +10,13 @@ namespace Architect.Objects;
 internal class ResetObject : SelectableObject
 {
     internal static readonly ResetObject Instance = new();
-    
+
+    private static float _resetTime;
+
+    private static bool _resetting;
+
+    private readonly Sprite _sprite;
+
     private ResetObject() : base("Reset - Cannot be undone!")
     {
         _sprite = PrepareSprite();
@@ -20,8 +26,6 @@ internal class ResetObject : SelectableObject
     {
         return ResourceUtils.LoadInternal("reset_rocket");
     }
-
-    private static float _resetTime;
 
     public static void RestartDelay()
     {
@@ -33,27 +37,25 @@ internal class ResetObject : SelectableObject
         }
     }
 
-    private static bool _resetting;
-
     public override void OnClickInWorld(Vector3 pos, bool first)
     {
         if (first) _resetting = true;
         if (!_resetting) return;
-        
+
         _resetTime += Time.deltaTime;
-        
+
         if (_resetTime >= 3)
         {
             RestartDelay();
-            
+
             var id = GameManager.instance.sceneName;
             ResetRoom(id);
-            
+
             if (!Architect.UsingMultiplayer || !Architect.GlobalSettings.CollaborationMode) return;
             HkmpHook.ClearRoom(id);
             return;
         }
-        
+
         EditorUIManager.SetText(Mathf.Ceil(3 - _resetTime).ToString(CultureInfo.InvariantCulture));
     }
 
@@ -61,8 +63,6 @@ internal class ResetObject : SelectableObject
     {
         return false;
     }
-
-    private readonly Sprite _sprite;
 
     public override Sprite GetSprite()
     {
@@ -82,6 +82,9 @@ internal class ResetObject : SelectableObject
             while (placements.Count > 0) placements[0].Destroy();
             UndoManager.ClearHistory();
         }
-        else SceneSaveLoader.SaveScene(sceneName, []);
+        else
+        {
+            SceneSaveLoader.SaveScene(sceneName, []);
+        }
     }
 }

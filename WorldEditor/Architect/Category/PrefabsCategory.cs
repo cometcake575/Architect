@@ -9,7 +9,7 @@ internal class PrefabsCategory : ObjectCategory
 {
     private static readonly List<SelectableObject> Prefabs = [];
     private static readonly List<ObjectPlacement> Objects = [];
-    
+
     public PrefabsCategory() : base("Prefabs")
     {
         foreach (var obj in SceneSaveLoader.Load("Prefabs"))
@@ -24,12 +24,12 @@ internal class PrefabsCategory : ObjectCategory
         if (EditorUIManager.SelectedItem is not PlaceableObject placeable) return;
 
         var placement = placeable.MakePlacement();
-        
+
         Objects.Add(placement);
         SceneSaveLoader.Save("Prefabs", Objects);
-        
+
         Prefabs.Add(new PrefabObject(placement));
-        
+
         EditorUIManager.RefreshObjects();
         EditorUIManager.RefreshButtons();
     }
@@ -39,7 +39,7 @@ internal class PrefabsCategory : ObjectCategory
         Prefabs.Remove(obj);
         Objects.RemoveAll(placement => placement.GetId() == obj.GetId());
         SceneSaveLoader.Save("Prefabs", Objects);
-        
+
         EditorUIManager.RefreshObjects();
         EditorUIManager.RefreshButtons();
     }

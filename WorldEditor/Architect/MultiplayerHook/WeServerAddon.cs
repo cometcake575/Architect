@@ -8,6 +8,10 @@ namespace Architect.MultiplayerHook;
 
 public class WeServerAddon : ServerAddon
 {
+    protected override string Name => "Architect";
+    protected override string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString();
+    public override bool NeedsNetwork => true;
+
     public IPacketData InstantiatePacket(PacketId packetId)
     {
         return packetId switch
@@ -22,64 +26,64 @@ public class WeServerAddon : ServerAddon
             _ => null
         };
     }
-    
+
     public override void Initialize(IServerApi serverApi)
     {
         Logger.Info("Initializing server-side Architect addon!");
-        
+
         var netReceiver = serverApi.NetServer.GetNetworkReceiver<PacketId>(this, InstantiatePacket);
         var sender = serverApi.NetServer.GetNetworkSender<PacketId>(this);
-        
+
         netReceiver.RegisterPacketHandler<RefreshPacketData>(PacketId.Refresh, (id, packet) =>
         {
             Logger.Info("Receiving Refresh Packet [SERVER]");
             sender.SendSingleData(PacketId.Refresh, packet, serverApi.ServerManager.Players
-                    .Where(player => player.Id != id)
-                    .Select(player => player.Id)
-                    .ToArray()
-                );
+                .Where(player => player.Id != id)
+                .Select(player => player.Id)
+                .ToArray()
+            );
         });
-        
+
         netReceiver.RegisterPacketHandler<ErasePacketData>(PacketId.Erase, (id, packet) =>
         {
             Logger.Info("Receiving Erase Packet [SERVER]");
             sender.SendSingleData(PacketId.Erase, packet, serverApi.ServerManager.Players
-                    .Where(player => player.Id != id)
-                    .Select(player => player.Id)
-                    .ToArray()
-                );
+                .Where(player => player.Id != id)
+                .Select(player => player.Id)
+                .ToArray()
+            );
         });
-        
+
         netReceiver.RegisterPacketHandler<ClearPacketData>(PacketId.Clear, (id, packet) =>
         {
             Logger.Info("Receiving Clear Packet [SERVER]");
             sender.SendSingleData(PacketId.Clear, packet, serverApi.ServerManager.Players
-                    .Where(player => player.Id != id)
-                    .Select(player => player.Id)
-                    .ToArray()
-                );
+                .Where(player => player.Id != id)
+                .Select(player => player.Id)
+                .ToArray()
+            );
         });
-        
+
         netReceiver.RegisterPacketHandler<UpdatePacketData>(PacketId.Update, (id, packet) =>
         {
             Logger.Info("Receiving Update Packet [SERVER]");
             sender.SendSingleData(PacketId.Update, packet, serverApi.ServerManager.Players
-                    .Where(player => player.Id != id)
-                    .Select(player => player.Id)
-                    .ToArray()
-                );
+                .Where(player => player.Id != id)
+                .Select(player => player.Id)
+                .ToArray()
+            );
         });
-        
+
         netReceiver.RegisterPacketHandler<EditPacketData>(PacketId.Edit, (id, packet) =>
         {
             Logger.Info("Receiving Edit Packet [SERVER]");
             sender.SendSingleData(PacketId.Edit, packet, serverApi.ServerManager.Players
-                    .Where(player => player.Id != id)
-                    .Select(player => player.Id)
-                    .ToArray()
-                );
+                .Where(player => player.Id != id)
+                .Select(player => player.Id)
+                .ToArray()
+            );
         });
-        
+
         netReceiver.RegisterPacketHandler<WinPacketData>(PacketId.Win, (id, packet) =>
         {
             Logger.Info("Receiving Win Packet [SERVER]");
@@ -87,7 +91,7 @@ public class WeServerAddon : ServerAddon
                 .Where(player => player.Id != id)
                 .Select(player => player.Id).ToArray());
         });
-        
+
         netReceiver.RegisterPacketHandler<RelayPacketData>(PacketId.Relay, (id, packet) =>
         {
             Logger.Info("Receiving Relay Packet [SERVER]");
@@ -97,8 +101,4 @@ public class WeServerAddon : ServerAddon
                 .ToArray());
         });
     }
-
-    protected override string Name => "Architect";
-    protected override string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString();
-    public override bool NeedsNetwork => true;
 }

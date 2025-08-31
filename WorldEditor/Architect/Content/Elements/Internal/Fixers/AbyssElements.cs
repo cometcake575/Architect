@@ -26,7 +26,8 @@ internal class ShadeSiblingElement : InternalPackElement
 
     internal override void AfterPreload(Dictionary<string, Dictionary<string, GameObject>> preloads)
     {
-        _gameObject = preloads["Abyss_06_Core"]["Shade Sibling Spawner"].GetComponent<PersonalObjectPool>().startupPool[0].prefab;
+        _gameObject = preloads["Abyss_06_Core"]["Shade Sibling Spawner"].GetComponent<PersonalObjectPool>()
+            .startupPool[0].prefab;
 
         _gameObject.AddComponent<ShadeSiblingVhEffects>();
     }
@@ -82,7 +83,7 @@ internal class VoidTendrilsElement : InternalPackElement
     internal class VoidTendrilsVhEffects : VhEffects
     {
         public override void ForceDisable()
-        { 
+        {
             gameObject.LocateMyFSM("Black Charm").enabled = false;
         }
     }

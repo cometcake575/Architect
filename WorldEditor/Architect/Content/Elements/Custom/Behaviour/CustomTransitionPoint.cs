@@ -5,6 +5,8 @@ namespace Architect.Content.Elements.Custom.Behaviour;
 
 public class CustomTransitionPoint : MonoBehaviour
 {
+    public int pointType;
+
     public static void Init()
     {
         On.TransitionPoint.GetGatePosition += (orig, self) =>
@@ -13,8 +15,6 @@ public class CustomTransitionPoint : MonoBehaviour
             return ctp ? ctp.GetGatePosition() : orig(self);
         };
     }
-    
-    public int pointType;
 
     public GatePosition GetGatePosition()
     {

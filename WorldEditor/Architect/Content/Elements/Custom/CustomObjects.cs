@@ -25,6 +25,7 @@ namespace Architect.Content.Elements.Custom;
 
 public static class CustomObjects
 {
+    private const int ShapeWeight = 1;
     internal static readonly HashSet<string> TemporaryAbilities = [];
     internal static readonly List<PlayerHook> PlayerListeners = [];
     internal static readonly Dictionary<string, List<CustomBinder>> Bindings = new();
@@ -32,8 +33,38 @@ public static class CustomObjects
 
     private static GridLayout _bindingsLayout;
     private static Image[] _bindingIcons;
-        
-    private const int ShapeWeight = 1;
+
+    private static readonly FieldInfo ShadowDashTimer = typeof(HeroController).GetField("shadowDashTimer",
+        BindingFlags.NonPublic | BindingFlags.Instance);
+
+    private static readonly FieldInfo SpriteFlash = typeof(HeroController).GetField("spriteFlash",
+        BindingFlags.NonPublic | BindingFlags.Instance);
+
+    private static readonly SetCollider DisableSwim = new()
+    {
+        active = false,
+        gameObject = new FsmOwnerDefault
+        {
+            OwnerOption = OwnerDefaultOption.UseOwner
+        }
+    };
+
+    private static readonly SetDamageHeroAmount Damage = new()
+    {
+        damageDealt = 1,
+        target = new FsmOwnerDefault
+        {
+            OwnerOption = OwnerDefaultOption.UseOwner
+        }
+    };
+
+    private static int[] _previousEquippedCharms;
+    private static bool _wasOvercharmed;
+
+    private static bool _charmsBound;
+    private static bool _shellBound;
+    private static bool _soulBound;
+    private static bool _nailBound;
 
     public static void Initialize()
     {
@@ -101,14 +132,15 @@ public static class CustomObjects
             CreateMov(),
             CreateWav(),
             new SimplePackElement(CreateWind(), "Wind", "Hazards",
-                sprite:ResourceUtils.LoadInternal("wind", FilterMode.Point, 3.2f))
+                    ResourceUtils.LoadInternal("wind", FilterMode.Point, 3.2f))
                 .WithConfigGroup(ConfigGroup.Wind)
                 .WithRotationGroup(RotationGroup.All),
             new SimplePackElement(CreateZoteTrophy(), "Winner's Trophy", "Utility"),
             CreateTemporaryAbilityGranter("dash_crystal", "Dash", false, "Dash Crystal"),
             CreateTemporaryAbilityGranter("single_dash_crystal", "Dash", true, "Single Use Dash Crystal"),
             CreateTemporaryAbilityGranter("shadow_dash_crystal", "Shadow Dash", false, "Shadow Dash Crystal"),
-            CreateTemporaryAbilityGranter("single_shadow_dash_crystal", "Shadow Dash", true, "Single Use Shadow Dash Crystal"),
+            CreateTemporaryAbilityGranter("single_shadow_dash_crystal", "Shadow Dash", true,
+                "Single Use Shadow Dash Crystal"),
             CreateTemporaryAbilityGranter("wings_crystal", "Wings", false, "Wings Crystal"),
             CreateTemporaryAbilityGranter("single_wings_crystal", "Wings", true, "Single Use Wings Crystal"),
             new SimplePackElement(CreateDamagingOrb("energy_orb", "Energy Orb", 1), "Energy Orb", "Hazards")
@@ -151,17 +183,12 @@ public static class CustomObjects
         InitializeHooks();
     }
 
-    private static readonly FieldInfo ShadowDashTimer = typeof(HeroController).GetField("shadowDashTimer", 
-        BindingFlags.NonPublic | BindingFlags.Instance);
-    private static readonly FieldInfo SpriteFlash = typeof(HeroController).GetField("spriteFlash", 
-        BindingFlags.NonPublic | BindingFlags.Instance);
-
     public static void RefreshShadowDash()
     {
-        if ((float) ShadowDashTimer.GetValue(HeroController.instance) <= 0) return;
+        if ((float)ShadowDashTimer.GetValue(HeroController.instance) <= 0) return;
         ShadowDashTimer.SetValue(HeroController.instance, 0.0f);
         FSMUtility.LocateFSM(HeroController.instance.shadowRechargePrefab, "Recharge Effect").SetState("Burst");
-        ((SpriteFlash) SpriteFlash.GetValue(HeroController.instance)).FlashShadowRecharge();
+        ((SpriteFlash)SpriteFlash.GetValue(HeroController.instance)).FlashShadowRecharge();
     }
 
     public static void CollectAbilityGranter(string type)
@@ -172,11 +199,11 @@ public static class CustomObjects
     private static AbstractPackElement CreateSquare()
     {
         var square = CreateShape("square");
-        
+
         var collider = square.AddComponent<BoxCollider2D>();
         collider.isTrigger = true;
         collider.size = new Vector2(10, 10);
-        
+
         return new SimplePackElement(square, "Coloured Square", "Decorations", weight: ShapeWeight)
             .WithConfigGroup(ConfigGroup.Shapes)
             .WithRotationGroup(RotationGroup.All);
@@ -185,7 +212,7 @@ public static class CustomObjects
     private static AbstractPackElement CreateCircle()
     {
         var circle = CreateShape("circle");
-        
+
         var collider = circle.AddComponent<PolygonCollider2D>();
         collider.isTrigger = true;
 
@@ -200,7 +227,7 @@ public static class CustomObjects
 
         collider.pathCount = 1;
         collider.SetPath(0, points);
-        
+
         return new SimplePackElement(circle, "Coloured Circle", "Decorations", weight: ShapeWeight)
             .WithConfigGroup(ConfigGroup.Shapes)
             .WithRotationGroup(RotationGroup.All);
@@ -209,7 +236,7 @@ public static class CustomObjects
     private static AbstractPackElement CreateTriangle()
     {
         var triangle = CreateShape("triangle");
-        
+
         var collider = triangle.AddComponent<EdgeCollider2D>();
         collider.isTrigger = true;
         collider.points =
@@ -219,7 +246,7 @@ public static class CustomObjects
             new Vector2(5, -4.17f),
             new Vector2(-5, -4.17f)
         ];
-        
+
         return new SimplePackElement(triangle, "Coloured Triangle", "Decorations", weight: ShapeWeight)
             .WithConfigGroup(ConfigGroup.Shapes)
             .WithRotationGroup(RotationGroup.All);
@@ -233,8 +260,9 @@ public static class CustomObjects
         png.AddComponent<PngObject>();
         Object.DontDestroyOnLoad(png);
         png.SetActive(false);
-        
-        return new SimplePackElement(png, "Custom PNG", "Decorations", ResourceUtils.LoadInternal("png", ppu:300), weight: ShapeWeight)
+
+        return new SimplePackElement(png, "Custom PNG", "Decorations", ResourceUtils.LoadInternal("png", ppu: 300),
+                ShapeWeight)
             .WithConfigGroup(ConfigGroup.Png)
             .WithRotationGroup(RotationGroup.All);
     }
@@ -245,14 +273,15 @@ public static class CustomObjects
 
         var renderer = png.AddComponent<SpriteRenderer>();
         renderer.sprite = ResourceUtils.LoadInternal("blank", ppu: 300);
-        
+
         png.AddComponent<VideoPlayer>();
-        
+
         png.AddComponent<MovObject>();
         Object.DontDestroyOnLoad(png);
         png.SetActive(false);
-        
-        return new SimplePackElement(png, "Custom MP4", "Decorations", ResourceUtils.LoadInternal("mp4", ppu: 300), weight: ShapeWeight)
+
+        return new SimplePackElement(png, "Custom MP4", "Decorations", ResourceUtils.LoadInternal("mp4", ppu: 300),
+                ShapeWeight)
             .WithConfigGroup(ConfigGroup.Mov)
             .WithReceiverGroup(ReceiverGroup.Mov)
             .WithRotationGroup(RotationGroup.All);
@@ -267,7 +296,7 @@ public static class CustomObjects
         wav.SetActive(false);
 
         return new SimplePackElement(wav, "Custom WAV", "Decorations", ResourceUtils.LoadInternal("wav", ppu: 300),
-                weight: ShapeWeight)
+                ShapeWeight)
             .WithConfigGroup(ConfigGroup.Wav)
             .WithReceiverGroup(ReceiverGroup.Playable);
     }
@@ -299,7 +328,7 @@ public static class CustomObjects
         var collider = point.AddComponent<BoxCollider2D>();
         collider.isTrigger = true;
         collider.size = new Vector2(0.32f, 0.32f);
-        
+
         point.AddComponent<TriggerZone>();
 
         point.SetActive(false);
@@ -311,14 +340,14 @@ public static class CustomObjects
     private static GameObject CreateInteraction()
     {
         Interaction.Init();
-        
+
         var point = new GameObject("Trigger Zone");
         point.transform.localScale *= 10;
 
         var collider = point.AddComponent<BoxCollider2D>();
         collider.isTrigger = true;
         collider.size = new Vector2(0.32f, 0.32f);
-        
+
         point.AddComponent<Interaction>();
 
         point.SetActive(false);
@@ -358,7 +387,7 @@ public static class CustomObjects
         point.transform.localScale *= 10;
 
         TextDisplay.Init();
-        
+
         point.SetActive(false);
         point.AddComponent<TextDisplay>().displayType = def;
         Object.DontDestroyOnLoad(point);
@@ -416,11 +445,11 @@ public static class CustomObjects
     {
         var point = new GameObject("Enemy Barrier");
         var heroOnly = LayerMask.NameToLayer("Hero Only");
-        
+
         point.AddComponent<BoxCollider2D>().size = new Vector2(2, 2);
         point.transform.localScale *= 5f / 3;
         point.layer = heroOnly;
-        
+
         point.SetActive(false);
         Object.DontDestroyOnLoad(point);
 
@@ -443,7 +472,7 @@ public static class CustomObjects
     private static GameObject CreateShape(string name)
     {
         var sprite = ResourceUtils.LoadInternal(name);
-        
+
         var point = new GameObject("Shape (" + name + ")");
         point.transform.localScale /= 3;
 
@@ -458,7 +487,7 @@ public static class CustomObjects
     private static GameObject CreateZoteTrophy()
     {
         ZoteTrophy.Init();
-        
+
         var sprite = ResourceUtils.LoadInternal("zote_trophy");
         var obj = new GameObject("Winner's Trophy");
 
@@ -481,7 +510,7 @@ public static class CustomObjects
     private static GameObject CreateWind()
     {
         Wind.Init();
-        
+
         var obj = new GameObject("Wind")
         {
             layer = LayerMask.NameToLayer("Terrain")
@@ -492,7 +521,7 @@ public static class CustomObjects
         collider.isTrigger = true;
 
         obj.AddComponent<Wind>();
-        
+
         obj.SetActive(false);
         Object.DontDestroyOnLoad(obj);
 
@@ -524,7 +553,7 @@ public static class CustomObjects
 
         var element = new SimplePackElement(granterObj, name, "Abilities");
         if (!singleUse) element.WithConfigGroup(ConfigGroup.Crystals);
-        
+
         return element;
     }
 
@@ -559,7 +588,7 @@ public static class CustomObjects
         obj.layer = LayerMask.NameToLayer("Terrain");
 
         obj.AddComponent<BoxCollider2D>().size *= 10;
-        
+
         var col = obj.AddComponent<BoxCollider2D>();
         col.isTrigger = true;
         col.size *= 9.8f;
@@ -567,11 +596,12 @@ public static class CustomObjects
         obj.SetActive(false);
         obj.AddComponent<DreamBlock>();
 
-        obj.AddComponent<SpriteRenderer>().sprite = ResourceUtils.LoadInternal("ScatteredAndLost.dream_block", FilterMode.Point);
-        
+        obj.AddComponent<SpriteRenderer>().sprite =
+            ResourceUtils.LoadInternal("ScatteredAndLost.dream_block", FilterMode.Point);
+
         obj.transform.SetPositionZ(0.01f);
 
-        return new SimplePackElement(obj, "Dream Block", "Interactable", weight:ContentPacks.MiscInteractableWeight)
+        return new SimplePackElement(obj, "Dream Block", "Interactable", weight: ContentPacks.MiscInteractableWeight)
             .WithConfigGroup(ConfigGroup.DreamBlocks);
     }
 
@@ -606,13 +636,11 @@ public static class CustomObjects
     private static bool BindingCheck(bool orig, string type)
     {
         if (!orig) return false;
-        
+
         if (!Bindings.TryGetValue(type, out var list) || list.Count == 0) return true;
         foreach (var binding in list.ToList())
-        {
             if (!binding) list.Remove(binding);
             else if (binding.active && binding.gameObject.activeInHierarchy) return false;
-        }
 
         return true;
     }
@@ -620,9 +648,9 @@ public static class CustomObjects
     private static void InitializeHooks()
     {
         MovingObject.Init();
-        
+
         SetupPlayerListeners();
-        
+
         On.PersistentBoolItem.Awake += (orig, self) =>
         {
             if (self.persistentBoolData == null) return;
@@ -634,15 +662,15 @@ public static class CustomObjects
         {
             orig(self);
             if (BossSequenceController.IsInSequence) return;
-            
+
             RefreshCharmsBinding();
             RefreshNailBinding();
             RefreshShellBinding();
             RefreshSoulBinding();
         };
-        
+
         InitializePantheonBindings();
-        
+
         // Bindings
         On.HeroController.CanDash += (orig, self) => BindingCheck(orig(self), "dash");
         On.HeroController.CanFocus += (orig, self) => BindingCheck(orig(self), "focus");
@@ -652,13 +680,13 @@ public static class CustomObjects
         On.HeroController.CanDoubleJump += (orig, self) => BindingCheck(orig(self), "wings");
         On.HeroController.CanDreamNail += (orig, self) => BindingCheck(orig(self), "dnail");
         On.HeroController.CanQuickMap += (orig, self) => BindingCheck(orig(self), "map");
-        
+
         ModHooks.GetPlayerBoolHook += (name, orig) =>
         {
             return name switch
             {
-                "hasShadowDash" => BindingCheck(orig, "shadow_dash") 
-                                   || TemporaryAbilities.Contains("Shadow Dash") 
+                "hasShadowDash" => BindingCheck(orig, "shadow_dash")
+                                   || TemporaryAbilities.Contains("Shadow Dash")
                                    || TemporaryAbilities.Contains("Shadow Dash Check"),
                 "hasLantern" => BindingCheck(orig, "lantern"),
                 "hasWalljump" => BindingCheck(orig, "claw"),
@@ -714,8 +742,8 @@ public static class CustomObjects
         };
 
         // Crystals
-        On.HeroController.CanDash += (orig, self) => TemporaryAbilities.Contains("Dash") 
-                                                     || TemporaryAbilities.Contains("Shadow Dash") 
+        On.HeroController.CanDash += (orig, self) => TemporaryAbilities.Contains("Dash")
+                                                     || TemporaryAbilities.Contains("Shadow Dash")
                                                      || orig(self);
         On.HeroController.HeroDash += (orig, self) =>
         {
@@ -766,20 +794,11 @@ public static class CustomObjects
             var val = playMakerFsm.FsmVariables.FindFsmInt("Spell Level");
             if (!BindingCheck(true, "wraiths")) val.Value = 0;
             else if (val.Value == 2 && !BindingCheck(true, "abyss_shriek")) val.Value = 1;
-        }, 1); 
-        
-        fsm.InsertCustomAction("Level Check", () =>
-        {
-            PlayerEvent("Spirit");
-        }, 0);
-        fsm.InsertCustomAction("Level Check 2", () =>
-        {
-            PlayerEvent("Dive");
-        }, 0);
-        fsm.InsertCustomAction("Level Check 3", () =>
-        {
-            PlayerEvent("Wraiths");
-        }, 0);
+        }, 1);
+
+        fsm.InsertCustomAction("Level Check", () => { PlayerEvent("Spirit"); }, 0);
+        fsm.InsertCustomAction("Level Check 2", () => { PlayerEvent("Dive"); }, 0);
+        fsm.InsertCustomAction("Level Check 3", () => { PlayerEvent("Wraiths"); }, 0);
     }
 
     private static void InitNailArtBindings(PlayMakerFSM fsm)
@@ -808,24 +827,6 @@ public static class CustomObjects
         }, 2);
     }
 
-    private static readonly SetCollider DisableSwim = new()
-    {
-        active = false,
-        gameObject = new FsmOwnerDefault
-        {
-            OwnerOption = OwnerDefaultOption.UseOwner
-        }
-    };
-    
-    private static readonly SetDamageHeroAmount Damage = new()
-    {
-        damageDealt = 1,
-        target = new FsmOwnerDefault
-        {
-            OwnerOption = OwnerDefaultOption.UseOwner
-        }
-    };
-
     private static void InitTearBinding(PlayMakerFSM fsm)
     {
         fsm.DisableAction("Check", 0);
@@ -833,7 +834,7 @@ public static class CustomObjects
         fsm.AddGlobalTransition("REFRESH ACID ARMOUR", "Check");
         var damager = fsm.TryGetState("Disable", out _);
         fsm.AddState("Lost Tear").AddAction(damager ? Damage : DisableSwim);
-        
+
         fsm.AddTransition("Check", "LOST", "Lost Tear");
     }
 
@@ -844,7 +845,7 @@ public static class CustomObjects
             makerFsm.SendEvent("LOST");
             return;
         }
-            
+
         makerFsm.SendEvent("DISABLE");
         makerFsm.SendEvent("ENABLE");
     }
@@ -889,10 +890,7 @@ public static class CustomObjects
             i++;
         }
 
-        for (var k = i; k < ExtraVisualsBindings.Count; k++)
-        {
-            _bindingIcons[k].Sprite = Architect.BlankSprite;
-        }
+        for (var k = i; k < ExtraVisualsBindings.Count; k++) _bindingIcons[k].Sprite = Architect.BlankSprite;
     }
 
     private static void InitializeBindingsUI()
@@ -920,7 +918,7 @@ public static class CustomObjects
                     Padding = new Padding(5, 0, 0, 0)
                 }
                 .WithProp(GridLayout.Column, i);
-            
+
             _bindingsLayout.ColumnDefinitions.Add(new GridDimension(1, GridUnit.Proportional));
             _bindingsLayout.Children.Add(_bindingIcons[i]);
         }
@@ -934,11 +932,10 @@ public static class CustomObjects
     internal static void RefreshLanternBinding()
     {
         PlayMakerFSM.BroadcastEvent("RESET");
-        if (GameManager.instance.sm.GetDarknessLevel() > 0 && 
+        if (GameManager.instance.sm.GetDarknessLevel() > 0 &&
             BindingCheck(PlayerData.instance.GetBool("hasLantern"), "lantern"))
-        {
             HeroController.instance.SetWieldingLantern(true);
-        } else HeroController.instance.SetWieldingLantern(false);
+        else HeroController.instance.SetWieldingLantern(false);
     }
 
     private static void RefreshNailBinding()
@@ -946,7 +943,7 @@ public static class CustomObjects
         if (BossSequenceController.IsInSequence) return;
         if (_nailBound == ShouldBindNail()) return;
         _nailBound = !_nailBound;
-        
+
         EventRegister.SendEvent(_nailBound ? "SHOW BOUND NAIL" : "HIDE BOUND NAIL");
         PlayMakerFSM.BroadcastEvent("UPDATE NAIL DAMAGE");
     }
@@ -964,29 +961,22 @@ public static class CustomObjects
         GameManager.instance.playerData.health = health;
     }
 
-    private static int[] _previousEquippedCharms;
-    private static bool _wasOvercharmed;
-    
-    private static bool _charmsBound;
-    private static bool _shellBound;
-    private static bool _soulBound;
-    private static bool _nailBound;
-
     private static void RefreshCharmsBinding()
     {
         if (BossSequenceController.IsInSequence) return;
         if (ShouldBindCharms())
         {
             if (_charmsBound) return;
-            
-            _previousEquippedCharms = GameManager.instance.playerData.GetVariable<List<int>>("equippedCharms").ToArray();
+
+            _previousEquippedCharms =
+                GameManager.instance.playerData.GetVariable<List<int>>("equippedCharms").ToArray();
             GameManager.instance.playerData.GetVariable<List<int>>("equippedCharms").Clear();
             _wasOvercharmed = GameManager.instance.playerData.GetBool("overcharmed");
             GameManager.instance.playerData.SetBool("overcharmed", false);
-            
+
             foreach (var previousEquippedCharm in _previousEquippedCharms)
                 GameManager.instance.SetPlayerDataBool("equippedCharm_" + previousEquippedCharm, false);
-            
+
             EventRegister.SendEvent("SHOW BOUND CHARMS");
 
             _charmsBound = true;
@@ -996,10 +986,10 @@ public static class CustomObjects
             GameManager.instance.playerData.SetVariable(
                 "equippedCharms",
                 new List<int>(_previousEquippedCharms));
-            
+
             foreach (var previousEquippedCharm in _previousEquippedCharms)
                 GameManager.instance.SetPlayerDataBool("equippedCharm_" + previousEquippedCharm, true);
-            
+
             GameManager.instance.playerData.SetBool("overcharmed", _wasOvercharmed);
             EventRegister.SendEvent("HIDE BOUND CHARMS");
 
@@ -1012,23 +1002,20 @@ public static class CustomObjects
         if (BossSequenceController.IsInSequence) return;
         if (ShouldBindSoul() == _soulBound) return;
         _soulBound = !_soulBound;
-        
+
         if (_soulBound)
         {
             var soul = PlayerData.instance.MPCharge;
             PlayerData.instance.ClearMP();
             PlayerData.instance.AddMPCharge(Math.Min(soul, 33));
         }
-        
+
         GameManager.instance.StartCoroutine(RefreshSoulBindingRoutine());
     }
 
     private static IEnumerator RefreshSoulBindingRoutine()
     {
-        while (GameManager.instance.soulOrb_fsm.ActiveStateName != "Idle")
-        {
-            yield return Task.Yield();
-        }
+        while (GameManager.instance.soulOrb_fsm.ActiveStateName != "Idle") yield return Task.Yield();
         if (_soulBound)
         {
             EventRegister.SendEvent("BIND VESSEL ORB");
@@ -1046,7 +1033,6 @@ public static class CustomObjects
     {
         if (BossSequenceController.IsInSequence) return ShouldBind(BossSequenceController.ChallengeBindings.Soul);
         return !BindingCheck(true, "soul");
-
     }
 
     public static bool ShouldBindShell()
@@ -1066,7 +1052,10 @@ public static class CustomObjects
 
     public static int BoundShell()
     {
-        var num = !GameManager.instance.playerData.GetBool("equippedCharm_23") || GameManager.instance.playerData.GetBool("brokenCharm_23") ? 0 : 2;
+        var num = !GameManager.instance.playerData.GetBool("equippedCharm_23") ||
+                  GameManager.instance.playerData.GetBool("brokenCharm_23")
+            ? 0
+            : 2;
         return 4 + num;
     }
 
@@ -1095,7 +1084,7 @@ public static class CustomObjects
             typeof(BossSequenceController).GetProperty(nameof(BossSequenceController.BoundSoul))?.GetGetMethod(),
             typeof(CustomObjects).GetMethod(nameof(ShouldBindSoul))
         );
-        
+
         _ = new Detour(
             typeof(BossSequenceController).GetProperty(nameof(BossSequenceController.BoundShell))?.GetGetMethod(),
             typeof(CustomObjects).GetMethod(nameof(ShouldBindShell))
@@ -1104,7 +1093,7 @@ public static class CustomObjects
             typeof(BossSequenceController).GetProperty(nameof(BossSequenceController.BoundMaxHealth))?.GetGetMethod(),
             typeof(CustomObjects).GetMethod(nameof(BoundShell))
         );
-        
+
         _ = new Detour(
             typeof(BossSequenceController).GetProperty(nameof(BossSequenceController.BoundNail))?.GetGetMethod(),
             typeof(CustomObjects).GetMethod(nameof(ShouldBindNail))
@@ -1113,7 +1102,7 @@ public static class CustomObjects
             typeof(BossSequenceController).GetProperty(nameof(BossSequenceController.BoundNailDamage))?.GetGetMethod(),
             typeof(CustomObjects).GetMethod(nameof(BoundNailDamage))
         );
-        
+
         _ = new Detour(
             typeof(BossSequenceController).GetProperty(nameof(BossSequenceController.BoundCharms))?.GetGetMethod(),
             typeof(CustomObjects).GetMethod(nameof(ShouldBindCharms))
@@ -1126,23 +1115,24 @@ public static class CustomObjects
                 orig(self);
                 return;
             }
+
             if (ShouldBindSoul())
             {
                 self.Fsm.Event(self.boundEvent);
                 self.Finish();
             }
-            else orig(self);
+            else
+            {
+                orig(self);
+            }
         };
     }
 
     private static void PlayerEvent(string name)
     {
-        foreach (var listener in PlayerListeners)
-        {
-            EventManager.BroadcastEvent(listener.gameObject, name);
-        }
+        foreach (var listener in PlayerListeners) EventManager.BroadcastEvent(listener.gameObject, name);
     }
-    
+
     private static void SetupPlayerListeners()
     {
         On.HeroController.TakeDamage += (orig, self, go, side, amount, type) =>
@@ -1158,10 +1148,7 @@ public static class CustomObjects
             orig(self, amount);
         };
 
-        ModHooks.BeforePlayerDeadHook += () =>
-        {
-            PlayerEvent("OnDeath");
-        };
+        ModHooks.BeforePlayerDeadHook += () => { PlayerEvent("OnDeath"); };
 
         On.HeroController.HeroJump += (orig, self) =>
         {
@@ -1198,7 +1185,7 @@ public static class CustomObjects
             orig(self);
             PlayerEvent(self.cState.facingRight ? "FaceRight" : "FaceLeft");
         };
-        
+
         On.HeroController.DoAttack += (orig, self) =>
         {
             PlayerEvent("Attack");

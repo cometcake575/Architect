@@ -16,7 +16,7 @@ public class WalkTarget : MonoBehaviour
         var hero = HeroController.instance;
         var body = hero.GetComponent<Rigidbody2D>();
         var heroTrans = hero.transform;
-        
+
         hero.RelinquishControl();
         hero.StopAnimationControl();
         hero.GetComponent<tk2dSpriteAnimator>().Play("Walk");
