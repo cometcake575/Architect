@@ -80,30 +80,21 @@ public class ChoiceConfigElement : ConfigElement
     }
 }
 
-public class ChoiceConfigValue : ConfigValue<ChoiceConfigType>
+public class ChoiceConfigValue(ChoiceConfigType type, int value, string stringValue)
+    : ConfigValue<ChoiceConfigType>(type)
 {
-    private readonly string _stringValue;
-
-    private readonly int _value;
-
-    public ChoiceConfigValue(ChoiceConfigType type, int value, string stringValue) : base(type)
-    {
-        _value = value;
-        _stringValue = stringValue;
-    }
-
     public int GetValue()
     {
-        return _value;
+        return value;
     }
 
     public string GetStringValue()
     {
-        return _stringValue;
+        return stringValue;
     }
 
     public override string SerializeValue()
     {
-        return _value.ToString();
+        return value.ToString();
     }
 }

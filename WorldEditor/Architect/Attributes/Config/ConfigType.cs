@@ -40,15 +40,9 @@ public abstract class ConfigType
     internal abstract void RunAction(GameObject obj, ConfigValue value);
 }
 
-public abstract class ConfigType<TValue> : ConfigType where TValue : ConfigValue
+public abstract class ConfigType<TValue>(string name, Action<GameObject, TValue> action) : ConfigType(name)
+    where TValue : ConfigValue
 {
-    private readonly Action<GameObject, TValue> _action;
-
-    protected ConfigType(string name, Action<GameObject, TValue> action) : base(name)
-    {
-        _action = action;
-    }
-
     public ConfigType<TValue> PreAwake()
     {
         IsPreAwake = true;
@@ -59,7 +53,7 @@ public abstract class ConfigType<TValue> : ConfigType where TValue : ConfigValue
     {
         try
         {
-            _action.Invoke(obj, value as TValue);
+            action.Invoke(obj, value as TValue);
         }
         catch (Exception e)
         {
@@ -83,33 +77,27 @@ public abstract class ConfigValue
     public abstract void Setup(GameObject obj);
 }
 
-public abstract class ConfigValue<TType> : ConfigValue where TType : ConfigType
+public abstract class ConfigValue<TType>(TType type) : ConfigValue
+    where TType : ConfigType
 {
-    private readonly TType _type;
-
-    protected ConfigValue(TType type)
-    {
-        _type = type;
-    }
-
     public override string GetTypeId()
     {
-        return _type.Id;
+        return type.Id;
     }
 
     public override string GetName()
     {
-        return _type.Name;
+        return type.Name;
     }
 
     public override void Setup(GameObject obj)
     {
-        _type.RunAction(obj, this);
+        type.RunAction(obj, this);
     }
 
     public override bool PreAwake()
     {
-        return _type.IsPreAwake;
+        return type.IsPreAwake;
     }
 }
 

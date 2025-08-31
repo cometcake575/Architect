@@ -75,22 +75,15 @@ public class BoolConfigElement : ConfigElement
     }
 }
 
-public class BoolConfigValue : ConfigValue<BoolConfigType>
+public class BoolConfigValue(BoolConfigType type, bool value) : ConfigValue<BoolConfigType>(type)
 {
-    private readonly bool _value;
-
-    public BoolConfigValue(BoolConfigType type, bool value) : base(type)
-    {
-        _value = value;
-    }
-
     public bool GetValue()
     {
-        return _value;
+        return value;
     }
 
     public override string SerializeValue()
     {
-        return _value.ToString();
+        return value.ToString();
     }
 }

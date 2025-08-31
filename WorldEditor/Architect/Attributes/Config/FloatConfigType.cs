@@ -70,22 +70,15 @@ public class FloatConfigElement : ConfigElement
     }
 }
 
-public class FloatConfigValue : ConfigValue<FloatConfigType>
+public class FloatConfigValue(FloatConfigType type, float value) : ConfigValue<FloatConfigType>(type)
 {
-    private readonly float _value;
-
-    public FloatConfigValue(FloatConfigType type, float value) : base(type)
-    {
-        _value = value;
-    }
-
     public float GetValue()
     {
-        return _value;
+        return value;
     }
 
     public override string SerializeValue()
     {
-        return _value.ToString(CultureInfo.InvariantCulture);
+        return value.ToString(CultureInfo.InvariantCulture);
     }
 }

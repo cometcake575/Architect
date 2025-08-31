@@ -66,22 +66,15 @@ public class StringConfigElement : ConfigElement
     }
 }
 
-public class StringConfigValue : ConfigValue<StringConfigType>
+public class StringConfigValue(StringConfigType type, string value) : ConfigValue<StringConfigType>(type)
 {
-    private readonly string _value;
-
-    public StringConfigValue(StringConfigType type, string value) : base(type)
-    {
-        _value = value;
-    }
-
     public string GetValue()
     {
-        return _value;
+        return value;
     }
 
     public override string SerializeValue()
     {
-        return _value;
+        return value;
     }
 }

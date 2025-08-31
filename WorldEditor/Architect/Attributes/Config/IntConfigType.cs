@@ -69,22 +69,15 @@ public class IntConfigElement : ConfigElement
     }
 }
 
-public class IntConfigValue : ConfigValue<IntConfigType>
+public class IntConfigValue(IntConfigType type, int value) : ConfigValue<IntConfigType>(type)
 {
-    private readonly int _value;
-
-    public IntConfigValue(IntConfigType type, int value) : base(type)
-    {
-        _value = value;
-    }
-
     public int GetValue()
     {
-        return _value;
+        return value;
     }
 
     public override string SerializeValue()
     {
-        return _value.ToString();
+        return value.ToString();
     }
 }
