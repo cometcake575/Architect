@@ -11,7 +11,6 @@ public class Wind : MonoBehaviour
     private static bool _actuallyJumping;
     private static MethodInfo _setState;
     private static Material _windMaterial;
-    private static float _verticalWindForce;
     private static readonly int EnemyLayer = LayerMask.NameToLayer("Enemies");
     private static readonly int ProjectileLayer = LayerMask.NameToLayer("Projectiles");
     private static readonly int AttackLayer = LayerMask.NameToLayer("Enemy Attack");
@@ -58,16 +57,10 @@ public class Wind : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.GetComponent<HeroController>()) _verticalWindForce += _force.y;
-    }
-
     private void OnTriggerExit2D(Collider2D other)
     {
         if (other.GetComponent<HeroController>())
         {
-            _verticalWindForce -= _force.y;
             _windPlayer = false;
         }
     }
@@ -115,12 +108,6 @@ public class Wind : MonoBehaviour
                 || HeroController.instance.cState.doubleJumping
                 || HeroController.instance.cState.wallJumping) _actuallyJumping = true;
             else if (HeroController.instance.GetComponent<Rigidbody2D>().velocity.y < 0) _actuallyJumping = false;
-        };
-
-        On.HeroController.SceneInit += (orig, self) =>
-        {
-            _verticalWindForce = 0;
-            orig(self);
         };
 
         On.HeroController.BackOnGround += (orig, self) =>

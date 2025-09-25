@@ -51,7 +51,7 @@ internal sealed class HatcherPackElement : GInternalPackElement
 
         var fsm = gameObject.LocateMyFSM(_fsmName);
         if (!fsm.TryGetState("Init", out var state)) state = fsm.GetValidState("Initiate");
-
+        
         var fgo = state.GetAction<FindGameObject>(1) ?? state.GetAction<FindGameObject>(2);
         fgo.objectName = cage.name;
 

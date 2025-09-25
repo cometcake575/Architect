@@ -26,6 +26,8 @@ public class ConfigGroup
     public static ConfigGroup Generic;
 
     public static ConfigGroup Benches;
+    
+    public static ConfigGroup BlurPlanes;
 
     public static ConfigGroup Transitions;
 
@@ -251,6 +253,8 @@ public class ConfigGroup
             zOffset
         );
 
+        BlurPlanes = new ConfigGroup(Invisible, zOffset);
+
         Generic = new ConfigGroup(Invisible,
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Visible", (o, value) =>
             {
@@ -268,7 +272,10 @@ public class ConfigGroup
         Transitions = new ConfigGroup(Invisible,
             Attributes.ConfigManager.RegisterConfigType(
                 new ChoiceConfigType("Gate Type",
-                    (o, value) => { o.GetComponent<CustomTransitionPoint>().pointType = value.GetValue(); }, "Door",
+                    (o, value) =>
+                    {
+                        o.GetComponent<CustomTransitionPoint>().pointType = value.GetValue();
+                    }, "Door",
                     "Left", "Right", "Top", "Bottom").WithDefaultValue(0).PreAwake(),
                 "trans_dir"),
             Attributes.ConfigManager.RegisterConfigType(

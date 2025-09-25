@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Architect.Content.Elements.Internal;
@@ -9,6 +10,8 @@ internal class GInternalPackElement : InternalPackElement
     private readonly string _path;
     private readonly string _scene;
 
+    [CanBeNull] private Sprite _sprite;
+
     protected GameObject GameObject;
 
     public GInternalPackElement(string scene, string path, string name, string category, int weight, float offset = 0) :
@@ -17,6 +20,12 @@ internal class GInternalPackElement : InternalPackElement
         _scene = scene;
         _path = path;
         _offset = offset;
+    }
+
+    internal GInternalPackElement WithSprite(Sprite sprite)
+    {
+        _sprite = sprite;
+        return this;
     }
 
     internal override void AddPreloads(List<(string, string)> preloadInfo)
@@ -38,5 +47,10 @@ internal class GInternalPackElement : InternalPackElement
     public override GameObject GetPrefab(bool flipped, float rotation)
     {
         return GameObject;
+    }
+
+    public override Sprite GetSprite()
+    {
+        return _sprite;
     }
 }

@@ -469,7 +469,7 @@ internal class BrokenVesselElement : GInternalPackElement
 
         if (config.disableRoar) fsm.DisableAction("Roar", 5);
 
-        var pos = fsm.gameObject.transform.position;
+        var pos = gameObject.transform.position;
 
         fsm.FsmVariables.FindFsmFloat("Min Dstab Height").Value = -100;
 
@@ -513,11 +513,11 @@ internal class BrokenVesselElement : GInternalPackElement
                 }, 0);
                 break;
             case 1:
-                fsm.FsmVariables.FindFsmFloat("X Min").Value = pos.x - 9.55f;
-                fsm.FsmVariables.FindFsmFloat("X Max").Value = pos.x + 9.55f;
+                balloonFsm.FsmVariables.FindFsmFloat("X Min").Value = pos.x - 9.55f;
+                balloonFsm.FsmVariables.FindFsmFloat("X Max").Value = pos.x + 9.55f;
 
-                fsm.FsmVariables.FindFsmFloat("Y Min").Value = pos.y;
-                fsm.FsmVariables.FindFsmFloat("Y Max").Value = pos.y + 5.26f;
+                balloonFsm.FsmVariables.FindFsmFloat("Y Min").Value = pos.y;
+                balloonFsm.FsmVariables.FindFsmFloat("Y Max").Value = pos.y + 5.26f;
                 break;
             default:
                 balloonFsm.RemoveState("Spawn");

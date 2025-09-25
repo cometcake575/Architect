@@ -64,7 +64,7 @@ public static class ContentPacks
         }
     }
 
-    private static AbstractPackElement Create(string scene, string path, string name, string category, int weight = 0,
+    private static GInternalPackElement Create(string scene, string path, string name, string category, int weight = 0,
         float offset = 0)
     {
         return new GInternalPackElement(scene, path, name, category, weight, offset);
