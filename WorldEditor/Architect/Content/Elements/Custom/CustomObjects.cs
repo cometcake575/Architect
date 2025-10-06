@@ -68,6 +68,8 @@ public static class CustomObjects
 
     public static void Initialize()
     {
+        TextDisplay.Init();
+        
         var customs = new ContentPack("Custom", "Various custom assets that don't exist in the base game")
         {
             new SimplePackElement(CreateTriggerZone(), "Trigger Zone", "Utility",
@@ -385,9 +387,7 @@ public static class CustomObjects
     {
         var point = new GameObject("Text Display");
         point.transform.localScale *= 10;
-
-        TextDisplay.Init();
-
+        
         point.SetActive(false);
         point.AddComponent<TextDisplay>().displayType = def;
         Object.DontDestroyOnLoad(point);

@@ -166,7 +166,7 @@ public static class RoomObjects
 
         Object.DontDestroyOnLoad(obj);
         obj.SetActive(false);
-        return new PreviewablePackElement(obj, "Remove Top Right Border", "Utility", sprite)
+        return new PreviewablePackElement(obj, "Scene Border Remover", "Utility", sprite)
             .WithReceiverGroup(ReceiverGroup.Invisible);
     }
 

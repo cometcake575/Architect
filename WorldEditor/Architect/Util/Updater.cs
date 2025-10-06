@@ -30,6 +30,7 @@ public static class Updater
             "Coin Switch" => "Switch",
             "Coin Switch Door" => "Switch Door",
             "Spell Twister" => "Soul Twister",
+            "Remove Top Right Border" => "Scene Border Remover",
             _ => name
         };
     }

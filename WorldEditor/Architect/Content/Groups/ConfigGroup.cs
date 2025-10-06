@@ -489,7 +489,16 @@ public class ConfigGroup
                             range.localScale *= value.GetValue();
                         })
                     .WithCondition(o => o.GetComponentInChildren<AlertRange>() || o.transform.Find("Alert Range")),
-                "alert_range_trigger")
+                "alert_range_trigger"),
+            Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Contact Damage",
+                        (o, value) =>
+                        {
+                            if (value.GetValue()) return;
+                            Object.Destroy(o.GetComponentInChildren<DamageHero>());
+                        })
+                    .WithCondition(o => o.GetComponentInChildren<DamageHero>()),
+                "contact_damage")
         );
 
         Goams = new ConfigGroup(Generic,
