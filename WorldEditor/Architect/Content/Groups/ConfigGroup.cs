@@ -437,19 +437,19 @@ public class ConfigGroup
 
         GeoChest = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(
-                new IntConfigType("Large Geo",
+                new IntConfigType("<size=16>Large Geo</size>",
                     (o, value) =>
                     {
                         o.LocateMyFSM("Chest Control").FsmVariables.FindFsmInt("Geo Large").Value = value.GetValue();
                     }), "chest_large_geo"),
             Attributes.ConfigManager.RegisterConfigType(
-                new IntConfigType("Medium Geo",
+                new IntConfigType("<size=16>Medium Geo</size>",
                     (o, value) =>
                     {
                         o.LocateMyFSM("Chest Control").FsmVariables.FindFsmInt("Geo Med").Value = value.GetValue();
                     }), "chest_med_geo"),
             Attributes.ConfigManager.RegisterConfigType(
-                new IntConfigType("Small Geo",
+                new IntConfigType("<size=16>Small Geo</size>",
                     (o, value) =>
                     {
                         o.LocateMyFSM("Chest Control").FsmVariables.FindFsmInt("Geo Small").Value = value.GetValue();
@@ -520,19 +520,19 @@ public class ConfigGroup
 
         KillableEnemies = new ConfigGroup(Enemies,
             Attributes.ConfigManager.RegisterConfigType(
-                new IntConfigType("Health",
+                new IntConfigType("<size=16>Health</size>",
                     (o, value) => { o.GetComponent<HealthManager>().hp = Mathf.Abs(value.GetValue()); }),
                 "enemy_health"),
             Attributes.ConfigManager.RegisterConfigType(
-                new IntConfigType("Large Geo Drops",
+                new IntConfigType("<size=16>Large Geo Drops</size>",
                     (o, value) => { o.GetComponent<HealthManager>().SetGeoLarge(Mathf.Abs(value.GetValue())); }),
                 "enemy_large_geo"),
             Attributes.ConfigManager.RegisterConfigType(
-                new IntConfigType("Medium Geo Drops",
+                new IntConfigType("<size=16>Medium Geo Drops</size>",
                     (o, value) => { o.GetComponent<HealthManager>().SetGeoMedium(Mathf.Abs(value.GetValue())); }),
                 "enemy_med_geo"),
             Attributes.ConfigManager.RegisterConfigType(
-                new IntConfigType("Small Geo Drops",
+                new IntConfigType("<size=16>Small Geo Drops</size>",
                     (o, value) => { o.GetComponent<HealthManager>().SetGeoSmall(Mathf.Abs(value.GetValue())); }),
                 "enemy_small_geo"),
             Attributes.ConfigManager.RegisterConfigType(MakePersistenceConfigType("Stay Dead", o =>
@@ -667,7 +667,7 @@ public class ConfigGroup
 
         Cocoon = new ConfigGroup(Breakable,
             Attributes.ConfigManager.RegisterConfigType(
-                new IntConfigType("Lifeseed Count",
+                new IntConfigType("<size=16>Lifeseed Count</size>",
                     (o, value) => { o.GetComponent<HealthCocoon>()?.SetScuttlerAmount(Mathf.Abs(value.GetValue())); }),
                 "lifeseed_count")
         );
@@ -740,7 +740,7 @@ public class ConfigGroup
         );
 
         TollBench = new ConfigGroup(Levers,
-            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Cost", (o, value) =>
+            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("<size=16>Cost</size>", (o, value) =>
             {
                 foreach (var fsm in o.GetComponents<PlayMakerFSM>())
                 {
@@ -778,7 +778,7 @@ public class ConfigGroup
             }), "disable_collision");
         Thorns = new ConfigGroup(Colours,
             Attributes.ConfigManager.RegisterConfigType(
-                new IntConfigType("Damage Amount",
+                new IntConfigType("<size=16>Damage Amount</size>",
                     (o, value) => { o.GetOrAddComponent<CustomDamager>().damageAmount = value.GetValue(); }),
                 "thorns_damage"),
             disableCollision
@@ -1263,7 +1263,7 @@ public class ConfigGroup
                 new FloatConfigType("Repeat Delay",
                     (o, value) => { o.GetComponent<Timer>().repeatDelay = value.GetValue(); }), "timer_delay"),
             Attributes.ConfigManager.RegisterConfigType(
-                new IntConfigType("Max Calls", (o, value) => { o.GetComponent<Timer>().maxCalls = value.GetValue(); }),
+                new IntConfigType("<size=16>Max Calls</size>", (o, value) => { o.GetComponent<Timer>().maxCalls = value.GetValue(); }),
                 "timer_max_calls")
         );
 
@@ -1473,7 +1473,7 @@ public class ConfigGroup
         Choice = new ConfigGroup(Invisible,
             tc,
             Attributes.ConfigManager.RegisterConfigType(
-                new IntConfigType("Cost", (o, value) => { o.GetComponent<TextDisplay>().cost = value.GetValue(); })
+                new IntConfigType("<size=16>Cost</size>", (o, value) => { o.GetComponent<TextDisplay>().cost = value.GetValue(); })
                     .WithDefaultValue(0), "choice_cost")
         );
 
