@@ -1,14 +1,12 @@
 using Architect.MultiplayerHook;
-using HutongGames.PlayMaker;
-using Modding;
+using SFCore.Utils;
 using UnityEngine;
+using FsmUtil = Satchel.FsmUtil;
 
 namespace Architect.Content.Elements.Custom.Behaviour;
 
 public class ZoteTrophy : MonoBehaviour
 {
-    private static GameObject _titleCard;
-    private static FsmString _titleCardData;
     private bool _collected;
     private float _collectedTime;
     private bool _particlesStopped;
@@ -77,19 +75,40 @@ public class ZoteTrophy : MonoBehaviour
 
     public static void Init()
     {
-        _titleCard = GameCameras.instance.hudCamera.transform.GetChild(10).GetChild(0).gameObject;
-        _titleCardData = _titleCard.LocateMyFSM("Area Title Control").FsmVariables.FindFsmString("Area Event");
-
-        ModHooks.LanguageGetHook += (key, _, orig) =>
+        On.PlayMakerFSM.Awake += (orig, fsm) =>
         {
-            if (key.EndsWith("_RawText_SUPER") || key.EndsWith("_RawText_SUB")) return "";
-            return key.EndsWith("_RawText_MAIN") ? key.Replace("_RawText_MAIN", "") : orig;
+            if (fsm.FsmName != "Area Title Control") return;
+
+            var header = fsm.FsmVariables.FindFsmString("Title Sup");
+            var footer = fsm.FsmVariables.FindFsmString("Title Sub");
+            var body = fsm.FsmVariables.FindFsmString("Title Main");
+
+            FsmUtil.AddCustomAction(fsm.GetState("Init all"), () =>
+            {
+                if (!_overrideAreaText) return;
+
+                header.Value = _areaHeader;
+                footer.Value = _areaFooter;
+                body.Value = _areaBody;
+
+                _overrideAreaText = false;
+            });
+            orig(fsm);
         };
     }
+    
+    private static bool _overrideAreaText;
+    private static string _areaHeader;
+    private static string _areaBody;
+    private static string _areaFooter;
 
     public static void WinScreen(string name)
     {
-        _titleCardData.Value = name + "_RawText";
-        _titleCard.SetActive(true);
+        _overrideAreaText = true;
+        _areaHeader = "";
+        _areaBody = name;
+        _areaFooter = "Wins";
+        
+        AreaTitle.instance.gameObject.SetActive(true);
     }
 }
