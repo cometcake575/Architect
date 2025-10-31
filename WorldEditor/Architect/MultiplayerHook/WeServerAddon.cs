@@ -88,7 +88,6 @@ public class WeServerAddon : ServerAddon
         {
             Logger.Info("Receiving Win Packet [SERVER]");
             sender.SendSingleData(PacketId.Win, packet, serverApi.ServerManager.Players
-                .Where(player => player.Id != id)
                 .Select(player => player.Id).ToArray());
         });
 

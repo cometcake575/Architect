@@ -77,37 +77,30 @@ public class ZoteTrophy : MonoBehaviour
     {
         On.PlayMakerFSM.Awake += (orig, fsm) =>
         {
+            orig(fsm);
+            
             if (fsm.FsmName != "Area Title Control") return;
 
-            var header = fsm.FsmVariables.FindFsmString("Title Sup");
-            var footer = fsm.FsmVariables.FindFsmString("Title Sub");
-            var body = fsm.FsmVariables.FindFsmString("Title Main");
-
-            FsmUtil.AddCustomAction(fsm.GetState("Init all"), () =>
+            FsmUtil.InsertCustomAction(fsm, "Visited Check", f =>
             {
-                if (!_overrideAreaText) return;
-
-                header.Value = _areaHeader;
-                footer.Value = _areaFooter;
-                body.Value = _areaBody;
-
-                _overrideAreaText = false;
-            });
-            orig(fsm);
+                if (_overrideAreaText)
+                {
+                    f.SendEvent("UNVISITED");
+                    f.FsmVariables.FindFsmString("Title Main").Value = _areaBody;
+                    f.FsmVariables.FindFsmString("Title Sup").Value = "";
+                    f.FsmVariables.FindFsmString("Title Sub").Value = "";
+                }
+            }, 0);
         };
     }
     
     private static bool _overrideAreaText;
-    private static string _areaHeader;
     private static string _areaBody;
-    private static string _areaFooter;
 
     public static void WinScreen(string name)
     {
         _overrideAreaText = true;
-        _areaHeader = "";
         _areaBody = name;
-        _areaFooter = "Wins";
         
         AreaTitle.instance.gameObject.SetActive(true);
     }
