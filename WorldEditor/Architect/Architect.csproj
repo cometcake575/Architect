@@ -22,7 +22,7 @@
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
         <!-- Path to DLL references required to build mod -->
-        <LocalRefs>/Users/arunkapila/Library/Application Support/Steam/steamapps/common/Hollow Knight/hollow_knight.app/Contents/Resources/Data/Managed</LocalRefs>
+        <LocalRefs>C:/Users/vimav/Desktop/James Baxter/Hollow Knight/hollow_knight_Data/Managed</LocalRefs>
         <!-- Path to Mods folder -->
         <ModsPath>$(LocalRefs)/Mods</ModsPath>
         <!-- The folder that exports will be generated in -->
@@ -333,16 +333,16 @@
             <HintPath>$(LocalRefs)/UnityEngine.XRModule.dll</HintPath>
         </Reference>
         <Reference Include="MagicUI">
-            <HintPath>/Users/arunkapila/Library/Application Support/Steam/steamapps/common/Hollow Knight/hollow_knight.app/Contents/Resources/Data/Managed/Mods/MagicUI/MagicUI.dll</HintPath>
+            <HintPath>C:/Users/vimav/Desktop/James Baxter/Hollow Knight/hollow_knight_Data/Managed/Mods/MagicUI/MagicUI.dll</HintPath>
         </Reference>
         <Reference Include="Satchel">
-            <HintPath>/Users/arunkapila/Library/Application Support/Steam/steamapps/common/Hollow Knight/hollow_knight.app/Contents/Resources/Data/Managed/Mods/Satchel/Satchel.dll</HintPath>
+            <HintPath>C:/Users/vimav/Desktop/James Baxter/Hollow Knight/hollow_knight_Data/Managed/Mods/Satchel/Satchel.dll</HintPath>
         </Reference>
         <Reference Include="SFCore">
-            <HintPath>/Users/arunkapila/Library/Application Support/Steam/steamapps/common/Hollow Knight/hollow_knight.app/Contents/Resources/Data/Managed/Mods/SFCore/SFCore.dll</HintPath>
+            <HintPath>C:/Users/vimav/Desktop/James Baxter/Hollow Knight/hollow_knight_Data/Managed/Mods/SFCore/SFCore.dll</HintPath>
         </Reference>
         <Reference Include="HKMP">
-            <HintPath>/Users/arunkapila/Library/Application Support/Steam/steamapps/common/Hollow Knight/hollow_knight.app/Contents/Resources/Data/Managed/Mods/HKMP/HKMP.dll</HintPath>
+            <HintPath>C:/Users/vimav/Desktop/James Baxter/Hollow Knight/hollow_knight_Data/Managed/Mods/HKMP/HKMP.dll</HintPath>
         </Reference>
     </ItemGroup>
     <ItemGroup>

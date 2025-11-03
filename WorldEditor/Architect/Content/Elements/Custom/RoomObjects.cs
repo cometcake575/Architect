@@ -36,6 +36,14 @@ public static class RoomObjects
             CreateTransitionPoint(),
             CreateCameraBorder(),
             CreateSceneBorderRemover(),
+	    new PreviewablePackElement(CreateOmnitool(), "Omnitool", "Utility",
+                    ResourceUtils.LoadInternal("omnitool_remover"))
+                .WithConfigGroup(ConfigGroup.Invisible)
+                .WithReceiverGroup(ReceiverGroup.Invisible),
+	    new PreviewablePackElement(CreateObjectEnabler(), "ObjectEnabler", "Utility",
+                    ResourceUtils.LoadInternal("object_enabler"))
+                .WithConfigGroup(ConfigGroup.Invisible)
+                .WithReceiverGroup(ReceiverGroup.Invisible),
             CreateObjectRemover("room_remover", "Clear Room", o =>
             {
                 var clearer = o.GetOrAddComponent<RoomClearerConfig>();
@@ -137,6 +145,45 @@ public static class RoomObjects
         return point is not null && lowest <= 500 ? [point.gameObject.GetOrAddComponent<Disabler>()] : [];
     }
 
+    private static Disabler[] FindAnyObjectInRadius(GameObject disabler)
+    {
+        // Get all objects in the scene except Architect tools
+        var allObjects = disabler.scene.GetRootGameObjects()
+            .Where(obj => !obj.name.StartsWith("[Architect] "))
+            .SelectMany(root => root.GetComponentsInChildren<Transform>(true))
+            .Select(t => t.gameObject)
+            .Distinct()
+            .ToList();
+
+        // Find the single closest object
+        var closestObject = FindClosestObject(disabler, allObjects);
+
+        // Return only the closest object (or empty if none found)
+        return closestObject != null ? [closestObject.GetOrAddComponent<Disabler>()] : [];
+    }
+
+    private static GameObject FindClosestObject(GameObject disabler, List<GameObject> allObjects)
+    {
+        GameObject closestObject = null;
+        float closestDistance = float.MaxValue;
+
+        foreach (var obj in allObjects)
+        {
+            var pos = obj.transform.position - disabler.transform.position;
+            pos.z = 0;
+            var dist = pos.sqrMagnitude;
+
+            // Only consider objects within range and closer than current closest
+            if (dist <= 500 && dist < closestDistance)
+            {
+                closestDistance = dist;
+                closestObject = obj;
+            }
+        }
+
+        return closestObject;
+    }
+
     private static AbstractPackElement CreateCameraBorder()
     {
         CameraBorder.Init();
@@ -227,6 +274,41 @@ public static class RoomObjects
         Object.DontDestroyOnLoad(point);
 
         return point;
+    }
+
+    private static GameObject CreateOmnitool()
+    {
+    	var omnitool = new GameObject("Omnitool");
+    
+    	// Add the ObjectRemover component and set up the trigger
+    	var remover = omnitool.AddComponent<ObjectRemover>();
+    	remover.triggerName = "omnitool";
+    
+    	// Register the omnitool action
+    	EditActions["omnitool"] = FindAnyObjectInRadius;
+    
+    	var sprite = ResourceUtils.LoadInternal("omnitool_remover", FilterMode.Point);
+    	omnitool.layer = 10;
+    	omnitool.transform.position += new Vector3(0, 0, 0.1f);
+
+    	Object.DontDestroyOnLoad(omnitool);
+    	omnitool.SetActive(false);
+    	return omnitool;
+    }
+
+    private static GameObject CreateObjectEnabler()
+    {
+    	var objectenabler = new GameObject("Object Enabler");
+
+	point.AddComponent<ObjectEnabler>();
+    
+    	var sprite = ResourceUtils.LoadInternal("object_enabler", FilterMode.Point);
+    	objectenabler.layer = 10;
+    	objectenabler.transform.position += new Vector3(0, 0, -2);
+
+    	Object.DontDestroyOnLoad(objectenabler);
+    	objectenabler.SetActive(false);
+    	return objectenabler;
     }
 
     private static GameObject CreateDarkness()
