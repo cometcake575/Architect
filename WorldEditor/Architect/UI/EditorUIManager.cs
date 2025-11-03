@@ -193,6 +193,9 @@ public static class EditorUIManager
             case -5:
                 SelectedItem = ResetObject.Instance;
                 break;
+            case -6:
+                SelectedItem = LockObject.Instance;
+                break;
             default:
             {
                 var index = _groupIndex * ItemsPerGroup + _index;
@@ -577,6 +580,7 @@ public static class EditorUIManager
                 new GridDimension(1, GridUnit.Proportional),
                 new GridDimension(1, GridUnit.Proportional),
                 new GridDimension(1, GridUnit.Proportional),
+                new GridDimension(1, GridUnit.Proportional),
                 new GridDimension(1, GridUnit.Proportional)
             },
             RowDefinitions =
@@ -595,7 +599,7 @@ public static class EditorUIManager
                 VerticalAlignment = VerticalAlignment.Bottom,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 Content = "Reshare Level (HKMP)"
-            }.WithProp(GridLayout.Column, 0).WithProp(GridLayout.ColumnSpan, 4).WithProp(GridLayout.Row, correctRow);
+            }.WithProp(GridLayout.Column, 0).WithProp(GridLayout.ColumnSpan, 5).WithProp(GridLayout.Row, correctRow);
             multiplayerRefresh.Click += _ => { HkmpHook.Refresh(); };
             extraSettings.Children.Add(multiplayerRefresh);
             correctRow++;
@@ -624,6 +628,12 @@ public static class EditorUIManager
         eraserImagedButton.Item2.WithProp(GridLayout.Column, 3).WithProp(GridLayout.Row, correctRow);
         extraSettings.Children.Add(eraserImagedButton.Item1);
         extraSettings.Children.Add(eraserImagedButton.Item2);
+
+        var lockImagedButton = CreateImagedButton(layout, LockObject.Instance.GetSprite(), "Lock", 0, 0, -6);
+        lockImagedButton.Item1.WithProp(GridLayout.Column, 4).WithProp(GridLayout.Row, correctRow);
+        lockImagedButton.Item2.WithProp(GridLayout.Column, 4).WithProp(GridLayout.Row, correctRow);
+        extraSettings.Children.Add(lockImagedButton.Item1);
+        extraSettings.Children.Add(lockImagedButton.Item2);
 
         PauseOptions.Add(extraSettings);
     }
