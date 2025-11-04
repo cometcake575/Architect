@@ -300,7 +300,7 @@ public static class RoomObjects
     {
     	var objectenabler = new GameObject("Object Enabler");
 
-	point.AddComponent<ObjectEnabler>();
+	objectenabler.AddComponent<ObjectEnabler>();
     
     	var sprite = ResourceUtils.LoadInternal("object_enabler", FilterMode.Point);
     	objectenabler.layer = 10;

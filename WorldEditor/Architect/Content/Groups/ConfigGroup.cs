@@ -131,6 +131,8 @@ public class ConfigGroup
 
     public static ConfigGroup ObjectRemover;
 
+    public static ConfigGroup ObjectEnablerConfig;
+
     public static ConfigGroup HazardRespawnPoint;
 
     public static ConfigGroup RepeatNpcs;
@@ -411,11 +413,11 @@ public class ConfigGroup
                 "object_duplicator_identifier")
         );
 
-	ObjectEnabler = new ConfigGroup(Invisible,
+	ObjectEnablerConfig = new ConfigGroup(Invisible,
             Attributes.ConfigManager.RegisterConfigType(
                 new StringConfigType("Path",
-                    (o, value) => { o.AddComponent<ObjectEnabler>().objectPath = value.GetValue(); })
-		    .WithPriority(-1)
+                    (o, value) => { o.AddComponent<ObjectEnabler>().objectPath = value.GetValue(); }),
+		"object_enabler_identifier"
 	    )
         );
 

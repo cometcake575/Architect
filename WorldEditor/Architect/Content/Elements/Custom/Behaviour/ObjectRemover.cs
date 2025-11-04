@@ -1,6 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Architect.Utils;
 
 namespace Architect.Content.Elements.Custom.Behaviour;
 
@@ -9,7 +9,6 @@ public class ObjectEnabler : MonoBehaviour
     public string objectPath;
     
     private Enabler _toggle;
-
     private bool _shouldEnable;
     private bool _setup;
         
@@ -20,7 +19,10 @@ public class ObjectEnabler : MonoBehaviour
 
     private void OnDisable()
     {
-        if (_toggle) ArchitectPlugin.Instance.StartCoroutine(_toggle.Disable(name));
+        if (_toggle != null)
+        {
+            StartCoroutine(_toggle.Disable(name));
+        }
     }
     
     private void Update()
@@ -28,15 +30,19 @@ public class ObjectEnabler : MonoBehaviour
         if (!_setup)
         {
             _setup = true;
-            var o = ObjectUtils.GetGameObjectFromArray(gameObject.scene.GetRootGameObjects(), objectPath);
+            var o = GetGameObjectFromArray(gameObject.scene.GetRootGameObjects(), objectPath);
             if (o)
             {
                 if (o.GetComponent<Disabler>()) return;
-                _toggle = o.GetOrAddComponent<Enabler>();
+            
+                // Replace GetOrAddComponent with manual implementation
+                _toggle = o.GetComponent<Enabler>();
+                if (_toggle == null)
+                    _toggle = o.AddComponent<Enabler>();
             }
         }
-        
-        if (_shouldEnable)
+    
+        if (_shouldEnable && _toggle != null)
         {
             _shouldEnable = false;
             DoEnable();
@@ -45,7 +51,44 @@ public class ObjectEnabler : MonoBehaviour
 
     private void DoEnable()
     {
-        if (_toggle) _toggle.Enable(name);
+        if (_toggle != null) 
+            _toggle.Enable(name);
+    }
+
+    private GameObject GetGameObjectFromArray(GameObject[] rootObjects, string path)
+    {
+        if (rootObjects == null || string.IsNullOrEmpty(path))
+            return null;
+
+        foreach (var root in rootObjects)
+        {
+            if (root.name == path)
+                return root;
+
+            var child = root.transform.Find(path);
+            if (child != null)
+                return child.gameObject;
+            
+            var found = RecursiveFind(root.transform, path);
+            if (found != null)
+                return found.gameObject;
+        }
+
+        return null;
+    }
+
+    private Transform RecursiveFind(Transform parent, string name)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.name == name)
+                return child;
+            
+            var result = RecursiveFind(child, name);
+            if (result != null)
+                return result;
+        }
+        return null;
     }
 }
 
@@ -70,7 +113,7 @@ public class Enabler : MonoBehaviour
         Refresh();
     }
 
-    public IEnumerator Disable(string enableName)
+    public IEnumerator<object> Disable(string enableName)
     {
         yield return null;
 
@@ -97,6 +140,7 @@ public class Enabler : MonoBehaviour
 public class ObjectRemover : MonoBehaviour
 {
     public string triggerName;
+    public string filter;
 
     private Disabler[] _toggle;
 
