@@ -59,8 +59,9 @@ public static class PlacementManager
     }
 
     [CanBeNull]
-    public static ObjectPlacement FindClickedObject(Vector3 mousePos)
+    public static ObjectPlacement FindClickedObject(Vector3 mousePos, bool ignoreLock = false)
     {
-        return GetCurrentPlacements().FirstOrDefault(placement => placement.Touching(mousePos));
+        return GetCurrentPlacements().FirstOrDefault(placement => (ignoreLock || !placement.Locked) 
+                                                                  && placement.Touching(mousePos));
     }
 }

@@ -1,14 +1,12 @@
 using Architect.MultiplayerHook;
-using HutongGames.PlayMaker;
-using Modding;
+using SFCore.Utils;
 using UnityEngine;
+using FsmUtil = Satchel.FsmUtil;
 
 namespace Architect.Content.Elements.Custom.Behaviour;
 
 public class ZoteTrophy : MonoBehaviour
 {
-    private static GameObject _titleCard;
-    private static FsmString _titleCardData;
     private bool _collected;
     private float _collectedTime;
     private bool _particlesStopped;
@@ -77,19 +75,33 @@ public class ZoteTrophy : MonoBehaviour
 
     public static void Init()
     {
-        _titleCard = GameCameras.instance.hudCamera.transform.GetChild(10).GetChild(0).gameObject;
-        _titleCardData = _titleCard.LocateMyFSM("Area Title Control").FsmVariables.FindFsmString("Area Event");
-
-        ModHooks.LanguageGetHook += (key, _, orig) =>
+        On.PlayMakerFSM.Awake += (orig, fsm) =>
         {
-            if (key.EndsWith("_RawText_SUPER") || key.EndsWith("_RawText_SUB")) return "";
-            return key.EndsWith("_RawText_MAIN") ? key.Replace("_RawText_MAIN", "") : orig;
+            orig(fsm);
+            
+            if (fsm.FsmName != "Area Title Control") return;
+
+            FsmUtil.InsertCustomAction(fsm, "Visited Check", f =>
+            {
+                if (_overrideAreaText)
+                {
+                    f.SendEvent("UNVISITED");
+                    f.FsmVariables.FindFsmString("Title Main").Value = _areaBody;
+                    f.FsmVariables.FindFsmString("Title Sup").Value = "";
+                    f.FsmVariables.FindFsmString("Title Sub").Value = "";
+                }
+            }, 0);
         };
     }
+    
+    private static bool _overrideAreaText;
+    private static string _areaBody;
 
     public static void WinScreen(string name)
     {
-        _titleCardData.Value = name + "_RawText";
-        _titleCard.SetActive(true);
+        _overrideAreaText = true;
+        _areaBody = name;
+        
+        AreaTitle.instance.gameObject.SetActive(true);
     }
 }

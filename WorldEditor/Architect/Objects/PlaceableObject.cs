@@ -37,7 +37,7 @@ public class PlaceableObject : SelectableObject
     public override void OnClickInWorld(Vector3 pos, bool first)
     {
         if (!first) return;
-
+        
         var placement = MakePlacement(pos);
 
         PlacementManager.GetCurrentPlacements().Add(placement);
@@ -61,6 +61,7 @@ public class PlaceableObject : SelectableObject
             GetName(),
             pos,
             EditorManager.IsFlipped,
+            false,
             EditorManager.Rotation,
             EditorManager.Scale,
             Guid.NewGuid().ToString().Substring(0, 8),

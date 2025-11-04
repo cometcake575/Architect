@@ -92,6 +92,9 @@ public static class RoomObjects
             CreateObjectRemover("door_remover", "Remove Transition", FindObjectsToDisable<TransitionPoint>)
                 .WithConfigGroup(ConfigGroup.Invisible)
                 .WithReceiverGroup(ReceiverGroup.Invisible),
+            CreateObjectRemover("door_remover", "Remove Renderer", FindObjectsToDisable<Renderer>)
+                .WithConfigGroup(ConfigGroup.Invisible)
+                .WithReceiverGroup(ReceiverGroup.Invisible),
             CreateObjectRemover("enemy_remover", "Remove Enemy", FindObjectsToDisable<HealthManager>)
                 .WithConfigGroup(ConfigGroup.Invisible)
                 .WithReceiverGroup(ReceiverGroup.Invisible),
@@ -135,7 +138,7 @@ public static class RoomObjects
         ContentPacks.RegisterPack(edits);
     }
 
-    private static Disabler[] FindObjectsToDisable<T>(GameObject disabler) where T : UnityEngine.Behaviour
+    private static Disabler[] FindObjectsToDisable<T>(GameObject disabler) where T : Component
     {
         var objects = disabler.scene.GetRootGameObjects()
             .Where(obj => !obj.name.StartsWith("[Architect] "))

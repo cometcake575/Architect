@@ -28,6 +28,7 @@ public class ObjectPlacement
     public readonly EventReceiver[] Receivers;
     public readonly float Rotation;
     public readonly float Scale;
+    public bool Locked;
     private Color _defaultColor;
 
     private bool _dragging;
@@ -42,6 +43,7 @@ public class ObjectPlacement
         string name,
         Vector3 pos,
         bool flipped,
+        bool locked,
         float rotation,
         float scale,
         string id,
@@ -52,6 +54,7 @@ public class ObjectPlacement
         Name = name;
         _pos = pos;
         Flipped = flipped;
+        Locked = locked;
         Scale = scale;
         _id = id;
         Rotation = rotation;
@@ -99,6 +102,7 @@ public class ObjectPlacement
 
     public bool IsWithinZone(Vector2 pos1, Vector2 pos2)
     {
+        if (Locked) return false;
         var withinX = (_pos.x > pos1.x && _pos.x < pos2.x) || (_pos.x < pos1.x && _pos.x > pos2.x);
         var withinY = (_pos.y > pos1.y && _pos.y < pos2.y) || (_pos.y < pos1.y && _pos.y > pos2.y);
         return withinX && withinY;
@@ -162,7 +166,7 @@ public class ObjectPlacement
         var r = 1f;
         var g = 1f;
         var b = 1f;
-        var a = 0.5f;
+        var a = Locked ? 0.2f : 0.5f;
 
         var renderer = _previewObject.AddComponent<SpriteRenderer>();
 
@@ -190,10 +194,6 @@ public class ObjectPlacement
             else if (config.GetName() == "b" && config is FloatConfigValue blue)
             {
                 b = blue.GetValue();
-            }
-            else if (config.GetName() == "a" && config is FloatConfigValue alpha)
-            {
-                a *= Mathf.Max(0.15f, alpha.GetValue());
             }
             else if (config.GetName() == "layer" && config is IntConfigValue layer)
             {
@@ -353,6 +353,9 @@ public class ObjectPlacement
             writer.WritePropertyName("flipped");
             writer.WriteValue(placement.Flipped);
 
+            writer.WritePropertyName("locked");
+            writer.WriteValue(placement.Locked);
+
             if (placement.Rotation != 0)
             {
                 writer.WritePropertyName("rotation");
@@ -376,6 +379,7 @@ public class ObjectPlacement
             string id = null;
             var pos = Vector3.zero;
             var flipped = true;
+            var locked = false;
             var rotation = 0f;
             var scale = 1f;
 
@@ -412,6 +416,10 @@ public class ObjectPlacement
                                 case "flipped":
                                     reader.ReadAsBoolean();
                                     flipped = (bool)reader.Value;
+                                    break;
+                                case "locked":
+                                    reader.ReadAsBoolean();
+                                    locked = (bool)reader.Value;
                                     break;
                                 case "rotation":
                                     reader.ReadAsDouble();
@@ -450,7 +458,7 @@ public class ObjectPlacement
             name = Updater.UpdateObject(name);
             id ??= Guid.NewGuid().ToString().Substring(0, 8);
             var placement =
-                new ObjectPlacement(name, pos, flipped, rotation, scale, id, broadcasters, receivers, config);
+                new ObjectPlacement(name, pos, flipped, locked, rotation, scale, id, broadcasters, receivers, config);
 
             return placement;
         }
@@ -481,5 +489,12 @@ public class ObjectPlacement
 
             return config;
         }
+    }
+
+    public void ToggleLock()
+    {
+        Locked = !Locked;
+        _defaultColor.a = Locked ? 0.2f : 0.5f;
+        if (_previewObject) _previewObject.GetComponent<SpriteRenderer>().color = _defaultColor;
     }
 }

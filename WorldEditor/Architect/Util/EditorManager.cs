@@ -496,6 +496,7 @@ public static class EditorManager
                 pl.Name,
                 wp - obj.Offset,
                 pl.Flipped,
+                false,
                 pl.Rotation,
                 pl.Scale,
                 converts[pl.GetId()],
