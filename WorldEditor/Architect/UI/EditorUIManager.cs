@@ -10,6 +10,7 @@ using Architect.Category;
 using Architect.Content;
 using Architect.MultiplayerHook;
 using Architect.Objects;
+using Architect.Storage;
 using Architect.Util;
 using JetBrains.Annotations;
 using MagicUI.Core;
@@ -32,6 +33,13 @@ public static class EditorUIManager
 
     private const string Nothing = " ";
 
+    // UI Scaling
+    private static float _uiScaleFactor = 1.0f;
+    public static float UI_SCALE_FACTOR => _uiScaleFactor;
+    private const int BASE_BUTTON_SIZE = 80;
+    private const int BASE_IMAGE_SIZE = 40;
+    private const int BASE_PADDING = 15;
+
     // The current page, item index and filter info
     private static int _groupIndex;
     private static int _index;
@@ -42,6 +50,7 @@ public static class EditorUIManager
     private static List<ObjectCategory> _categories;
 
     // Info about current selected item and buttons to change item
+    private static TextObject _editorEnabledText;
     private static TextObject _selectionInfo;
     private static TextObject _sceneInfo;
     private static TextObject _extraInfo;
@@ -229,44 +238,60 @@ public static class EditorUIManager
     // Initializes the UI
     internal static void Initialize(LayoutRoot layout)
     {
-        _layout = layout;
+	try
+    	{
+            _layout = layout;
 
-        _selectionButtons = [];
-        PauseOptions = [];
+            _selectionButtons = [];
+            PauseOptions = [];
 
-        layout.VisibilityCondition = () => EditorManager.IsEditing;
+            layout.VisibilityCondition = () => EditorManager.IsEditing;
 
-        SetupTextDisplay(layout);
-        SetupLeftSide(layout);
-        SetupObjectOptions(layout);
-        SetupFilter(layout);
-        SetupTools(layout);
+            SetupTextDisplay(layout);
+            SetupLeftSide(layout);
+            SetupObjectOptions(layout);
+            SetupFilter(layout);
+            SetupTools(layout);
 
-        On.HeroController.SceneInit += (orig, self) =>
+            On.HeroController.SceneInit += (orig, self) =>
+            {
+                orig(self);
+                _sceneInfo.Text = "Scene: " + GameManager.instance.sceneName;
+            };
+	}
+
+	catch (Exception e)
         {
-            orig(self);
-            _sceneInfo.Text = "Scene: " + GameManager.instance.sceneName;
-        };
+            Debug.LogError($"Failed to initialize Editor UI: {e}");
+            throw; // Re-throw to see the actual error
+        }
     }
 
     private static void SetupLeftSide(LayoutRoot layout)
     {
+	var basePadding = 20;
+        var baseRow1Height = 120;
+        var baseRow2Height = 280; 
+        var baseRow3Height = 25;
+        var baseColumnWidth = 150;
+        var categoriesVerticalOffset = 40;
+
         _leftSideGrid = new GridLayout(layout, "Left Side")
         {
-            Padding = new Padding(20, 15),
+            Padding = new Padding((int)(basePadding * _uiScaleFactor), (int)((basePadding + categoriesVerticalOffset) * _uiScaleFactor)),
             VerticalAlignment = VerticalAlignment.Bottom,
             HorizontalAlignment = HorizontalAlignment.Left,
             RowDefinitions =
             {
-                new GridDimension(120, GridUnit.AbsoluteMin),
-                new GridDimension(320, GridUnit.AbsoluteMin),
-                new GridDimension(24, GridUnit.AbsoluteMin)
+                new GridDimension((int)(baseRow1Height * _uiScaleFactor), GridUnit.AbsoluteMin),
+                new GridDimension((int)(baseRow2Height * _uiScaleFactor), GridUnit.AbsoluteMin),
+                new GridDimension((int)(baseRow3Height * _uiScaleFactor), GridUnit.AbsoluteMin)
             },
             ColumnDefinitions =
             {
-                new GridDimension(160, GridUnit.AbsoluteMin),
-                new GridDimension(160, GridUnit.AbsoluteMin),
-                new GridDimension(160, GridUnit.AbsoluteMin)
+                new GridDimension((int)(baseColumnWidth * _uiScaleFactor), GridUnit.AbsoluteMin),
+                new GridDimension((int)(baseColumnWidth * _uiScaleFactor), GridUnit.AbsoluteMin),
+                new GridDimension((int)(baseColumnWidth * _uiScaleFactor), GridUnit.AbsoluteMin)
             }
         };
 
@@ -284,13 +309,21 @@ public static class EditorUIManager
 
     private static GridLayout SetupExtraControls(LayoutRoot layout)
     {
+	var baseInputWidth = 80;
+        var basePadding = 20;
+        var baseFontSize = 12;
+
+        RotationChoice?.Destroy();
+        ScaleChoice?.Destroy();
+
         RotationChoice = new TextInput(layout, "Rotation Input")
         {
             ContentType = InputField.ContentType.DecimalNumber,
             HorizontalAlignment = HorizontalAlignment.Right,
-            MinWidth = 80,
+            MinWidth = (int)(baseInputWidth * _uiScaleFactor),
             Text = "0",
-            Padding = new Padding(20, 10)
+            Padding = new Padding((int)(basePadding * _uiScaleFactor), (int)(10 * _uiScaleFactor)),
+	    FontSize = (int)(baseFontSize * _uiScaleFactor)
         }.WithProp(GridLayout.Column, 1);
         RotationChoice.TextEditFinished += (_, s) =>
         {
@@ -302,9 +335,10 @@ public static class EditorUIManager
         {
             ContentType = InputField.ContentType.DecimalNumber,
             HorizontalAlignment = HorizontalAlignment.Right,
-            MinWidth = 80,
+            MinWidth = (int)(baseInputWidth * _uiScaleFactor),
             Text = "1",
-            Padding = new Padding(20, 10)
+            Padding = new Padding((int)(basePadding * _uiScaleFactor), (int)(10 * _uiScaleFactor)),
+	    FontSize = (int)(baseFontSize * _uiScaleFactor)
         }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 1);
         ScaleChoice.TextEditFinished += (_, s) =>
         {
@@ -316,8 +350,8 @@ public static class EditorUIManager
         {
             RowDefinitions =
             {
-                new GridDimension(1, GridUnit.Proportional),
-                new GridDimension(1, GridUnit.Proportional)
+                new GridDimension((int)(40 * _uiScaleFactor), GridUnit.AbsoluteMin),
+                new GridDimension((int)(40 * _uiScaleFactor), GridUnit.AbsoluteMin)
             },
             ColumnDefinitions =
             {
@@ -330,13 +364,17 @@ public static class EditorUIManager
                 {
                     Text = "Rotation",
                     HorizontalAlignment = HorizontalAlignment.Left,
-                    Padding = new Padding(0, 10)
+		    VerticalAlignment = VerticalAlignment.Center,
+                    Padding = new Padding(0, 10),
+		    FontSize = (int)(baseFontSize * _uiScaleFactor)
                 },
                 new TextObject(layout, "Scale Text")
                 {
                     Text = "Scale",
                     HorizontalAlignment = HorizontalAlignment.Left,
-                    Padding = new Padding(0, 10)
+		    VerticalAlignment = VerticalAlignment.Center,
+                    Padding = new Padding(0, 10),
+		    FontSize = (int)(baseFontSize * _uiScaleFactor)
                 }.WithProp(GridLayout.Row, 1),
                 RotationChoice,
                 ScaleChoice
@@ -349,12 +387,23 @@ public static class EditorUIManager
 
     private static void SetupConfigArea(LayoutRoot layout)
     {
+	_configButton?.Destroy();
+        _broadcasterButton?.Destroy();
+        _receiverButton?.Destroy();
+
+	var baseButtonWidth = 140;
+        var baseFontSize = 12;
+	var configButtonsTopPadding = 10;
+
         _configButton = new Button(layout, "Config Choice")
         {
             Content = "Config",
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Bottom,
-            MinWidth = 160,
+            MinWidth = (int)(baseButtonWidth * _uiScaleFactor),
+            MinHeight = (int)(25 * _uiScaleFactor),
+            FontSize = (int)(baseFontSize * _uiScaleFactor),
+	    Padding = new Padding(0, (int)(configButtonsTopPadding * _uiScaleFactor)),
             Enabled = false
         }.WithProp(GridLayout.Row, 2);
         _configButton.Click += _ =>
@@ -368,8 +417,10 @@ public static class EditorUIManager
             Content = "Events",
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Bottom,
-            MinWidth = 160,
-            Padding = new Padding(20, 0),
+            MinWidth = (int)(baseButtonWidth * _uiScaleFactor),
+            MinHeight = (int)(25 * _uiScaleFactor),
+            FontSize = (int)(baseFontSize * _uiScaleFactor),
+            Padding = new Padding((int)(20 * _uiScaleFactor), (int)(configButtonsTopPadding * _uiScaleFactor)),
             Enabled = false
         }.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, 2);
         _broadcasterButton.Click += _ =>
@@ -383,7 +434,10 @@ public static class EditorUIManager
             Content = "Listeners",
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Bottom,
-            MinWidth = 160,
+            MinWidth = (int)(baseButtonWidth * _uiScaleFactor),
+            MinHeight = (int)(25 * _uiScaleFactor),
+            FontSize = (int)(baseFontSize * _uiScaleFactor),
+	    Padding = new Padding(0, (int)(configButtonsTopPadding * _uiScaleFactor)),
             Enabled = false
         }.WithProp(GridLayout.Column, 2).WithProp(GridLayout.Row, 2);
         _receiverButton.Click += _ =>
@@ -399,52 +453,67 @@ public static class EditorUIManager
 
     private static void SetupTextDisplay(LayoutRoot layout)
     {
-        _ = new TextObject(layout)
+        var baseFontSize = 12;
+
+	_editorEnabledText?.Destroy();
+        _selectionInfo?.Destroy();
+        _sceneInfo?.Destroy();
+        _extraInfo?.Destroy();
+        _bigText?.Destroy();
+
+	var basePadding = 80;
+        var paddingIncrement = 35;
+
+        _editorEnabledText = new TextObject(layout)
         {
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Top,
-            MaxWidth = 200,
-            MaxHeight = 20,
-            Padding = new Padding(0, 60),
-            Text = "Editor Enabled"
+            MaxWidth = (int)(250 * _uiScaleFactor),
+            MaxHeight = (int)(25 * _uiScaleFactor),
+            Padding = new Padding(0, (int)(basePadding * _uiScaleFactor)),
+            Text = "Editor Enabled",
+	    FontSize = (int)(baseFontSize * _uiScaleFactor)
         };
 
         _selectionInfo = new TextObject(layout)
         {
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Top,
-            Padding = new Padding(0, 90),
-            MaxWidth = 1000,
-            MaxHeight = 20,
-            Text = "Current Item: None"
+            Padding = new Padding(0, (int)((basePadding + paddingIncrement) * _uiScaleFactor)),
+            MaxWidth = (int)(1200 * _uiScaleFactor),
+            MaxHeight = (int)(20 * _uiScaleFactor),
+            Text = "Current Item: None",
+	    FontSize = (int)(baseFontSize * _uiScaleFactor)
         };
 
         _sceneInfo = new TextObject(layout)
         {
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Top,
-            Padding = new Padding(0, 120),
-            MaxWidth = 1000,
-            MaxHeight = 20,
-            Text = "Scene: None"
+            Padding = new Padding(0, (int)((basePadding + paddingIncrement * 2) * _uiScaleFactor)),
+            MaxWidth = (int)(1200 * _uiScaleFactor),
+            MaxHeight = (int)(25 * _uiScaleFactor),
+            Text = "Scene: None",
+	    FontSize = (int)(baseFontSize * _uiScaleFactor)
         };
 
         _extraInfo = new TextObject(layout)
         {
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Top,
-            Padding = new Padding(0, 150),
-            MaxWidth = 1000,
-            MaxHeight = 20,
+            Padding = new Padding(0, (int)((basePadding + paddingIncrement * 3) * _uiScaleFactor)),
+            MaxWidth = (int)(1200 * _uiScaleFactor),
+            MaxHeight = (int)(25 * _uiScaleFactor),
             Text = "ID: None",
-            Visibility = Visibility.Hidden
+            Visibility = Visibility.Hidden,
+	    FontSize = (int)(baseFontSize * _uiScaleFactor)
         };
 
         _bigText = new TextObject(layout)
         {
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
-            FontSize = 128,
+            FontSize = (int)(128 * _uiScaleFactor),
             Text = ""
         };
     }
@@ -465,27 +534,57 @@ public static class EditorUIManager
 
     private static GridLayout SetupCategories(LayoutRoot layout)
     {
+	var existingCategories = _leftSideGrid?.Children?.FirstOrDefault(c => c.Name == "Categories");
+    
+        existingCategories?.Destroy();
+
         _categories = [];
 
         SetCategory(FavouritesCategory.Instance);
 
         Dictionary<string, NormalCategory> normalCategories = new();
-        foreach (var element in ContentPacks.Packs.Where(pack => pack.IsEnabled()).SelectMany(pack => pack))
-        {
-            if (!normalCategories.ContainsKey(element.GetCategory()))
-            {
-                var normalCategory = new NormalCategory(element.GetCategory());
-                normalCategories.Add(element.GetCategory(), normalCategory);
-                _categories.Add(normalCategory);
-            }
 
-            normalCategories[element.GetCategory()].AddObject(PlaceableObject.Create(element));
+        if (ContentPacks.Packs != null)
+        {
+            foreach (var element in ContentPacks.Packs.Where(pack => pack?.IsEnabled() == true).SelectMany(pack => pack))
+            {
+                if (element?.GetCategory() == null) continue;
+
+                if (!normalCategories.ContainsKey(element.GetCategory()))
+                {
+                    var normalCategory = new NormalCategory(element.GetCategory());
+                    normalCategories.Add(element.GetCategory(), normalCategory);
+                    _categories.Add(normalCategory);
+                }
+
+                var placeable = PlaceableObject.Create(element);
+                if (placeable != null)
+                {
+                    normalCategories[element.GetCategory()].AddObject(placeable);
+                }
+            }
         }
 
         foreach (var category in normalCategories.Values) category.Sort();
 
-        _categories.Add(new BlankCategory());
-        _categories.Add(new PrefabsCategory());
+        try
+        {
+            _categories.Add(new BlankCategory());
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to create BlankCategory: {e}");
+        }
+
+        try
+        {
+            _categories.Add(new PrefabsCategory());
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to create PrefabsCategory: {e}");
+        }
+
         _categories.Add(_category);
 
         var grid = new GridLayout(layout, "Categories")
@@ -500,13 +599,15 @@ public static class EditorUIManager
         {
             columnCount -= 1;
             grid.RowDefinitions.Add(new GridDimension(1, GridUnit.Proportional));
-            if (!category.CreateButton()) continue;
+            if (category == null || !category.CreateButton()) continue;
 
             var button = new Button(layout, category.GetName())
             {
                 VerticalAlignment = VerticalAlignment.Bottom,
                 Padding = new Padding(0, 2),
-                Content = category.GetName()
+                Content = category.GetName(),
+		FontSize = (int)(12 * _uiScaleFactor),
+		MinHeight = (int)(30 * _uiScaleFactor)
             }.WithProp(GridLayout.Row, columnCount);
             button.Click += _ => { SetCategory(category); };
             grid.Children.Add(button);
@@ -517,31 +618,68 @@ public static class EditorUIManager
 
     private static void SetupObjectOptions(LayoutRoot layout)
     {
+	var baseButtonSpacingX = 100;
+        var baseButtonSpacingY = 100;
+        var baseGridOffsetX = 30;
+        var baseGridOffsetY = 30;
+
+	foreach (var (button, favButton, image) in _selectionButtons)
+        {
+            button?.Destroy();
+            favButton?.Destroy();
+            image?.Destroy();
+        }
+        
+	_selectionButtons.Clear();
+
         for (var i = 0; i < ItemsPerGroup; i++)
         {
-            var j = 2 - i / 3;
+            var row = 2 - i / 3;
+            var col = i % 3;
+
+	    var horizontalPos = baseGridOffsetX + col * baseButtonSpacingX * _uiScaleFactor;
+            var verticalPos = baseGridOffsetY + row * baseButtonSpacingY * _uiScaleFactor;
 
             var (button, image) =
-                CreateImagedButton(layout, Architect.BlankSprite, i.ToString(), (2 - i % 3) * 100, j * 100, i);
+                CreateImagedButton(layout, Architect.BlankSprite, i.ToString(), (2 - i % 3) * 100, row * 100, i);
 
             var favourite = new Button(layout, i + " Favourite")
             {
                 Content = EmptyStar,
                 HorizontalAlignment = HorizontalAlignment.Right,
                 VerticalAlignment = VerticalAlignment.Bottom,
-                MinHeight = 20,
-                MinWidth = 20,
+                MinHeight = (int)(20 * _uiScaleFactor),
+                MinWidth = (int)(20 * _uiScaleFactor),
+		FontSize = (int)(12 * _uiScaleFactor),
                 Borderless = true,
-                Padding = new Padding((2 - i % 3) * 100 + 92, j * 100 + 45)
+                Padding = new Padding(
+                    (int)((horizontalPos + 50) * _uiScaleFactor),
+                    (int)((verticalPos + 50) * _uiScaleFactor)
+    	    	),
             };
             var k = i;
             favourite.Click += _ => { ToggleFavourite(k); };
             PauseOptions.Add(favourite);
 
             _selectionButtons.Add((button, favourite, image));
+
+	    PauseOptions.Add(button);
+            PauseOptions.Add(image);
         }
 
-        CreateImagedButton(layout, ResetObject.Instance.GetSprite(), "Reset", 0, 360, -5);
+        var resetHorizontalPos = baseGridOffsetX;
+        var resetVerticalPos = baseGridOffsetY + 3 * baseButtonSpacingY;
+
+        var existingReset = PauseOptions.FirstOrDefault(x => x.Name?.Contains("Reset Button") == true);
+    	if (existingReset == null)
+    	{
+        	var (resetButton, resetImage) = CreateImagedButton(layout, ResetObject.Instance.GetSprite(), "Reset", 
+            		resetHorizontalPos, resetVerticalPos, -5);
+        
+        	// Add reset button and image to PauseOptions
+        	PauseOptions.Add(resetButton);
+        	PauseOptions.Add(resetImage);
+    	}
 
         RefreshObjects();
         RefreshButtons();
@@ -549,13 +687,18 @@ public static class EditorUIManager
 
     private static void SetupFilter(LayoutRoot layout)
     {
+	var baseFilterWidth = 200;
+        var baseFilterX = 100;
+        var baseFilterY = 350;
+
         var filter = new TextInput(layout, "Search")
         {
             ContentType = InputField.ContentType.Standard,
             HorizontalAlignment = HorizontalAlignment.Right,
             VerticalAlignment = VerticalAlignment.Bottom,
-            MinWidth = 200,
-            Padding = new Padding(55, 315)
+            MinWidth = (int)(baseFilterWidth * _uiScaleFactor),
+	    FontSize = (int)(12 * _uiScaleFactor),
+            Padding = new Padding((int)(baseFilterX * _uiScaleFactor), (int)(baseFilterY * _uiScaleFactor))
         };
         filter.TextChanged += (_, s) =>
         {
@@ -568,24 +711,111 @@ public static class EditorUIManager
         PauseOptions.Add(filter);
     }
 
+    public static void ApplyUIScale(float scaleFactor)
+    {
+        _uiScaleFactor = scaleFactor;
+    
+        if (_layout != null && EditorManager.IsEditing)
+        {
+            var currentSelectedItem = SelectedItem;
+            var currentIndex = _index;
+            var currentGroupIndex = _groupIndex;
+            var currentCategory = _category;
+	    var currentFilter = _filter;
+
+            // Destroy current UI elements
+            foreach (var element in PauseOptions.ToArray())
+            {
+                if (element != null)
+                {
+                    element.Destroy();
+                }
+            }
+
+            PauseOptions.Clear();
+
+	    if (_selectionButtons != null)
+            {
+                foreach (var (button, favButton, image) in _selectionButtons)
+                {
+                    button?.Destroy();
+                    favButton?.Destroy();
+                    image?.Destroy();
+                }
+                _selectionButtons.Clear();
+            }
+            else
+            {
+                _selectionButtons = new List<(Button, Button, Image)>();
+            }
+
+	    _configGrid?.Destroy();
+            _broadcastersGrid?.Destroy();
+            _receiversGrid?.Destroy();
+            _editorEnabledText?.Destroy();
+            _selectionInfo?.Destroy();
+            _sceneInfo?.Destroy();
+            _extraInfo?.Destroy();
+            _bigText?.Destroy();
+            _leftSideGrid?.Destroy();
+            _configButton?.Destroy();
+            _broadcasterButton?.Destroy();
+            _receiverButton?.Destroy();
+            RotationChoice?.Destroy();
+            ScaleChoice?.Destroy();
+
+            _configGrid = null;
+            _broadcastersGrid = null;
+            _receiversGrid = null;
+	    _editorEnabledText = null;
+            _selectionInfo = null;
+            _sceneInfo = null;
+            _extraInfo = null;
+            _bigText = null;
+            _leftSideGrid = null;
+            _configButton = null;
+            _broadcasterButton = null;
+            _receiverButton = null;
+            RotationChoice = null;
+            ScaleChoice = null;
+
+            Initialize(_layout);
+        
+            _category = currentCategory;
+            _groupIndex = currentGroupIndex;
+            _index = currentIndex;
+	    _filter = currentFilter;
+            SelectedItem = currentSelectedItem;
+        
+            RefreshObjects();
+            RefreshButtons();
+            RefreshSelectedItem(false);
+        }
+    }
+
     private static void SetupTools(LayoutRoot layout)
     {
+	var baseToolsPaddingX = 300;
+        var baseToolsPaddingY = 30;
+        var toolsRightPadding = 80;
+        var toolSpacing = 70;
+
         var extraSettings = new GridLayout(layout, "Extra Settings")
         {
             HorizontalAlignment = HorizontalAlignment.Right,
             VerticalAlignment = VerticalAlignment.Bottom,
-            Padding = new Padding(335, 0),
+            Padding = new Padding((int)((baseToolsPaddingX + toolsRightPadding) * _uiScaleFactor), 
+                             (int)(baseToolsPaddingY * _uiScaleFactor)),
             ColumnDefinitions =
             {
-                new GridDimension(1, GridUnit.Proportional),
-                new GridDimension(1, GridUnit.Proportional),
-                new GridDimension(1, GridUnit.Proportional),
-                new GridDimension(1, GridUnit.Proportional),
-                new GridDimension(1, GridUnit.Proportional)
+                new GridDimension((int)(toolSpacing * _uiScaleFactor), GridUnit.AbsoluteMin),
+                new GridDimension((int)(toolSpacing * _uiScaleFactor), GridUnit.AbsoluteMin),
+                new GridDimension((int)(toolSpacing * _uiScaleFactor), GridUnit.AbsoluteMin),
+                new GridDimension((int)(toolSpacing * _uiScaleFactor), GridUnit.AbsoluteMin)
             },
             RowDefinitions =
             {
-                new GridDimension(1, GridUnit.Proportional)
+                new GridDimension((int)(toolSpacing * _uiScaleFactor), GridUnit.AbsoluteMin)
             }
         };
 
@@ -593,7 +823,7 @@ public static class EditorUIManager
 
         if (Architect.UsingMultiplayer)
         {
-            extraSettings.RowDefinitions.Add(new GridDimension(0.2f, GridUnit.Proportional));
+            extraSettings.RowDefinitions.Add(new GridDimension((int)(40 * _uiScaleFactor), GridUnit.AbsoluteMin));
             var multiplayerRefresh = new Button(layout, "Refresh")
             {
                 VerticalAlignment = VerticalAlignment.Bottom,
@@ -605,29 +835,31 @@ public static class EditorUIManager
             correctRow++;
         }
 
-        var cursorImagedButton = CreateImagedButton(layout, CursorObject.Instance.GetSprite(), "Cursor", 0, 0, -1);
+	var toolOffset = 0;
+
+        var cursorImagedButton = CreateImagedButton(layout, CursorObject.Instance.GetSprite(), "Cursor", toolOffset, toolOffset, -1);
         cursorImagedButton.Item1.WithProp(GridLayout.Column, 0).WithProp(GridLayout.Row, correctRow);
-        cursorImagedButton.Item2.WithProp(GridLayout.Column, 0).WithProp(GridLayout.Row, correctRow);
+   	cursorImagedButton.Item2.WithProp(GridLayout.Column, 0).WithProp(GridLayout.Row, correctRow);
         extraSettings.Children.Add(cursorImagedButton.Item1);
-        extraSettings.Children.Add(cursorImagedButton.Item2);
+	extraSettings.Children.Add(cursorImagedButton.Item2);
 
-        var dragImagedButton = CreateImagedButton(layout, DragObject.Instance.GetSprite(), "Drag", 0, 0, -3);
+        var dragImagedButton = CreateImagedButton(layout, DragObject.Instance.GetSprite(), "Drag", toolOffset, toolOffset, -3);
         dragImagedButton.Item1.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, correctRow);
-        dragImagedButton.Item2.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, correctRow);
+	dragImagedButton.Item2.WithProp(GridLayout.Column, 1).WithProp(GridLayout.Row, correctRow);
         extraSettings.Children.Add(dragImagedButton.Item1);
-        extraSettings.Children.Add(dragImagedButton.Item2);
+	extraSettings.Children.Add(dragImagedButton.Item2);
 
-        var pickImagedButton = CreateImagedButton(layout, PickObject.Instance.GetSprite(), "Pick", 0, 0, -4);
+        var pickImagedButton = CreateImagedButton(layout, PickObject.Instance.GetSprite(), "Pick", toolOffset, toolOffset, -4);
         pickImagedButton.Item1.WithProp(GridLayout.Column, 2).WithProp(GridLayout.Row, correctRow);
-        pickImagedButton.Item2.WithProp(GridLayout.Column, 2).WithProp(GridLayout.Row, correctRow);
+	pickImagedButton.Item2.WithProp(GridLayout.Column, 2).WithProp(GridLayout.Row, correctRow);
         extraSettings.Children.Add(pickImagedButton.Item1);
-        extraSettings.Children.Add(pickImagedButton.Item2);
+	extraSettings.Children.Add(pickImagedButton.Item2);
 
-        var eraserImagedButton = CreateImagedButton(layout, EraserObject.Instance.GetSprite(), "Eraser", 0, 0, -2);
+        var eraserImagedButton = CreateImagedButton(layout, EraserObject.Instance.GetSprite(), "Eraser", toolOffset, toolOffset, -2);
         eraserImagedButton.Item1.WithProp(GridLayout.Column, 3).WithProp(GridLayout.Row, correctRow);
-        eraserImagedButton.Item2.WithProp(GridLayout.Column, 3).WithProp(GridLayout.Row, correctRow);
+	eraserImagedButton.Item2.WithProp(GridLayout.Column, 3).WithProp(GridLayout.Row, correctRow);
         extraSettings.Children.Add(eraserImagedButton.Item1);
-        extraSettings.Children.Add(eraserImagedButton.Item2);
+	extraSettings.Children.Add(eraserImagedButton.Item2);
 
         var lockImagedButton = CreateImagedButton(layout, LockObject.Instance.GetSprite(), "Lock", 0, 0, -6);
         lockImagedButton.Item1.WithProp(GridLayout.Column, 4).WithProp(GridLayout.Row, correctRow);
@@ -641,24 +873,44 @@ public static class EditorUIManager
     private static (Button, Image) CreateImagedButton(LayoutRoot layout, Sprite sprite, string name,
         int horizontalPadding, int verticalPadding, int index)
     {
-        var img = new Image(layout, sprite, name + " Image")
+    	var buttonSize = (int)(BASE_BUTTON_SIZE * _uiScaleFactor);
+        var imageSize = (int)(BASE_IMAGE_SIZE * _uiScaleFactor);
+
+	var existingButton = PauseOptions.FirstOrDefault(x => x.Name == name + " Button");
+        var existingImage = PauseOptions.FirstOrDefault(x => x.Name == name + " Image");
+    
+        if (existingButton != null)
         {
-            HorizontalAlignment = HorizontalAlignment.Right,
-            VerticalAlignment = VerticalAlignment.Bottom,
-            Height = 40,
-            Width = 40,
-            PreserveAspectRatio = true,
-            Padding = new Padding(horizontalPadding + 35, verticalPadding + 35)
-        };
+            existingButton.Destroy();
+        }
+        if (existingImage != null)
+        {
+            existingImage.Destroy();
+        }
 
         var button = new Button(layout, name + " Button")
         {
             Content = "",
             HorizontalAlignment = HorizontalAlignment.Right,
             VerticalAlignment = VerticalAlignment.Bottom,
-            MinHeight = 80,
-            MinWidth = 80,
-            Padding = new Padding(horizontalPadding + 15, verticalPadding + 15)
+            MinHeight = buttonSize,
+            MinWidth = buttonSize,
+            Padding = new Padding(
+                (int)(horizontalPadding * _uiScaleFactor), 
+                (int)(verticalPadding * _uiScaleFactor))
+        };
+
+	var imageHorizontalPos = (int)(horizontalPadding * _uiScaleFactor) + (buttonSize - imageSize) / 2;
+        var imageVerticalPos = (int)(verticalPadding * _uiScaleFactor) + (buttonSize - imageSize) / 2;
+
+	var img = new Image(layout, sprite, name + " Image")
+        {
+            HorizontalAlignment = HorizontalAlignment.Right,
+            VerticalAlignment = VerticalAlignment.Bottom,
+            Height = imageSize,
+            Width = imageSize,
+            PreserveAspectRatio = true,
+	    Padding = new Padding(imageHorizontalPos, imageVerticalPos)
         };
 
         button.Click += _ =>
@@ -669,8 +921,8 @@ public static class EditorUIManager
             SelectedItem?.AfterSelect();
         };
 
-        PauseOptions.Add(img);
         PauseOptions.Add(button);
+	PauseOptions.Add(img);
 
         return (button, img);
     }

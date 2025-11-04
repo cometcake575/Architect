@@ -18,5 +18,7 @@ public class WorldEditorGlobalSettings
     [JsonConverter(typeof(PlayerActionSetConverter))]
     public WorldEditorKeyBinds Keybinds = new();
 
+    public float UIScaleFactor { get; set; } = 1.0f;
+
     public bool TestMode = false;
 }

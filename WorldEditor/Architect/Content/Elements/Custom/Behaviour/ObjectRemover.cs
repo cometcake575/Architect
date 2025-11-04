@@ -1,11 +1,146 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Architect.Content.Elements.Custom.Behaviour;
 
+public class ObjectEnabler : MonoBehaviour
+{
+    public string objectPath;
+    
+    private Enabler _toggle;
+    private bool _shouldEnable;
+    private bool _setup;
+        
+    private void OnEnable()
+    {
+        _shouldEnable = true;
+    }
+
+    private void OnDisable()
+    {
+        if (_toggle != null)
+        {
+            StartCoroutine(_toggle.Disable(name));
+        }
+    }
+    
+    private void Update()
+    {
+        if (!_setup)
+        {
+            _setup = true;
+            var o = GetGameObjectFromArray(gameObject.scene.GetRootGameObjects(), objectPath);
+            if (o)
+            {
+                if (o.GetComponent<Disabler>()) return;
+            
+                // Replace GetOrAddComponent with manual implementation
+                _toggle = o.GetComponent<Enabler>();
+                if (_toggle == null)
+                    _toggle = o.AddComponent<Enabler>();
+            }
+        }
+    
+        if (_shouldEnable && _toggle != null)
+        {
+            _shouldEnable = false;
+            DoEnable();
+        }
+    }
+
+    private void DoEnable()
+    {
+        if (_toggle != null) 
+            _toggle.Enable(name);
+    }
+
+    private GameObject GetGameObjectFromArray(GameObject[] rootObjects, string path)
+    {
+        if (rootObjects == null || string.IsNullOrEmpty(path))
+            return null;
+
+        foreach (var root in rootObjects)
+        {
+            if (root.name == path)
+                return root;
+
+            var child = root.transform.Find(path);
+            if (child != null)
+                return child.gameObject;
+            
+            var found = RecursiveFind(root.transform, path);
+            if (found != null)
+                return found.gameObject;
+        }
+
+        return null;
+    }
+
+    private Transform RecursiveFind(Transform parent, string name)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.name == name)
+                return child;
+            
+            var result = RecursiveFind(child, name);
+            if (result != null)
+                return result;
+        }
+        return null;
+    }
+}
+
+public class Enabler : MonoBehaviour
+{
+    public List<string> enablers = [];
+
+    private bool _disableByDefault;
+
+    private void OnDisable()
+    {
+        if (enablers.Count > 0)
+        {
+            _disableByDefault = true;
+            gameObject.SetActive(true);
+        }
+    }
+
+    public void Enable(string enableName)
+    {
+        enablers.Add(enableName);
+        Refresh();
+    }
+
+    public IEnumerator<object> Disable(string enableName)
+    {
+        yield return null;
+
+        if (!this) yield break;
+        
+        enablers.Remove(enableName);
+        Refresh();
+    }
+
+    private void Refresh()
+    {
+        if (enablers.Count == 0)
+        {
+            if (_disableByDefault) gameObject.SetActive(false);
+        }
+        else if (!gameObject.activeSelf)
+        {
+            _disableByDefault = true;
+            gameObject.SetActive(true);
+        }
+    }
+}
+
 public class ObjectRemover : MonoBehaviour
 {
     public string triggerName;
+    public string filter;
 
     private Disabler[] _toggle;
 
