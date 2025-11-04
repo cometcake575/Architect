@@ -659,18 +659,24 @@ public static class EditorUIManager
             PauseOptions.Add(favourite);
 
             _selectionButtons.Add((button, favourite, image));
+
+	    PauseOptions.Add(button);
+            PauseOptions.Add(image);
         }
 
         var resetHorizontalPos = baseGridOffsetX;
         var resetVerticalPos = baseGridOffsetY + 3 * baseButtonSpacingY;
 
         var existingReset = PauseOptions.FirstOrDefault(x => x.Name?.Contains("Reset Button") == true);
-        if (existingReset == null)
-        {
-            CreateImagedButton(layout, ResetObject.Instance.GetSprite(), "Reset", 
-                resetHorizontalPos, 
-                resetVerticalPos, -5);
-        }
+    	if (existingReset == null)
+    	{
+        	var (resetButton, resetImage) = CreateImagedButton(layout, ResetObject.Instance.GetSprite(), "Reset", 
+            		resetHorizontalPos, resetVerticalPos, -5);
+        
+        	// Add reset button and image to PauseOptions
+        	PauseOptions.Add(resetButton);
+        	PauseOptions.Add(resetImage);
+    	}
 
         RefreshObjects();
         RefreshButtons();
@@ -907,6 +913,7 @@ public static class EditorUIManager
         };
 
         PauseOptions.Add(button);
+	PauseOptions.Add(img);
 
         return (button, img);
     }

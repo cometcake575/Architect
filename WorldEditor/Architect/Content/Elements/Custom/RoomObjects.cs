@@ -106,7 +106,22 @@ public static class RoomObjects
                     if (config)
                         try
                         {
-                            point = o.scene.FindGameObject(config.objectPath);
+                            // First try the current scene
+            		    point = o.scene.FindGameObject(config.objectPath);
+            
+            		    // If not found, search all other loaded scenes
+            		    if (point == null)
+            		    {
+                		for (int i = 0; i < UnityEngine.SceneManagement.SceneManager.sceneCount; i++)
+                		{
+                    			var scene = UnityEngine.SceneManagement.SceneManager.GetSceneAt(i);
+                    			if (scene != o.scene) // Skip the current scene since we already checked it
+                    			{
+                        			point = scene.FindGameObject(config.objectPath);
+                        			if (point != null) break;
+                    			}
+                		}
+            		    }
                         }
                         catch (ArgumentException)
                         {

@@ -500,6 +500,41 @@ public class ConfigGroup
                         })
                     .WithCondition(o => o.GetComponentInChildren<AlertRange>() || o.transform.Find("Alert Range")),
                 "alert_range_trigger"),
+	    Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Can Attack",
+                        (o, value) =>
+                        {
+                            var attackRange = o.transform.Find("Attack Range");
+			    var attackRegion = o.transform.Find("Attack Region");
+            		    var alertRegion = o.transform.Find("Alert Region");
+            		    var evadeCheck = o.transform.Find("Evade Check");
+            		    var runCheck = o.transform.Find("Run Check");
+            		    var wallCheck = o.transform.Find("Wall Check");
+			    var HeadBox = o.transform.Find("Head Box");
+                        
+			    if (attackRange != null)
+                		attackRange.gameObject.SetActive(value.GetValue());
+            
+            		    if (attackRegion != null)
+                		attackRegion.gameObject.SetActive(value.GetValue());
+            
+            		    if (alertRegion != null)
+                		alertRegion.gameObject.SetActive(value.GetValue());
+            
+            		    if (evadeCheck != null)
+                		evadeCheck.gameObject.SetActive(value.GetValue());
+            
+            		    if (runCheck != null)
+                		runCheck.gameObject.SetActive(value.GetValue());
+            
+            		    if (wallCheck != null)
+                		wallCheck.gameObject.SetActive(value.GetValue());
+
+			    if (HeadBox != null)
+                		HeadBox.gameObject.SetActive(value.GetValue());
+			})
+                    .WithCondition(o => o.transform.Find("Attack Range") != null || o.transform.Find("Attack Region") != null),
+                "attack_range_trigger"),
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Contact Damage",
                         (o, value) =>
