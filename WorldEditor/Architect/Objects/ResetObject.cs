@@ -78,13 +78,27 @@ internal class ResetObject : SelectableObject
     {
         if (sceneName == GameManager.instance.sceneName)
         {
-            var placements = PlacementManager.GetCurrentPlacements();
+            var level = PlacementManager.GetCurrentLevel();
+            var placements = level.Placements;
             while (placements.Count > 0) placements[0].Destroy();
+
+            var map = PlacementManager.GetTilemap();
+            if (map)
+            {
+                foreach (var (x, y) in level.TileChanges)
+                {
+                    if (map.GetTile(x, y, 0) == -1) map.SetTile(x, y, 0, 0);
+                    else map.ClearTile(x, y, 0);
+                }
+                map.Build();
+            }
+            level.TileChanges.Clear();
+
             UndoManager.ClearHistory();
         }
         else
         {
-            SceneSaveLoader.SaveScene(sceneName, []);
+            SceneSaveLoader.SaveScene(sceneName, new LevelData([], []));
         }
     }
 }

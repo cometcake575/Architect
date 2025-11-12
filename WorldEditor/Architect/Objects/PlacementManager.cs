@@ -12,11 +12,23 @@ namespace Architect.Objects;
 public static class PlacementManager
 {
     private static string _sceneName;
-    private static List<ObjectPlacement> _currentPlacements;
+    private static LevelData _currentPlacements;
+    private static tk2dTileMap _tileMap;
 
     public static readonly Dictionary<string, GameObject> Objects = [];
 
     public static List<ObjectPlacement> GetCurrentPlacements()
+    {
+        return GetCurrentLevel().Placements;
+    }
+
+    public static tk2dTileMap GetTilemap()
+    {
+        if (!_tileMap) _tileMap = Object.FindObjectOfType<tk2dTileMap>();
+        return _tileMap;
+    }
+
+    public static LevelData GetCurrentLevel()
     {
         var sceneName = GameManager.instance.sceneName;
         if (_sceneName == sceneName) return _currentPlacements;
@@ -37,10 +49,20 @@ public static class PlacementManager
     {
         Objects.Clear();
         CustomObjects.PlayerListeners.Clear();
-        foreach (var placement in GetCurrentPlacements().Where(placement => placement.GetPlaceableObject() != null))
+        var ld = GetCurrentLevel();
+        foreach (var placement in ld.Placements.Where(placement => placement.GetPlaceableObject() != null))
             if (EditorManager.IsEditing) placement.PlaceGhost();
             else
                 Objects[placement.GetId()] = placement.SpawnObject();
+
+        var map = GetTilemap();
+        if (!map) return;
+        foreach (var (x, y) in ld.TileChanges)
+        {
+            if (map.GetTile(x, y, 0) == -1) map.SetTile(x, y, 0, 0);
+            else map.ClearTile(x, y, 0);
+        }
+        map.Build();
     }
 
     internal static void Initialize()

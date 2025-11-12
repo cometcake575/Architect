@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Architect.Objects;
 using Hkmp.Api.Client;
@@ -35,6 +36,11 @@ public static class HkmpHook
     public static void Erase(string guid, string scene)
     {
         _clientAddon.Erase(guid, scene);
+    }
+
+    public static void TilemapChange(string scene, List<(int, int)> changes, bool empty)
+    {
+        _clientAddon.TilemapChange(scene, changes, empty);
     }
 
     public static void ClearRoom(string scene)

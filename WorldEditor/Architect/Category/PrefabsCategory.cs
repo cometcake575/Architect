@@ -12,7 +12,7 @@ internal class PrefabsCategory : ObjectCategory
 
     public PrefabsCategory() : base("Prefabs")
     {
-        foreach (var obj in SceneSaveLoader.Load("Prefabs"))
+        foreach (var obj in SceneSaveLoader.Load("Prefabs").Placements)
         {
             Prefabs.Add(new PrefabObject(obj));
             Objects.Add(obj);
@@ -26,7 +26,7 @@ internal class PrefabsCategory : ObjectCategory
         var placement = placeable.MakePlacement();
 
         Objects.Add(placement);
-        SceneSaveLoader.Save("Prefabs", Objects);
+        SceneSaveLoader.Save("Prefabs", new LevelData(Objects, []));
 
         Prefabs.Add(new PrefabObject(placement));
 
@@ -38,7 +38,7 @@ internal class PrefabsCategory : ObjectCategory
     {
         Prefabs.Remove(obj);
         Objects.RemoveAll(placement => placement.GetId() == obj.GetId());
-        SceneSaveLoader.Save("Prefabs", Objects);
+        SceneSaveLoader.Save("Prefabs", new LevelData(Objects, []));
 
         EditorUIManager.RefreshObjects();
         EditorUIManager.RefreshButtons();

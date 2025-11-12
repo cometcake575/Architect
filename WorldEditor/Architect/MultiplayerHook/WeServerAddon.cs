@@ -20,6 +20,7 @@ public class WeServerAddon : ServerAddon
             PacketId.Win => new WinPacketData(),
             PacketId.Edit => new EditPacketData(),
             PacketId.Erase => new ErasePacketData(),
+            PacketId.Tile => new TilePacketData(),
             PacketId.Update => new UpdatePacketData(),
             PacketId.Relay => new RelayPacketData(),
             PacketId.Clear => new ClearPacketData(),
@@ -48,6 +49,16 @@ public class WeServerAddon : ServerAddon
         {
             Logger.Info("Receiving Erase Packet [SERVER]");
             sender.SendSingleData(PacketId.Erase, packet, serverApi.ServerManager.Players
+                .Where(player => player.Id != id)
+                .Select(player => player.Id)
+                .ToArray()
+            );
+        });
+
+        netReceiver.RegisterPacketHandler<TilePacketData>(PacketId.Tile, (id, packet) =>
+        {
+            Logger.Info("Receiving Tile Change Packet [SERVER]");
+            sender.SendSingleData(PacketId.Tile, packet, serverApi.ServerManager.Players
                 .Where(player => player.Id != id)
                 .Select(player => player.Id)
                 .ToArray()
@@ -88,7 +99,10 @@ public class WeServerAddon : ServerAddon
         {
             Logger.Info("Receiving Win Packet [SERVER]");
             sender.SendSingleData(PacketId.Win, packet, serverApi.ServerManager.Players
-                .Select(player => player.Id).ToArray());
+                .Where(player => player.Id != id) 
+                .Select(player => player.Id)
+                .ToArray()
+            );
         });
 
         netReceiver.RegisterPacketHandler<RelayPacketData>(PacketId.Relay, (id, packet) =>

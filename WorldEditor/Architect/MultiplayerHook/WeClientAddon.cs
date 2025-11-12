@@ -97,8 +97,7 @@ public class WeClientAddon : ClientAddon
             }
             else
             {
-                SceneSaveLoader.ScheduleEdit(packet.SceneName,
-                    edit); // This will store it in a list to be added when the scene is next loaded, or saved when the game is next closed
+                SceneSaveLoader.ScheduleEdit(packet.SceneName, edit);
             }
         });
 
@@ -123,8 +122,33 @@ public class WeClientAddon : ClientAddon
             }
             else
             {
-                SceneSaveLoader.ScheduleErase(packet.SceneName,
-                    packet.Id); // This will store it in a list to be added when the scene is next loaded, or saved when the game is next closed
+                SceneSaveLoader.ScheduleErase(packet.SceneName, packet.Id);
+            }
+        });
+
+        netReceiver.RegisterPacketHandler<TilePacketData>(PacketId.Tile, packet =>
+        {
+            if (!Architect.GlobalSettings.CollaborationMode) return;
+            Logger.Info("Receiving Tile Change Packet [CLIENT]");
+
+            if (packet.SceneName == GameManager.instance.sceneName)
+            {
+                var map = PlacementManager.GetTilemap();
+                foreach (var (x, y) in packet.Tiles)
+                {
+                    PlacementManager.GetCurrentLevel().ToggleTile((x, y));
+                    if (EditorManager.IsEditing)
+                    {
+                        if (!map) continue;
+                        if (packet.Empty) map.ClearTile(x, y, 0);
+                        else map.SetTile(x, y, 0, 0);
+                    }
+                }
+                if (map) map.Build();
+            }
+            else
+            {
+                SceneSaveLoader.ScheduleTileChange(packet.SceneName, packet.Tiles);
             }
         });
 
@@ -192,6 +216,21 @@ public class WeClientAddon : ClientAddon
             });
     }
 
+    public void TilemapChange(string scene, List<(int, int)> changes, bool empty)
+    {
+        if (!_api.NetClient.IsConnected) return;
+
+        Logger.Info("Sending Tile Change Packet");
+
+        _api.NetClient.GetNetworkSender<PacketId>(this)
+            .SendSingleData(PacketId.Tile, new TilePacketData
+            {
+                SceneName = scene,
+                Tiles = changes,
+                Empty = empty
+            });
+    }
+
     public void ClearRoom(string scene)
     {
         if (!_api.NetClient.IsConnected) return;
@@ -242,7 +281,7 @@ public class WeClientAddon : ClientAddon
             Logger.Info("Sending Refresh Packets");
 
             var scene = GameManager.instance.sceneName;
-            var json = SceneSaveLoader.SerializeSceneData(PlacementManager.GetCurrentPlacements());
+            var json = SceneSaveLoader.SerializeSceneData(PlacementManager.GetCurrentLevel());
 
             var bytes = Split(ZipUtils.Zip(json), SplitSize);
 
@@ -300,6 +339,7 @@ public class WeClientAddon : ClientAddon
             PacketId.Win => new WinPacketData(),
             PacketId.Edit => new EditPacketData(),
             PacketId.Erase => new ErasePacketData(),
+            PacketId.Tile => new TilePacketData(),
             PacketId.Update => new UpdatePacketData(),
             PacketId.Relay => new RelayPacketData(),
             PacketId.Clear => new ClearPacketData(),

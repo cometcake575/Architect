@@ -196,6 +196,9 @@ public static class EditorUIManager
             case -6:
                 SelectedItem = LockObject.Instance;
                 break;
+            case -7:
+                SelectedItem = TilemapObject.Instance;
+                break;
             default:
             {
                 var index = _groupIndex * ItemsPerGroup + _index;
@@ -581,6 +584,7 @@ public static class EditorUIManager
                 new GridDimension(1, GridUnit.Proportional),
                 new GridDimension(1, GridUnit.Proportional),
                 new GridDimension(1, GridUnit.Proportional),
+                new GridDimension(1, GridUnit.Proportional),
                 new GridDimension(1, GridUnit.Proportional)
             },
             RowDefinitions =
@@ -599,7 +603,7 @@ public static class EditorUIManager
                 VerticalAlignment = VerticalAlignment.Bottom,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 Content = "Reshare Level (HKMP)"
-            }.WithProp(GridLayout.Column, 0).WithProp(GridLayout.ColumnSpan, 5).WithProp(GridLayout.Row, correctRow);
+            }.WithProp(GridLayout.Column, 0).WithProp(GridLayout.ColumnSpan, 6).WithProp(GridLayout.Row, correctRow);
             multiplayerRefresh.Click += _ => { HkmpHook.Refresh(); };
             extraSettings.Children.Add(multiplayerRefresh);
             correctRow++;
@@ -634,6 +638,12 @@ public static class EditorUIManager
         lockImagedButton.Item2.WithProp(GridLayout.Column, 4).WithProp(GridLayout.Row, correctRow);
         extraSettings.Children.Add(lockImagedButton.Item1);
         extraSettings.Children.Add(lockImagedButton.Item2);
+
+        var tileImagedButton = CreateImagedButton(layout, TilemapObject.Instance.GetSprite(), "Tilemap Editor", 0, 0, -7);
+        tileImagedButton.Item1.WithProp(GridLayout.Column, 5).WithProp(GridLayout.Row, correctRow);
+        tileImagedButton.Item2.WithProp(GridLayout.Column, 5).WithProp(GridLayout.Row, correctRow);
+        extraSettings.Children.Add(tileImagedButton.Item1);
+        extraSettings.Children.Add(tileImagedButton.Item2);
 
         PauseOptions.Add(extraSettings);
     }

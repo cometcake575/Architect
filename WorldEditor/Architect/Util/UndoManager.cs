@@ -105,6 +105,25 @@ public class EraseObject(List<ObjectPlacement> placements) : IUndoable
     }
 }
 
+public class ToggleTile(List<(int, int)> tiles, bool empty) : IUndoable
+{
+    public IUndoable Undo()
+    {
+        var map = PlacementManager.GetTilemap();
+        if (!map) return null;
+        foreach (var (x, y) in tiles)
+        {
+            if (empty) map.ClearTile(x, y, 0);
+            else map.SetTile(x, y, 0, 0);
+            
+            PlacementManager.GetCurrentLevel().ToggleTile((x, y));
+        }
+        map.Build();
+        
+        return new ToggleTile(tiles, !empty);
+    }
+}
+
 public class MoveObjects(List<(string, Vector3)> data) : IUndoable
 {
     public IUndoable Undo()

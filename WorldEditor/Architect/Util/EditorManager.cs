@@ -66,7 +66,7 @@ public static class EditorManager
 
         On.GameManager.SaveGame += (orig, self) =>
         {
-            if (IsEditing) SceneSaveLoader.SaveScene(self.sceneName, PlacementManager.GetCurrentPlacements());
+            if (IsEditing) SceneSaveLoader.SaveScene(self.sceneName, PlacementManager.GetCurrentLevel());
             orig(self);
         };
 
@@ -331,7 +331,7 @@ public static class EditorManager
         if (HeroController.instance.controlReqlinquished) return;
 
         if (IsEditing)
-            SceneSaveLoader.SaveScene(GameManager.instance.sceneName, PlacementManager.GetCurrentPlacements());
+            SceneSaveLoader.SaveScene(GameManager.instance.sceneName, PlacementManager.GetCurrentLevel());
         else _freeMovePos = HeroController.instance.transform.position;
 
         IsEditing = !IsEditing;
@@ -366,7 +366,11 @@ public static class EditorManager
         var b1 = Input.GetMouseButtonDown(0);
         var b2 = Input.GetMouseButton(0);
 
-        if (!b2) ResetObject.RestartDelay();
+        if (!b2)
+        {
+            ResetObject.RestartDelay();
+            TilemapObject.Release();
+        }
 
         if (!b1 && !b2) return;
 

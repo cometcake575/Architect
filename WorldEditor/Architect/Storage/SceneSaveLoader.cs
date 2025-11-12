@@ -21,6 +21,7 @@ public static class SceneSaveLoader
     public static string DataPath;
 
     private static readonly Dictionary<string, List<string>> ScheduledErases = new();
+    private static readonly Dictionary<string, List<(int, int)>> ScheduledTileChanges = new();
     private static readonly Dictionary<string, List<(string, Vector3)>> ScheduledUpdates = new();
     private static readonly Dictionary<string, List<ObjectPlacement>> ScheduledEdits = new();
 
@@ -34,53 +35,69 @@ public static class SceneSaveLoader
             List<string> scenes = [];
 
             scenes.AddRange(ScheduledErases.Keys);
+            scenes.AddRange(ScheduledTileChanges.Keys);
             scenes.AddRange(ScheduledEdits.Keys);
             scenes.AddRange(ScheduledUpdates.Keys);
 
             foreach (var scene in scenes)
             {
-                var placements = LoadScene(scene);
+                var levelData = LoadScene(scene);
                 if (ScheduledErases.TryGetValue(scene, out var erases))
-                    placements.RemoveAll(obj => erases.Contains(obj.GetId()));
-                if (ScheduledEdits.TryGetValue(scene, out var edits)) placements.AddRange(edits);
+                    levelData.Placements.RemoveAll(obj => erases.Contains(obj.GetId()));
+                if (ScheduledEdits.TryGetValue(scene, out var edits)) levelData.Placements.AddRange(edits);
+                if (ScheduledTileChanges.TryGetValue(scene, out var tileChanges))
+                {
+                    foreach (var tile in tileChanges) levelData.ToggleTile(tile);
+                }
                 if (ScheduledUpdates.TryGetValue(scene, out var updates))
                     foreach (var pair in updates)
-                        placements.First(obj => obj.GetId() == pair.Item1).Move(pair.Item2);
-                SaveScene(scene, placements);
+                        levelData.Placements.First(obj => obj.GetId() == pair.Item1).Move(pair.Item2);
+                SaveScene(scene, levelData);
             }
+
+            ScheduledTileChanges.Clear();
+            ScheduledErases.Clear();
+            ScheduledEdits.Clear();
+            ScheduledUpdates.Clear();
 
             orig(self);
         };
     }
 
-    public static List<ObjectPlacement> LoadScene(string name)
+    public static LevelData LoadScene(string name)
     {
         return Load("Architect/" + name);
     }
 
-    public static List<ObjectPlacement> Load(string name)
+    public static LevelData Load(string name)
     {
         var path = DataPath + name + ".architect.json";
-        if (!File.Exists(path)) return [];
+        if (!File.Exists(path)) return new LevelData([], []);
 
         var content = File.ReadAllText(path);
         var data = DeserializeSceneData(content);
 
         if (ScheduledErases.TryGetValue(name, out var erase))
         {
-            data.RemoveAll(obj => erase.Contains(obj.GetId()));
+            data.Placements.RemoveAll(obj => erase.Contains(obj.GetId()));
             ScheduledErases.Remove(name);
         }
 
         if (ScheduledEdits.TryGetValue(name, out var edit))
         {
-            data.AddRange(edit);
-            ScheduledErases.Remove(name);
+            data.Placements.AddRange(edit);
+            ScheduledEdits.Remove(name);
+        }
+
+        if (ScheduledTileChanges.TryGetValue(name, out var tileChanges))
+        {
+            foreach (var tile in tileChanges) data.ToggleTile(tile);
+            ScheduledTileChanges.Remove(name);
         }
 
         if (ScheduledUpdates.TryGetValue(name, out var scheduledUpdate))
         {
-            foreach (var update in scheduledUpdate) data.First(obj => obj.GetId() == update.Item1).Move(update.Item2);
+            foreach (var update in scheduledUpdate) data.Placements.First(obj => obj.GetId() == update.Item1).Move(update.Item2);
 
             ScheduledUpdates.Remove(name);
         }
@@ -88,12 +105,12 @@ public static class SceneSaveLoader
         return data;
     }
 
-    public static void SaveScene(string name, List<ObjectPlacement> placements)
+    public static void SaveScene(string name, LevelData placements)
     {
         Save("Architect/" + name, placements);
     }
 
-    public static void Save(string name, List<ObjectPlacement> placements)
+    public static void Save(string name, LevelData placements)
     {
         var data = SerializeSceneData(placements);
         Save(name, data);
@@ -124,12 +141,12 @@ public static class SceneSaveLoader
         foreach (var file in Directory.GetFiles(DataPath + "Architect/")) File.Delete(file);
     }
 
-    public static List<ObjectPlacement> DeserializeSceneData(string data)
+    public static LevelData DeserializeSceneData(string data)
     {
-        return JsonConvert.DeserializeObject<List<ObjectPlacement>>(data);
+        return JsonConvert.DeserializeObject<LevelData>(data);
     }
 
-    public static string SerializeSceneData(List<ObjectPlacement> placements)
+    public static string SerializeSceneData(LevelData placements)
     {
         return JsonConvert.SerializeObject(placements,
             Opc,
@@ -178,7 +195,7 @@ public static class SceneSaveLoader
     private static async Task<bool> LoadEdits(string data)
     {
         var passed = true;
-        foreach (var config in DeserializeSceneData(data).Select(obj => obj.Config
+        foreach (var config in DeserializeSceneData(data).Placements.Select(obj => obj.Config
                      .ToDictionary(conf => conf.GetName())))
         {
             if (!await TryDownload(config, "Source URL", CustomAssetLoader.GetSpritePath)) passed = false;
@@ -207,6 +224,12 @@ public static class SceneSaveLoader
     {
         if (!ScheduledErases.ContainsKey(scene)) ScheduledErases[scene] = [];
         ScheduledErases[scene].Add(id);
+    }
+
+    public static void ScheduleTileChange(string scene, List<(int, int)> tiles)
+    {
+        if (!ScheduledTileChanges.ContainsKey(scene)) ScheduledTileChanges[scene] = [];
+        ScheduledTileChanges[scene].AddRange(tiles);
     }
 
     public static void ScheduleEdit(string scene, ObjectPlacement placement)
