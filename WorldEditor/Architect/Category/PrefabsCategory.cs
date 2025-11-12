@@ -14,7 +14,7 @@ internal class PrefabsCategory : ObjectCategory
     {
         foreach (var obj in SceneSaveLoader.Load("Prefabs").Placements)
         {
-            Prefabs.Add(new PrefabObject(obj));
+            if (obj != null) Prefabs.Add(new PrefabObject(obj));
             Objects.Add(obj);
         }
     }
