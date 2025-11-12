@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Architect.Objects;
 using Architect.Storage;
 using Architect.UI;
@@ -12,13 +13,11 @@ internal class PrefabsCategory : ObjectCategory
 
     public PrefabsCategory() : base("Prefabs")
     {
-        foreach (var obj in SceneSaveLoader.Load("Prefabs").Placements)
+        foreach (var obj in SceneSaveLoader.Load("Prefabs").Placements
+                     .Where(obj => obj != null))
         {
-            if (obj != null)
-            {
-                Prefabs.Add(new PrefabObject(obj));
-                Objects.Add(obj);
-            }
+            Prefabs.Add(new PrefabObject(obj));
+            Objects.Add(obj);
         }
     }
 
