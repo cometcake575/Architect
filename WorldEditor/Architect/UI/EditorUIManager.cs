@@ -651,14 +651,15 @@ public static class EditorUIManager
     private static (Button, Image) CreateImagedButton(LayoutRoot layout, Sprite sprite, string name,
         int horizontalPadding, int verticalPadding, int index)
     {
+        var ext = index < 0 ? 0 : 10;
         var img = new Image(layout, sprite, name + " Image")
         {
             HorizontalAlignment = HorizontalAlignment.Right,
             VerticalAlignment = VerticalAlignment.Bottom,
-            Height = 40,
-            Width = 40,
+            Height = 40 + 2 * ext,
+            Width = 40 + 2 * ext,
             PreserveAspectRatio = true,
-            Padding = new Padding(horizontalPadding + 35, verticalPadding + 35)
+            Padding = new Padding(horizontalPadding + 35 - ext, verticalPadding + 35 - ext)
         };
 
         var button = new Button(layout, name + " Button")

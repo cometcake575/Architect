@@ -15,6 +15,7 @@ using MagicUI.Core;
 using Modding;
 using Satchel;
 using UnityEngine;
+using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 namespace Architect;
@@ -112,6 +113,8 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
     private static void InitializeLayout()
     {
         _editorLayout = new LayoutRoot(true, "Architect Editor");
+        _editorLayout.Canvas.GetComponent<CanvasScaler>().screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
+        
         EditorUIManager.Initialize(_editorLayout);
 
         _menuLayout = new LayoutRoot(true, "Architect Menu")

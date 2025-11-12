@@ -14,7 +14,7 @@ internal class PrefabsCategory : ObjectCategory
     public PrefabsCategory() : base("Prefabs")
     {
         foreach (var obj in SceneSaveLoader.Load("Prefabs").Placements
-                     .Where(obj => obj != null))
+                     .Where(obj => obj?.GetPlaceableObject() != null))
         {
             Prefabs.Add(new PrefabObject(obj));
             Objects.Add(obj);
