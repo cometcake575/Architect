@@ -70,6 +70,15 @@ public static class ContentPacks
         return new GInternalPackElement(scene, path, name, category, weight, offset);
     }
 
+    private static AbstractPackElement CreateGhost(string scene, string path, string name, int weight = 0,
+        string category = "Ghosts")
+    {
+        return new GInternalPackElement(scene, path, name, category, weight)
+            .WithConfigGroup(ConfigGroup.Ghosts)
+            .WithReceiverGroup(ReceiverGroup.Ghosts)
+            .WithBroadcasterGroup(BroadcasterGroup.Ghosts);
+    }
+
     private static AbstractPackElement CreateEnemy(string scene, string path, string name, int weight = 0,
         string category = "Enemies")
     {
@@ -270,6 +279,30 @@ public static class ContentPacks
                 .WithConfigGroup(ConfigGroup.BouncyMushrooms)
                 .WithRotationGroup(RotationGroup.All),
             CreateSolid("Fungus2_04", "mush_plat_float_01", "Fungal Wastes Platform 1"),
+	    CreateSolid("Fungus2_01", "_Scenery/fungd_arch_back_33", "Fungal Wastes Arch Back"),
+	    CreateSolid("Fungus2_01", "_Scenery/cd_archbase_40", "Fungal Wastes Arch Base"),
+	    CreateSolid("Fungus2_01", "_Scenery/cd_archway_34", "Fungal Wastes Arch Half Right"),
+	    CreateSolid("Fungus2_01", "_Scenery/cd_archway_47", "Fungal Wastes Arch Half Left"),
+	    CreateSolid("Fungus2_01", "_Scenery/cd_archway_17", "Fungal Wastes Arch"),
+	    CreateSolid("Fungus2_01", "_Scenery/cd_wall_17", "Fungal Wastes Wall Left"),
+	    CreateSolid("Fungus2_01", "_Scenery/cd_wall_06", "Fungal Wastes Wall Right"),
+	    CreateSolid("Fungus2_01", "_Scenery/fung_fence_34", "Fungal Wastes Fence Big"),
+	    CreateSolid("Fungus2_01", "_Scenery/fung_fence_23", "Fungal Wastes Fence Small"),
+	    CreateSolid("Fungus2_01", "Stag_Pole_Break (1)", "Stag Pole On"),
+	    CreateSolid("Fungus2_01", "Stag_Pole_Break", "Stag Pole Off"),
+	    CreateSolid("Fungus2_02", "Station Bell", "Station Bell"),
+	    CreateSolid("Fungus2_02", "stag_tracks", "Stag Tracks"),
+	    CreateSolid("Fungus2_02", "station_pole", "Station Pole"),
+	    CreateSolid("Fungus2_02", "station_BG_tunnel 58", "Station Tunnel"),
+	    CreateSolid("Fungus2_02", "station_BG_tunnel_02 59", "Station Tunnel BG"),
+	    CreateSolid("Fungus2_02", "tunnel_FG_layers_0003_Layer-4", "Station Tunnel Wall"),
+	    CreateSolid("Fungus2_02", "station_FG_tunnel_02 57", "Station Tunnel Floor"),
+	    CreateSolid("Fungus2_02", "station_BG_tunnel 58", "Station Tunnel"),
+	    CreateEnemy("Fungus2_34", "Giraffe NPC", "Willoh"),
+	    CreateEnemy("Fungus2_02", "Stag", "Stag"),
+	    CreateSolid("Fungus2_01", "_Scenery/cd_floor_highway_38", "Fungal Wastes Floor Full"),
+	    CreateSolid("Fungus2_01", "_Scenery/cd_floor_highway_50", "Fungal Wastes Floor Tile"),
+	    CreateSolid("Fungus2_15", "mantis_detail_0015_a (3)", "Mantis throne"),
             CreateSolid("Fungus2_18", "_Scenery/mush_plat_float_03", "Fungal Wastes Platform 2"),
             CreateSolid("Fungus2_18", "_Scenery/mush_plat_float_04", "Fungal Wastes Platform 3"),
             CreateSolid("Fungus2_04", "mush_plat_float_05", "Fungal Wastes Platform 4"),
@@ -344,6 +377,12 @@ public static class ContentPacks
             Create("Fungus3_34", "Royal Gardens Plat L", "Queen's Gardens Collapsing Platform L", "Interactable",
                 MiscInteractableWeight),
             new ShadeGateElement(MiscInteractableWeight),
+	    CreateSolid("Fungus3_04", "four_floors 4", "Queen's Gardens Floor 4"),
+	    CreateSolid("Fungus3_13", "Fungus Stone Totem Alt", "Queen's Gardens Stone Totem"),
+	    CreateSolid("Fungus3_13", "fungd_wall_13", "Queen's Gardens Wall Left"),
+	    CreateSolid("Fungus3_13", "fungd_wall_08 (2)", "Queen's Gardens Wall Left"),
+	    CreateSolid("Fungus3_49", "fung_floor_05 (10)", "Queen's Gardens Floor L"),
+	    CreateSolid("Fungus3_49", "fung_floor_05 (22)", "Queen's Gardens Floor M"),
             CreateSolid("Fungus3_44", "Royal_garden_plat_float_08", "Queen's Gardens Platform S"),
             CreateSolid("Fungus3_44", "Royal_garden_plat_float_06", "Queen's Gardens Platform L"),
             new TollBenchElement(BenchWeight)
@@ -373,6 +412,7 @@ public static class ContentPacks
             CreateEnemy("Ruins2_01", "Royal Zombie Fat (2)", "Gluttonous Husk"),
             CreateEnemy("Ruins2_01", "Battle Scene/Great Shield Zombie", "Great Husk Sentry"),
             CreateEnemy("Ruins_House_02", "Gorgeous Husk", "Gorgeous Husk"),
+	    CreateGhost("Ruins_Bathhouse", "Ghost NPC", "Ghost NPC"),
             CreateDecoration("Ruins_House_02", "ruind_dressing_light_03", "Ceiling Lantern")
                 .WithBroadcasterGroup(BroadcasterGroup.Breakable),
             Create("Ruins2_08", "ruind_bridge_roof_01 (1)/ruind_bridge_roof_04_spikes", "Roof Spikes", "Hazards")
@@ -474,11 +514,36 @@ public static class ContentPacks
                 .WithRotationGroup(RotationGroup.Four)
                 .WithConfigGroup(ConfigGroup.Breakable)
         });
+	RegisterInternalPack(new ContentPack("Dreamer Scenes", "Assets from the Dreamer Scenes")
+        {
+	    CreateGhost("Dream_Guardian_Hegemol", "Dreamer NPC", "Dreamer Herrah"),
+	    CreateGhost("Dream_Guardian_Lurien", "Dreamer NPC", "Dreamer Lurien"),
+	    CreateGhost("Dream_Guardian_Monomon", "Dreamer NPC", "Dreamer Monomon"),
+	});
         RegisterInternalPack(new ContentPack("Resting Grounds", "Assets from the Resting Grounds")
         {
             CreateSolid("RestingGrounds_05", "plat_float_08", "Resting Grounds Platform S"),
             new BreakableCoffinElement(BreakableWallsWeight),
-            CreateEnemy("RestingGrounds_10", "Grave Zombie", "Entombed Husk")
+	    CreateGhost("RestingGrounds_08", "Ghost revek", "Ghost Revek"),
+	    CreateGhost("RestingGrounds_08", "Ghost kcin", "Ghost kcin"),
+	    CreateGhost("RestingGrounds_08", "Ghost atra", "Ghost atra"),
+	    CreateGhost("RestingGrounds_08", "Ghost wyatt", "Ghost wyatt"),
+	    CreateGhost("RestingGrounds_08", "Ghost boss", "Ghost boss"),
+	    CreateGhost("RestingGrounds_08", "Ghost chagax", "Ghost chagax"),
+	    CreateGhost("RestingGrounds_08", "Ghost hex", "Ghost hex"),
+	    CreateGhost("RestingGrounds_08", "Ghost garro", "Ghost garro"),
+	    CreateGhost("RestingGrounds_08", "Ghost perpetos", "Ghost perpetos"),
+	    CreateGhost("RestingGrounds_08", "Ghost molten", "Ghost molten"),
+	    CreateGhost("RestingGrounds_08", "Ghost NPC 100 nail", "Ghost NPC 100 nail"),
+	    CreateGhost("RestingGrounds_08", "Ghost caspian", "Ghost caspian"),
+	    CreateGhost("RestingGrounds_08", "Ghost waldie", "Ghost waldie"),
+	    CreateGhost("RestingGrounds_08", "Ghost milly", "Ghost milly"),
+	    CreateGhost("RestingGrounds_08", "Ghost magnus", "Ghost magnus"),
+	    CreateGhost("RestingGrounds_08", "Ghost grohac", "Ghost grohac"),
+	    CreateGhost("RestingGrounds_08", "Ghost wayner", "Ghost wayner"),
+	    CreateGhost("RestingGrounds_08", "Ghost thistlewind", "Ghost thistlewind"),
+            CreateEnemy("RestingGrounds_10", "Grave Zombie", "Entombed Husk"),
+	    CreateEnemy("RestingGrounds_08", "Ghost Battle Revek", "Ghost Battle Revek")
         });
         RegisterInternalPack(new ContentPack("Ancient Basin", "Assets from the Ancient Basin")
         {
@@ -489,6 +554,16 @@ public static class ContentPacks
                 .WithRotationGroup(RotationGroup.Four),
             new BrokenVesselElement("GG_Broken_Vessel", "Infected Knight", "Broken Vessel"),
             new BrokenVesselElement("Dream_03_Infected_Knight", "Lost Kin", "Lost Kin"),
+	    CreateSolid("White_Palace_11", "white_palace_bits", "White Palace"),
+	    CreateSolid("White_Palace_11", "Palace Gate", "White Palace Gate"),
+	    CreateEnemy("White_Palace_09", "White King Corpse", "Pale King"),
+	    CreateSolid("White_Palace_11", "white_symbol (1)", "White Palace Floor Entrance 1"),
+	    CreateSolid("White_Palace_11", "wp_exterior_bg_pole", "White Palace Pole BG "),
+	    CreateSolid("White_Palace_11", "wp_exterior_bg_pole (1)", "White Palace Pole BG 1"),
+	    CreateSolid("White_Palace_11", "wp_exterior_bg_pole (2)", "White Palace Pole BG 2"),
+	    CreateSolid("White_Palace_11", "white_bridge 1 (1)", "White Palace Bridge"),
+	    CreateSolid("White_Palace_11", "_0033_white_lamp1 (3)", "White Palace Lamp"),
+	    CreateSolid("White_Palace_11", "white_floor (3)", "White Palace Bridge Floor"),
             CreateSolid("Dream_03_Infected_Knight", "dream_plat_small (1)", "Dream Platform S"),
             CreateSolid("Dream_03_Infected_Knight", "dream_plat_med (7)", "Dream Platform M"),
             CreateSolid("Dream_03_Infected_Knight", "dream_plat_large (3)", "Dream Platform L")

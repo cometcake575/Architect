@@ -45,6 +45,10 @@ public class ConfigGroup
 
     public static ConfigGroup Enemies;
 
+    public static ConfigGroup Ghosts;
+
+    public static ConfigGroup RainSounds;
+
     public static ConfigGroup Goams;
 
     public static ConfigGroup Wingsmould;
@@ -130,6 +134,8 @@ public class ConfigGroup
     public static ConfigGroup RoomClearer;
 
     public static ConfigGroup ObjectRemover;
+
+    public static ConfigGroup ObjectEnabler;
 
     public static ConfigGroup HazardRespawnPoint;
 
@@ -437,19 +443,19 @@ public class ConfigGroup
 
         GeoChest = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(
-                new IntConfigType("<size=16>Large Geo</size>",
+                new IntConfigType("Large Geo",
                     (o, value) =>
                     {
                         o.LocateMyFSM("Chest Control").FsmVariables.FindFsmInt("Geo Large").Value = value.GetValue();
                     }), "chest_large_geo"),
             Attributes.ConfigManager.RegisterConfigType(
-                new IntConfigType("<size=16>Medium Geo</size>",
+                new IntConfigType("Medium Geo",
                     (o, value) =>
                     {
                         o.LocateMyFSM("Chest Control").FsmVariables.FindFsmInt("Geo Med").Value = value.GetValue();
                     }), "chest_med_geo"),
             Attributes.ConfigManager.RegisterConfigType(
-                new IntConfigType("<size=16>Small Geo</size>",
+                new IntConfigType("Small Geo",
                     (o, value) =>
                     {
                         o.LocateMyFSM("Chest Control").FsmVariables.FindFsmInt("Geo Small").Value = value.GetValue();
@@ -489,28 +495,69 @@ public class ConfigGroup
                             range.localScale *= value.GetValue();
                         })
                     .WithCondition(o => o.GetComponentInChildren<AlertRange>() || o.transform.Find("Alert Range")),
-                "alert_range_trigger"),
+            "alert_range_trigger"),
+
+	    Attributes.ConfigManager.RegisterConfigType(
+		new BoolConfigType("Can Teleport",
+                        (o, value) =>
+                        {
+                            var teleplane = o.transform.Find("Teleplane");
+                        
+			    if (teleplane != null)
+                		teleplane.gameObject.SetActive(value.GetValue());
+			})
+		    .WithCondition(o => o.transform.Find("Orb Spinner") != null),
+	    "can_teleport"),
+
+	    Attributes.ConfigManager.RegisterConfigType(
+		new BoolConfigType("Orb Spinner",
+                        (o, value) =>
+                        {
+                            var orbspinner = o.transform.Find("Orb Spinner");
+                        
+			    if (orbspinner != null)
+                		orbspinner.gameObject.SetActive(value.GetValue());
+			})
+		    .WithCondition(o => o.transform.Find("Orb Spinner") != null),
+	    "orb_spinner"),
+
 	    Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Can Attack",
                         (o, value) =>
                         {
                             var attackRange = o.transform.Find("Attack Range");
+			    var slashRange = o.transform.Find("Slash Range");
+			    var firingRange = o.transform.Find("Firing Range");
 			    var attackRegion = o.transform.Find("Attack Region");
+			    var chargeRegion = o.transform.Find("Charge Region");
             		    var alertRegion = o.transform.Find("Alert Region");
+			    var lostheroRegion = o.transform.Find("Lost hero Region");
             		    var evadeCheck = o.transform.Find("Evade Check");
             		    var runCheck = o.transform.Find("Run Check");
             		    var wallCheck = o.transform.Find("Wall Check");
-			    var HeadBox = o.transform.Find("Head Box");
+			    var headBox = o.transform.Find("Head Box");
                         
 			    if (attackRange != null)
                 		attackRange.gameObject.SetActive(value.GetValue());
-            
+
+			    if (slashRange != null)
+                		slashRange.gameObject.SetActive(value.GetValue());
+
+			    if (firingRange != null)
+                		firingRange.gameObject.SetActive(value.GetValue());
+
             		    if (attackRegion != null)
                 		attackRegion.gameObject.SetActive(value.GetValue());
+
+			    if (chargeRegion != null)
+                		chargeRegion.gameObject.SetActive(value.GetValue());
             
             		    if (alertRegion != null)
                 		alertRegion.gameObject.SetActive(value.GetValue());
-            
+
+			    if (lostheroRegion != null)
+                		lostheroRegion.gameObject.SetActive(value.GetValue());
+
             		    if (evadeCheck != null)
                 		evadeCheck.gameObject.SetActive(value.GetValue());
             
@@ -520,11 +567,36 @@ public class ConfigGroup
             		    if (wallCheck != null)
                 		wallCheck.gameObject.SetActive(value.GetValue());
 
-			    if (HeadBox != null)
-                		HeadBox.gameObject.SetActive(value.GetValue());
+			    if (headBox != null)
+                		headBox.gameObject.SetActive(value.GetValue());
 			})
-                    .WithCondition(o => o.transform.Find("Attack Range") != null || o.transform.Find("Attack Region") != null),
-                "attack_range_trigger"),
+                    .WithCondition(o => o.transform.Find("Attack Range") != null || o.transform.Find("Firing Range") != null || o.transform.Find("Attack Region") != null || o.transform.Find("Lost hero Region") != null),
+            "can_attack"),
+
+	    Attributes.ConfigManager.RegisterConfigType(
+                new BoolConfigType("Remove effects",
+                        (o, value) =>
+                        {
+                            var entrySteam = o.transform.Find("Entry Steam");
+			    var roarSteam1 = o.transform.Find("Roar Steam 1");
+			    var roarSteam2 = o.transform.Find("Roar Steam 2");
+			    var roarPoint = o.transform.Find("Roar Point");
+                        
+			    if (entrySteam != null)
+                		entrySteam.gameObject.SetActive(value.GetValue());
+
+			    if (roarSteam1 != null)
+                		roarSteam1.gameObject.SetActive(value.GetValue());
+
+			    if (roarSteam2 != null)
+                		roarSteam2.gameObject.SetActive(value.GetValue());
+
+            		    if (roarPoint != null)
+                		roarPoint.gameObject.SetActive(value.GetValue());
+			})
+                    .WithCondition(o => o.transform.Find("Entry Steam") != null),
+            "remove_effects"),
+
             Attributes.ConfigManager.RegisterConfigType(
                 new BoolConfigType("Contact Damage",
                         (o, value) =>
@@ -533,8 +605,154 @@ public class ConfigGroup
                             Object.Destroy(o.GetComponentInChildren<DamageHero>());
                         })
                     .WithCondition(o => o.GetComponentInChildren<DamageHero>()),
-                "contact_damage")
+                "contact_damage"),
+
+	    Attributes.ConfigManager.RegisterConfigType(
+	        new BoolConfigType("Disable Pale King Hitbox",
+                        (o, value) =>
+                        {
+                            bool disable = value.GetValue();
+                            var component1 = o.GetComponents<UnityEngine.BoxCollider2D>();
+			    var component2 = o.GetComponents<DeactivateIfPlayerdataTrue>();
+                            foreach (var Behaviour in component1)
+                            {
+                                Behaviour.enabled = !disable;
+                                break;
+                            }
+			    foreach (var Behaviour in component2)
+                            {
+                                UnityEngine.Object.Destroy(Behaviour);
+                                break;
+                            }
+			})
+		    .WithCondition(o => o.transform.Find("Throne Sit") != null),
+	    "disable_hitbox")
         );
+
+	Ghosts = new ConfigGroup(Generic,
+	    Attributes.ConfigManager.RegisterConfigType(
+	        new BoolConfigType("Disable Effects",
+                        (o, value) =>
+                        {
+                            var rushEffect = o.transform.Find("Rush");
+			    var burstEffect = o.transform.Find("Burst");
+			    var unappearRange = o.transform.Find("Unappear Range");
+			    var baseglowEffect = o.transform.Find("Base Glow");
+			    var idleptEffect = o.transform.Find("Idle Pt");
+                        
+			    if (rushEffect != null)
+                		rushEffect.gameObject.SetActive(!value.GetValue());
+
+			    if (burstEffect != null)
+                		burstEffect.gameObject.SetActive(!value.GetValue());
+
+			    if (unappearRange != null)
+                		unappearRange.gameObject.SetActive(!value.GetValue());
+
+			    if (baseglowEffect != null)
+                		baseglowEffect.gameObject.SetActive(!value.GetValue());
+
+			    if (idleptEffect != null)
+                		idleptEffect.gameObject.SetActive(!value.GetValue());
+			})
+		    .WithCondition(o => o.transform.Find("Rush") != null),
+	    "disable_effects"),
+
+	    Attributes.ConfigManager.RegisterConfigType(
+	        new FloatConfigType("Ghost Transparency",
+    			(o, value) =>
+    			{
+			    var spriteRoot = o.transform.Find("Character Sprite");
+    			    if (!spriteRoot) return;
+    			    var sprite = spriteRoot.GetComponent<tk2dSprite>();
+    			    if (!sprite) return;
+
+    			    // Remove any existing keeper so we don't stack duplicates
+    			    var existing = spriteRoot.GetComponent<AlphaKeeper>();
+    			    if (existing) UnityEngine.Object.Destroy(existing);
+
+    			    var keeper = spriteRoot.gameObject.AddComponent<AlphaKeeper>();
+    			    keeper.sprite = sprite;
+    			    keeper.targetAlpha = Mathf.Clamp01(value.GetValue());
+    			})
+		    .WithCondition(o => o.transform.Find("Character Sprite") != null),
+	    "sprite_alpha"),
+
+	    Attributes.ConfigManager.RegisterConfigType(
+	        new BoolConfigType("Disable Movement",
+                        (o, value) =>
+                        {
+                            bool disable = value.GetValue();
+                            var spriteRoot = o.transform.Find("Character Sprite");
+                            if (!spriteRoot) return;
+                            var fsms = spriteRoot.GetComponents<PlayMakerFSM>();
+                            foreach (var fsm in fsms)
+                            {
+                                if (fsm.FsmName == "Bob")
+                                {
+                                    fsm.enabled = !disable;
+                                    break;
+                                }
+                            }
+			})
+		    .WithCondition(o => o.transform.Find("Character Sprite") != null),
+	    "disable_movement"),
+
+	    Attributes.ConfigManager.RegisterConfigType(
+	        new BoolConfigType("Disable Dreamer Movement",
+                        (o, value) =>
+                        {
+                            bool disable = value.GetValue();
+                            var fsms = o.GetComponents<PlayMakerFSM>();
+                            foreach (var fsm in fsms)
+                            {
+                                if (fsm.FsmName == "Bob")
+                                {
+                                    fsm.enabled = !disable;
+                                    break;
+                                }
+                            }
+			})
+		    .WithCondition(o => o.transform.Find("Got Pulse") != null),
+	    "disable_dreamer_movement"),
+
+	    Attributes.ConfigManager.RegisterConfigType(
+	        new BoolConfigType("Disable Dreamer Hitbox",
+                        (o, value) =>
+                        {
+                            bool disable = value.GetValue();
+                            var component = o.GetComponents<UnityEngine.BoxCollider2D>();
+                            foreach (var Behaviour in component)
+                            {
+                                Behaviour.enabled = !disable;
+                                break;
+                            }
+			})
+		    .WithCondition(o => o.transform.Find("Get Pulse") != null),
+	    "disable_dreamer_hitbox")
+	);
+
+	RainSounds = new ConfigGroup(Generic,
+	    Attributes.ConfigManager.RegisterConfigType(
+	        new BoolConfigType("Disable Rain Outdoor",
+		        (o, value) =>
+        	        {
+            	            bool disable = value.GetValue();
+            	            var rainoutdoor = GameObject.Find("_GameManager/AudioManager/Atmos/Rain Outdoor");
+			    var rainindoor = GameObject.Find("_GameManager/AudioManager/Atmos/Rain Indoor");
+
+            	            if (rainoutdoor == null)
+			        return;
+
+			    if (rainindoor == null)
+			        return;
+
+            	            rainoutdoor.SetActive(!disable);
+			    rainindoor.SetActive(!disable);
+        	        })
+    	        .WithCondition(o => GameObject.Find("_GameManager/AudioManager/Atmos/Rain Outdoor") != null),
+    	    "disable_rain")
+	);
 
         Goams = new ConfigGroup(Generic,
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Start Down", (o, value) =>
@@ -555,19 +773,19 @@ public class ConfigGroup
 
         KillableEnemies = new ConfigGroup(Enemies,
             Attributes.ConfigManager.RegisterConfigType(
-                new IntConfigType("<size=16>Health</size>",
+                new IntConfigType("Health",
                     (o, value) => { o.GetComponent<HealthManager>().hp = Mathf.Abs(value.GetValue()); }),
                 "enemy_health"),
             Attributes.ConfigManager.RegisterConfigType(
-                new IntConfigType("<size=16>Large Geo Drops</size>",
+                new IntConfigType("Large Geo Drops",
                     (o, value) => { o.GetComponent<HealthManager>().SetGeoLarge(Mathf.Abs(value.GetValue())); }),
                 "enemy_large_geo"),
             Attributes.ConfigManager.RegisterConfigType(
-                new IntConfigType("<size=16>Medium Geo Drops</size>",
+                new IntConfigType("Medium Geo Drops",
                     (o, value) => { o.GetComponent<HealthManager>().SetGeoMedium(Mathf.Abs(value.GetValue())); }),
                 "enemy_med_geo"),
             Attributes.ConfigManager.RegisterConfigType(
-                new IntConfigType("<size=16>Small Geo Drops</size>",
+                new IntConfigType("Small Geo Drops",
                     (o, value) => { o.GetComponent<HealthManager>().SetGeoSmall(Mathf.Abs(value.GetValue())); }),
                 "enemy_small_geo"),
             Attributes.ConfigManager.RegisterConfigType(MakePersistenceConfigType("Stay Dead", o =>
@@ -702,7 +920,7 @@ public class ConfigGroup
 
         Cocoon = new ConfigGroup(Breakable,
             Attributes.ConfigManager.RegisterConfigType(
-                new IntConfigType("<size=16>Lifeseed Count</size>",
+                new IntConfigType("Lifeseed Count",
                     (o, value) => { o.GetComponent<HealthCocoon>()?.SetScuttlerAmount(Mathf.Abs(value.GetValue())); }),
                 "lifeseed_count")
         );
@@ -775,7 +993,7 @@ public class ConfigGroup
         );
 
         TollBench = new ConfigGroup(Levers,
-            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("<size=16>Cost</size>", (o, value) =>
+            Attributes.ConfigManager.RegisterConfigType(new IntConfigType("Cost", (o, value) =>
             {
                 foreach (var fsm in o.GetComponents<PlayMakerFSM>())
                 {
@@ -813,7 +1031,7 @@ public class ConfigGroup
             }), "disable_collision");
         Thorns = new ConfigGroup(Colours,
             Attributes.ConfigManager.RegisterConfigType(
-                new IntConfigType("<size=16>Damage Amount</size>",
+                new IntConfigType("Damage Amount",
                     (o, value) => { o.GetOrAddComponent<CustomDamager>().damageAmount = value.GetValue(); }),
                 "thorns_damage"),
             disableCollision
@@ -1228,6 +1446,15 @@ public class ConfigGroup
             )
         );
 
+	ObjectEnabler = new ConfigGroup(
+            Invisible,
+            Attributes.ConfigManager.RegisterConfigType(
+                new StringConfigType("Path",
+                        (o, value) => { o.GetOrAddComponent<ObjectEnablerConfig>().objectPath = value.GetValue(); })
+                    .PreAwake(), "enabler_path"
+            )
+        );
+
         HazardRespawnPoint = new ConfigGroup(
             Invisible,
             Attributes.ConfigManager.RegisterConfigType(
@@ -1298,7 +1525,7 @@ public class ConfigGroup
                 new FloatConfigType("Repeat Delay",
                     (o, value) => { o.GetComponent<Timer>().repeatDelay = value.GetValue(); }), "timer_delay"),
             Attributes.ConfigManager.RegisterConfigType(
-                new IntConfigType("<size=16>Max Calls</size>", (o, value) => { o.GetComponent<Timer>().maxCalls = value.GetValue(); }),
+                new IntConfigType("Max Calls", (o, value) => { o.GetComponent<Timer>().maxCalls = value.GetValue(); }),
                 "timer_max_calls")
         );
 
@@ -1508,7 +1735,7 @@ public class ConfigGroup
         Choice = new ConfigGroup(Invisible,
             tc,
             Attributes.ConfigManager.RegisterConfigType(
-                new IntConfigType("<size=16>Cost</size>", (o, value) => { o.GetComponent<TextDisplay>().cost = value.GetValue(); })
+                new IntConfigType("Cost", (o, value) => { o.GetComponent<TextDisplay>().cost = value.GetValue(); })
                     .WithDefaultValue(0), "choice_cost")
         );
 
@@ -1551,6 +1778,21 @@ public class ConfigGroup
                 item.persistentBoolData.semiPersistent = val == 1;
             }
         }, "False", "Bench", "True").PreAwake();
+    }
+
+    public class AlphaKeeper : MonoBehaviour
+    {
+        public tk2dSprite sprite;
+        public float targetAlpha = 1f;
+
+        void LateUpdate()
+        {
+            if (!sprite) return;
+            var c = sprite.color;
+            if (c.a == targetAlpha) return; // avoid dirtying every frame if unchanged
+            c.a = targetAlpha;
+            sprite.color = c;
+        }
     }
 
     private class EnemyInvulnerabilityMarker : MonoBehaviour

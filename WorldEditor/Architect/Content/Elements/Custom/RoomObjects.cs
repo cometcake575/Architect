@@ -8,12 +8,15 @@ using JetBrains.Annotations;
 using Modding.Utils;
 using UnityEngine;
 using Object = UnityEngine.Object;
+using SM = UnityEngine.SceneManagement.SceneManager;
 
 namespace Architect.Content.Elements.Custom;
 
 public static class RoomObjects
 {
-    private static readonly Dictionary<string, Func<GameObject, Disabler[]>> EditActions = new();
+    private static readonly Dictionary<string, Func<GameObject, Disabler[]>> EditDisablerActions = new();
+    private static readonly Dictionary<string, Func<GameObject, Enabler[]>> EditEnablerActions = new();
+    private static readonly Dictionary<string, Func<GameObject, CustomTalk[]>> EditCustomTalkActions = new();
 
     public static void Initialize()
     {
@@ -85,10 +88,14 @@ public static class RoomObjects
                 .WithConfigGroup(ConfigGroup.Invisible)
                 .WithReceiverGroup(ReceiverGroup.Invisible),
             CreateObjectRemover("renderer_remover", "Remove Renderer", FindObjectsToDisable<Renderer>)
-                .WithConfigGroup(ConfigGroup.Invisible)
-                .WithReceiverGroup(ReceiverGroup.Invisible),
+                .WithConfigGroup(ConfigGroup.Invisible),
+	    CreateObjectCustomTalk("custom_talk", "Custom Dialogue", FindNPCs<Renderer>)
+                .WithConfigGroup(ConfigGroup.Invisible),
             CreateObjectRemover("enemy_remover", "Remove Enemy", FindObjectsToDisable<HealthManager>)
                 .WithConfigGroup(ConfigGroup.Invisible)
+                .WithReceiverGroup(ReceiverGroup.Invisible),
+	    CreateObjectRemover("disable_rain", "Remove Rain Sounds", FindObjectsToDisable<Renderer>)
+                .WithConfigGroup(ConfigGroup.RainSounds)
                 .WithReceiverGroup(ReceiverGroup.Invisible),
             CreateObjectRemover("collision_remover", "Remove Solid", FindObjectsToDisable<Collider2D>)
                 .WithConfigGroup(ConfigGroup.Invisible)
@@ -96,6 +103,24 @@ public static class RoomObjects
             CreateObjectRemover("object_remover", "Remove Object", o =>
                 {
                     var config = o.GetComponent<ObjectRemoverConfig>();
+                    GameObject point = null;
+
+                    if (config)
+                        try
+                        {
+                            point = o.scene.FindGameObject(config.objectPath);
+                        }
+                        catch (ArgumentException)
+                        {
+                        }
+
+                    return point is not null ? [point.GetOrAddComponent<Disabler>()] : [];
+                })
+                .WithConfigGroup(ConfigGroup.ObjectRemover)
+                .WithReceiverGroup(ReceiverGroup.Invisible),
+	    CreateObjectEnabler("object_enabler", "Enable Object", o =>
+                {
+                    var config = o.GetComponent<ObjectEnablerConfig>();
                     GameObject point = null;
 
                     if (config)
@@ -122,12 +147,54 @@ public static class RoomObjects
                         {
                         }
 
-                    return point is not null ? [point.GetOrAddComponent<Disabler>()] : [];
+		    return point is not null ? [point.GetOrAddComponent<Enabler>()] : [];
                 })
-                .WithConfigGroup(ConfigGroup.ObjectRemover)
+                .WithConfigGroup(ConfigGroup.ObjectEnabler)
                 .WithReceiverGroup(ReceiverGroup.Invisible)
         };
         ContentPacks.RegisterPack(edits);
+    }
+
+    private static IEnumerable<GameObject> FindAllGameObjects(GameObject o, string path)
+    {
+        var lastSlash = path.LastIndexOf('/');
+    
+        if (lastSlash < 0)
+            return FindAllByNameInScenes(path);
+
+        var parentPath = path.Substring(0, lastSlash);
+        var targetName = path.Substring(lastSlash + 1);
+
+        var parent = o.scene.FindGameObject(parentPath);
+    
+    	if (parent == null)
+    	{
+            for (int i = 0; i < SM.sceneCount; i++)
+            {
+                parent = SM.GetSceneAt(i).FindGameObject(parentPath);
+                if (parent != null) break;
+            }
+        }
+
+        if (parent == null) return Enumerable.Empty<GameObject>();
+
+        return parent.GetComponentsInChildren<Transform>(includeInactive: true)
+                 .Where(t => t.name == targetName)
+                 .Select(t => t.gameObject);
+    }
+
+    private static IEnumerable<GameObject> FindAllByNameInScenes(string name)
+    {
+        var results = new List<GameObject>();
+        for (int i = 0; i < SM.sceneCount; i++)
+        {
+            foreach (var root in SM.GetSceneAt(i).GetRootGameObjects())
+            foreach (var t in root.GetComponentsInChildren<Transform>(true))
+                if (t.name == name)
+                    results.Add(t.gameObject);
+        }
+    
+        return results;
     }
 
     private static Disabler[] FindObjectsToDisable<T>(GameObject disabler) where T : Component
@@ -153,6 +220,41 @@ public static class RoomObjects
         }
 
         return point is not null && lowest <= 500 ? [point.gameObject.GetOrAddComponent<Disabler>()] : [];
+    }
+
+    private static CustomTalk[] FindNPCs<T>(GameObject npc) where T : Component
+    {
+        var objects = npc.scene.GetRootGameObjects()
+            .Where(obj => obj.GetComponent<T>() != null)
+            .SelectMany(root => root.GetComponentsInChildren<PlayMakerFSM>(true))
+            .Select(fsm => fsm.gameObject);
+
+        float lowest = float.MaxValue;
+        GameObject point = null;
+
+        foreach (var obj in objects)
+        {
+            var pos = obj.transform.position - npc.transform.position;
+            pos.z = 0;
+
+            float dist = pos.sqrMagnitude;
+
+            if (dist < lowest)
+            {
+                lowest = dist;
+                point = obj;
+            }
+        }
+
+        if (point is null || lowest > 500) 
+	    return [];
+
+    	var talk = point.gameObject.GetOrAddComponent<CustomTalk>();
+
+	if (talk.dialoguePages == null || talk.dialoguePages.Length == 0)
+    	    CustomTalkUI.Instance?.Open(talk);
+
+    	return [talk];
     }
 
     private static AbstractPackElement CreateCameraBorder()
@@ -193,7 +295,7 @@ public static class RoomObjects
     {
         var obj = new GameObject { name = "Object Remover (" + id + ")" };
 
-        EditActions[id] = action;
+        EditDisablerActions[id] = action;
         obj.AddComponent<ObjectRemover>().triggerName = id;
 
         var sprite = ResourceUtils.LoadInternal(id, FilterMode.Point);
@@ -202,6 +304,60 @@ public static class RoomObjects
 
         Object.DontDestroyOnLoad(obj);
         obj.SetActive(false);
+        return new PreviewablePackElement(obj, name, "Utility", sprite)
+            .WithReceiverGroup(ReceiverGroup.Invisible);
+    }
+
+    private static AbstractPackElement CreateRainSoundsRemover(string id, string name,
+        [CanBeNull] Func<GameObject, Disabler[]> action)
+    {
+        var obj = new GameObject { name = "Remove Rain Sounds (" + id + ")" };
+
+        EditDisablerActions[id] = action;
+        obj.AddComponent<ObjectRemover>().triggerName = id;
+
+        var sprite = ResourceUtils.LoadInternal(id, FilterMode.Point);
+        obj.layer = 10;
+        obj.transform.position += new Vector3(0, 0, 0.1f);
+
+        Object.DontDestroyOnLoad(obj);
+        obj.SetActive(false);
+        return new PreviewablePackElement(obj, name, "Utility", sprite)
+            .WithReceiverGroup(ReceiverGroup.Invisible);
+    }
+
+    private static AbstractPackElement CreateObjectCustomTalk(string id, string name,
+        [CanBeNull] Func<GameObject, CustomTalk[]> action)
+    {
+        var obj = new GameObject { name = "Custom Dialogue (" + id + ")" };
+
+        EditCustomTalkActions[id] = action;
+        obj.AddComponent<CustomTalkPlacer>().triggerName = id;
+
+        var sprite = ResourceUtils.LoadInternal(id, FilterMode.Point);
+        obj.layer = 10;
+        obj.transform.position += new Vector3(0, 0, 0.1f);
+
+        Object.DontDestroyOnLoad(obj);
+        obj.SetActive(false);
+        return new PreviewablePackElement(obj, name, "Utility", sprite)
+            .WithReceiverGroup(ReceiverGroup.Invisible);
+    }
+
+    private static AbstractPackElement CreateObjectEnabler(string id, string name,
+        [CanBeNull] Func<GameObject, Enabler[]> action)
+    {
+        var obj = new GameObject { name = "Object Enabler (" + id + ")" };
+
+        EditEnablerActions[id] = action;
+        obj.AddComponent<ObjectEnabler>().triggerName = id;
+
+        var sprite = ResourceUtils.LoadInternal(id, FilterMode.Point);
+        obj.layer = 10;
+        obj.transform.position += new Vector3(0, 0, 0.1f);
+
+        Object.DontDestroyOnLoad(obj);
+        obj.SetActive(true);
         return new PreviewablePackElement(obj, name, "Utility", sprite)
             .WithReceiverGroup(ReceiverGroup.Invisible);
     }
@@ -232,9 +388,19 @@ public static class RoomObjects
             .WithReceiverGroup(ReceiverGroup.Transitions);
     }
 
-    public static Disabler[] GetObjects(ObjectRemover editor)
+    public static Disabler[] GetObjectsDisable(ObjectRemover editor)
     {
-        return EditActions[editor.triggerName].Invoke(editor.gameObject);
+        return EditDisablerActions[editor.triggerName].Invoke(editor.gameObject);
+    }
+
+    public static Enabler[] GetObjectsEnable(ObjectEnabler editor)
+    {
+        return EditEnablerActions[editor.triggerName].Invoke(editor.gameObject);
+    }
+
+    public static CustomTalk[] GetNPCs(CustomTalkPlacer editor)
+    {
+        return EditCustomTalkActions[editor.triggerName].Invoke(editor.gameObject);
     }
 
     private static GameObject CreateObject(string name)

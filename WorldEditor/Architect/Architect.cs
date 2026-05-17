@@ -4,6 +4,7 @@ using System.Reflection;
 using Architect.Attributes;
 using Architect.Content;
 using Architect.Content.Elements.Custom;
+using Architect.Content.Elements.Custom.Behaviour;
 using Architect.Content.Elements.Custom.SaL;
 using Architect.MultiplayerHook;
 using Architect.Objects;
@@ -81,6 +82,21 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
         EventManager.InitializeBroadcasters();
 
         UndoManager.Initialize();
+
+	ModHooks.LanguageGetHook += (key, sheet, orig) =>
+    	{
+            if (sheet != "CustomSheet" || CustomTalk.currentTalkingNPC == null)
+		return orig;
+            if (!key.StartsWith("CUSTOM_NPC_"))
+		return orig;
+            if (!int.TryParse(key.Replace("CUSTOM_NPC_", ""), out int page))
+		return orig;
+
+       	    var pages = CustomTalk.currentTalkingNPC.dialoguePages;
+            return page < pages.Length ? string.Join("<page>", pages) : orig;
+    	};
+
+	new GameObject("CustomTalkUI").AddComponent<CustomTalkUI>();
 
         if (ModHooks.GetMod("HKMP") is Mod)
         {

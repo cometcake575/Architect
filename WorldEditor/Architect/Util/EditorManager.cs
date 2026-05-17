@@ -314,8 +314,17 @@ public static class EditorManager
     {
         if (paused) return;
         _prevPaused = true;
+	var sceneName = GameManager.instance.sceneName;
+	bool isMenu = sceneName == "Menu_Title";
 
         if (!Architect.GlobalSettings.Keybinds.ToggleEditor.WasPressed) return;
+
+	if (isMenu)
+	{
+    	    ToggleMenuEditor();
+    	    return;
+	}
+
         var fsm = HeroController.instance.gameObject.LocateMyFSM("Surface Water");
         if (fsm.ActiveStateName == "Idle") fsm.SetState("Regain Control");
 
@@ -336,6 +345,12 @@ public static class EditorManager
 
         IsEditing = !IsEditing;
 
+        ReloadScene();
+    }
+
+    private static void ToggleMenuEditor()
+    {
+	IsEditing = !IsEditing;
         ReloadScene();
     }
 

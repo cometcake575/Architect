@@ -25,6 +25,8 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
 
     internal static ReceiverGroup Enemies;
 
+    internal static ReceiverGroup Ghosts;
+
     internal static ReceiverGroup Binoculars;
 
     internal static ReceiverGroup TeleportPoint;
@@ -120,6 +122,12 @@ public class ReceiverGroup([CanBeNull] ReceiverGroup parent, params string[] typ
         }));
 
         Enemies = new ReceiverGroup(Generic, EventManager.RegisterEventReceiverType("die", o =>
+        {
+            if (!o.activeInHierarchy) return;
+            o.GetComponent<HealthManager>().Die(null, AttackTypes.Generic, true);
+        }));
+
+	Ghosts = new ReceiverGroup(Generic, EventManager.RegisterEventReceiverType("die", o =>
         {
             if (!o.activeInHierarchy) return;
             o.GetComponent<HealthManager>().Die(null, AttackTypes.Generic, true);

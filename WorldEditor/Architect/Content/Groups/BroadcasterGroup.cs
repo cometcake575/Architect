@@ -6,6 +6,8 @@ public class BroadcasterGroup
 
     public static readonly string[] Enemies = ["OnDeath", "OnDamage", "FirstDeath", "LoadedDead"];
 
+    public static readonly string[] Ghosts = ["OnDreamNailHit"];
+
     public static readonly string[] Levers = ["OnPull"];
 
     public static readonly string[] PersistentLevers = ["OnPull", "FirstPull", "LoadedPulled"];
