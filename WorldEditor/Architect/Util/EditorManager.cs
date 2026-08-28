@@ -99,6 +99,7 @@ public static class EditorManager
         On.GameManager.EnterHero += (orig, self, search) =>
         {
             orig(self, search);
+            if (self.entryGateName == "dreamGate") return;
             if (!search) return;
 
             if (self.startedOnThisScene) return;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using Architect.Attributes;
@@ -36,6 +37,7 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
 
     public Architect() : base("Architect")
     {
+        Instance = this;
     }
 
     public static Architect Instance { get; private set; }
@@ -90,8 +92,13 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
 
         if (ModHooks.GetMod("ScatteredAndLost") is Mod) CustomSaL.Initialize();
 
-        InitializeLayout();
+        var o = new GameObject("[Architect] Delayed Setup");
+        o.AddComponent<DelayedSetup>().StartCoroutine(InitializeLayout());
+        
+        ExternalLoader.FindMaps();
     }
+
+    public class DelayedSetup : MonoBehaviour;
 
     public MenuScreen GetMenuScreen(MenuScreen modListMenu, ModToggleDelegates? toggleDelegates)
     {
@@ -110,8 +117,10 @@ public class Architect : Mod, IGlobalSettings<WorldEditorGlobalSettings>, ICusto
         return GlobalSettings;
     }
 
-    private static void InitializeLayout()
+    private static IEnumerator InitializeLayout()
     {
+        yield return new WaitForSeconds(1);
+        
         _editorLayout = new LayoutRoot(true, "Architect Editor");
         _editorLayout.Canvas.GetComponent<CanvasScaler>().screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
         

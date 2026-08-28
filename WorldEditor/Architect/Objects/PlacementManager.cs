@@ -25,6 +25,12 @@ public static class PlacementManager
     public static tk2dTileMap GetTilemap()
     {
         if (!_tileMap) _tileMap = Object.FindObjectOfType<tk2dTileMap>();
+        if (_tileMap)
+        {
+            _tileMap.transform.position = Vector3.zero;
+            _tileMap.transform.localScale = Vector3.one;
+            _tileMap.transform.SetRotation2D(0);
+        }
         return _tileMap;
     }
 
@@ -50,10 +56,14 @@ public static class PlacementManager
         Objects.Clear();
         CustomObjects.PlayerListeners.Clear();
         var ld = GetCurrentLevel();
+        var exld = ExternalLoader.GetDataForScene(GameManager.instance.sceneName);
         foreach (var placement in ld.Placements.Where(placement => placement.GetPlaceableObject() != null))
             if (EditorManager.IsEditing) placement.PlaceGhost();
             else
                 Objects[placement.GetId()] = placement.SpawnObject();
+        
+        foreach (var placement in exld.Placements.Where(placement => placement.GetPlaceableObject() != null))
+            Objects[placement.GetId()] = placement.SpawnObject();
 
         var map = GetTilemap();
         if (!map) return;
@@ -62,6 +72,13 @@ public static class PlacementManager
             if (map.GetTile(x, y, 0) == -1) map.SetTile(x, y, 0, 0);
             else map.ClearTile(x, y, 0);
         }
+        
+        foreach (var (x, y) in exld.TileChanges)
+        {
+            if (map.GetTile(x, y, 0) == -1) map.SetTile(x, y, 0, 0);
+            else map.ClearTile(x, y, 0);
+        }
+        
         map.Build();
     }
 

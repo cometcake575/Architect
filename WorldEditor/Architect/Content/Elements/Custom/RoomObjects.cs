@@ -158,6 +158,23 @@ public static class RoomObjects
             .WithReceiverGroup(ReceiverGroup.Invisible);
     }
 
+    private static AbstractPackElement CreateObjectEnabler()
+    {
+        var obj = new GameObject("Object Enabler");
+        Object.DontDestroyOnLoad(obj);
+        obj.SetActive(false);
+
+        obj.AddComponent<ObjectEnabler>();
+
+        var sprite = ResourceUtils.LoadInternal("object_enabler", FilterMode.Point);
+        obj.layer = 10;
+        obj.transform.position = new Vector3(0, 0, -2);
+
+        return new PreviewablePackElement(obj, "Enable Object", "Utility", sprite)
+            .WithReceiverGroup(ReceiverGroup.Invisible)
+            .WithConfigGroup(ConfigGroup.ObjectEnabler);
+    }
+
     private static AbstractPackElement CreateSceneBorderRemover()
     {
         var obj = new GameObject("Scene Border Remover");

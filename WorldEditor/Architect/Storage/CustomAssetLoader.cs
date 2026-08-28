@@ -20,6 +20,8 @@ public static class CustomAssetLoader
 
     public static readonly HashSet<string> LoadingSounds = [];
 
+    public static readonly List<string> AssetPaths = [];
+
     private static readonly Vector2 Pivot = new(0.5f, 0.5f);
 
     public static async Task<bool> SaveFile(string url, string path)
@@ -70,13 +72,6 @@ public static class CustomAssetLoader
         }
     }
 
-    public static string GetVideoPath(string url)
-    {
-        var pathUrl = Path.GetInvalidFileNameChars()
-            .Aggregate(url, (current, c) => current.Replace(c, '_'));
-        return SceneSaveLoader.DataPath + "Architect/" + pathUrl + ".mov";
-    }
-
     public static void DoLoadSprite(GameObject obj, string url, bool point, float ppu)
     {
         GameManager.instance.StartCoroutine(LoadSprite(url, point, ppu, obj));
@@ -101,13 +96,6 @@ public static class CustomAssetLoader
 
         if (obj) obj.GetComponent<SpriteRenderer>().sprite = Sprites[id];
         yield return null;
-    }
-
-    public static string GetSpritePath(string url)
-    {
-        var pathUrl = Path.GetInvalidFileNameChars()
-            .Aggregate(url, (current, c) => current.Replace(c, '_'));
-        return SceneSaveLoader.DataPath + "Architect/" + pathUrl + ".png";
     }
 
     public static void DoLoadSound(GameObject obj, string url)
@@ -143,10 +131,20 @@ public static class CustomAssetLoader
         GameManager.instance.StartCoroutine(LoadSound(url));
     }
 
-    public static string GetSoundPath(string url)
+    private static string GetPath(string url, string extension)
     {
         var pathUrl = Path.GetInvalidFileNameChars()
             .Aggregate(url, (current, c) => current.Replace(c, '_'));
-        return SceneSaveLoader.DataPath + "Architect/" + pathUrl + ".wav";
+        
+        foreach (var fullPath in AssetPaths.Select(path => Path.Combine(path, pathUrl)).Where(fullPath => File.Exists(fullPath)))
+        {
+            return fullPath;
+        }
+        
+        return SceneSaveLoader.DataPath + "Architect/" + pathUrl + extension;
     }
+
+    public static string GetSoundPath(string url) => GetPath(url, ".wav");
+    public static string GetVideoPath(string url) => GetPath(url, ".mov");
+    public static string GetSpritePath(string url) => GetPath(url, ".png");
 }

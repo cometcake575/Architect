@@ -27,8 +27,6 @@ public class ConfigGroup
 
     public static ConfigGroup Benches;
     
-    public static ConfigGroup BlurPlanes;
-
     public static ConfigGroup Transitions;
 
     public static ConfigGroup LaserCrystal;
@@ -130,6 +128,8 @@ public class ConfigGroup
     public static ConfigGroup RoomClearer;
 
     public static ConfigGroup ObjectRemover;
+    
+    public static ConfigGroup ObjectEnabler;
 
     public static ConfigGroup HazardRespawnPoint;
 
@@ -252,8 +252,6 @@ public class ConfigGroup
             layerType,
             zOffset
         );
-
-        BlurPlanes = new ConfigGroup(Invisible, zOffset);
 
         Generic = new ConfigGroup(Invisible,
             Attributes.ConfigManager.RegisterConfigType(new BoolConfigType("Visible", (o, value) =>
@@ -1190,6 +1188,15 @@ public class ConfigGroup
                 new StringConfigType("Path",
                         (o, value) => { o.GetOrAddComponent<ObjectRemoverConfig>().objectPath = value.GetValue(); })
                     .PreAwake(), "remover_path"
+            )
+        );
+
+        ObjectEnabler = new ConfigGroup(
+            Invisible,
+            Attributes.ConfigManager.RegisterConfigType(
+                new StringConfigType("Path",
+                        (o, value) => { o.GetOrAddComponent<ObjectEnabler>().objectPath = value.GetValue(); })
+                    .PreAwake(), "enabler_path"
             )
         );
 
