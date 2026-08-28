@@ -1,7 +1,12 @@
 # Architect (Legacy)
-Architect is a Hollow Knight level editor mod allowing you to add platforms, enemies and more to change areas in the game.
 
-This repo is for the now outdated legacy version of Architect.
+ArchitectLegacy is an older level editor for Hollow Knight, used to make and play custom levels.
+
+For creating new maps it is recommended to instead use the modern version of [Architect](https://github.com/cometcake575/Architect-HK/), a more modern level editor with better stability and more capabilities.
+
+-----------------
+
+Architect is a Hollow Knight level editor mod allowing you to add platforms, enemies and more to change areas in the game.
 
 You can make these changes with the **in-game editor**, and can share them with your friends in multiplayer using HKMP.
 
