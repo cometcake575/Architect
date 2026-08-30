@@ -47,6 +47,20 @@ public static class ExternalLoader
         {
             if (dir == Path.Combine(modsPath, "ArchitectLegacy")) continue;
 
+            var parent = dir;
+            var disabled = false;
+            while (!parent.EndsWith("Mods"))
+            {
+                parent = Directory.GetParent(parent)?.FullName;
+                if (parent == null || parent.EndsWith("Disabled"))
+                {
+                    disabled = true;
+                    break;
+                }
+            }
+
+            if (disabled) continue;
+
             foreach (var path in Directory.GetFiles(dir))
             {
                 if (!path.EndsWith(".architect.json")) continue;
